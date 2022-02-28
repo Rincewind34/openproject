@@ -38,19 +38,21 @@ import {
   IHalMultipleError,
 } from 'core-app/features/hal/resources/error-resource';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { I18nService } from 'core-app/core/i18n/i18n.service';
 
 export function removeSuccessFlashMessages() {
   jQuery('.flash.notice').remove();
 }
 
-export type ToastType = 'success'|'error'|'warning'|'info'|'upload';
+export type ToastType = 'success'|'error'|'warning'|'info'|'upload'|'loading';
 export const OPToastEvent = 'op:toasters:add';
 
 export interface IToast {
   message:string;
   link?:{ text:string, target:Function };
   type:ToastType;
-  data?:any;
+  data?:unknown;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -58,7 +60,10 @@ export class ToastService {
   // The current stack of toasters
   private stack = input<IToast[]>([]);
 
-  constructor(readonly configurationService:ConfigurationService) {
+  constructor(
+    readonly configurationService:ConfigurationService,
+    readonly I18n:I18nService,
+  ) {
     jQuery(window)
       .on(OPToastEvent,
         (event:JQuery.TriggeredEvent, toast:IToast) => {
@@ -133,6 +138,10 @@ export class ToastService {
     return this.add(this.createAttachmentUploadToast(message, uploads));
   }
 
+  public addLoading(observable:Observable<unknown>):IToast {
+    return this.add(this.createLoadingToast(this.I18n.t('js.ajax.updating'), observable));
+  }
+
   public remove(toast:IToast):void {
     this.stack.doModify((current) => {
       _.remove(current, (n) => n === toast);
@@ -160,6 +169,13 @@ export class ToastService {
 
     const toast = this.createToast(message, 'upload');
     toast.data = uploads;
+
+    return toast;
+  }
+
+  private createLoadingToast(message:IToast|string, observable:Observable<unknown>) {
+    const toast = this.createToast(message, 'loading');
+    toast.data = observable;
 
     return toast;
   }
