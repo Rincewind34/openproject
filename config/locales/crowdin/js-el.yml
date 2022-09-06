@@ -23,7 +23,8 @@ el:
   js:
     ajax:
       hide: "Απόκρυψη"
-      loading: "Φόρτωση ..."
+      loading: "Loading…"
+      updating: "Updating…"
     attachments:
       draggable_hint: |
         Σύρετε στο πεδίο επεξεργαστή για να ευθυγραμμίσετε συνημμένα εικόνας ή αναφοράς. Τα κλειστά πεδία επεξεργαστή θα ανοίξουν όσο συνεχίζετε να σέρνετε.
@@ -150,7 +151,7 @@ el:
           language_hint: 'Εισάγετε την γλώσσα μορφοποίησης που θα χρησιμοποιηθεί για επισημάνσεις (αν υποστηρίζεται).'
         dropdown:
           macros: 'Μακροεντολές'
-          chose_macro: 'Επιλογή μακροεντολής'
+          chose_macro: 'Choose macro'
         toc: 'Πίνακας περιεχομένων'
         toolbar_help: 'Κάντε κλικ για να επιλέξετε widget και να εμφανίσετε τη γραμμή εργαλείων. Κάντε διπλό κλικ για να επεξεργαστείτε το widget'
         wiki_page_include:
@@ -203,6 +204,7 @@ el:
             label_expires_at: "Λήγει στις"
             receive_newsletter: Θέλω να λαμβάνω το <a target="_blank" href="%{link}">ενημερωτικό δελτίο</a> του OpenProject.
             taken_domain: Μπορεί να υπάρχει μόνο μια ενεργή δοκιμαστική συνδρομή ανά τομέα.
+            domain_mismatch: The current request host name does not match the configured host name. Please double check your system settings.
             taken_email: Κάθε χρήστης μπορεί να δημιουργήσει μόνο μία δοκιμαστική συνδρομή.
           email_not_received: "Δεν λάβατε email? Μπορείτε να ξαναστείλετε το email με τον σύνδεσμο στα δεξιά."
           try_another_email: "Ή δοκιμάστε με διαφορετική διεύθυνση email."
@@ -229,14 +231,16 @@ el:
             professional_support: "Επαγγελματική υποστήριξη"
             professional_support_text: "Αποκτήστε αξιόπιστη, high-touch υποστήριξη από ανώτερους μηχανικούς υποστήριξης με εξειδικευμένες γνώσεις σχετικά με τη λειτουργία του OpenProject σε κρίσιμα επιχειρηματικά περιβάλλοντα."
           button_start_trial: "Έναρξη δωρεάν δοκιμαστικής περιόδου"
+          button_upgrade: "Upgrade now"
           button_book_now: "Κάντε κράτηση τώρα"
           confidence: >
             Παρέχουμε την εμπιστοσύνη ενός δοκιμασμένου και υποστηριζόμενου λογισμικού διαχείρισης έργων, επιχειρησιακού επιπέδου - με Ανοιχτό Κώδικα και ανοιχτό μυαλό.
           link_quote: "Λάβετε μια προσφορά"
+          more_info: "More information"
           text: >
             Η OpenProject Enterprise έκδοση βασίζεται στην Community έκδοση. Περιλαμβάνει premium χαρακτηριστικά και επαγγελματική υποστήριξη που απευθύνεται κυρίως σε οργανισμούς με περισσότερους από 10 χρήστες που διαχειρίζονται κρίσιμα επιχειρηματικά έργα με το OpenProject.
           unlimited: "Απεριόριστα"
-          you_contribute: "Και οι προγραμματιστές πρέπει να πληρώσουν τους λογαριασμούς τους. Με την Έκδοση για Επιχειρήσεις, μπορείτε να συνεισφέρετε ουσιαστικά σε αυτή προσπάθεια της Open Source κοινότητας."
+          you_contribute: "Developers need to pay their bills, too. By upgrading to the Enterprise Edition, you will be supporting this open source community effort and contributing to its development, maintenance and continuous improvement."
     custom_actions:
       date:
         specific: 'σε'
@@ -265,7 +269,7 @@ el:
           one: "Πρώτο κριτήριο ταξινόμησης"
           two: "Δεύτερο κριτήριο ταξινόμησης"
           three: "Τρίτο κριτήριο ταξινόμησης"
-      upsale_for_more: "Για περισσότερα προχωρημένα φίλτρα, κοιτάξτε το"
+      upsale_for_more: "Advanced filters allow you to also filter for file names and content of work package attachments. Please upgrade to a paid plan to use this feature."
       upsale_link: 'Έκδοση για Επιχειρήσεις.'
     general_text_no: "όχι"
     general_text_yes: "ναι"
@@ -285,16 +289,17 @@ el:
           learn_about: "Μάθετε περισσότερα για τις νέες λειτουργίες"
           #Include the version to invalidate outdated translations in other locales.
           #Otherwise, e.g. chinese might still have the translations for 10.0 in the 12.0 release.
-          '12_0':
+          '12_2':
             standard:
-              learn_about_link: https://www.openproject.org/blog/openproject-12-0-release
+              learn_about_link: https://www.openproject.org/blog/openproject-12-2-release
               new_features_html: >
-                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>With the new <b>in-app notifications</b> you receive all important updates directly in the application and don't get a flood of emails anymore.</li> <li>The new <b>notification center</b> shows all the changes, including intuitive filter options, e.g. by reason for notification or projects. It even allows editing directly in a split view.</li> <li>Improved <b>notification settings</b> allow to fine-tune for which actions and in which projects you want to receive a notification.</li> <li><b>Email reminders</b> can be configured to receive important updates via a daily email summary.</li> <li>The work package auto-completer for relations now also shows additional information (project name, status, ...) to easily identify the respective work package.</li> </ul>
+                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>No more endless searching for files! With the new <b>Nextcloud integration</b> in OpenProject 12.2, you can now find files directly in the respective work package and always have the correct version at your fingertips.</li> <li>We introduced <b>a new date picker</b> with updated input behaviour and an information banner that includes a button to show releations in the Gantt chart.</li> <li>We added the possibility to <b>log time for other users.</b></li> <li>Mark notifications as read also outside of the notification center.</li> </ul>
             bim:
-              learn_about_link: https://www.openproject.org/blog/openproject-12-0-release
+              learn_about_link: https://www.openproject.org/blog/openproject-12-2-release
               new_features_html: >
-                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>Notification center: Reduce the number of mails you receive. Instead find and act upon all relevant notifications in one central place.</li> <li>All uploaded IFC files can now also be downloaded.</li> <li>The uploading and processing of IFC got faster and received better error messages.</li> <li>The <a href="https://github.com/opf/openproject-revit-add-in">OpenProject Revit Add-in</a> received many bug fixes.</li> </ul>
+                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>No more endless searching for files! With the new <b>Nextcloud integration</b> in OpenProject 12.2, you can now find files directly in the respective work package and always have the correct version at your fingertips.</li> <li>We introduced <b>a new date picker</b> with updated input behaviour and an information banner that includes a button to show releations in the Gantt chart.</li> <li>We added the possibility to <b>log time for other users.</b></li> <li>Mark notifications as read also outside of the notification center.</li> </ul>
     label_activate: "Ενεργοποίηση"
+    label_assignee: 'Assignee'
     label_add_column_after: "Προσθήκη στήλης μετά"
     label_add_column_before: "Προσθήκη στήλης πριν"
     label_add_columns: "Προσθέστε στήλη"
@@ -364,6 +369,7 @@ el:
     label_in_more_than: "σε περισσότερο από"
     label_incoming_emails: "Εισερχόμενα email"
     label_information_plural: "Πληροφορίες"
+    label_invalid: "Invalid"
     label_import: "Εισαγωγή"
     label_latest_activity: "Τελευταία δραστηριότητα"
     label_last_updated_on: "Τελευταία ενημέρωση στις"
@@ -395,6 +401,8 @@ el:
     label_previous: "Προηγούμενο"
     label_per_page: "Ανά σελίδα:"
     label_please_wait: "Παρακαλώ περιμένετε"
+    label_project: "Project"
+    label_project_list: "Projects list"
     label_project_plural: "Έργα"
     label_visibility_settings: "Ρυθμίσεις ορατότητας"
     label_quote_comment: "Παραθέστε αυτό το σχόλιο"
@@ -407,6 +415,7 @@ el:
     label_report: "Αναφορά"
     label_repository_plural: "Αποθετήρια"
     label_save_as: "Αποθήκευση ως"
+    label_select_project: "Select a project"
     label_select_watcher: "Επιλέξτε έναν παρατηρητή..."
     label_selected_filter_list: "Επιλεγμένα φίλτρα"
     label_show_attributes: "Εμφανίστε όλα τα χαρακτηριστικά"
@@ -448,13 +457,12 @@ el:
     label_unwatch: "Αναίρεση παρακολούθησης"
     label_unwatch_work_package: "Αναίρεση παρακολούθησης πακέτου εργασίας"
     label_uploaded_by: "Μεταφορτώθηκε από"
-    label_default_queries: "Προεπιλεγμένες προβολές"
-    label_starred_queries: "Αγαπημένες προβολές"
-    label_global_queries: "Δημόσιες προβολές"
-    label_custom_queries: "Ιδιωτικές προβολές"
-    label_create_new_query: "Δημιουργία νέου"
+    label_default_queries: "Default"
+    label_starred_queries: "Favorite"
+    label_global_queries: "Public"
+    label_custom_queries: "Private"
     label_columns: "Στήλες"
-    label_attachments: Αρχεία
+    label_attachments: Συνημμένα
     label_drop_files: Σύρετε αρχεία εδώ
     label_drop_files_hint: ή κάντε κλικ για να προσθέσετε αρχεία
     label_drop_folders_hint: Δεν μπορείτε να μεταφορτώσετε φακέλους ως συνημμένο. Παρακαλώ επιλέξτε μεμονωμένα αρχεία.
@@ -465,7 +473,7 @@ el:
     label_remove_all_files: Διαγράψτε όλα τα αρχεία
     label_add_description: "Προσθέστε περιγραφή για το αρχείο %{file}"
     label_upload_notification: "Μεταφόρτωση αρχείων..."
-    label_work_package_upload_notification: "Μεταφόρτωση αρχείων για το Πακέτο εργασίας #%{id}: %{subject}"
+    label_work_package_upload_notification: "Μεταφόρτωση αρχείων για το Πακέτο εργασίας #%{id}: %{subject}" #%{id}: %{subject}"
     label_wp_id_added_by: "#%{id} προστέθηκε από %{author}"
     label_files_to_upload: "Τα αρχεία αυτά θα μεταφορτωθούν:"
     label_rejected_files: "Δεν ήταν δυνατή η μεταφόρτωση αυτών των αρχείων:"
@@ -483,7 +491,7 @@ el:
         next: 'Επόμενο'
         got_it: 'Το κατάλαβα'
       steps:
-        help_menu: 'The Help (?) menu provides <b>additional help resources</b>. Here you can find a user guide and helpful how-to videos and more. <br> Enjoy your work with OpenProject!'
+        help_menu: 'The Help (?) menu provides <b>additional help resources</b>. Here you can find a user guide, helpful how-to videos and more. <br> Enjoy your work with OpenProject!'
         members: 'Invite new <b>members</b> to join your project.'
         project_selection: 'Please click on one of the demo projects that we have prepared. Demo data is currently only available in English. <br> The general <b>demo project</b> suits best for classical project management, while the <b>Scrum project</b> is better for agile project management.'
         quick_add_button: 'Click on the plus (+) icon in the header navigation to <b>create a new project</b> or to <b>invite coworkers</b>.'
@@ -498,7 +506,8 @@ el:
           task_board: "The task board visualizes the <b>progress for this sprint</b>. Click on the plus (+) icon next to a user story to add new tasks or impediments. <br> The status can be updated by drag and drop."
         boards:
           overview: 'Select <b>boards</b> to shift the view and manage your project using the agile boards view.'
-          lists: 'Here you can create multiple lists (columns) within your board. This feature allows you to create a <b>Kanban board</b>, for example.'
+          lists_kanban: 'Here you can create multiple lists (columns) within your board. This feature allows you to create a <b>Kanban board</b>, for example.'
+          lists_basic: 'Here you can create multiple lists (columns) within your agile board.'
           add: 'Click on the plus (+) icon to <b>create a new card</b> or <b>add an existing card</b> to the list on the board.'
           drag: 'Drag and drop your cards within a given list to reorder them, or to move them to another list. <br> You can click the info (i) icon in the upper right-hand corner or double-click a card to open its details.'
         wp:
@@ -509,6 +518,12 @@ el:
           create_button: 'The <b>+ Create</b> button will add a new work package to your project.'
           timeline_button: 'You can activate the <b>Gantt chart</b> view to create a timeline for your project.'
           timeline: 'Here you can <b>edit your project plan</b>, create new work packages, such as tasks, milestones, phases, and more, as well as <b>add dependencies</b>. All team members can see and update the latest plan at any time.'
+        team_planner:
+          overview: 'The team planner lets you visually assign tasks to team members and get an overview of who is working on what.'
+          calendar: 'The weekly or biweekly planning board displays all work packages assigned to your team members.'
+          add_assignee: 'To get started, add assignees to the team planner.'
+          add_existing: 'Search for existing work packages and drag them to the team planner to instantly assign them to a team member and define start and end dates.'
+          card: 'Drag work packages horizontally to move them backwards or forwards in time, drag the edges to change start and end dates and even drag them vertically to a different row to assign them to another member.'
     notifications:
       title: "Notifications"
       no_unread: "No unread notifications"
@@ -517,6 +532,11 @@ el:
         watched: 'watched'
         assigned: 'assigned'
         responsible: 'accountable'
+        created: 'created'
+        scheduled: 'scheduled'
+        commented: 'commented'
+        processed: 'processed'
+        prioritized: 'prioritized'
       facets:
         unread: 'Unread'
         all: 'Όλα'
@@ -525,7 +545,7 @@ el:
           one: 'and 1 other'
           other: 'and %{count} others'
         no_results:
-          at_all: 'New notifications will appear here when there is activity that concerns you'
+          at_all: 'New notifications will appear here when there is activity that concerns you, in the mean time you can also view and modify your notification settings to configure when to be notified.'
           with_current_filter: 'There are no notifications in this view at the moment'
         mark_all_read: 'Mark all as read'
         mark_as_read: 'Mark as read'
@@ -533,14 +553,14 @@ el:
         total_count_warning: "Showing the %{newest_count} most recent notifications. %{more_count} more are not displayed."
         empty_state:
           no_notification: "Looks like you're all caught up."
-          no_notification_with_current_filter: "Change of involvement or go back to the Inbox to view notifications"
+          no_notification_with_current_project_filter: "Looks like you're all caught up with the selected project."
+          no_notification_with_current_filter: "Looks like you're all caught up for %{filter} filter."
           no_selection: "Click on a notification to view all activity details."
         new_notifications:
           message: 'There are new notifications.'
           link_text: 'Click here to load them'
       menu:
         accountable: 'Υπόλογος'
-        assigned: 'Assigned'
         by_project: 'Unread by project'
         by_reason: 'Involvement'
         inbox: 'Inbox'
@@ -588,6 +608,7 @@ el:
       default: '-'
       subject: 'Εισάγετε θέμα εδώ'
       selection: 'Παρακαλώ επιλέξτε'
+      description: 'Description: Click to edit...'
       relation_description: 'Κάντε κλικ για να προσθέσετε περιγραφή για αυτή την σχέση'
     project:
       required_outside_context: >
@@ -651,14 +672,7 @@ el:
         projects: "Έργα"
         settings: "Ρυθμίσεις"
     time_entry:
-      project: 'Έργο'
-      work_package: 'Εργασία'
       work_package_required: 'Πρέπει πρώτα να επιλεγεί ένα πακέτο εργασίας.'
-      activity: 'Δραστηριότητα'
-      comment: 'Σχόλιο'
-      duration: 'Διάρκεια'
-      spent_on: 'Ημερομηνία'
-      hours: 'Ώρες'
       title: 'Καταγραφή χρόνου'
     two_factor_authentication:
       label_two_factor_authentication: 'Ταυτοποίηση δύο παραγόντων'
@@ -725,8 +739,9 @@ el:
     field_value_enter_prompt: "Εισαγωγή τιμής για το '%{field}'"
     project_menu_details: "Λεπτομέρειες"
     scheduling:
-      manual: 'Χειροκίνητος προγραμματισμός'
-      automatic: 'Αυτόματος προγραμματισμός'
+      title: 'Scheduling'
+      manual: 'Manual'
+      default: 'Default'
     sort:
       sorted_asc: 'Εφαρμόστηκε αύξουσα ταξινόμηση, '
       sorted_dsc: 'Εφαρμόστηκε φθίνουσα ταξινόμηση, '
@@ -749,7 +764,7 @@ el:
         farRight: 'Πολύ δεξιά'
         showNone: '-- Χωρίς ετικέτας --'
         description: >
-          Επιλέξτε τα χαρακτηριστικά που θέλετε να εμφανίζονται στις αντίστοιχες θέσεις του διαγράμματος Gantt συνεχώς. Σημειώστε πως όταν τοποθετείτε το ποντίκι πάνω από ένα στοιχείο, θα εμφανίζονται οι ετικέτες ημερομηνίας αντί για αυτά τα χαρακτηριστικά.
+          Select the attributes you want to be shown in the respective positions of the Gantt chart at all times. Note that when hovering over an element, its date labels will be shown instead of these attributes.
       button_activate: 'Εμφάνιση διαγράμματος Gantt'
       button_deactivate: 'Απόκρυψη διαγράμματος Gantt'
       cancel: Ακύρωση
@@ -799,7 +814,7 @@ el:
       zooms: "Επίπεδο μεγέθυνσης"
       outlines: "Επίπεδο Ιεραρχίας"
     upsale:
-      ee_only: 'Λειτουργία μόνο για εκδόσεις για επιχειρήσεις'
+      ee_only: 'Enterprise Edition feature'
     wiki_formatting:
       strong: "Δυνατό"
       italic: "Πλάγια γραφή"
@@ -827,6 +842,17 @@ el:
       comment_send_failed: "Παρουσιάστηκε ένα σφάλμα. Δεν ήταν δυνατή η υποβολή του σχολίου."
       comment_updated: "Το σχόλιο ενημερώθηκε με επιτυχία."
       confirm_edit_cancel: "Είστε βέβαιοι ότι θέλετε να ακυρώσετε την επεξεργασία αυτού του πακέτου εργασίας;"
+      datepicker_modal:
+        automatically_scheduled_parent: "Automatically scheduled. Dates are derived from relations."
+        manually_scheduled: "Manual scheduling enabled, all relations ignored."
+        start_date_limited_by_relations: "Available start and finish dates are limited by relations."
+        changing_dates_affects_follow_relations: "Changing these dates will affect dates of related work packages."
+        click_on_show_relations_to_open_gantt: 'Click on "%{button_name}" for GANTT overview.'
+        show_relations: 'Show relations'
+        ignore_non_working_days:
+          title: 'Working days'
+          false: 'Work week'
+          true: 'Include weekends'
       description_filter: "Φίλτρο"
       description_enter_text: "Εισάγετε κείμενο"
       description_options_hide: "Απόκρυψη επιλογών"
@@ -882,6 +908,7 @@ el:
         description: "Περιγραφή"
         date: "Ημερομηνία"
         dueDate: "Ημερομηνία λήξης"
+        duration: "Duration"
         estimatedTime: "Εκτιμώμενος χρόνος"
         spentTime: "Χρόνος που δαπανήθηκε"
         category: "Κατηγορία"
@@ -913,7 +940,6 @@ el:
       placeholders:
         default: "-"
         date: "Select date"
-        formattable: "%{name}: Κάντε κλικ για επεξεργασία..."
       query:
         column_names: "Στήλες"
         group_by: "Ομαδοποίηση αποτελεσμάτων κατά"
@@ -987,7 +1013,8 @@ el:
         activity: Δραστηριότητα
         relations: Συσχετίσεις
         watchers: Παρατηρητές
-        attachments: Συνημμένα
+        files: Αρχεία
+        files_tab_migration_help: 'You can now attach files to work packages via the new tab:'
       time_relative:
         days: "ημέρες"
         weeks: "εβδομάδες"
@@ -1011,10 +1038,7 @@ el:
       filter: "Φίλτρο"
       unselected_title: "Εργασία"
       search_query_label: "Αναζήτηση αποθηκευμένων προβολών"
-      search_query_title: "Πατήστε για να αναζητήσετε τις αποθηκευμένες προβολές"
-      placeholder_query_title: "Ορίστε έναν τίτλο για αυτή την προβολή"
     modals:
-      label_settings: "Μετονομασία προβολής"
       label_name: "Όνομα"
       label_delete_page: "Διαγραφή της τρέχουσας σελίδας"
       button_apply: "Εφαρμογή"
@@ -1074,6 +1098,10 @@ el:
         one: "1 ώρα"
         other: "%{count} ώρες"
         zero: "0 ω"
+      day:
+        one: "1 day"
+        other: "%{count} days"
+        zero: "0 days"
     zen_mode:
       button_activate: 'Ενεργοποίηση λειτουργίας zen'
       button_deactivate: 'Απενεργοποίηση λειτουργίας zen'
@@ -1140,7 +1168,7 @@ el:
       role:
         label: 'Ρόλος στο %{project}'
         no_roles_found: 'Δεν βρέθηκε κανένας ρόλος'
-        description: 'This is the role that %{principal} will receive when they join your project. The role defines which actions they are allowed to take and which information they are allowed to see. <a href="https://docs.openproject.org/system-admin-guide/users-permissions/roles-permissions/#roles-and-permissions" target="_blank"> Learn more about roles and permissions. </a>'
+        description: 'This is the role that %{principal} will receive when they join your project. The role defines which actions they are allowed to take and which information they are allowed to see. <a href="https://www.openproject.org/docs/system-admin-guide/users-permissions/roles-permissions/#roles-and-permissions" target="_blank"> Learn more about roles and permissions. </a>'
         required: 'Παρακαλούμε επιλέξτε ένα ρόλο'
         next_button: 'Επόμενο'
       message:
@@ -1157,16 +1185,27 @@ el:
           group: 'Η ομάδα είναι τώρα μέρος του %{project}. Εν τω μεταξύ, μπορείτε να προγραμματίσετε ήδη με αυτή την ομάδα και να αντιστοιχίσετε πακέτα εργασίας.'
         next_button: 'Συνέχεια'
     include_projects:
-      toggle_title: 'Include Projects'
+      toggle_title: 'Include projects'
       title: 'Έργα'
       clear_selection: 'Clear selection'
       apply: 'Εφαρμογή'
       selected_filter:
-        all: 'All projects'
+        all: 'Όλα τα έργα'
         selected: 'Only selected'
       search_placeholder: 'Search project...'
+      include_subprojects: 'Include all sub-projects'
+      tooltip:
+        include_all_selected: 'Project already included since Include all sub-projects is enabled.'
+        current_project: 'This is the current project you are in.'
+        does_not_match_search: 'Project does not match the search criteria.'
+      no_results: 'No project matches your search criteria.'
     forms:
       submit_success_message: 'Η φόρμα υποβλήθηκε με επιτυχία'
       load_error_message: 'There was an error loading the form'
       validation_error_message: 'Please fix the errors present in the form'
       advanced_settings: 'Προηγμένες ρυθμίσεις'
+    spot:
+      filter_chip:
+        remove: 'Αφαίρεση'
+      drop_modal:
+        Close: 'Κλείσιμο'

@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -99,7 +97,7 @@ module Redmine
         end
       end
 
-      def log_debug(&_message)
+      def log_debug(&)
         logger.debug(yield) if logger && logger.debug?
       end
 

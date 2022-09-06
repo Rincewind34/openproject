@@ -3,7 +3,6 @@ sidebar_navigation:
   title: Toggl integration
   priority: 798
 description: Time tracking with Toggl
-robots: index, follow
 keywords: time tracking, toggl integration
 ---
 
@@ -19,7 +18,7 @@ If this add-in is installed, a start/stop button is displayed on the work packag
 
 ![Toggl-integration](Toggl-integration.png)
 
-This integration can be added for example for Google Chrome as Chrome Extension: https://chrome.google.com/webstore/detail/toggl-button-productivity/oejgccbfbmkkpaidnkphaiaecficdnfn.
+This integration can be added for example for Google Chrome as [Chrome Extension](https://chrome.google.com/webstore/detail/toggl-button-productivity/oejgccbfbmkkpaidnkphaiaecficdnfn).
 
 You can then transfer the recorded times from Toggl to OpenProject via the API if needed.
 Details can be found in our [API documentation](../../../../api/).

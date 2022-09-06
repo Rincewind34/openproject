@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -68,7 +66,7 @@ class ModelContract < BaseContract
 
   def readonly_attributes_unchanged
     unauthenticated_changed.each do |attribute|
-      outside_attribute = collect_ancestor_attribute_aliases[attribute] || attribute
+      outside_attribute = ancestor_attribute_aliases[attribute] || attribute
 
       errors.add outside_attribute, :error_readonly
     end

@@ -1,7 +1,6 @@
 require 'spec_helper'
 require 'features/page_objects/notification'
 
-# rubocop:disable RSpec/MultipleMemoizedHelpers
 describe 'Bulk update work packages through Rails view', js: true do
   let(:dev_role) do
     create :role,
@@ -36,16 +35,16 @@ describe 'Bulk update work packages through Rails view', js: true do
   let!(:work_package) do
     create(:work_package,
            author: dev,
-           status: status,
-           project: project,
-           type: type)
+           status:,
+           project:,
+           type:)
   end
   let!(:work_package2) do
     create(:work_package,
            author: dev,
            status: work_package2_status,
-           project: project,
-           type: type)
+           project:,
+           type:)
   end
 
   let!(:status2) { create :default_status }
@@ -72,78 +71,75 @@ describe 'Bulk update work packages through Rails view', js: true do
     find('body').send_keys [:control, 'a']
   end
 
-  describe 'copying work packages' do
-    context 'with permission' do
-      let(:current_user) { mover }
+  context 'with permission' do
+    let(:current_user) { mover }
 
-      before do
-        context_menu.open_for work_package
-        context_menu.choose 'Bulk edit'
+    before do
+      context_menu.open_for work_package
+      context_menu.choose 'Bulk edit'
 
-        # On work packages edit page
-        expect(page).to have_selector('#work_package_status_id')
-        select status2.name, from: 'work_package_status_id'
-        notes.set_markdown('The typed note')
-      end
-
-      it 'sets status and leaves a note' do
-        click_on 'Submit'
-
-        expect_angular_frontend_initialized
-        wp_table.expect_work_package_count 2
-
-        # Should update the status
-        expect([work_package.reload.status_id, work_package2.reload.status_id].uniq)
-          .to eq([status2.id])
-
-        expect([work_package.journals.last.notes, work_package2.journals.last.notes].uniq)
-          .to eq(['The typed note'])
-      end
-
-      context 'when making an error in the form' do
-        let(:work_package2_status) { create(:status) } # without creating a workflow
-
-        it 'does not update the work packages' do
-          fill_in 'work_package_start_date', with: '123'
-          click_on 'Submit'
-
-          expect(page)
-            .to have_selector(
-              '.flash.error',
-              text: I18n.t('work_packages.bulk.none_could_be_saved', total: 2)
-            )
-
-          expect(page)
-            .to have_selector(
-              '.flash.error',
-              text: "#{work_package.id}: Start date #{I18n.t('activerecord.errors.messages.not_a_date')}"
-            )
-
-          expect(page)
-            .to have_selector(
-              '.flash.error',
-              text: <<~MSG.squish
-                #{work_package2.id}:
-                Status #{I18n.t('activerecord.errors.models.work_package.attributes.status_id.status_transition_invalid')}
-              MSG
-            )
-
-          # Should not update the status
-          work_package2.reload
-          work_package.reload
-          expect(work_package.status_id).to eq(status.id)
-          expect(work_package2.status_id).to eq(work_package2_status.id)
-        end
-      end
+      select status2.name, from: 'work_package_status_id'
+      notes.set_markdown('The typed note')
     end
 
-    context 'without permission' do
-      let(:current_user) { dev }
+    it 'sets status and leaves a note' do
+      click_on 'Submit'
 
-      it 'does not allow to copy' do
-        context_menu.open_for work_package
-        context_menu.expect_no_options 'Bulk edit'
+      expect_angular_frontend_initialized
+      wp_table.expect_work_package_count 2
+
+      # Should update the status
+      expect([work_package.reload.status_id, work_package2.reload.status_id].uniq)
+        .to eq([status2.id])
+
+      expect([work_package.journals.last.notes, work_package2.journals.last.notes].uniq)
+        .to eq(['The typed note'])
+    end
+
+    context 'when making an error in the form' do
+      let(:work_package2_status) { create(:status) } # without creating a workflow
+
+      it 'does not update the work packages' do
+        fill_in 'Parent', with: '-1'
+        click_on 'Submit'
+
+        expect(page)
+          .to have_selector(
+            '.flash.error',
+            text: I18n.t('work_packages.bulk.none_could_be_saved', total: 2)
+          )
+
+        expect(page)
+          .to have_selector(
+            '.flash.error',
+            text: "#{work_package.id}: Parent #{I18n.t('activerecord.errors.messages.does_not_exist')}"
+          )
+
+        expect(page)
+          .to have_selector(
+            '.flash.error',
+            text: <<~MSG.squish
+              #{work_package2.id}:
+              Parent #{I18n.t('activerecord.errors.messages.does_not_exist')}
+              Status #{I18n.t('activerecord.errors.models.work_package.attributes.status_id.status_transition_invalid')}
+            MSG
+          )
+
+        # Should not update the status
+        work_package2.reload
+        work_package.reload
+        expect(work_package.status_id).to eq(status.id)
+        expect(work_package2.status_id).to eq(work_package2_status.id)
       end
+    end
+  end
+
+  context 'without permission' do
+    let(:current_user) { dev }
+
+    it 'does not allow to copy' do
+      context_menu.open_for work_package
+      context_menu.expect_no_options 'Bulk edit'
     end
   end
 
@@ -160,6 +156,20 @@ describe 'Bulk update work packages through Rails view', js: true do
         context_menu.open_for work_package
         context_menu.expect_options ['Bulk edit']
       end
+
+      context 'with a project budget' do
+        let!(:budget) { create(:budget, project:) }
+
+        it 'updates all the work packages' do
+          context_menu.open_for work_package
+          context_menu.choose 'Bulk edit'
+
+          select budget.subject, from: 'work_package_budget_id'
+          click_on 'Submit'
+          expect(work_package.reload.budget_id).to eq(budget.id)
+          expect(work_package2.reload.budget_id).to eq(budget.id)
+        end
+      end
     end
 
     context 'without permission' do
@@ -172,4 +182,3 @@ describe 'Bulk update work packages through Rails view', js: true do
     end
   end
 end
-# rubocop:enable RSpec/MultipleMemoizedHelpers

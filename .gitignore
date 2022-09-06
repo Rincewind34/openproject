@@ -48,6 +48,7 @@ npm-debug.log*
 /tags
 /tags.lock
 /tags.temp
+/tags.files
 
 # Ignore RubyMine files
 /.idea
@@ -92,6 +93,7 @@ npm-debug.log*
 /.ruby-gemset
 /.foreman
 .DS_Store
+*.icloud
 .rspec
 .byebug_history
 
@@ -114,6 +116,7 @@ structure.sql
 
 # Local development docker 
 /.env
+/docker-compose.override.yml
 
 # Local development direnv files
 /.envrc

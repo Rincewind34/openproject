@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -62,7 +60,7 @@ describe DigestMailer, type: :mailer do
     [build_stubbed(:notification,
                    resource: work_package,
                    reason: :commented,
-                   journal: journal,
+                   journal:,
                    project: project1)].tap do |notifications|
       allow(Notification)
         .to receive(:where)
@@ -124,7 +122,7 @@ describe DigestMailer, type: :mailer do
     context 'with only a deleted work package for the digest' do
       let(:work_package) { nil }
 
-      it `is a NullMail which isn't sent` do
+      it "is a NullMail which isn't sent" do
         expect(mail.body)
           .to eql ''
 

@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -59,7 +57,7 @@ module Users
 
     def set_preferences
       ::UserPreferences::SetAttributesService
-        .new(user: user, model: model.pref, contract_class: ::UserPreferences::UpdateContract)
+        .new(user:, model: model.pref, contract_class: ::UserPreferences::UpdateContract)
         .call(pref)
     end
 

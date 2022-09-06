@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -40,7 +38,7 @@ describe RolesController, type: :controller do
     session[:user_id] = 1 # admin
   end
 
-  it 'should destroy' do
+  it 'destroys' do
     r = Role.new(name: 'ToBeDestroyed', permissions: [:view_wiki_pages])
     assert r.save
 
@@ -49,14 +47,14 @@ describe RolesController, type: :controller do
     assert_nil Role.find_by(id: r.id)
   end
 
-  it 'should destroy role in use' do
+  it 'destroys role in use' do
     delete :destroy, params: { id: 1 }
     assert_redirected_to roles_path
     assert flash[:error] == 'This role is in use and cannot be deleted.'
     refute_nil Role.find_by(id: 1)
   end
 
-  it 'should get report' do
+  it 'gets report' do
     get :report
     assert_response :success
     assert_template 'report'

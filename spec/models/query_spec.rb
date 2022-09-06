@@ -60,22 +60,44 @@ describe Query, type: :model do
       expect(query.sort_criteria)
         .to match_array([['id', 'asc']])
     end
+
+    context 'with global subprojects include', with_settings: { display_subprojects_work_packages: true } do
+      it 'sets the include subprojects' do
+        expect(query.include_subprojects).to be true
+      end
+    end
+
+    context 'with global subprojects include', with_settings: { display_subprojects_work_packages: false } do
+      it 'sets the include subprojects' do
+        expect(query.include_subprojects).to be false
+      end
+    end
+  end
+
+  describe 'include_subprojects' do
+    let(:query) { described_class.new name: 'foo' }
+
+    it 'is required' do
+      expect(query).not_to be_valid
+
+      expect(query.errors[:include_subprojects]).to include 'is not set to one of the allowed values.'
+    end
   end
 
   describe 'hidden' do
     context 'with a view' do
       before do
-        create(:view_work_packages_table, query: query)
+        create(:view_work_packages_table, query:)
       end
 
       it 'is false' do
-        expect(query.hidden).to eq(false)
+        expect(query.hidden).to be(false)
       end
     end
 
     context 'without a view' do
       it 'is true' do
-        expect(query.hidden).to eq(true)
+        expect(query.hidden).to be(true)
       end
     end
   end
@@ -488,6 +510,7 @@ describe Query, type: :model do
 
       context 'for an unavailable filter' do
         let(:values) { [valid_status.id.to_s] }
+
         before do
           query.add_filter('cf_0815', '=', ['1'])
 
@@ -629,16 +652,10 @@ describe Query, type: :model do
 
   describe '#filter_for' do
     context 'for a status_id filter' do
-      before do
-        allow(Status)
-          .to receive(:exists?)
-          .and_return(true)
-      end
-
       subject { query.filter_for('status_id') }
 
       it 'exists' do
-        is_expected.to_not be_nil
+        expect(subject).not_to be_nil
       end
 
       it 'has the context set' do
@@ -673,7 +690,7 @@ describe Query, type: :model do
 
     shared_examples_for 'adds a subproject id filter' do |operator|
       it "does not add a visible subproject filter" do
-        expect(detect_subproject_filter(query.filters)).to eq nil
+        expect(detect_subproject_filter(query.filters)).to be_nil
       end
 
       it "adds a #{operator} subproject_id filter to the statement" do

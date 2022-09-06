@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -40,7 +38,7 @@ describe AuthSourceSSO,
   end
 
   let(:auth_source) { create(:auth_source) }
-  let(:user) { create(:user, login: 'bob', auth_source: auth_source) }
+  let(:user) { create(:user, login: 'bob', auth_source:) }
 
   before do
     allow(OpenProject::Configuration)

@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -36,10 +34,9 @@ module API
         include API::Decorators::LinkedResource
         extend API::Decorators::PolymorphicResource
 
-        self_link title_getter: ->(*) { represented.subject }
+        self_link title_getter: ->(*) {}
 
         property :id
-        property :subject
 
         property :read_ian,
                  as: :readIAN

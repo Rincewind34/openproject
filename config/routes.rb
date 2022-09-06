@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -204,10 +202,6 @@ OpenProject::Application.routes.draw do
       get :destroy_info, as: 'confirm_destroy'
     end
 
-    collection do
-      get :level_list
-    end
-
     resources :versions, only: %i[new create] do
       collection do
         put :close_completed
@@ -230,7 +224,6 @@ OpenProject::Application.routes.draw do
       collection do
         post '/new' => 'wiki#create', as: 'create'
         get :export
-        get :date_index
         get '/index' => 'wiki#index'
       end
 
@@ -358,7 +351,9 @@ OpenProject::Application.routes.draw do
     post 'design/themes' => 'custom_styles#update_themes', as: 'update_design_themes'
     resource :custom_style, only: %i[update show create], path: 'design'
 
-    resources :attribute_help_texts, only: %i(index new create edit update destroy)
+    resources :attribute_help_texts, only: %i(index new create edit update destroy) do
+      get :upsale, to: 'attribute_help_texts#upsale', on: :collection, as: :upsale
+    end
 
     resources :groups, except: %i[show] do
       member do
@@ -402,8 +397,9 @@ OpenProject::Application.routes.draw do
 
       resource :authentication, controller: '/admin/settings/authentication_settings', only: %i[show update]
       resource :incoming_mails, controller: '/admin/settings/incoming_mails_settings', only: %i[show update]
-      resource :notifications, controller: '/admin/settings/notifications_settings', only: %i[show update]
+      resource :aggregation, controller: '/admin/settings/aggregation_settings', only: %i[show update]
       resource :mail_notifications, controller: '/admin/settings/mail_notifications_settings', only: %i[show update]
+      resource :api, controller: '/admin/settings/api_settings', only: %i[show update]
       resource :work_packages, controller: '/admin/settings/work_packages_settings', only: %i[show update]
       resource :users, controller: '/admin/settings/users_settings', only: %i[show update]
 
@@ -581,9 +577,12 @@ OpenProject::Application.routes.draw do
     get '(/*state)', to: 'angular#notifications_layout', as: :notifications_center
   end
 
-  # Development route for styleguide
-  if Rails.env.development?
-    get '/spot-docs', to: 'angular#empty_layout'
-    get '/styleguide' => redirect('/assets/styleguide.html')
+  # OAuthClient needs a "callback" URL that Nextcloud calls with a "code" (see OAuth2 RFC)
+  scope 'oauth_clients/:oauth_client_id' do
+    get 'callback', controller: 'oauth_clients', action: :callback
   end
+
+  # Routes for design related documentation and examples pages
+  get '/design/spot', to: 'angular#empty_layout'
+  get '/design/styleguide' => redirect('/assets/styleguide.html')
 end

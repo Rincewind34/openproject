@@ -78,10 +78,6 @@ $nm-upload-box-padding: rem-calc(15) rem-calc(25)
   @include icon-mixin-info1
   color: $nm-color-info-icon
 
-%nm-icon-enterprise
-  @include icon-mixin-enterprise
-  color: $nm-color-info-icon
-
 %error-placeholder
   background-color: $nm-color-error-background
   border-color: var(--content-form-danger-zone-bg-color)
@@ -136,9 +132,13 @@ $nm-upload-box-padding: rem-calc(15) rem-calc(25)
   &.-error,
   &.-success,
   &.-warning,
-  &.-info,
-  &.-ee-upsale
+  &.-info
     padding: $nm-box-padding
+  &.-ee-upsale
+    z-index: 1
+
+  &.-left-margin
+    margin-left: 20px
 
   &.-error
     @extend %error-placeholder
@@ -166,18 +166,19 @@ $nm-upload-box-padding: rem-calc(15) rem-calc(25)
   &.-ee-upsale::before
     @extend %info-placeholder
     @include messages-icon
-    @extend %nm-icon-enterprise
 
   &.-upload
     padding: $nm-upload-box-padding
 
   //@hack adapting to provided styles
   //messy I dont have all the details for a magic resolve, this might change
-  & p, & ul
+  & p, & div, & ul
     margin-bottom: 0
-  & p, & ul>li, & .button
+  & p, & div, & ul>li, & .button
     font-size: $nm-font-size
 
+  &.-with-bottom-spacing
+    margin-bottom: 2rem
 
 [class^="icon-"]
   &.-error
@@ -225,6 +226,7 @@ $nm-upload-box-padding: rem-calc(15) rem-calc(25)
   .op-toast--content
     width: 100%
 
+    > div,
     > p
       margin-bottom: 0
       color: var(--body-font-color)
@@ -238,6 +240,14 @@ $nm-upload-box-padding: rem-calc(15) rem-calc(25)
         border-radius: $nm-pb-border-radius
       &::-webkit-progress-value
         border-radius: $nm-pb-border-radius
+
+.op-toast.-loading
+  width: 150px
+  margin: 0 auto
+
+  .op-toast--content
+    display: flex
+    align-items: center
 
 // upload toaster styles
 %progress-styles

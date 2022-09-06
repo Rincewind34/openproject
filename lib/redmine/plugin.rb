@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -30,7 +28,7 @@
 
 require Rails.root.join('config/constants/open_project/activity')
 
-module Redmine #:nodoc:
+module Redmine # :nodoc:
   class PluginError < StandardError
     attr_reader :plugin_id
 
@@ -109,8 +107,10 @@ module Redmine #:nodoc:
       registered_plugins[id] = p
 
       if p.settings
-        Setting.create_setting("plugin_#{id}", 'default' => p.settings[:default], 'serialized' => true)
-        Setting.create_setting_accessors("plugin_#{id}")
+        Settings::Definition.add("plugin_#{id}",
+                                 default: p.settings[:default],
+                                 format: :hash,
+                                 env_alias: p.settings[:env_alias])
       end
 
       # If there are plugins waiting for us to be loaded, we try loading those, again
@@ -154,7 +154,10 @@ module Redmine #:nodoc:
     # (might not be complete at all times!)
     def self.dependencies_for(id)
       direct_deps = deferred_plugins.keys.find_all { |k| deferred_plugins[k].map(&:first).include?(id) }
-      direct_deps.inject([]) { |deps, v| deps << v; deps += dependencies_for(v) }
+      direct_deps.inject([]) do |deps, v|
+        deps << v
+        deps += dependencies_for(v)
+      end
     end
 
     # Returns an array of all registered plugins
@@ -330,11 +333,14 @@ module Redmine #:nodoc:
     #     permission :view_contacts, { contacts: [:list, :show] }, public: true
     #     permission :destroy_contacts, { contacts: :destroy }
     #   end
-    def project_module(name, options = {}, &block)
-      @project_scope = [name, options]
-      instance_eval(&block)
+    def project_module(name, options = {}, &)
+      plugin = self
+      Rails.application.reloader.to_prepare do
+        plugin.instance_eval { @project_scope = [name, options] }
+        plugin.instance_eval(&)
+      end
     ensure
-      @project_scope = nil
+      plugin.instance_eval { @project_scope = nil }
     end
 
     # Registers an activity provider.
@@ -375,7 +381,7 @@ module Redmine #:nodoc:
 
     # Returns +true+ if the plugin can be configured.
     def configurable?
-      settings && settings.is_a?(Hash) && !settings[:partial].blank?
+      settings && settings.is_a?(Hash) && settings[:partial].present?
     end
 
     def mirror_assets

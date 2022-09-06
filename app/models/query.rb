@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -47,6 +45,9 @@ class Query < ApplicationRecord
             presence: true,
             length: { maximum: 255 }
 
+  validates :include_subprojects,
+            inclusion: [true, false]
+
   validate :validate_work_package_filters
   validate :validate_columns
   validate :validate_sort_criteria
@@ -64,6 +65,7 @@ class Query < ApplicationRecord
       query.add_default_filter
       query.set_default_sort
       query.show_hierarchies = true
+      query.include_subprojects = Setting.display_subprojects_work_packages?
     end
   end
 
@@ -135,7 +137,7 @@ class Query < ApplicationRecord
 
   def validate_show_hierarchies
     if show_hierarchies && group_by.present?
-      errors.add :show_hierarchies, :group_by_hierarchies_exclusive, group_by: group_by
+      errors.add :show_hierarchies, :group_by_hierarchies_exclusive, group_by:
     end
   end
 
@@ -188,11 +190,11 @@ class Query < ApplicationRecord
 
   def available_columns
     if @available_columns &&
-       (@available_columns_project == (project && project.cache_key || 0))
+       (@available_columns_project == ((project && project.cache_key) || 0))
       return @available_columns
     end
 
-    @available_columns_project = project && project.cache_key || 0
+    @available_columns_project = (project && project.cache_key) || 0
     @available_columns = ::Query.available_columns(project)
   end
 
@@ -370,7 +372,7 @@ class Query < ApplicationRecord
     subproject_filter = Queries::WorkPackages::Filter::SubprojectFilter.create!
     subproject_filter.context = self
 
-    subproject_filter.operator = if Setting.display_subprojects_work_packages?
+    subproject_filter.operator = if include_subprojects?
                                    '*'
                                  else
                                    '!*'

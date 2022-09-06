@@ -42,11 +42,11 @@ module.exports = {
          */
         "@angular-eslint/directive-selector": [
           "error",
-          { "type": "attribute", "prefix": "op", "style": "camelCase" }
+          { "type": "attribute", "prefix": ["op", "spot"], "style": "camelCase" }
         ],
         "@angular-eslint/component-selector": [
           "error",
-          { "type": "element", "prefix": "op", "style": "kebab-case" }
+          { "type": "element", "prefix": ["op", "spot"], "style": "kebab-case" }
         ],
 
         // Warn when new components are being created without OnPush
@@ -62,8 +62,15 @@ module.exports = {
           },
         ],
 
+        // Sometimes we need to shush the TypeScript compiler
+        "no-unused-vars": ["error", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
+        "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
+
         // Who cares about line length
         "max-len": "off",
+
+        // Allow short circuit evaluations
+        "@typescript-eslint/no-unused-expressions": ["error", { "allowShortCircuit": true }],
 
         // Force single quotes to align with ruby
         quotes: "off",
@@ -76,6 +83,9 @@ module.exports = {
 
         // It'd be good if we could error this for switch cases but allow it for for loops
         "no-continue": "off",
+
+        // no param reassignment is a pain when trying to set props on elements
+        "no-param-reassign": "off",
 
         // No void at all collides with `@typescript-eslint/no-floating-promises` which wants us to handle each promise.
         // Until we do that, `void` is a good way to explicitly mark unhandled promises. 
@@ -141,11 +151,6 @@ module.exports = {
       files: ["*.html"],
       extends: ["plugin:@angular-eslint/template/recommended"],
       rules: {
-        /**
-         * Any template/HTML related rules you wish to use/reconfigure over and above the
-         * recommended set provided by the @angular-eslint project would go here.
-         */
-        "@angular-eslint/template/no-call-expression": 2,
       }
     },
     {

@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -58,8 +56,8 @@ class WikiPages::CopyService
 
   def create(attributes)
     WikiPages::CreateService
-      .new(user: user,
-           contract_class: contract_class)
+      .new(user:,
+           contract_class:)
       .call(attributes.symbolize_keys)
   end
 

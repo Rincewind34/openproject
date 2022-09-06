@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -37,6 +35,7 @@ class DigestMailer < ApplicationMailer
   include OpenProject::TextFormatting
   include Redmine::I18n
   include MailDigestHelper
+  include MailNotificationHelper
 
   helper :mail_digest,
          :mail_notification
@@ -78,7 +77,7 @@ class DigestMailer < ApplicationMailer
       subject = "#{Setting.app_title} - #{digest_summary_text(notification_ids.size, @mentioned_count)}"
 
       mail to: recipient.mail,
-           subject: subject
+           subject:
     end
   end
 

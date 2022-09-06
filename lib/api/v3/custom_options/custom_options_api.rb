@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -57,7 +55,7 @@ module API
 
               authorize_view_in_activated_project(co)
 
-              CustomOptionRepresenter.new(co, current_user: current_user)
+              CustomOptionRepresenter.new(co, current_user:)
             end
           end
         end

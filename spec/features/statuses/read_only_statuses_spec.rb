@@ -39,8 +39,8 @@ describe 'Read-only statuses affect work package editing',
   let(:project) { create :project, types: [type] }
   let!(:work_package) do
     create :work_package,
-           project: project,
-           type: type,
+           project:,
+           type:,
            status: unlocked_status
   end
 
@@ -56,14 +56,14 @@ describe 'Read-only statuses affect work package editing',
            type_id: type.id,
            old_status: unlocked_status,
            new_status: locked_status,
-           role: role
+           role:
   end
   let!(:workflow2) do
     create :workflow,
            type_id: type.id,
            old_status: locked_status,
            new_status: unlocked_status,
-           role: role
+           role:
   end
 
   let(:wp_page) { Pages::FullWorkPackage.new(work_package) }
@@ -74,6 +74,7 @@ describe 'Read-only statuses affect work package editing',
   end
 
   it 'locks the work package on a read only status' do
+    wp_page.switch_to_tab(tab: 'FILES')
     expect(page).to have_selector '.work-package--attachments--drop-box'
 
     subject_field = wp_page.edit_field :subject

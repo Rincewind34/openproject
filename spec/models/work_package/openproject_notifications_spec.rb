@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -41,7 +39,7 @@ describe WorkPackage, type: :model, with_settings: { journal_aggregation_time_mi
       create :work_package,
              author: admin,
              subject: 'I can see you',
-             project: project
+             project:
     end
 
     let(:journal_ids) { [] }

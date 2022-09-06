@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -39,7 +37,7 @@ describe Notifications::CreateFromModelService, 'news', with_settings: { journal
 
   let(:journable) { build_stubbed(:news) }
 
-  let(:resource) { create(:news, project: project) }
+  let(:resource) { create(:news, project:) }
 
   # view_news is a public permission
   let(:permissions) { [] }

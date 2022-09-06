@@ -3,7 +3,6 @@ sidebar_navigation:
   title: Work packages FAQ
   priority: 001
 description: Frequently asked questions regarding work packages
-robots: index, follow
 keywords: work packages FAQ, tickets, how to, task
 ---
 
@@ -41,7 +40,22 @@ You can set the assignee filter in the work package list to "Assignee and belong
 
 ### How can I track the progress of my work package?
 
-You can track the progress either manually by changing the progress bar in the work package details yourself. Or you can track it automatically by assigning the progress in % to the status of a work package. Please find the guide on how to do the automatic tracking (in bullet point 5) [here](../../../system-admin-guide/manage-work-packages/work-package-settings).
+You can track the progress either manually by changing the progress 
+bar in the work package details yourself. Or you can track it 
+automatically by assigning the progress in % to each status of 
+a work package. Please find the guide on how to do the automatic 
+tracking (in bullet point 5) 
+[here](../../../system-admin-guide/manage-work-packages/work-package-settings).
+
+### How can I track the progress of work packages with children?
+
+OpenProject automatically calculates the progress of work packages with children. 
+It sums up the progress of the children weighted by the Estimated time 
+of each child. OpenProject uses 1 hour as the default value if Estimated time 
+is empty. When adding the progress bar to a work package hierarchy view, 
+please always add the Estimated time column as well so that you can track 
+the calculation.
+Estimated time manually added to work packages with children is ignored.
 
 ### Can I set multiple parents for one work package?
 
@@ -59,16 +73,15 @@ One possible solution: If you receive this error message when trying to create a
 
 You can change this in your account settings. Please find out more [here](../../../getting-started/my-account/#change-the-order-to-display-comments).
 
-### Why are changes on parent work packages which are triggered by changes to child work packages not aggregated?
+### Why are changes on parent work packages which are triggered by making changes to a child work package not aggregated? 
 
 OpenProject aggregates work package activities only if:
 
 - They are within the defined time frame
-
 - Are made by the same user
 - If at most one comment is part of the aggregate (because it is hard to merge two bodies of text)
 
-As an inherited change is always commented ("Updated automatically by...") they can basically never be aggregated.
+As an inherited change is always commented ("Updated automatically by...") they can not be aggregated.
 
 ### How can I fill/populate the position field/column for work packages?
 

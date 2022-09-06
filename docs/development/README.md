@@ -2,7 +2,6 @@
 sidebar_navigation:
   title: Development
   priority: 920
-robots: index, follow
 ---
 
 # Develop OpenProject
@@ -87,7 +86,7 @@ Project maintainers have the right and responsibility to remove, edit, or reject
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by opening an issue or contacting one or more of the project maintainers.
 
-This code of conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/), version 1.0.0, available at http://contributor-covenant.org/version/1/0/0/
+This code of conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/), version 1.0.0, available at [contributor-covenant.org/version/1/0/0/](https://www.contributor-covenant.org/version/1/0/0/)
 
 
 
@@ -95,7 +94,7 @@ This code of conduct is adapted from the [Contributor Covenant](https://www.cont
 
 If you want to contribute to OpenProject, please make sure to accept our Contributor License Agreement first. The contributor license agreement documents the rights granted by contributors to OpenProject.
 
-[Read and accept the Contributor License Agreement here.](https://www.openproject.org/contributor-license-agreement/)
+[Read and accept the Contributor License Agreement here.](https://www.openproject.org/legal/contributor-license-agreement/)
 
 # Additional resources
 

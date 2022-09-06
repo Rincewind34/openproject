@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -49,9 +47,9 @@ class CustomOption < ApplicationRecord
   protected
 
   def assure_at_least_one_option
-    return if CustomOption.where(custom_field_id: custom_field_id).where.not(id: id).count > 0
+    return if CustomOption.where(custom_field_id:).where.not(id:).count > 0
 
-    errors[:base] << I18n.t(:'activerecord.errors.models.custom_field.at_least_one_custom_option')
+    errors.add(:base, I18n.t(:'activerecord.errors.models.custom_field.at_least_one_custom_option'))
 
     throw :abort
   end

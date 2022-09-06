@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -48,7 +46,7 @@ module Grids
     end
 
     def initialize(user:, source:, contract_class: ::EmptyContract)
-      super user: user, source: source, contract_class: contract_class
+      super user:, source:, contract_class:
     end
 
     protected

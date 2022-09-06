@@ -95,6 +95,7 @@ form
 
       & > *
         padding-left: 1rem
+        padding-right: 1rem
 
     .form--section-title
       background-color: var(--content-form-danger-zone-bg-color)
@@ -124,6 +125,9 @@ form
         &:before
           padding-left: 0px
           color: var(--content-form-danger-zone-bg-color)
+
+    .danger-zone--expected-value
+      white-space: pre
 
     .danger-zone--verification
       display: flex
@@ -181,7 +185,7 @@ hr
 
     &.-invisible
       border-bottom-width: 0px
-      
+
     &_limited
       max-width: 600px
 
@@ -484,6 +488,9 @@ fieldset.form--fieldset
   &.-no-italic
     font-style: normal
 
+  &.-xwide
+    max-width: 800px
+
   &.-labeled-checkbox
     margin-left: 25px
 
@@ -745,6 +752,7 @@ input[readonly].-clickable
 
 .inline-label
   margin: 0rem
+  flex-grow: 1
 
   > .form-label.-transparent
     margin-bottom: 0
@@ -857,6 +865,9 @@ input[readonly].-clickable
     &:last-of-type
       border-top-right-radius: 2px
       border-bottom-right-radius: 2px
+
+    &:focus-within
+      @include spot-focus
 
 .form--list
   display: flex

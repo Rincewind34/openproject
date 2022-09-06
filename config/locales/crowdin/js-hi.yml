@@ -23,7 +23,8 @@ hi:
   js:
     ajax:
       hide: "छुपाएँ"
-      loading: "लोड हो रहा है..."
+      loading: "Loading…"
+      updating: "Updating…"
     attachments:
       draggable_hint: |
         Drag on editor field to inline image or reference attachment. Closed editor fields will be opened while you keep dragging.
@@ -150,7 +151,7 @@ hi:
           language_hint: 'वह स्वरूपण भाषा दर्ज करें जिसका उपयोग हाइलाइटिंग (यदि समर्थित हो) के लिए किया जाएगा.'
         dropdown:
           macros: 'मैक्रो'
-          chose_macro: 'मैक्रो चुनें'
+          chose_macro: 'Choose macro'
         toc: 'विषय सूची'
         toolbar_help: 'Click to select widget and show the toolbar. Double-click to edit widget'
         wiki_page_include:
@@ -204,6 +205,7 @@ hi:
             label_expires_at: "Expires at"
             receive_newsletter: I want to receive the OpenProject <a target="_blank" href="%{link}">newsletter</a>.
             taken_domain: There can only be one active trial per domain.
+            domain_mismatch: The current request host name does not match the configured host name. Please double check your system settings.
             taken_email: Each user can only create one trial.
           email_not_received: "You did not receive an email? You can resend the email with the link on the right."
           try_another_email: "Or try it with another email address."
@@ -230,14 +232,16 @@ hi:
             professional_support: "Professional support"
             professional_support_text: "Get reliable, high-touch support from senior support engineers with expert knowledge about running OpenProject in business-critical environments."
           button_start_trial: "Start free trial"
+          button_upgrade: "Upgrade now"
           button_book_now: "Book now"
           confidence: >
             We deliver the confidence of a tested and supported enterprise-class project management software - with Open Source and an open mind.
           link_quote: "Get a quote"
+          more_info: "More information"
           text: >
             The OpenProject Enterprise Edition builds on top of the Community Edition. It includes premium features and professional support mainly aimed at organizations with more than 10 users that manage business critical projects with OpenProject.
           unlimited: "Unlimited"
-          you_contribute: "Developers need to pay their bills, too. With the Enterprise Edition, you substantially contribute to this Open Source community effort."
+          you_contribute: "Developers need to pay their bills, too. By upgrading to the Enterprise Edition, you will be supporting this open source community effort and contributing to its development, maintenance and continuous improvement."
     custom_actions:
       date:
         specific: 'पर'
@@ -266,7 +270,7 @@ hi:
           one: "First sorting criteria"
           two: "Second sorting criteria"
           three: "Third sorting criteria"
-      upsale_for_more: "For more advanced filters, check out the"
+      upsale_for_more: "Advanced filters allow you to also filter for file names and content of work package attachments. Please upgrade to a paid plan to use this feature."
       upsale_link: 'Enterprise Edition.'
     general_text_no: "no"
     general_text_yes: "yes"
@@ -286,16 +290,17 @@ hi:
           learn_about: "Learn more about the new features"
           #Include the version to invalidate outdated translations in other locales.
           #Otherwise, e.g. chinese might still have the translations for 10.0 in the 12.0 release.
-          '12_0':
+          '12_2':
             standard:
-              learn_about_link: https://www.openproject.org/blog/openproject-12-0-release
+              learn_about_link: https://www.openproject.org/blog/openproject-12-2-release
               new_features_html: >
-                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>With the new <b>in-app notifications</b> you receive all important updates directly in the application and don't get a flood of emails anymore.</li> <li>The new <b>notification center</b> shows all the changes, including intuitive filter options, e.g. by reason for notification or projects. It even allows editing directly in a split view.</li> <li>Improved <b>notification settings</b> allow to fine-tune for which actions and in which projects you want to receive a notification.</li> <li><b>Email reminders</b> can be configured to receive important updates via a daily email summary.</li> <li>The work package auto-completer for relations now also shows additional information (project name, status, ...) to easily identify the respective work package.</li> </ul>
+                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>No more endless searching for files! With the new <b>Nextcloud integration</b> in OpenProject 12.2, you can now find files directly in the respective work package and always have the correct version at your fingertips.</li> <li>We introduced <b>a new date picker</b> with updated input behaviour and an information banner that includes a button to show releations in the Gantt chart.</li> <li>We added the possibility to <b>log time for other users.</b></li> <li>Mark notifications as read also outside of the notification center.</li> </ul>
             bim:
-              learn_about_link: https://www.openproject.org/blog/openproject-12-0-release
+              learn_about_link: https://www.openproject.org/blog/openproject-12-2-release
               new_features_html: >
-                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>Notification center: Reduce the number of mails you receive. Instead find and act upon all relevant notifications in one central place.</li> <li>All uploaded IFC files can now also be downloaded.</li> <li>The uploading and processing of IFC got faster and received better error messages.</li> <li>The <a href="https://github.com/opf/openproject-revit-add-in">OpenProject Revit Add-in</a> received many bug fixes.</li> </ul>
+                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>No more endless searching for files! With the new <b>Nextcloud integration</b> in OpenProject 12.2, you can now find files directly in the respective work package and always have the correct version at your fingertips.</li> <li>We introduced <b>a new date picker</b> with updated input behaviour and an information banner that includes a button to show releations in the Gantt chart.</li> <li>We added the possibility to <b>log time for other users.</b></li> <li>Mark notifications as read also outside of the notification center.</li> </ul>
     label_activate: "Activate"
+    label_assignee: 'Assignee'
     label_add_column_after: "Add column after"
     label_add_column_before: "Add column before"
     label_add_columns: "Add columns"
@@ -365,6 +370,7 @@ hi:
     label_in_more_than: "से अधिक में"
     label_incoming_emails: "आने वाली ईमेल"
     label_information_plural: "जानकारी"
+    label_invalid: "Invalid"
     label_import: "Import"
     label_latest_activity: "Latest activity"
     label_last_updated_on: "अंतिम अद्यतन"
@@ -396,6 +402,8 @@ hi:
     label_previous: "पिछला"
     label_per_page: "प्रति पृष्ठ"
     label_please_wait: "Please wait"
+    label_project: "Project"
+    label_project_list: "Projects list"
     label_project_plural: "Projects"
     label_visibility_settings: "दृश्यता settings"
     label_quote_comment: "Quote this comment"
@@ -408,6 +416,7 @@ hi:
     label_report: "Report"
     label_repository_plural: "Repositories"
     label_save_as: "के रूप में सहेजें..."
+    label_select_project: "Select a project"
     label_select_watcher: "एक द्रष्टा का चयन करें.."
     label_selected_filter_list: "चयनित फ़िल्टर्स"
     label_show_attributes: "Show all attributes"
@@ -449,13 +458,12 @@ hi:
     label_unwatch: "अनवॉच"
     label_unwatch_work_package: "कार्य पैकेज तांकना समाप्त"
     label_uploaded_by: "द्वारा अपलोड"
-    label_default_queries: "Default views"
-    label_starred_queries: "Favorite views"
-    label_global_queries: "सार्वजनिक दृश्य"
-    label_custom_queries: "निजी दृश्य"
-    label_create_new_query: "Create new"
+    label_default_queries: "Default"
+    label_starred_queries: "Favorite"
+    label_global_queries: "Public"
+    label_custom_queries: "Private"
     label_columns: "स्तंभ"
-    label_attachments: फ़ाइलें
+    label_attachments: Attachments
     label_drop_files: Drop files here
     label_drop_files_hint: or click to add files
     label_drop_folders_hint: You cannot upload folders as an attachment. Please select single files.
@@ -466,7 +474,7 @@ hi:
     label_remove_all_files: Delete all files
     label_add_description: "Add a description for %{file}"
     label_upload_notification: "Uploading files..."
-    label_work_package_upload_notification: "Uploading files for Work package #%{id}: %{subject}"
+    label_work_package_upload_notification: "Uploading files for Work package #%{id}: %{subject}" #%{id}: %{subject}"
     label_wp_id_added_by: "#%{id} added by %{author}"
     label_files_to_upload: "These files will be uploaded:"
     label_rejected_files: "These files cannot be uploaded:"
@@ -484,7 +492,7 @@ hi:
         next: 'Next'
         got_it: 'समझ गया'
       steps:
-        help_menu: 'The Help (?) menu provides <b>additional help resources</b>. Here you can find a user guide and helpful how-to videos and more. <br> Enjoy your work with OpenProject!'
+        help_menu: 'The Help (?) menu provides <b>additional help resources</b>. Here you can find a user guide, helpful how-to videos and more. <br> Enjoy your work with OpenProject!'
         members: 'Invite new <b>members</b> to join your project.'
         project_selection: 'Please click on one of the demo projects that we have prepared. Demo data is currently only available in English. <br> The general <b>demo project</b> suits best for classical project management, while the <b>Scrum project</b> is better for agile project management.'
         quick_add_button: 'Click on the plus (+) icon in the header navigation to <b>create a new project</b> or to <b>invite coworkers</b>.'
@@ -499,7 +507,8 @@ hi:
           task_board: "The task board visualizes the <b>progress for this sprint</b>. Click on the plus (+) icon next to a user story to add new tasks or impediments. <br> The status can be updated by drag and drop."
         boards:
           overview: 'Select <b>boards</b> to shift the view and manage your project using the agile boards view.'
-          lists: 'Here you can create multiple lists (columns) within your board. This feature allows you to create a <b>Kanban board</b>, for example.'
+          lists_kanban: 'Here you can create multiple lists (columns) within your board. This feature allows you to create a <b>Kanban board</b>, for example.'
+          lists_basic: 'Here you can create multiple lists (columns) within your agile board.'
           add: 'Click on the plus (+) icon to <b>create a new card</b> or <b>add an existing card</b> to the list on the board.'
           drag: 'Drag and drop your cards within a given list to reorder them, or to move them to another list. <br> You can click the info (i) icon in the upper right-hand corner or double-click a card to open its details.'
         wp:
@@ -510,6 +519,12 @@ hi:
           create_button: 'The <b>+ Create</b> button will add a new work package to your project.'
           timeline_button: 'You can activate the <b>Gantt chart</b> view to create a timeline for your project.'
           timeline: 'Here you can <b>edit your project plan</b>, create new work packages, such as tasks, milestones, phases, and more, as well as <b>add dependencies</b>. All team members can see and update the latest plan at any time.'
+        team_planner:
+          overview: 'The team planner lets you visually assign tasks to team members and get an overview of who is working on what.'
+          calendar: 'The weekly or biweekly planning board displays all work packages assigned to your team members.'
+          add_assignee: 'To get started, add assignees to the team planner.'
+          add_existing: 'Search for existing work packages and drag them to the team planner to instantly assign them to a team member and define start and end dates.'
+          card: 'Drag work packages horizontally to move them backwards or forwards in time, drag the edges to change start and end dates and even drag them vertically to a different row to assign them to another member.'
     notifications:
       title: "Notifications"
       no_unread: "No unread notifications"
@@ -518,6 +533,11 @@ hi:
         watched: 'watched'
         assigned: 'assigned'
         responsible: 'accountable'
+        created: 'created'
+        scheduled: 'scheduled'
+        commented: 'commented'
+        processed: 'processed'
+        prioritized: 'prioritized'
       facets:
         unread: 'Unread'
         all: 'All'
@@ -526,7 +546,7 @@ hi:
           one: 'and 1 other'
           other: 'and %{count} others'
         no_results:
-          at_all: 'New notifications will appear here when there is activity that concerns you'
+          at_all: 'New notifications will appear here when there is activity that concerns you, in the mean time you can also view and modify your notification settings to configure when to be notified.'
           with_current_filter: 'There are no notifications in this view at the moment'
         mark_all_read: 'Mark all as read'
         mark_as_read: 'Mark as read'
@@ -534,14 +554,14 @@ hi:
         total_count_warning: "Showing the %{newest_count} most recent notifications. %{more_count} more are not displayed."
         empty_state:
           no_notification: "Looks like you're all caught up."
-          no_notification_with_current_filter: "Change of involvement or go back to the Inbox to view notifications"
+          no_notification_with_current_project_filter: "Looks like you're all caught up with the selected project."
+          no_notification_with_current_filter: "Looks like you're all caught up for %{filter} filter."
           no_selection: "Click on a notification to view all activity details."
         new_notifications:
           message: 'There are new notifications.'
           link_text: 'Click here to load them'
       menu:
         accountable: 'जवाबदेह'
-        assigned: 'Assigned'
         by_project: 'Unread by project'
         by_reason: 'Involvement'
         inbox: 'Inbox'
@@ -589,6 +609,7 @@ hi:
       default: '-'
       subject: 'Enter subject here'
       selection: 'कृपया चयन करें'
+      description: 'Description: Click to edit...'
       relation_description: 'Click to add description for this relation'
     project:
       required_outside_context: >
@@ -652,14 +673,7 @@ hi:
         projects: "Projects"
         settings: "Settings"
     time_entry:
-      project: 'परियोजना'
-      work_package: 'कार्य पैकेज'
       work_package_required: 'Requires selecting a work package first.'
-      activity: 'गतिविधी'
-      comment: 'टिप्पणी'
-      duration: 'Duration'
-      spent_on: 'तिथि'
-      hours: 'घंटे'
       title: 'लॉग समय'
     two_factor_authentication:
       label_two_factor_authentication: 'Two-factor authentication'
@@ -726,8 +740,9 @@ hi:
     field_value_enter_prompt: "Enter a value for '%{field}'"
     project_menu_details: "Details"
     scheduling:
-      manual: 'Manual scheduling'
-      automatic: 'Automatic scheduling'
+      title: 'Scheduling'
+      manual: 'Manual'
+      default: 'Default'
     sort:
       sorted_asc: 'Ascending sort applied, '
       sorted_dsc: 'Descending sort applied, '
@@ -750,7 +765,7 @@ hi:
         farRight: 'Far right'
         showNone: '-- No label --'
         description: >
-          Select the attributes you want to be shown in the respective positions of the Gantt chart at all times. Note that when hovering an element, its date labels will be shown instead of these attributes.
+          Select the attributes you want to be shown in the respective positions of the Gantt chart at all times. Note that when hovering over an element, its date labels will be shown instead of these attributes.
       button_activate: 'गैन्ट चार्ट दिखाएं'
       button_deactivate: 'गैन्ट चार्ट छुपाएं'
       cancel: निरस्त करें
@@ -800,7 +815,7 @@ hi:
       zooms: "Zoom level"
       outlines: "Hierarchy level"
     upsale:
-      ee_only: 'केवल एंटरप्राइज संस्करण में सुविधा'
+      ee_only: 'Enterprise Edition feature'
     wiki_formatting:
       strong: "Strong"
       italic: "Italic"
@@ -828,6 +843,17 @@ hi:
       comment_send_failed: "An error has occurred. Could not submit the comment."
       comment_updated: "The comment was successfully updated."
       confirm_edit_cancel: "Are you sure you want to cancel editing the work package?"
+      datepicker_modal:
+        automatically_scheduled_parent: "Automatically scheduled. Dates are derived from relations."
+        manually_scheduled: "Manual scheduling enabled, all relations ignored."
+        start_date_limited_by_relations: "Available start and finish dates are limited by relations."
+        changing_dates_affects_follow_relations: "Changing these dates will affect dates of related work packages."
+        click_on_show_relations_to_open_gantt: 'Click on "%{button_name}" for GANTT overview.'
+        show_relations: 'Show relations'
+        ignore_non_working_days:
+          title: 'Working days'
+          false: 'Work week'
+          true: 'Include weekends'
       description_filter: "Filter"
       description_enter_text: "Enter text"
       description_options_hide: "Hide options"
@@ -883,6 +909,7 @@ hi:
         description: "Description"
         date: "तिथि"
         dueDate: "समाप्ति दिनांक"
+        duration: "Duration"
         estimatedTime: "Estimated time"
         spentTime: "समय बिताया"
         category: "श्रेणी"
@@ -914,7 +941,6 @@ hi:
       placeholders:
         default: "-"
         date: "Select date"
-        formattable: "%{name}: Click to edit..."
       query:
         column_names: "स्तंभ"
         group_by: "द्वारा परिणाम समूह"
@@ -988,7 +1014,8 @@ hi:
         activity: गतिविधी
         relations: Relations
         watchers: वॉचर
-        attachments: Attachments
+        files: फ़ाइलें
+        files_tab_migration_help: 'You can now attach files to work packages via the new tab:'
       time_relative:
         days: "days"
         weeks: "weeks"
@@ -1012,10 +1039,7 @@ hi:
       filter: "Filter"
       unselected_title: "कार्य पैकेज"
       search_query_label: "Search saved views"
-      search_query_title: "Click to search saved views"
-      placeholder_query_title: "Set a title for this view"
     modals:
-      label_settings: "Rename view"
       label_name: "नाम"
       label_delete_page: "Delete current page"
       button_apply: "लागू करें"
@@ -1075,6 +1099,10 @@ hi:
         one: "1 h"
         other: "%{count} h"
         zero: "0 h"
+      day:
+        one: "1 day"
+        other: "%{count} days"
+        zero: "0 days"
     zen_mode:
       button_activate: 'Activate zen mode'
       button_deactivate: 'Deactivate zen mode'
@@ -1141,7 +1169,7 @@ hi:
       role:
         label: 'Role in %{project}'
         no_roles_found: 'No roles were found'
-        description: 'This is the role that %{principal} will receive when they join your project. The role defines which actions they are allowed to take and which information they are allowed to see. <a href="https://docs.openproject.org/system-admin-guide/users-permissions/roles-permissions/#roles-and-permissions" target="_blank"> Learn more about roles and permissions. </a>'
+        description: 'This is the role that %{principal} will receive when they join your project. The role defines which actions they are allowed to take and which information they are allowed to see. <a href="https://www.openproject.org/docs/system-admin-guide/users-permissions/roles-permissions/#roles-and-permissions" target="_blank"> Learn more about roles and permissions. </a>'
         required: 'Please select a role'
         next_button: 'Next'
       message:
@@ -1158,7 +1186,7 @@ hi:
           group: 'The group is now a part of %{project}. Meanwhile you can already plan with that group and assign work packages for instance.'
         next_button: 'Continue'
     include_projects:
-      toggle_title: 'Include Projects'
+      toggle_title: 'Include projects'
       title: 'Projects'
       clear_selection: 'Clear selection'
       apply: 'लागू करें'
@@ -1166,8 +1194,19 @@ hi:
         all: 'All projects'
         selected: 'Only selected'
       search_placeholder: 'Search project...'
+      include_subprojects: 'Include all sub-projects'
+      tooltip:
+        include_all_selected: 'Project already included since Include all sub-projects is enabled.'
+        current_project: 'This is the current project you are in.'
+        does_not_match_search: 'Project does not match the search criteria.'
+      no_results: 'No project matches your search criteria.'
     forms:
       submit_success_message: 'The form was successfully submitted'
       load_error_message: 'There was an error loading the form'
       validation_error_message: 'Please fix the errors present in the form'
       advanced_settings: 'Advanced settings'
+    spot:
+      filter_chip:
+        remove: 'Remove'
+      drop_modal:
+        Close: 'बंद करें'

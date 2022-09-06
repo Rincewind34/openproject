@@ -73,7 +73,7 @@ module Components
       end
 
       def save
-        find("#{selector} .button.-highlight").click
+        find('[data-qa-selector="spot-modal-wp-table-configuration-save-button"]').click
       end
 
       def cancel
@@ -89,7 +89,7 @@ module Components
       end
 
       def expect_disabled_tab(name)
-        expect(page).to have_selector("#{selector} [data-qa-tab-disabled]", text: name.upcase)
+        expect(page).to have_selector("#{selector} [data-qa-tab-disabled]", text: name.upcase, wait: 10)
       end
 
       def selected_tab(name)
@@ -109,7 +109,7 @@ module Components
       end
 
       def selector
-        '.op-modal'
+        '.spot-modal'
       end
 
       private

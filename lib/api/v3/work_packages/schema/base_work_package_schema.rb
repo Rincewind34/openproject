@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -59,9 +57,7 @@ module API
             # Special case for milestones + date property
             property = :start_date if property == :date && milestone?
 
-            @writable_attributes ||= begin
-              contract.writable_attributes
-            end
+            @writable_attributes ||= contract.writable_attributes
 
             property_name = ::API::Utilities::PropertyNameConverter.to_ar_name(property, context: work_package)
 

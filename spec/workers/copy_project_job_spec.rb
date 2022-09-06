@@ -36,7 +36,7 @@ describe CopyProjectJob, type: :model do
   let(:maildouble) { double('Mail::Message', deliver: true) }
 
   before do
-    allow(maildouble).to receive(:deliver_now).and_return nil
+    allow(maildouble).to receive(:deliver_later)
   end
 
   describe 'copy localizes error message' do
@@ -66,7 +66,7 @@ describe CopyProjectJob, type: :model do
   describe 'copy project succeeds with errors' do
     let(:admin) { create(:admin) }
     let(:source_project) { create(:project, types: [type]) }
-    let!(:work_package) { create(:work_package, project: source_project, type: type) }
+    let!(:work_package) { create(:work_package, project: source_project, type:) }
     let(:type) { create(:type_bug) }
     let(:custom_field) do
       create(:work_package_custom_field,
@@ -229,6 +229,8 @@ describe CopyProjectJob, type: :model do
         end
 
         it "notifies the user of the success" do
+          perform_enqueued_jobs
+
           mail = ActionMailer::Base.deliveries
                    .find { |m| m.message_id.start_with? "op.project-#{subject.id}" }
 
@@ -242,8 +244,8 @@ describe CopyProjectJob, type: :model do
         let(:role_add_subproject) { create(:role, permissions: [:add_subprojects]) }
         let(:member_add_subproject) do
           create(:member,
-                 user: user,
-                 project: project,
+                 user:,
+                 project:,
                  roles: [role_add_subproject])
         end
 
@@ -263,6 +265,8 @@ describe CopyProjectJob, type: :model do
         end
 
         it "notifies the user of the success" do
+          perform_enqueued_jobs
+
           mail = ActionMailer::Base.deliveries
                                    .find { |m| m.message_id.start_with? "op.project-#{subject.id}" }
 

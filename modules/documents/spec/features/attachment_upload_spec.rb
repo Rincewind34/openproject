@@ -32,7 +32,7 @@ require 'features/page_objects/notification'
 describe 'Upload attachment to documents',
          js: true,
          with_settings: {
-           journal_aggregation_time_minutes: 0,
+           journal_aggregation_time_minutes: 0
          } do
   let!(:user) do
     create :user,
@@ -68,7 +68,7 @@ describe 'Upload attachment to documents',
 
       # adding an image
       editor.drag_attachment image_fixture.path, 'Image uploaded on creation'
-      expect(page).to have_selector('attachment-list-item', text: 'image.png')
+      expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png')
 
       perform_enqueued_jobs do
         click_on 'Create'
@@ -97,7 +97,7 @@ describe 'Upload attachment to documents',
       # editor.click_and_type_slowly 'abc'
       SeleniumHubWaiter.wait
       editor.drag_attachment image_fixture.path, 'Image uploaded the second time'
-      expect(page).to have_selector('attachment-list-item', text: 'image.png', count: 2)
+      expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png', count: 2)
 
       perform_enqueued_jobs do
         click_on 'Save'
@@ -107,7 +107,7 @@ describe 'Upload attachment to documents',
       expect(page).to have_selector('#content img', count: 2)
       expect(page).to have_content('Image uploaded on creation')
       expect(page).to have_content('Image uploaded the second time')
-      expect(page).to have_selector('attachment-list-item', text: 'image.png', count: 2)
+      expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png', count: 2)
 
       # Expect a mail to be sent to the user having subscribed to all notifications
       expect(ActionMailer::Base.deliveries.size)

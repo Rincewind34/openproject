@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -55,7 +53,7 @@ module Copy
       @user = user
       # Create a result with an empty error set
       # that we can merge! so that not the target.errors object is reused.
-      @result = ServiceResult.new(result: target, success: true, errors: ActiveModel::Errors.new(target))
+      @result = ServiceResult.success(result: target, errors: ActiveModel::Errors.new(target))
     end
 
     protected
@@ -76,7 +74,7 @@ module Copy
 
     def perform(params:)
       begin
-        copy_dependency(params: params)
+        copy_dependency(params:)
       rescue StandardError => e
         Rails.logger.error { "Failed to copy dependency #{self.class.identifier}: #{e.message}" }
         result.success = false

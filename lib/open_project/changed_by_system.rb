@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -27,7 +25,6 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 #++
-
 
 # OpenProject in its contracts has checks to govern which attributes are writable. Only attributes marked to be
 # writable, can be set by a user.

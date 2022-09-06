@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -55,7 +53,7 @@ module Users
 
       user.log_successful_login
 
-      ServiceResult.new(result: user)
+      ServiceResult.failure(result: user)
     end
 
     def retain_sso_session_values!(user)

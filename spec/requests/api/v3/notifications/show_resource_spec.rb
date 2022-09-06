@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2020 the OpenProject GmbH
@@ -44,12 +42,12 @@ describe ::API::V3::Notifications::NotificationsAPI,
     create :project,
            members: { recipient => role }
   end
-  shared_let(:resource) { create :work_package, project: project }
+  shared_let(:resource) { create :work_package, project: }
   shared_let(:notification) do
     create :notification,
-           recipient: recipient,
-           project: project,
-           resource: resource,
+           recipient:,
+           project:,
+           resource:,
            journal: resource.journals.last
   end
 

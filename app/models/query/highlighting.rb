@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2022 the OpenProject GmbH
@@ -45,10 +43,9 @@ module Query::Highlighting
 
     serialize :highlighted_attributes, Array
 
-    validates_inclusion_of :highlighting_mode,
-                           in: QUERY_HIGHLIGHTING_MODES,
-                           allow_nil: true,
-                           allow_blank: true
+    validates :highlighting_mode,
+              inclusion: { in: QUERY_HIGHLIGHTING_MODES,
+                           allow_blank: true }
 
     validate :attributes_highlightable?
 

@@ -51,8 +51,8 @@ describe 'Projects copy',
       project = create(:project)
 
       create(:member,
-             project: project,
-             user: user,
+             project:,
+             user:,
              roles: [role])
       project
     end
@@ -74,7 +74,7 @@ describe 'Projects copy',
     let(:user) { create(:user) }
     let(:role) do
       create(:role,
-             permissions: permissions)
+             permissions:)
     end
     let(:permissions) do
       %i(copy_projects edit_project add_subprojects manage_types view_work_packages select_custom_fields work_package_assigned)
@@ -83,27 +83,27 @@ describe 'Projects copy',
       user = create(:user)
 
       create(:member,
-             project: project,
-             user: user,
+             project:,
+             user:,
              roles: [role])
       user
     end
     let(:category) do
-      create(:category, project: project)
+      create(:category, project:)
     end
     let(:version) do
-      create(:version, project: project)
+      create(:version, project:)
     end
     let!(:work_package) do
       create(:work_package,
-             project: project,
+             project:,
              type: project.types.first,
              author: wp_user,
              assigned_to: wp_user,
              responsible: wp_user,
              done_ratio: 20,
-             category: category,
-             version: version,
+             category:,
+             version:,
              description: 'Some description',
              custom_field_values: { wp_custom_field.id => 'Some wp cf text' })
     end
@@ -112,13 +112,20 @@ describe 'Projects copy',
     let!(:wiki_page) do
       create :wiki_page_with_content,
              title: 'Attached',
-             wiki: wiki,
+             wiki:,
              attachments: [build(:attachment, container: nil, filename: 'attachment.pdf')]
     end
 
     let(:parent_field) { ::FormFields::SelectFormField.new :parent }
 
+    let(:storage) { create(:storage) }
+    let(:project_storage) { create(:project_storage, project:, storage:) }
+    let(:file_link) { create(:file_link, container: work_package, storage:) }
+
     before do
+      project_storage
+      file_link
+
       login_as user
 
       # Clear all jobs that would later on to having emails send.
@@ -197,6 +204,10 @@ describe 'Projects copy',
       expect(copied_page.attachments.count).to eq 1
       expect(copied_page.attachments.first.filename).to eq 'attachment.pdf'
 
+      # Expect ProjectStores and their FileLinks were copied
+      expect(copied_project.projects_storages.count).to eq(project.projects_storages.count)
+      expect(copied_project.work_packages[0].file_links.count).to eq(project.work_packages[0].file_links.count)
+
       # custom field is copied over where the author is the current user
       # Using the db directly due to performance and clarity
       copied_work_packages = copied_project.work_packages
@@ -246,7 +257,7 @@ describe 'Projects copy',
     let(:priority) { create :priority }
 
     let(:default_params) do
-      { type: type, status: status, project: project, priority: priority }
+      { type:, status:, project:, priority: }
     end
 
     let(:parent1) { create :work_package, default_params.merge(subject: 'Initial phase') }

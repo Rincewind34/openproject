@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe 'Login', type: :feature, clear_cache: true do
+describe 'Login', type: :feature do
   before do
     @capybara_ignore_elements = Capybara.ignore_hidden_elements
     Capybara.ignore_hidden_elements = true
@@ -55,8 +55,8 @@ describe 'Login', type: :feature, clear_cache: true do
     let(:first_login) { false }
     let(:user) do
       create(:user,
-             force_password_change: force_password_change,
-             first_login: first_login,
+             force_password_change:,
+             first_login:,
              login: 'bob',
              mail: 'bob@example.com',
              firstname: 'Bo',

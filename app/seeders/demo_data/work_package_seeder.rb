@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2020 the OpenProject GmbH
@@ -36,7 +34,7 @@ module DemoData
     def initialize(project, key)
       self.project = project
       self.key = key
-      self.user = User.admin.first
+      self.user = User.user.admin.first
       self.statuses = Status.all
       self.repository = Repository.first
       self.types = project.types.all.reject(&:is_milestone?)
@@ -102,7 +100,7 @@ module DemoData
 
     def base_work_package_attributes(attributes)
       {
-        project: project,
+        project:,
         author: user,
         assigned_to: find_principal(attributes[:assignee]),
         subject: attributes[:subject],
@@ -148,10 +146,11 @@ module DemoData
     end
 
     def set_time_tracking_attributes!(wp_attr, attributes)
-      start_date = attributes[:start] && calculate_start_date(attributes[:start])
+      start_date = calculate_start_date(attributes[:start])
 
       wp_attr[:start_date] = start_date
       wp_attr[:due_date] = calculate_due_date(start_date, attributes[:duration]) if start_date && attributes[:duration]
+      wp_attr[:duration] = attributes[:duration] || 1
       wp_attr[:done_ratio] = attributes[:done_ratio].to_i if attributes[:done_ratio]
       wp_attr[:estimated_hours] = attributes[:estimated_hours].to_i if attributes[:estimated_hours]
     end
@@ -199,20 +198,17 @@ module DemoData
     end
 
     def create_relation(to:, from:, type:)
-      from.new_relation.tap do |relation|
-        relation.to = to
-        relation.relation_type = type
-        relation.save!
-      end
+      Relation.create!(from:, to:, relation_type: type)
     end
 
     def calculate_start_date(days_ahead)
-      monday = Date.today.monday
-      days_ahead > 0 ? monday + days_ahead : monday
+      Time.zone.today.monday + (days_ahead || 0).days
     end
 
+    # Returns the due date based on the starting date and the duration
+    # but ensures that the due date cannot be before the start date.
     def calculate_due_date(date, duration)
-      duration && duration > 1 ? date + duration : date
+      [date + ((duration || 0) - 1).days, date].max
     end
   end
 end

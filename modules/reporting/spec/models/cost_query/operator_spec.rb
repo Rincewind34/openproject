@@ -71,6 +71,10 @@ describe CostQuery, type: :model, reporting_query_helper: true do
       expect(query('projects', 'id', '=', nil).size).to eq(0)
     end
 
+    it "does = for empty string" do
+      expect(query('projects', 'id', '=', '').size).to eq(0)
+    end
+
     it "does <=" do
       expect(query('projects', 'id', '<=', project2.id - 1).size).to eq(1)
     end
@@ -81,6 +85,10 @@ describe CostQuery, type: :model, reporting_query_helper: true do
 
     it "does !" do
       expect(query('projects', 'id', '!', project1.id).size).to eq(1)
+    end
+
+    it "does ! for empty string" do
+      expect(query('projects', 'id', '!', '').size).to eq(0)
     end
 
     it "does ! for multiple values" do
@@ -152,7 +160,7 @@ describe CostQuery, type: :model, reporting_query_helper: true do
       expect(query('projects', 'created_at', 't+', 1).size).to eq(n + 1)
     end
 
-    it "does >t+ (after the day which is n days in the furure)" do
+    it "does >t+ (after the day which is n days in the future)" do
       n = query('projects', 'created_at', '>t+', 1).size
       create(:project, created_at: Time.now)
       expect(query('projects', 'created_at', '>t+', 1).size).to eq(n)
