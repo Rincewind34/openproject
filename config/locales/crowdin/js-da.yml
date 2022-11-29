@@ -26,6 +26,9 @@ da:
       loading: "Loading…"
       updating: "Updating…"
     attachments:
+      delete: "Delete attachment"
+      delete_confirmation: |
+        Are you sure you want to delete this file? This action is not reversible.
       draggable_hint: |
         Træk på redigeringsfelt for at indsætte billede eller referencevedhæftning. Lukkede redigeringsfelter åbnes, mens du fortsætter med at trække.
     autocomplete_select:
@@ -82,6 +85,10 @@ da:
     button_open_fullscreen: "Fuldskærmsvisning"
     button_show_cards: "Show card view"
     button_show_list: "Show list view"
+    button_show_table: "Show table view"
+    button_show_gantt: "Show Gantt view"
+    button_show_fullscreen: "Show fullscreen view"
+    button_more_actions: "More actions"
     button_quote: "Citer"
     button_save: "Gem"
     button_settings: "Indstillinger"
@@ -151,7 +158,7 @@ da:
           language_hint: 'Indtast det formateringssprog, der skal bruges til at fremhæve (hvis det understøttes).'
         dropdown:
           macros: 'Makroer'
-          chose_macro: 'Vælg makro'
+          chose_macro: 'Choose macro'
         toc: 'Indholdsfortegnelse'
         toolbar_help: 'Klik for at vælge widget og vis værktøjslinjen. Dobbeltklik for at redigere widget'
         wiki_page_include:
@@ -204,6 +211,7 @@ da:
             label_expires_at: "Expires at"
             receive_newsletter: Jeg ønsker at modtage OpenProject <a target="_blank" href="%{link}">nyhedsbrevet</a>.
             taken_domain: Der kan kun være én aktiv prøve pr. domæne.
+            domain_mismatch: The current request host name does not match the configured host name. Please double check your system settings.
             taken_email: Hver bruger kan kun oprette en prøveversion.
           email_not_received: "Du har ikke modtaget en e-mail? Du kan gensende e-mailen med linket til højre."
           try_another_email: "Eller prøv det med en anden e-mail-adresse."
@@ -230,10 +238,12 @@ da:
             professional_support: "Professionel support"
             professional_support_text: "Få pålidelig, høj-touch support fra senior support ingeniører med ekspert viden om at køre OpenProject i forretningskritiske miljøer."
           button_start_trial: "Start gratis prøveperiode"
+          button_upgrade: "Upgrade now"
           button_book_now: "Bestil nu"
           confidence: >
             Vi leverer tillid til en testet og understøttet enterprise-klasse projektstyringssoftware - med Open Source og et åbent sind.
           link_quote: "Få et tilbud"
+          more_info: "More information"
           text: >
             OpenProject Enterprise Edition bygger oven på Community Edition. Det omfatter premium-funktioner og professionel support primært rettet mod organisationer med mere end 10 brugere, der administrerer forretningskritiske projekter med OpenProject.
           unlimited: "Ubegrænset"
@@ -266,7 +276,7 @@ da:
           one: "Første sorteringskriterium"
           two: "Anden sorteringskriterier"
           three: "Tredje sorteringskriterium"
-      upsale_for_more: "For mere avancerede filtre, tjek den"
+      upsale_for_more: "Advanced filters allow you to also filter for file names and content of work package attachments. Please upgrade to a paid plan to use this feature."
       upsale_link: 'Enterprise Udgave.'
     general_text_no: "nej"
     general_text_yes: "ja"
@@ -286,15 +296,15 @@ da:
           learn_about: "Learn more about the new features"
           #Include the version to invalidate outdated translations in other locales.
           #Otherwise, e.g. chinese might still have the translations for 10.0 in the 12.0 release.
-          '12_1':
+          '12_3':
             standard:
-              learn_about_link: https://www.openproject.org/blog/openproject-12-1-release
+              learn_about_link: https://www.openproject.org/blog/openproject-12-3-release
               new_features_html: >
-                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>A <b>new team planner module</b> (Enterprise feature) allows you to visually assign tasks to team members to get an overview of who is working on what.</li> <li>We are <b>releasing the basic agile boards</b> for the Community version.</li> <li>The <b>"Include Projects" filter</b> option makes it easier to add different projects to your views, such as for work packages, calendars, and team planners.</li> <li>We added <b>a new "Files" tab</b> in the work package details to have all possible information attached to a work package together.</li> <li>We created <b>global roles for groups</b> to assign these roles to groups and create superuser groups.</li> <li>Project status was given more options to choose from.</li> </ul>
+                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>Define your global work week (weekends and non-working days of the week).</li> <li>Calculate duration based on start and finish dates and the possibility to consider non-working days (weekends) in scheduling.</li> <li>Add meaningful tooltips to the most essential actions.</li> <li>Copying a project will also copy file links attached to all work packages.</li> </ul>
             bim:
-              learn_about_link: https://www.openproject.org/blog/openproject-12-1-release
+              learn_about_link: https://www.openproject.org/blog/openproject-12-3-release
               new_features_html: >
-                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>In the BCF module you can now save your selected work package filters, columns etc. as <b>views</b> and share those with your team members.</li> <li>A <b>new team planner module</b> (Enterprise feature) allows you to visually assign tasks to team members to get an overview of who is working on what.</li> <li>We are <b>releasing the basic agile boards</b> for the Community version.</li> <li>The <b>"Include Projects" filter</b> option makes it easier to add different projects to your views, such as for work packages, calendars, and team planners.</li> <li>We added <b>a new "Files" tab</b> in the work package details to have all possible information attached to a work package together.</li> <li>We created <b>global roles for groups</b> to assign these roles to groups and create superuser groups.</li> <li>Project status was given more options to choose from.</li> </ul>
+                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>Define your global work week (weekends and non-working days of the week).</li> <li>Calculate duration based on start and finish dates and the possibility to consider non-working days (weekends) in scheduling.</li> <li>Add meaningful tooltips to the most essential actions.</li> <li>Copying a project will also copy file links attached to all work packages.</li> </ul>
     label_activate: "Aktivér"
     label_assignee: 'Assignee'
     label_add_column_after: "Add column after"
@@ -366,6 +376,7 @@ da:
     label_in_more_than: "på mere end"
     label_incoming_emails: "Indkommende e-mails"
     label_information_plural: "Information"
+    label_invalid: "Invalid"
     label_import: "Import"
     label_latest_activity: "Latest activity"
     label_last_updated_on: "Senest opdateret den"
@@ -397,6 +408,8 @@ da:
     label_previous: "Foregående"
     label_per_page: "Per side:"
     label_please_wait: "Please wait"
+    label_project: "Project"
+    label_project_list: "Projects list"
     label_project_plural: "Projekter"
     label_visibility_settings: "Visibility settings"
     label_quote_comment: "Citér denne kommentar"
@@ -409,6 +422,7 @@ da:
     label_report: "Rapport"
     label_repository_plural: "Projektarkiver"
     label_save_as: "Gem som"
+    label_select_project: "Select a project"
     label_select_watcher: "Vælg en tilsynsførende..."
     label_selected_filter_list: "Valgte filtre"
     label_show_attributes: "Vis alle egenskaber"
@@ -450,10 +464,10 @@ da:
     label_unwatch: "Stands tilsyn"
     label_unwatch_work_package: "Stands tilsyn med arbejdspakke"
     label_uploaded_by: "Lagt op af"
-    label_default_queries: "Default views"
-    label_starred_queries: "Favorite views"
-    label_global_queries: "Public views"
-    label_custom_queries: "Private views"
+    label_default_queries: "Default"
+    label_starred_queries: "Favorite"
+    label_global_queries: "Public"
+    label_custom_queries: "Private"
     label_columns: "Kolonner"
     label_attachments: Vedhæftninger
     label_drop_files: Slip filer hér
@@ -466,7 +480,7 @@ da:
     label_remove_all_files: Slet alle filer
     label_add_description: "Tilføj en beskrivelse af %{file}"
     label_upload_notification: "Uploader filer..."
-    label_work_package_upload_notification: "Upload af filer til arbejdspakke #%{id}: %{subject}"
+    label_work_package_upload_notification: "Upload af filer til arbejdspakke #%{id}: %{subject}" #%{id}: %{subject}"
     label_wp_id_added_by: "#%{id} added by %{author}"
     label_files_to_upload: "Disse filer vil blive uploadet:"
     label_rejected_files: "Disse filer kan ikke uploades:"
@@ -484,7 +498,7 @@ da:
         next: 'Næste'
         got_it: 'Forstået'
       steps:
-        help_menu: 'The Help (?) menu provides <b>additional help resources</b>. Here you can find a user guide and helpful how-to videos and more. <br> Enjoy your work with OpenProject!'
+        help_menu: 'The Help (?) menu provides <b>additional help resources</b>. Here you can find a user guide, helpful how-to videos and more. <br> Enjoy your work with OpenProject!'
         members: 'Invite new <b>members</b> to join your project.'
         project_selection: 'Please click on one of the demo projects that we have prepared. Demo data is currently only available in English. <br> The general <b>demo project</b> suits best for classical project management, while the <b>Scrum project</b> is better for agile project management.'
         quick_add_button: 'Click on the plus (+) icon in the header navigation to <b>create a new project</b> or to <b>invite coworkers</b>.'
@@ -525,15 +539,22 @@ da:
         watched: 'watched'
         assigned: 'assigned'
         responsible: 'accountable'
+        created: 'created'
+        scheduled: 'scheduled'
+        commented: 'commented'
+        processed: 'processed'
+        prioritized: 'prioritized'
       facets:
         unread: 'Unread'
+        unread_title: 'Show unread'
         all: 'All'
+        all_title: 'Show all'
       center:
         and_more_users:
           one: 'and 1 other'
           other: 'and %{count} others'
         no_results:
-          at_all: 'New notifications will appear here when there is activity that concerns you'
+          at_all: 'New notifications will appear here when there is activity that concerns you, in the mean time you can also view and modify your notification settings to configure when to be notified.'
           with_current_filter: 'There are no notifications in this view at the moment'
         mark_all_read: 'Mark all as read'
         mark_as_read: 'Mark as read'
@@ -541,7 +562,8 @@ da:
         total_count_warning: "Showing the %{newest_count} most recent notifications. %{more_count} more are not displayed."
         empty_state:
           no_notification: "Looks like you're all caught up."
-          no_notification_with_current_filter: "Change of involvement or go back to the Inbox to view notifications"
+          no_notification_with_current_project_filter: "Looks like you're all caught up with the selected project."
+          no_notification_with_current_filter: "Looks like you're all caught up for %{filter} filter."
           no_selection: "Click on a notification to view all activity details."
         new_notifications:
           message: 'There are new notifications.'
@@ -595,6 +617,7 @@ da:
       default: '-'
       subject: 'Enter subject here'
       selection: 'Vælg venligst'
+      description: 'Description: Click to edit...'
       relation_description: 'Click to add description for this relation'
     project:
       required_outside_context: >
@@ -658,14 +681,7 @@ da:
         projects: "Projekter"
         settings: "Indstillinger"
     time_entry:
-      project: 'Prjoekt'
-      work_package: 'Arbejdspakke'
       work_package_required: 'Requires selecting a work package first.'
-      activity: 'Aktivivtet'
-      comment: 'Kommentér'
-      duration: 'Varighed'
-      spent_on: 'Dato'
-      hours: 'Timer'
       title: 'Tidsregistrering'
     two_factor_authentication:
       label_two_factor_authentication: 'Two-factor authentication'
@@ -733,7 +749,6 @@ da:
     project_menu_details: "Detaljer"
     scheduling:
       manual: 'Manual scheduling'
-      automatic: 'Automatic scheduling'
     sort:
       sorted_asc: 'Ascending sort applied, '
       sorted_dsc: 'Descending sort applied, '
@@ -744,7 +759,6 @@ da:
       activate_no: 'activate to remove the sort'
     text_work_packages_destroy_confirmation: "Er du sikker på, du vil slette de/den valgte arbejdspakke(r)?"
     text_query_destroy_confirmation: "Are you sure you want to delete the selected view?"
-    text_attachment_destroy_confirmation: "Sikker på, at du vil slette vedhæftningen?"
     timelines:
       quarter_label: 'Q%{quarter_number}'
       gantt_chart: 'Gantt chart'
@@ -756,7 +770,7 @@ da:
         farRight: 'Far right'
         showNone: '-- No label --'
         description: >
-          Select the attributes you want to be shown in the respective positions of the Gantt chart at all times. Note that when hovering an element, its date labels will be shown instead of these attributes.
+          Select the attributes you want to be shown in the respective positions of the Gantt chart at all times. Note that when hovering over an element, its date labels will be shown instead of these attributes.
       button_activate: 'Show Gantt chart'
       button_deactivate: 'Hide Gantt chart'
       cancel: Annuller
@@ -806,7 +820,7 @@ da:
       zooms: "Zoomniveau"
       outlines: "Niveau i hieraki"
     upsale:
-      ee_only: 'Enterprise Edition only feature'
+      ee_only: 'Enterprise Edition feature'
     wiki_formatting:
       strong: "Fed"
       italic: "Kursiv"
@@ -834,6 +848,15 @@ da:
       comment_send_failed: "En fejl opstod. Kunne ikke indsende kommentaren."
       comment_updated: "Kommentaren blev opdateret."
       confirm_edit_cancel: "Are you sure you want to cancel editing the work package?"
+      datepicker_modal:
+        automatically_scheduled_parent: "Automatically scheduled. Dates are derived from relations."
+        manually_scheduled: "Manual scheduling enabled, all relations ignored."
+        start_date_limited_by_relations: "Available start and finish dates are limited by relations."
+        changing_dates_affects_follow_relations: "Changing these dates will affect dates of related work packages."
+        click_on_show_relations_to_open_gantt: 'Click on "%{button_name}" for GANTT overview.'
+        show_relations: 'Show relations'
+        ignore_non_working_days:
+          title: 'Working days only'
       description_filter: "Filter"
       description_enter_text: "Indtast tekst"
       description_options_hide: "Gem muligheder"
@@ -853,6 +876,8 @@ da:
       message_work_package_read_only: "Work package is locked in this status. No attribute other than status can be altered."
       message_work_package_status_blocked: "Work package status is not writable due to closed status and closed version being assigned."
       placeholder_filter_by_text: "Subject, description, comments, ..."
+      filters:
+        title: 'Filter work packages'
       inline_create:
         title: 'Click here to add a new work package to this list'
       create:
@@ -889,6 +914,7 @@ da:
         description: "Beskrivelse"
         date: "Dato"
         dueDate: "Finish date"
+        duration: "Duration"
         estimatedTime: "Anslået tid"
         spentTime: "Anvendt tid"
         category: "Kategori"
@@ -920,7 +946,6 @@ da:
       placeholders:
         default: "-"
         date: "Select date"
-        formattable: "%{name}: Klik for at redigere..."
       query:
         column_names: "Kolonner"
         group_by: "Gruppér resultater efter"
@@ -1019,22 +1044,21 @@ da:
       filter: "Filter"
       unselected_title: "Arbejdspakke"
       search_query_label: "Search saved views"
-      search_query_title: "Click to search saved views"
-      placeholder_query_title: "Set a title for this view"
     modals:
-      label_settings: "Rename view"
       label_name: "Navn"
       label_delete_page: "Slet denne side"
       button_apply: "Benyt"
       button_save: "Gem"
       button_submit: "Indsend"
       button_cancel: "Annuller"
+      button_delete: "Delete"
       form_submit:
         title: 'Confirm to continue'
         text: 'Are you sure you want to perform this action?'
       destroy_work_package:
         title: "Confirm deletion of %{label}"
-        text: "Are you sure you want to delete the following %{label} ?"
+        single_text: "Are you sure you want to delete the work package"
+        bulk_text: "Are you sure you want to delete the following %{label}?"
         has_children: "The work package has %{childUnits}:"
         confirm_deletion_children: "I acknowledge that ALL descendants of the listed work packages will be recursively removed."
         deletes_children: "All child work packages and their descendants will also be recursively deleted."
@@ -1082,6 +1106,10 @@ da:
         one: "1 t"
         other: "%{count} t"
         zero: "0 h"
+      day:
+        one: "1 day"
+        other: "%{count} days"
+        zero: "0 days"
     zen_mode:
       button_activate: 'Activate zen mode'
       button_deactivate: 'Deactivate zen mode'
@@ -1148,13 +1176,13 @@ da:
       role:
         label: 'Rolle i %{project}'
         no_roles_found: 'No roles were found'
-        description: 'This is the role that %{principal} will receive when they join your project. The role defines which actions they are allowed to take and which information they are allowed to see. <a href="https://www.openproject.org/docs/system-admin-guide/users-permissions/roles-permissions/#roles-and-permissions" target="_blank"> Learn more about roles and permissions. </a>'
+        description: 'This is the role that the user will receive when they join your project. The role defines which actions they are allowed to take and which information they are allowed to see. <a href="https://www.openproject.org/docs/system-admin-guide/users-permissions/roles-permissions/#roles-and-permissions" target="_blank"> Learn more about roles and permissions. </a>'
         required: 'Vælg venligst en rolle'
         next_button: 'Næste'
       message:
         label: 'Invitations besked'
-        description: 'Vi sender en e-mail til %{principal}, som du kan tilføje en personlig besked til her. En forklaring på invitationen kunne være nyttig eller måske lidt information om projektet for at hjælpe dem med at komme i gang.'
-        next_button: 'Gennemse invitation'
+        description: 'We will send an email to the user, to which you can add a personal message here. An explanation for the invitation could be useful, or prehaps a bit of information regarding the project to help them get started.'
+        next_button: 'Next'
       summary:
         next_button: 'Send invitation'
       success:
@@ -1175,8 +1203,10 @@ da:
       search_placeholder: 'Search project...'
       include_subprojects: 'Include all sub-projects'
       tooltip:
-        include_all_selected: 'Include all sub-projects is currently selected.'
+        include_all_selected: 'Project already included since Include all sub-projects is enabled.'
         current_project: 'This is the current project you are in.'
+        does_not_match_search: 'Project does not match the search criteria.'
+      no_results: 'No project matches your search criteria.'
     forms:
       submit_success_message: 'The form was successfully submitted'
       load_error_message: 'There was an error loading the form'

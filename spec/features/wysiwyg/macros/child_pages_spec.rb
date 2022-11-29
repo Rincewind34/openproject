@@ -34,6 +34,7 @@ describe 'Wysiwyg child pages spec',
     create :project,
            enabled_module_names: %w[wiki]
   end
+  let(:editor) { ::Components::WysiwygEditor.new }
   let(:role) { create(:role, permissions: %i[view_wiki_pages edit_wiki_pages]) }
   let(:user) do
     create(:user, member_in_project: project, member_through_role: role)
@@ -68,8 +69,6 @@ describe 'Wysiwyg child pages spec',
     project.wiki.save!
   end
 
-  let(:editor) { ::Components::WysiwygEditor.new }
-
   before do
     login_as(user)
   end
@@ -96,18 +95,18 @@ describe 'Wysiwyg child pages spec',
           # Edit widget and cancel again
           placeholder.click
           page.find('.ck-balloon-panel .ck-button', visible: :all, text: 'Edit').click
-          expect(page).to have_selector('.op-modal')
+          expect(page).to have_selector('.spot-modal')
           expect(page).to have_field('selected-page', with: '')
-          find('.op-modal--cancel-button').click
+          find('.spot-modal--cancel-button').click
 
           # Edit widget and save
           placeholder.click
           page.find('.ck-balloon-panel .ck-button', visible: :all, text: 'Edit').click
-          expect(page).to have_selector('.op-modal')
+          expect(page).to have_selector('.spot-modal')
           fill_in 'selected-page', with: 'parent-page'
 
           # Save widget
-          find('.op-modal--submit-button').click
+          find('.spot-modal--submit-button').click
 
           # Placeholder states `parent-page` and no `Include parent`
           expect(placeholder).to have_text('parent-page')
@@ -136,11 +135,11 @@ describe 'Wysiwyg child pages spec',
           # Edit widget and save
           placeholder.click
           page.find('.ck-balloon-panel .ck-button', visible: :all, text: 'Edit').click
-          expect(page).to have_selector('.op-modal')
+          expect(page).to have_selector('.spot-modal')
           page.check 'include-parent'
 
           # Save widget
-          find('.op-modal--submit-button').click
+          find('.spot-modal--submit-button').click
 
           # Placeholder states `parent-page` and `Include parent`
           expect(placeholder).to have_text('parent-page')

@@ -33,15 +33,44 @@ describe Version, type: :model do
 
   it { is_expected.to be_valid }
 
-  it 'rejects a finish date that is smaller than the start date' do
-    version.start_date = '2013-05-01'
-    version.effective_date = '2012-01-01'
+  describe 'default values' do
+    let(:version) { described_class.new }
 
-    expect(version).not_to be_valid
-    expect(version.errors[:effective_date].size).to eq(1)
+    it 'sets the status to be open' do
+      expect(version.status)
+        .to eq 'open'
+    end
   end
 
-  context '#to_s_for_project' do
+  describe 'validations' do
+    context 'with finish date that is smaller than the start date' do
+      before do
+        version.start_date = '2013-05-01'
+        version.effective_date = '2012-01-01'
+      end
+
+      it 'is invalid' do
+        expect(version).not_to be_valid
+        expect(version.errors[:effective_date])
+          .to eq [I18n.t('activerecord.errors.messages.greater_than_start_date')]
+      end
+    end
+
+    context 'with an invalid date' do
+      before do
+        version.start_date = '2013-05-01'
+        version.effective_date = '99999-01-01'
+      end
+
+      it 'is invalid' do
+        expect(version).not_to be_valid
+        expect(version.errors[:effective_date])
+          .to eq [I18n.t('activerecord.errors.messages.not_a_date')]
+      end
+    end
+  end
+
+  describe '#to_s_for_project' do
     let(:other_project) { build(:project) }
 
     it 'returns only the version for the same project' do
@@ -76,7 +105,7 @@ describe Version, type: :model do
     end
   end
 
-  context '#<=>' do
+  describe '#<=>' do
     let(:version1) { build_stubbed(:version) }
     let(:version2) { build_stubbed(:version) }
 
@@ -93,7 +122,7 @@ describe Version, type: :model do
       version2.name = 'AAAA'
       version2.project.name = 'BBBB'
 
-      expect(version1 <=> version2).to eql -1
+      expect(version1 <=> version2).to be -1
     end
 
     it "is 1 if the project name is alphabetically after the other's project name" do
@@ -102,7 +131,7 @@ describe Version, type: :model do
       version2.name = 'BBBB'
       version2.project.name = 'AAAA'
 
-      expect(version1 <=> version2).to eql 1
+      expect(version1 <=> version2).to be 1
     end
 
     it "is -1 if the project name is equal
@@ -111,7 +140,7 @@ describe Version, type: :model do
       version1.name = 'AAAA'
       version2.name = 'BBBB'
 
-      expect(version1 <=> version2).to eql -1
+      expect(version1 <=> version2).to be -1
     end
 
     it "is 1 if the project name is equal
@@ -120,7 +149,7 @@ describe Version, type: :model do
       version1.name = 'BBBB'
       version2.name = 'AAAA'
 
-      expect(version1 <=> version2).to eql 1
+      expect(version1 <=> version2).to be 1
     end
 
     it 'is 0 if name and project are equal except for case' do
@@ -136,7 +165,7 @@ describe Version, type: :model do
       version2.name = 'AAAA'
       version2.project.name = 'BBBB'
 
-      expect(version1 <=> version2).to eql -1
+      expect(version1 <=> version2).to be -1
     end
 
     it "is 1 if the project name is alphabetically after the other's project name ignoring case" do
@@ -145,7 +174,7 @@ describe Version, type: :model do
       version2.name = 'BBBB'
       version2.project.name = 'aaaa'
 
-      expect(version1 <=> version2).to eql 1
+      expect(version1 <=> version2).to be 1
     end
 
     it "is -1 if the project name is equal
@@ -154,7 +183,7 @@ describe Version, type: :model do
       version1.name = 'aaaa'
       version2.name = 'BBBB'
 
-      expect(version1 <=> version2).to eql -1
+      expect(version1 <=> version2).to be -1
     end
 
     it "is 1 if the project name is equal
@@ -163,11 +192,11 @@ describe Version, type: :model do
       version1.name = 'BBBB'
       version2.name = 'aaaa'
 
-      expect(version1 <=> version2).to eql 1
+      expect(version1 <=> version2).to be 1
     end
   end
 
-  context '#projects' do
+  describe '#projects' do
     let(:grand_parent_project) do
       build(:project, name: 'grand_parent_project')
     end
@@ -275,6 +304,71 @@ describe Version, type: :model do
       system_shared_version.save!
 
       expect(unshared_version.projects).to match_array([parent_project])
+    end
+  end
+
+  describe '#estimated_hours' do
+    before do
+      version.save
+    end
+
+    context 'without assigned work packages' do
+      it 'returns 0.0' do
+        expect(version.estimated_hours)
+          .to eq 0.0
+      end
+    end
+
+    context 'with assigned work packages without estimated hours' do
+      let!(:work_package) { create(:work_package, version:) }
+
+      it 'returns 0.0' do
+        expect(version.estimated_hours)
+          .to eq 0.0
+      end
+    end
+
+    context 'with two assigned work packages with estimated hours' do
+      let!(:work_package1) { create(:work_package, version:, estimated_hours: 2.5) }
+      let!(:work_package2) { create(:work_package, version:, estimated_hours: 5) }
+
+      it 'returns the sum of estimated hours' do
+        expect(version.estimated_hours)
+          .to eq 7.5
+      end
+    end
+
+    context 'with assigned work packages with estimated hours in the leaves' do
+      let!(:parent) { create(:work_package, version:) }
+      let!(:work_package1) { create(:work_package, parent:, version:, estimated_hours: 2.5) }
+      let!(:work_package2) { create(:work_package, parent:, version:, estimated_hours: 5) }
+
+      it 'returns the sum of estimated hours' do
+        expect(version.estimated_hours)
+          .to eq 7.5
+      end
+    end
+  end
+
+  describe '#start_date' do
+    context 'with a value saved and a work package with its own start_date' do
+      let(:version) { create(:version, start_date: '2010-01-05') }
+      let!(:work_package) { create(:work_package, version:, start_date: '2010-03-01') }
+
+      it 'is the value' do
+        expect(version.start_date)
+          .to eq Date.parse('2010-01-05')
+      end
+    end
+
+    context 'without a value saved and a work package with its own start_date' do
+      let(:version) { create(:version) }
+      let!(:work_package) { create(:work_package, version:, start_date: '2010-03-01') }
+
+      it 'is nil' do
+        expect(version.start_date)
+          .to be_nil
+      end
     end
   end
 end

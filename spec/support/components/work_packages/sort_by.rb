@@ -97,13 +97,13 @@ module Components
       end
 
       def cancel_changes
-        page.within('.op-modal') do
+        page.within('.spot-modal') do
           click_on 'Cancel'
         end
       end
 
       def apply_changes
-        page.within('.op-modal') do
+        page.within('.spot-modal') do
           click_on 'Apply'
         end
       end
@@ -119,8 +119,8 @@ module Components
         page.find(".generic-table--sort-header ##{id}").click
       end
 
-      def within_column_context_menu(&block)
-        page.within('#column-context-menu', &block)
+      def within_column_context_menu(&)
+        page.within('#column-context-menu', &)
       end
     end
   end

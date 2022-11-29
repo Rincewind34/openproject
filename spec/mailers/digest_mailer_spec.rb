@@ -60,7 +60,7 @@ describe DigestMailer, type: :mailer do
     [build_stubbed(:notification,
                    resource: work_package,
                    reason: :commented,
-                   journal: journal,
+                   journal:,
                    project: project1)].tap do |notifications|
       allow(Notification)
         .to receive(:where)
@@ -104,7 +104,7 @@ describe DigestMailer, type: :mailer do
     it 'includes the notifications grouped by work package' do
       time_stamp = journal.created_at.strftime('%m/%d/%Y, %I:%M %p')
       expect(mail_body)
-        .to have_text("Hey #{recipient.firstname}!")
+        .to have_text("Hello #{recipient.firstname}")
 
       expected_notification_subject = "#{work_package.type.name.upcase} #{work_package.subject}"
       expect(mail_body)
@@ -122,7 +122,7 @@ describe DigestMailer, type: :mailer do
     context 'with only a deleted work package for the digest' do
       let(:work_package) { nil }
 
-      it `is a NullMail which isn't sent` do
+      it "is a NullMail which isn't sent" do
         expect(mail.body)
           .to eql ''
 

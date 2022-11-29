@@ -47,13 +47,13 @@ Details: [Revit Add-in](revit-add-in)
 
 
 
-## How to get a free trial?
+## How to get a free trial
 
 You easily can start a new BIM trial on our [OpenProject BIM website](https://www.openproject.org/bim-project-management/). The have a look at the full description of how to start a new trial installation just follow the Link: [Create trial installation](../enterprise-guide/enterprise-cloud-guide/create-cloud-trial/).
 
 
 
-## How to enable the BCF module?
+## How to enable the BCF module
 
 The BCF Module and the included IFC viewer can be enabled for every single project. Here you can find the description how to [enable a module](../user-guide/projects/project-settings/modules/) within your ***project settings***.
 
@@ -79,7 +79,7 @@ Yes, you are able to use all known features. Within our BIM Edition you get the 
 
 Yes, an existing OpenProject on-premises (self-hosted) installation can easily be switched to the BIM Edition without losing your settings and projects.
 
-In our [Installation & Upgrade Guide](../installation-and-operations/changing-to-bim-edition) you can find a description how to switch.
+In our [Installation & Upgrade Guide](../installation-and-operations/bim-edition/) you can find a description how to switch.
 
 
 
@@ -123,11 +123,11 @@ Yes, we want to develop some other integrations to stay interoparable with other
 
 
 
-### How to enable the BCF module?
+### How to enable the BCF module
 
 The BCF Module and the included IFC viewer can be enabled or disabled for every single project. Here you can find the description how to [enable a module](../user-guide/projects/project-settings/modules/) within the project settings. 
 
-*The BCF Module is an OpenProject BIM Premium function. Please make sure, that you are already using the OpenProject BIM Edition ([switch to the BIM Edition](../installation-and-operations/changing-to-bim-edition))*
+*The BCF Module is an OpenProject BIM Premium function. Please make sure, that you are already using the OpenProject BIM Edition ([switch to the BIM Edition](../installation-and-operations/bim-edition/))*
 
  
 

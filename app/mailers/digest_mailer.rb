@@ -35,6 +35,7 @@ class DigestMailer < ApplicationMailer
   include OpenProject::TextFormatting
   include Redmine::I18n
   include MailDigestHelper
+  include MailNotificationHelper
 
   helper :mail_digest,
          :mail_notification
@@ -76,7 +77,7 @@ class DigestMailer < ApplicationMailer
       subject = "#{Setting.app_title} - #{digest_summary_text(notification_ids.size, @mentioned_count)}"
 
       mail to: recipient.mail,
-           subject: subject
+           subject:
     end
   end
 

@@ -11,13 +11,21 @@ keywords: SAML, SSO, single sign-on, authentication
 
 You can integrate your active directory or other SAML compliant identity provider in your OpenProject Enterprise Edition.
 
+## Enterprise Cloud
+
+For the moment in the Enterprise cloud OpenProject DevOps team has to apply the configuration for you. The configuration has to be provided in a support ticket, for instance as a YAML file as described in the docs.
+Experience shows that configuring this can be tricky, though. So it may take a bit until the correct configuration is finished with your SAML provider.
+If you have the chance to test the SAML configuration on an Enterprise on-premises installation this might speed things up. But we can make it work either way.
+
+## Enterprise on-premises
+
 ### Prerequisites
 
 In order to use integrate OpenProject as a service provider (SP) using SAML, your identity providers (idP):
 
 - needs to be able to handle SAML 2.0 redirect Single-Sign On (SSO) flows, in some implementations also referred to as WebSSO
 - has a known or configurable set of attributes that map to the following required OpenProject attributes. The way these attribute mappings will be defined is described later in this document.
-  - **login**: A stable attribute used to uniquely identify the user. This willl most commonly map to an account ID, samAccountName or email (but please note that emails are often interchangeable, and this might result in logins changing in OpenProject).
+  - **login**: A stable attribute used to uniquely identify the user. This will most commonly map to an account ID, samAccountName or email (but please note that emails are often interchangeable, and this might result in logins changing in OpenProject).
   - **email**: The email attribute of the user being authenticated
   - **first name** and **last name** of the user.
 - provides the public certificate or certificate fingerprint (SHA1) in use for communicating with the idP.
@@ -54,45 +62,57 @@ This will contains the complete OpenProject configuration and can be extended to
 The following is an exemplary file with a set of common settings:
 
 ```yaml
-saml:
-  # Name of the provider, leave this at saml unless you use multiple providers
-  name: "saml"
-  # The name that will be display in the login button
-  display_name: "My SSO"
-  # Use the default SAML icon
-  icon: "auth_provider-saml.png"
+default:
+  # <-- other configuration -->
+  saml:
+    # First SAML provider
+    mysaml1:  
+      # Name of the provider, leave this at saml unless you use multiple providers
+      name: "saml"
+      # The name that will be display in the login button
+      display_name: "My SSO"
+      # Use the default SAML icon
+      icon: "auth_provider-saml.png"
 
-  # The callback within OpenProject that your idP should redirect to
-  assertion_consumer_service_url: "https://<YOUR OPENPROJECT HOSTNAME>/auth/saml/callback"
-  # The SAML issuer string that OpenProject will call your idP with
-  issuer: "https://<YOUR OPENPROJECT HOSTNAME>"
+      # The callback within OpenProject that your idP should redirect to
+      assertion_consumer_service_url: "https://<YOUR OPENPROJECT HOSTNAME>/auth/saml/callback"
+      # The SAML issuer string that OpenProject will call your idP with
+      issuer: "https://<YOUR OPENPROJECT HOSTNAME>"
 
-  # IF your SSL certificate on your SSO is not trusted on this machine, you need to add it here in ONE line
-  ### one liner to generate certificate in ONE line
-  ### awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' <yourcert.pem>
-  #idp_cert: "-----BEGIN CERTIFICATE-----\n ..... SSL CERTIFICATE HERE ...-----END CERTIFICATE-----\n"
-  # Otherwise, the certificate fingerprint must be added
-  # Either `idp_cert` or `idp_cert_fingerprint` must be present!
-  idp_cert_fingerprint: "E7:91:B2:E1:..."
+      # IF your SSL certificate on your SSO is not trusted on this machine, you need to add it here in ONE line
+      ### one liner to generate certificate in ONE line
+      ### awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' <yourcert.pem>
+      #idp_cert: "-----BEGIN CERTIFICATE-----\n ..... SSL CERTIFICATE HERE ...-----END CERTIFICATE-----\n"
+      # Otherwise, the certificate fingerprint must be added
+      # Either `idp_cert` or `idp_cert_fingerprint` must be present!
+      idp_cert_fingerprint: "E7:91:B2:E1:..."
 
-  # Replace with your SAML 2.0 redirect flow single sign on URL
-  # For example: "https://sso.example.com/saml/singleSignOn"
-  idp_sso_target_url: "<YOUR SSO URL>"
-  # Replace with your redirect flow single sign out URL
-  # or comment out
-  # For example: "https://sso.example.com/saml/proxySingleLogout"
-  idp_slo_target_url: "<YOUR SSO logout URL>"
+      # Replace with your SAML 2.0 redirect flow single sign on URL
+      # For example: "https://sso.example.com/saml/singleSignOn"
+      idp_sso_target_url: "<YOUR SSO URL>"
+      # Replace with your redirect flow single sign out URL
+      # or comment out
+      # For example: "https://sso.example.com/saml/proxySingleLogout"
+      idp_slo_target_url: "<YOUR SSO logout URL>"
 
-  # Attribute map in SAML
-  attribute_statements:
-    # What attribute in SAML maps to email (default: mail)
-    email: ['mail']
-    # What attribute in SAML maps to the user login (default: uid)
-    login: ['uid']
-    # What attribute in SAML maps to the first name (default: givenName)
-    first_name: ['givenName']
-    # What attribute in SAML maps to the last name (default: sn)
-    last_name: ['sn']
+      # Attribute map in SAML
+      attribute_statements:
+        # What attribute in SAML maps to email (default: mail)
+        email: ['mail']
+        # What attribute in SAML maps to the user login (default: uid)
+        login: ['uid']
+        # What attribute in SAML maps to the first name (default: givenName)
+        first_name: ['givenName']
+        # What attribute in SAML maps to the last name (default: sn)
+        last_name: ['sn']
+      
+    # OPTIONAL: Additional SAML provider(s)
+    #mysaml2:
+    #  name: "saml2"
+    #  display_name: "Additional SSO"
+    #  (...)
+    #mysaml3:
+    #  (...)
 ```
 
 Be sure to choose the correct indentation and base key. The items below the `saml` key should be indented two spaces more than `saml` already is. And `saml` can will need to be placed in the `default` or `production` group so it will already be indented. You will get an YAML parsing error otherwise when trying to start OpenProject.
@@ -124,10 +144,10 @@ OPENPROJECT_SAML_SAML_ISSUER="https://<openproject.host>"
 # Either `OPENPROJECT_SAML_SAML_IDP__CERT` or `OPENPROJECT_SAML_SAML_IDP__CERT__FINGERPRINT` must be present!
 OPENPROJECT_SAML_SAML_IDP__CERT="-----BEGIN CERTIFICATE-----<cert one liner>-----END CERTIFICATE-----"
 OPENPROJECT_SAML_SAML_IDP__CERT__FINGERPRINT="da:39:a3:ee:5e:6b:4b:0d:32:55:bf:ef:95:60:18:90:af:d8:07:09"
-# Replace with your single sign on URL, the exact value depends on your idP implemention
+# Replace with your single sign on URL, the exact value depends on your idP implementation
 OPENPROJECT_SAML_SAML_IDP__SSO__TARGET__URL="https://<hostname of your idp>/application/saml/<slug>/sso/binding/post/"
 
-# (Optinal) Replace with your redirect flow single sign out URL that we should redirect to
+# (Optional) Replace with your redirect flow single sign out URL that we should redirect to
 OPENPROJECT_SAML_SAML_IDP__SLO__TARGET__URL=""
 
 # 
@@ -219,20 +239,23 @@ SAML responses by identity providers are required to be signed. You can configur
 
 Use the key `attribute_statements` to provide mappings for attributes returned by the SAML identity provider's response to OpenProject internal attributes. 
 
-**a) Attribute mapping example for settings.yml**
+**a) Attribute mapping example for configration.yml**
 
 ```yaml
-# <-- other configuration -->
-# Attribute map in SAML
-attribute_statements:
-  # Use the `mail` attribute for 
-  email: ['mail']
-  # Use the mail address as login
-  login: ['mail']
-  # What attribute in SAML maps to the first name (default: givenName)
-  first_name: ['givenName']
-  # What attribute in SAML maps to the last name (default: sn)
-  last_name: ['sn']
+default:
+  # <-- other configuration -->
+    mysaml1:
+      # <-- other configuration -->
+      # Attribute map in SAML
+      attribute_statements:
+        # Use the `mail` attribute for 
+        email: ['mail']
+        # Use the mail address as login
+        login: ['mail']
+        # What attribute in SAML maps to the first name (default: givenName)
+        first_name: ['givenName']
+        # What attribute in SAML maps to the last name (default: sn)
+        last_name: ['sn']
 ```
 
 You may provide attribute names or namespace URIs as follows: `email: ['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']`. 
@@ -272,27 +295,30 @@ That means the response should contain attribute names 'mail', etc. as configure
 If you have URN or OID attribute identifiers, you can modify the request as follows:
 
 ```yaml
-# <-- other configuration -->
-# Modify the request attribute sent in the request
-# These oids are exemplary, but will often be identical,
-# please check with your identity provider for the correct oids
-request_attributes:
-  - name: 'urn:oid:0.9.2342.19200300.100.1.3'
-    friendly_name: 'Mail address'
-    name_format: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
-  - name: 'urn:oid:2.5.4.42'
-    friendly_name: 'First name'
-    name_format: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
-  - name: 'urn:oid:2.5.4.4'
-    friendly_name: 'Last name'
-    name_format: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
+default:
+  # <-- other configuration -->
+    mysaml1:
+      # <-- other configuration -->
+      # Modify the request attribute sent in the request
+      # These oids are exemplary, but will often be identical,
+      # please check with your identity provider for the correct oids
+      request_attributes:
+        - name: 'urn:oid:0.9.2342.19200300.100.1.3'
+          friendly_name: 'Mail address'
+          name_format: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
+        - name: 'urn:oid:2.5.4.42'
+          friendly_name: 'First name'
+          name_format: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
+        - name: 'urn:oid:2.5.4.4'
+          friendly_name: 'Last name'
+          name_format: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
 
-# Attribute map in SAML
-attribute_statements:
-  email: ['urn:oid:0.9.2342.19200300.100.1.3']
-  login: ['urn:oid:0.9.2342.19200300.100.1.3']
-  first_name: ['urn:oid:2.5.4.42']
-  last_name: ['urn:oid:2.5.4.4']
+      # Attribute map in SAML
+      attribute_statements:
+        email: ['urn:oid:0.9.2342.19200300.100.1.3']
+        login: ['urn:oid:0.9.2342.19200300.100.1.3']
+        first_name: ['urn:oid:2.5.4.42']
+        last_name: ['urn:oid:2.5.4.4']
 ```
 
 **Optional: Request signature and Assertion Encryption**
@@ -302,8 +328,12 @@ Your identity provider may optionally encrypt the assertion response, however no
 To configure assertion encryption, you need to provide the certificate to send in the request and private key to decrypt the response:
 
 ```yaml
-  certificate: "-----BEGIN CERTIFICATE-----\n .... certificate contents ....\n-----END CERTIFICATE-----",
-  private_key: "-----BEGIN PRIVATE KEY-----\n .... private key contents ....\n-----END PRIVATE KEY-----"
+default:
+  # <-- other configuration -->
+    mysaml1:
+      # <-- other configuration -->
+      certificate: "-----BEGIN CERTIFICATE-----\n .... certificate contents ....\n-----END CERTIFICATE-----"
+      private_key: "-----BEGIN PRIVATE KEY-----\n .... private key contents ....\n-----END PRIVATE KEY-----"
 ```
 
 Request signing means that the service provider (OpenProject in this case) uses the certificate specified to sign the request to the identity provider. They reuse the same `certificate` and `private_key` settings as for assertion encryption. It is recommended to use an RSA key pair, the key must be provided without password.
@@ -311,18 +341,21 @@ Request signing means that the service provider (OpenProject in this case) uses 
 To enable request signing, enable the following flag:
 
 ```yaml
-  certificate: "-----BEGIN CERTIFICATE-----\n .... certificate contents ....\n-----END CERTIFICATE-----",
-  private_key: "-----BEGIN PRIVATE KEY-----\n .... private key contents ....\n-----END PRIVATE KEY-----",
-  security: {
-    # Whether SP and idP should sign requests and assertions
-    authn_requests_signed: true,
-    want_assertions_signed: true,
-    # Whether the idP should encrypt assertions
-    want_assertions_signed: false,
-    embed_sign: true,
-    signature_method: 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256',
-    digest_method: 'http://www.w3.org/2001/04/xmlenc#sha256',
-  }
+default:
+  # <-- other configuration -->
+    mysaml1:
+      # <-- other configuration -->
+      certificate: "-----BEGIN CERTIFICATE-----\n .... certificate contents ....\n-----END CERTIFICATE-----"
+      private_key: "-----BEGIN PRIVATE KEY-----\n .... private key contents ....\n-----END PRIVATE KEY-----"
+      security:
+        # Whether SP and idP should sign requests and assertions
+        authn_requests_signed: true
+        want_assertions_signed: true
+        # Whether the idP should encrypt assertions
+        want_assertions_signed: false
+        embed_sign: true
+        signature_method: 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
+        digest_method: 'http://www.w3.org/2001/04/xmlenc#sha256'
 ```
 
 
@@ -348,14 +381,14 @@ From there on, you will see a button dedicated to logging in via SAML, e.g named
 
 ## Troubleshooting
 
-Q: After clicking on a provider badge, I am redirected to a signup form that says a user already exists with that login.
+**Q: After clicking on a provider badge, I am redirected to a signup form that says a user already exists with that login.**
 
 A: This can happen if you previously created user accounts in OpenProject with the same email than what is stored in the identity provider. In this case, if you want to allow existing users to be automatically remapped to the SAML identity provider, you should do the following:
 
 Spawn an interactive console in OpenProject. The following example shows the command for the packaged installation.
 See [our process control guide](../../../installation-and-operations/operation/control/) for information on other installation types.
 
-```
+```bash
 sudo openproject run console
 > Setting.oauth_allow_remapping_of_existing_users = true
 > exit
@@ -365,19 +398,21 @@ Then, existing users should be able to log in using their SAML identity. Note th
 
 
 
-Q: Could the users be automatically logged in to OpenProject if they are already authenticated at the SAML Identity Provider?
+**Q: Could the users be automatically logged in to OpenProject if they are already authenticated at the SAML Identity Provider?**
 
 A: You are able to chose a default direct-login-provider in the `/opt/openproject/config/configuration.yml` or by using environment variables
 
-```
-omniauth_direct_login_provider: saml
+```yaml
+default:
+  # <-- other configuration -->
+  omniauth_direct_login_provider: saml
 ```
 
 [Read more](../../../installation-and-operations/configuration/#omniauth-direct-login-provider)
 
 
 
-Q: `"certificate"` and `"private key"` are used in the SAML configuration and openproject logs show a FATAL error after GET "/auth/saml"  `**FATAL** -- :  OpenSSL::PKey::RSAError (Neither PUB key nor PRIV key: nested asn1 error):`
+**Q:** `"certificate"` **and** `"private key"` **are used in the SAML configuration and openproject logs show a FATAL error after GET "/auth/saml"**  `**FATAL** -- :  OpenSSL::PKey::RSAError (Neither PUB key nor PRIV key: nested asn1 error):`
 
 A1: The given private_key is encrypted. The key is needed without the password (cf., https://github.com/onelogin/ruby-saml/issues/473)
 

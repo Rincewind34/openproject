@@ -5,7 +5,7 @@ import {
   HostBinding,
   Input,
 } from '@angular/core';
-import { DatasetInputs } from 'core-app/shared/components/dataset-inputs.decorator';
+import { populateInputsFromDataset } from 'core-app/shared/components/dataset-inputs';
 import { CurrentUserService } from 'core-app/core/current-user/current-user.service';
 import { CurrentProjectService } from 'core-app/core/current-project/current-project.service';
 import { UntilDestroyedMixin } from 'core-app/shared/helpers/angular/until-destroyed.mixin';
@@ -15,7 +15,6 @@ import { map } from 'rxjs/operators';
 
 export const opTeamPlannerSidemenuSelector = 'op-team-planner-sidemenu';
 
-@DatasetInputs
 @Component({
   selector: opTeamPlannerSidemenuSelector,
   templateUrl: './team-planner-sidemenu.component.html',
@@ -38,12 +37,9 @@ export class TeamPlannerSidemenuComponent extends UntilDestroyedMixin {
       map((val) => val && !this.bannersService.eeShowBanners),
     );
 
-  text = {
-    create_new_team_planner: this.I18n.t('js.team_planner.title'),
-  };
-
   createButton = {
-    title: this.text.create_new_team_planner,
+    text: this.I18n.t('js.team_planner.create_label'),
+    title: this.I18n.t('js.team_planner.create_title'),
     uiSref: 'team_planner.page.show',
     uiParams: {
       query_id: null,
@@ -59,5 +55,7 @@ export class TeamPlannerSidemenuComponent extends UntilDestroyedMixin {
     readonly I18n:I18nService,
   ) {
     super();
+
+    populateInputsFromDataset(this);
   }
 }

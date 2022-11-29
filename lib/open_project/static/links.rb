@@ -38,9 +38,7 @@ module OpenProject
           OpenProject::Configuration.force_help_link.presence || static_links[:user_guides]
         end
 
-        def [](name)
-          links[name]
-        end
+        delegate :[], to: :links
 
         def links
           @links ||= static_links.merge(dynamic_links)
@@ -100,6 +98,22 @@ module OpenProject
               href: 'https://www.openproject.org/docs/user-guide/',
               label: 'homescreen.links.user_guides'
             },
+            installation_guides: {
+              href: 'https://www.openproject.org/docs/installation-and-operations/installation/',
+              label: :label_installation_guides
+            },
+            packager_installation: {
+              href: 'https://www.openproject.org/docs/installation-and-operations/installation/packaged/',
+              label: 'Packaged installation'
+            },
+            docker_installation: {
+              href: 'https://www.openproject.org/docs/installation-and-operations/installation/docker/',
+              label: 'Docker installation'
+            },
+            manual_installation: {
+              href: 'https://www.openproject.org/docs/installation-and-operations/installation/manual/',
+              label: 'Manual installation'
+            },
             upgrade_guides: {
               href: 'https://www.openproject.org/docs/installation-and-operations/operation/upgrading/',
               label: :label_upgrade_guides
@@ -155,6 +169,10 @@ module OpenProject
               href: 'https://www.openproject.org/legal/privacy/',
               label: :label_privacy_policy
             },
+            digital_accessibility: {
+              href: 'https://www.openproject.org/de/rechtliches/erklaerung-zur-digitalen-barrierefreiheit/',
+              label: :label_digital_accessibility
+            },
             report_bug: {
               href: 'https://www.openproject.org/docs/development/report-a-bug/',
               label: :label_report_bug
@@ -209,6 +227,31 @@ module OpenProject
             },
             contact_us: {
               href: 'https://www.openproject.org/contact/'
+            },
+            pricing: {
+              href: 'https://www.openproject.org/pricing/'
+            },
+            enterprise_docs: {
+              form_configuration: {
+                href: 'https://www.openproject.org/docs/system-admin-guide/manage-work-packages/work-package-types/#work-package-form-configuration-premium-feature'
+              },
+              attribute_highlighting: {
+                href: 'https://www.openproject.org/docs/user-guide/work-packages/work-package-table-configuration/#attribute-highlighting-premium-feature'
+              },
+              custom_field_projects: {
+                href: 'https://www.openproject.org/docs/system-admin-guide/custom-fields/custom-fields-projects/'
+              },
+              custom_field_multiselect: {
+                href: 'https://www.openproject.org/docs/system-admin-guide/custom-fields/#create-a-multi-select-custom-field-premium-feature'
+              },
+              status_read_only: {
+                href: 'https://www.openproject.org/docs/system-admin-guide/manage-work-packages/work-package-status/#create-a-new-work-package-status'
+              }
+            },
+            storage_docs: {
+              setup: {
+                href: 'https://www.openproject.org/docs/system-admin-guide/integrations/nextcloud/'
+              }
             }
           }
         end

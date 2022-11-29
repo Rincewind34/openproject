@@ -101,7 +101,7 @@ bin/compose up worker
 ```
 
 The testing containers are excluded as well, while they are harmless to start, but take up system resources again and
-clog your logs while running.
+clog your logs while running. The delayed_job background worker reloads the application for every job in development mode. This is a know issue and documented here: https://github.com/collectiveidea/delayed_job/issues/823
 
 This process can take quite a long time on the first run where all gems are installed for the first time. However, these
 are cached in a docker volume. Meaning that from the 2nd run onwards it will start a lot quicker.
@@ -186,7 +186,7 @@ When a dependency of the image or the base image itself is changed you may need 
 Ruby version is updated you may run into an error like the following when running `bin/compose setup`:
 
 ```
-Your Ruby version is 2.7.4, but your Gemfile specified ~> 3.0.4
+Your Ruby version is 2.7.6, but your Gemfile specified ~> 3.1.2
 ```
 
 This means that the current image is out-dated. You can update it like this:

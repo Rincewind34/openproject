@@ -58,6 +58,10 @@
     <span>Default Link</span>
     <span class="spot-icon spot-icon_bell"></span>
   </a>
+  <a class="spot-link" href="#">
+    <span class="spot-icon spot-icon_bell"></span>
+    <span>Default Link</span>
+  </a>
   <button class="spot-link"><span class="spot-icon spot-icon_bell"></span></button>
 </section>
 
@@ -66,6 +70,10 @@
   <a class="spot-link spot-link_danger" href="#">
     <span>Danger Link</span>
     <span class="spot-icon spot-icon_bell"></span>
+  </a>
+  <a class="spot-link spot-link_danger" href="#">
+    <span class="spot-icon spot-icon_bell"></span>
+    <span>Danger Link</span>
   </a>
   <button class="spot-link spot-link_danger"><span class="spot-icon spot-icon_bell"></span></button>
 </section>
@@ -81,22 +89,26 @@ Currently selected value is {{ toggleValue }}
 <h1>Checkbox</h1>
 
 <label>
-  <spot-checkbox></spot-checkbox> Unchecked
+  <spot-checkbox></spot-checkbox>
+  Unchecked
 </label>
 
 <label>
-  <spot-checkbox [checked]="true"></spot-checkbox> Checked
+  <spot-checkbox [checked]="true"></spot-checkbox>
+  Checked
 </label>
 
 <label>
-  <spot-checkbox [disabled]="true"></spot-checkbox> Disabled
+  <spot-checkbox [disabled]="true"></spot-checkbox>
+  Disabled
 </label>
 
 <label>
   <spot-checkbox
     [checked]="true"
     [disabled]="true"
-  ></spot-checkbox> Disabled checked
+  ></spot-checkbox>
+  Disabled checked
 </label>
 
 <label>
@@ -115,6 +127,13 @@ Currently selected value is {{ toggleValue }}
 
 <h1>Lists</h1>
 
+<h2>Normal list</h2>
+
+<p>HINT: To enable floating actions on hover, every <i>spot-list--item</i> needs a
+  <i>spot-list--item-floating-wrapper</i>, which wraps the item's content and the <i>spot-list-item-floating-actions</i>,
+  but not any sub lists. This way, floating actions on hover are defined specific for each item, hence in the same list
+  items with floating actions can be right next to items without.</p>
+
 <ul class="spot-list">
   <li class="spot-list--item">
     <label class="spot-list--item-action">
@@ -123,21 +142,50 @@ Currently selected value is {{ toggleValue }}
     </label>
   </li>
   <li class="spot-list--item">
+    <div class="spot-list--item-floating-wrapper">
+      <label class="spot-list--item-action">
+        <spot-checkbox [(ngModel)]="listCheckboxValue"></spot-checkbox>
+        <div class="spot-list--item-title">Checkbox item with hover menu</div>
+      </label>
+      <div class="spot-list--item-floating-actions">
+        <button class="spot-link">
+          <span class="spot-icon spot-icon_folder-open"></span>
+        </button>
+        <button class="spot-link">
+          <span class="spot-icon spot-icon_external-link"></span>
+        </button>
+        <button class="spot-link">
+          <span class="spot-icon spot-icon_file-doc"></span>
+        </button>
+      </div>
+    </div>
+  </li>
+  <li class="spot-list--item">
     <label class="spot-list--item-action">
       <spot-checkbox [(ngModel)]="listCheckboxValue"></spot-checkbox>
       <div class="spot-list--item-title">Checkbox item with children</div>
     </label>
     <ul class="spot-list">
       <li class="spot-list--item">
-        <label class="spot-list--item-action">
-          <spot-checkbox [(ngModel)]="listCheckboxValue"></spot-checkbox>
-          <div class="spot-list--item-title">Child checkbox item</div>
-        </label>
+        <div class="spot-list--item-floating-wrapper">
+          <label class="spot-list--item-action">
+            <spot-checkbox [(ngModel)]="listCheckboxValue"></spot-checkbox>
+            <div class="spot-list--item-title">Child checkbox item</div>
+          </label>
+          <div class="spot-list--item-floating-actions">
+            <button class="spot-link">
+              <span class="spot-icon spot-icon_folder-open"></span>
+            </button>
+            <button class="spot-link">
+              <span class="spot-icon spot-icon_file-doc"></span>
+            </button>
+          </div>
+        </div>
         <ul class="spot-list">
           <li class="spot-list--item">
             <label class="spot-list--item-action">
               <spot-checkbox [(ngModel)]="listCheckboxValue"></spot-checkbox>
-              <div class="spot-list--item-title">Secon level child</div>
+              <div class="spot-list--item-title">Second level child</div>
             </label>
           </li>
         </ul>
@@ -147,6 +195,115 @@ Currently selected value is {{ toggleValue }}
           <spot-checkbox [(ngModel)]="listCheckboxValue"></spot-checkbox>
           <div class="spot-list--item-title">Second child checkbox item</div>
         </label>
+      </li>
+      <li class="spot-list--item">
+        <div class="spot-list--item-floating-wrapper">
+          <label class="spot-list--item-action">
+            <spot-checkbox [(ngModel)]="listCheckboxValue"></spot-checkbox>
+            <div class="spot-list--item-title">Second child checkbox item with hover menu</div>
+          </label>
+          <div class="spot-list--item-floating-actions">
+            <button class="spot-link">
+              <span class="spot-icon spot-icon_folder-open"></span>
+            </button>
+            <button class="spot-link">
+              <span class="spot-icon spot-icon_file-doc"></span>
+            </button>
+          </div>
+        </div>
+      </li>
+      <li class="spot-list--item">
+        <label class="spot-list--item-action spot-list--item-action_disabled">
+          <spot-checkbox
+            [(ngModel)]="listCheckboxValue"
+            [disabled]="true"
+          ></spot-checkbox>
+          <div class="spot-list--item-title">Disabled item</div>
+        </label>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2>Compact list</h2>
+
+<ul class="spot-list spot-list_compact">
+  <li class="spot-list--item">
+    <label class="spot-list--item-action">
+      <spot-checkbox [(ngModel)]="listCheckboxValue"></spot-checkbox>
+      <div class="spot-list--item-title">Checkbox item</div>
+    </label>
+  </li>
+  <li class="spot-list--item">
+    <div class="spot-list--item-floating-wrapper">
+      <label class="spot-list--item-action">
+        <spot-checkbox [(ngModel)]="listCheckboxValue"></spot-checkbox>
+        <div class="spot-list--item-title">Checkbox item with hover menu</div>
+      </label>
+      <div class="spot-list--item-floating-actions">
+        <button class="spot-link">
+          <span class="spot-icon spot-icon_folder-open"></span>
+        </button>
+        <button class="spot-link">
+          <span class="spot-icon spot-icon_external-link"></span>
+        </button>
+        <button class="spot-link">
+          <span class="spot-icon spot-icon_file-doc"></span>
+        </button>
+      </div>
+    </div>
+  </li>
+  <li class="spot-list--item">
+    <label class="spot-list--item-action">
+      <spot-checkbox [(ngModel)]="listCheckboxValue"></spot-checkbox>
+      <div class="spot-list--item-title">Checkbox item with children</div>
+    </label>
+    <ul class="spot-list spot-list_compact">
+      <li class="spot-list--item">
+        <div class="spot-list--item-floating-wrapper">
+          <label class="spot-list--item-action">
+            <spot-checkbox [(ngModel)]="listCheckboxValue"></spot-checkbox>
+            <div class="spot-list--item-title">Child checkbox item</div>
+          </label>
+          <div class="spot-list--item-floating-actions">
+            <button class="spot-link">
+              <span class="spot-icon spot-icon_folder-open"></span>
+            </button>
+            <button class="spot-link">
+              <span class="spot-icon spot-icon_file-doc"></span>
+            </button>
+          </div>
+        </div>
+        <ul class="spot-list spot-list_compact">
+          <li class="spot-list--item">
+            <label class="spot-list--item-action">
+              <spot-checkbox [(ngModel)]="listCheckboxValue"></spot-checkbox>
+              <div class="spot-list--item-title">Second level child</div>
+            </label>
+          </li>
+        </ul>
+      </li>
+      <li class="spot-list--item">
+        <label class="spot-list--item-action">
+          <spot-checkbox [(ngModel)]="listCheckboxValue"></spot-checkbox>
+          <div class="spot-list--item-title">Second child checkbox item</div>
+        </label>
+      </li>
+      <li class="spot-list--item">
+        <div class="spot-list--item-floating-wrapper">
+          <label class="spot-list--item-action">
+            <spot-checkbox [(ngModel)]="listCheckboxValue"></spot-checkbox>
+            <div class="spot-list--item-title">Second child checkbox item with hover menu</div>
+          </label>
+          <div class="spot-list--item-floating-actions">
+            <button class="spot-link">
+              <span class="spot-icon spot-icon_folder-open"></span>
+            </button>
+            <button class="spot-link">
+              <span class="spot-icon spot-icon_file-doc"></span>
+            </button>
+          </div>
+        </div>
       </li>
       <li class="spot-list--item">
         <label class="spot-list--item-action spot-list--item-action_disabled">
@@ -272,6 +429,82 @@ Currently selected value is {{ toggleValue }}
       class="spot-icon spot-icon_bell"
     ></span>
   </spot-text-field>
+
+  <spot-text-field
+    placeholder="Disabled"
+    [disabled]="true"
+  >
+    <span
+      slot="before"
+      class="spot-icon spot-icon_bell"
+    ></span>
+  </spot-text-field>
+</section>
+
+<h1>Form Field</h1>
+
+<section class="space-children">
+  <spot-form-field label="Some input">
+    <spot-text-field
+      slot="input"
+      [(ngModel)]="textFieldValue"
+    ></spot-text-field>
+
+    <p
+      slot="description"
+      class="spot-form-field--description"
+    >This is a description for the form field</p>
+  </spot-form-field>
+
+  <form
+    [formGroup]="usernameForm"
+    (ngSubmit)="onUsernameSubmit()"
+  >
+    <spot-form-field
+      label="Validated input"
+      [required]="true"
+    >
+      <spot-text-field
+        slot="input"
+        formControlName="username"
+      >
+        <span
+          slot="before"
+          class="spot-icon spot-icon_user"
+        ></span>
+      </spot-text-field>
+
+      <p
+        slot="description"
+        class="spot-form-field--description"
+      >
+        This field has validation; try typing in it. The current value is "{{ usernameForm.get('username')!.value }}"
+      </p>
+
+      <p
+        slot="errors"
+        class="spot-form-field--error"
+        *ngIf="usernameForm.get('username')!.errors?.required"
+      >
+        This field is required
+      </p>
+
+      <p
+        slot="errors"
+        class="spot-form-field--error"
+        *ngIf="usernameForm.get('username')!.errors?.minlength"
+      >
+        A username must have at least 3 characters
+      </p>
+      <p
+        slot="errors"
+        class="spot-form-field--error"
+        *ngIf="usernameForm.get('username')!.errors?.maxlength"
+      >
+        A username must have at most 5 characters
+      </p>
+    </spot-form-field>
+  </form>
 </section>
 
 <h1>Drop Modal</h1>
@@ -301,7 +534,8 @@ Currently selected value is {{ toggleValue }}
     type="button"
     class="spot-button spot-button_main"
     (click)="dropModalOpen = !dropModalOpen"
-  >Open Modal</button>
+  >Open Modal
+  </button>
   <ng-container slot="body">
     <div class="spot-container">
       <h1 class="spot-header-small">Test</h1>
@@ -367,17 +601,57 @@ Currently selected value is {{ toggleValue }}
 
 <div class="spot-action-bar">
   <div class="spot-action-bar--left">
-    <button class="spot-button spot-button_outlined spot-button_main">
+    <button class="spot-button spot-button_outlined spot-button_main spot-action-bar--action">
       Independent action
     </button>
   </div>
   <div class="spot-action-bar--right">
-    <button class="spot-button spot-button_outlined spot-button_main">
+    <button class="spot-button spot-button_outlined spot-button_main spot-action-bar--action">
       Some Action
     </button>
-    <button class="spot-button spot-button_main">
+    <button class="spot-button spot-button_main spot-action-bar--action">
       Another Action
     </button>
+  </div>
+</div>
+
+<h1>Modals</h1>
+
+<div class="spot-modal">
+  <div class="spot-modal--header">Default size modal</div>
+  <div class="spot-modal--body spot-container">
+    <p class="spot-body-small">Here is some text in the body. Additionally this is a destructive action.</p>
+  </div>
+  <div class="spot-action-bar">
+    <div class="spot-action-bar--right">
+      <button class="spot-button spot-button_outlined spot-button_main spot-action-bar--action">
+        Cancel
+      </button>
+      <button class="spot-button spot-button_danger spot-action-bar--action">
+        <span class="spot-icon spot-icon_delete"></span>
+        <span>Delete</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="spot-modal spot-modal_wide">
+  <div class="spot-modal--header">
+    <span class="spot-icon spot-icon_help1"></span>
+    <span>Wide modal</span>
+  </div>
+  <div class="spot-divider"></div>
+  <div class="spot-modal--body spot-container">
+    <p class="spot-body-small">Here is some text in the body.</p>
+    <p class="spot-body-small">But this modal has a minimal height!</p>
+  </div>
+  <div class="spot-action-bar">
+    <div class="spot-action-bar--right">
+      <span>Some explanatory text.</span>
+      <button class="spot-button spot-button_main spot-action-bar--action">
+        OK
+      </button>
+    </div>
   </div>
 </div>
 
