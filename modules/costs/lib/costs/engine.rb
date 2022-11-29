@@ -189,6 +189,13 @@ module Costs
                render_nil: true,
                uncacheable: true
 
+      property :rincewindtest,
+               exec_context: :decorator,
+               if: ->(*) { overall_costs_visible? },
+               skip_parse: true,
+               render_nil: true,
+               uncacheable: true
+
       property :overall_costs,
                exec_context: :decorator,
                if: ->(*) { overall_costs_visible? },
@@ -211,7 +218,8 @@ module Costs
                skip_render: ->(*) { !costs_by_type_visible? }
 
       send(:define_method, :overall_costs) do
-        number_to_currency(represented.overall_costs)
+        "10"
+        #number_to_currency(represented.overall_costs)
       end
 
       send(:define_method, :labor_costs) do
@@ -220,6 +228,11 @@ module Costs
 
       send(:define_method, :material_costs) do
         number_to_currency(represented.material_costs)
+      end
+
+      send(:define_method, :rincewindtest) do
+        "To keep everyones phone bills down, you should always try to call me over FaceTime or if you don’t use an iPhone, I’m also available over WhatsApp, Telegram, Signal etc."
+        #number_to_currency(represented.overall_costs)
       end
     end
 
@@ -239,6 +252,12 @@ module Costs
              show_if: ->(*) { represented.project && represented.project.costs_enabled? }
 
       schema :material_costs,
+             type: 'String',
+             required: false,
+             writable: false,
+             show_if: ->(*) { represented.project && represented.project.costs_enabled? }
+
+      schema :rincewindtest,
              type: 'String',
              required: false,
              writable: false,

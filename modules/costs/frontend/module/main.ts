@@ -28,12 +28,14 @@ import { Injector, NgModule } from '@angular/core';
 import { OpenProjectPluginContext } from 'core-app/features/plugins/plugin-context';
 import { CostsByTypeDisplayField } from './wp-display/costs-by-type-display-field.module';
 import { CurrencyDisplayField } from './wp-display/currency-display-field.module';
+import { TestDisplayField } from './wp-display/test-display-field.module';
 
 export function initializeCostsPlugin(injector:Injector) {
   window.OpenProject.getPluginContext().then((pluginContext:OpenProjectPluginContext) => {
     const displayFieldService = pluginContext.services.displayField;
     displayFieldService.addFieldType(CostsByTypeDisplayField, 'costs', ['costsByType']);
     displayFieldService.addFieldType(CurrencyDisplayField, 'currency', ['laborCosts', 'materialCosts', 'overallCosts']);
+    displayFieldService.addFieldType(TestDisplayField, 'test', ['rincewindtest']);
 
     pluginContext.hooks.workPackageSingleContextMenu((params:any) => ({
       key: 'log_costs',

@@ -77,6 +77,11 @@ module Costs
         summable: true,
         summable_select: "labor_costs + material_costs AS overall_costs",
         summable_work_packages_select: false
+      },
+      rincewindtest: {
+        summable: true,
+        summable_select: "labor_costs + material_costs AS rincewindtest",
+        summable_work_packages_select: false
       }
     }
 
