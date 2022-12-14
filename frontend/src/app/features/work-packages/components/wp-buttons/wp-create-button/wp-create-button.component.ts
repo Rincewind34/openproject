@@ -36,6 +36,7 @@ import { Observable } from 'rxjs';
 import { UntilDestroyedMixin } from 'core-app/shared/helpers/angular/until-destroyed.mixin';
 import { componentDestroyed } from '@w11k/ngx-componentdestroyed';
 import { CurrentProjectService } from 'core-app/core/current-project/current-project.service';
+import { TypeResource } from 'core-app/features/hal/resources/type-resource';
 
 @Component({
   selector: 'wp-create-button',
@@ -46,6 +47,8 @@ export class WorkPackageCreateButtonComponent extends UntilDestroyedMixin implem
   @Input('allowed') allowedWhen:string[];
 
   @Input('stateName$') stateName$:Observable<string>;
+  
+  @Input('filteredTypesCallback') filteredTypesCallback:() => TypeResource[];
 
   allowed:boolean;
 

@@ -44,6 +44,8 @@ export class OpTypesContextMenuDirective extends OpContextMenuTrigger {
   @Input('projectIdentifier') public projectIdentifier:string|null|undefined;
 
   @Input('stateName') public stateName:string;
+  
+  @Input('filteredTypesCallback') public filteredTypesCallback:() => TypeResource[];
 
   @Input('dropdownActive') active:boolean;
 
@@ -73,9 +75,21 @@ export class OpTypesContextMenuDirective extends OpContextMenuTrigger {
       .wpCreate
       .getEmptyForm(this.projectIdentifier)
       .then((form) => {
-        this.buildItems(form.schema.type.allowedValues);
-        this.opContextMenu.show(this, evt);
+        if (!evt.altKey)
+          this.buildItemsAndFilterPreferedTypes(form.schema.type.allowedValues);
+        else
+          this.buildItems(form.schema.type.allowedValues)
+        
+        if (this.items.length === 1)
+          this.openOnlyItemNow(evt)
+        else
+          this.opContextMenu.show(this, evt);
       });
+  }
+
+  private openOnlyItemNow(evt:JQuery.TriggeredEvent):void
+  {
+    this.items[0].onClick?.(evt);
   }
 
   public get locals():{ showAnchorRight?:boolean, contextMenuId?:string, items:OpContextMenuItem[] } {
@@ -83,6 +97,12 @@ export class OpTypesContextMenuDirective extends OpContextMenuTrigger {
       items: this.items,
       contextMenuId: 'types-context-menu',
     };
+  }
+  
+  private buildItemsAndFilterPreferedTypes(projectEnabledTypes:TypeResource[])
+  {
+    let preferedTypes:TypeResource[] = this.filteredTypesCallback();
+    return this.buildItems(preferedTypes.length > 0 ? projectEnabledTypes.filter(el => !!preferedTypes.find(pref => pref.id === el.id)) : projectEnabledTypes)
   }
 
   private buildItems(types:TypeResource[]) {
@@ -97,9 +117,14 @@ export class OpTypesContextMenuDirective extends OpContextMenuTrigger {
           return false;
         }
 
-        this.$state.go(this.stateName, { type: type.id });
+        this.openStateWithType(type);
         return true;
       },
+      originTypeResource: type,
     }));
+  }
+
+  private openStateWithType(resource:TypeResource):void {
+    this.$state.go(this.stateName, { type: resource.id });
   }
 }

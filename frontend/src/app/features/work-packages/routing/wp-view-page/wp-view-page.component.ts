@@ -29,6 +29,8 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { HalResourceNotificationService } from 'core-app/features/hal/services/hal-resource-notification.service';
+import { HalResource } from 'core-app/features/hal/resources/hal-resource';
+import { TypeResource } from 'core-app/features/hal/resources/type-resource';
 import { WorkPackageNotificationService } from 'core-app/features/work-packages/services/notifications/work-package-notification.service';
 import { QueryParamListenerService } from 'core-app/features/work-packages/components/wp-query/query-param-listener.service';
 import {
@@ -67,10 +69,12 @@ export class WorkPackageViewPageComponent extends PartitionedQuerySpacePageCompo
       inputs: {
         stateName$: of('work-packages.partitioned.list.new'),
         allowed: ['work_packages.createWorkPackage'],
+        filteredTypesCallback: () => this.buildPreferedTypeIds(),
       },
     },
     {
       component: OpProjectIncludeComponent,
+      show: () => !!(this.currentQuery && this.currentQuery.groupBy),
     },
     {
       component: WorkPackageFilterButtonComponent,
@@ -112,10 +116,22 @@ export class WorkPackageViewPageComponent extends PartitionedQuerySpacePageCompo
     if (this.wpTableTimeline.isVisible) {
       return this.querySpace.timelineRendered.pipe(take(1)).toPromise();
     }
+    
     return this.querySpace.tableRendered.valuesPromise() as Promise<unknown>;
   }
 
   protected shouldUpdateHtmlTitle():boolean {
     return this.$state.current.name === 'work-packages.partitioned.list';
+  }
+  
+  private buildPreferedTypeIds():TypeResource[] {
+    if (!this.currentQuery || !this.currentQuery.filters)
+      return [];
+    
+    let filterInstance = this.currentQuery.filters.find((filter) => filter.id === 'type')
+    if (!filterInstance || !(filterInstance.values as HalResource[]))
+      return [];
+    
+    return (filterInstance.values as HalResource[]).map((el) => el as TypeResource).filter((el) => !!el)
   }
 }
