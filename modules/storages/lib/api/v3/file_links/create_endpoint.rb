@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,59 +26,53 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-module API::V3::FileLinks
-  # Handles /api/v3/work_packages/:work_package_id/file_links as defined
-  # in modules/storages/lib/api/v3/file_links/work_packages_file_links_api.rb
-  #
-  # Multiple classes are involved during its lifecycle:
-  #   - API::V3::FileLinks::ParseCreateParamsService
-  #   - API::V3::FileLinks::FileLinkCollectionRepresenter
-  #   - Storages::FileLinks::CreateService
-  #
-  # These classes are either deduced from the model class, or given as parameter
-  # on class instantiation.
-  class CreateEndpoint < API::Utilities::Endpoints::Create
-    include ::API::V3::Utilities::Endpoints::V3Deductions
-    include ::API::V3::Utilities::Endpoints::V3PresentSingle
+# Handles /api/v3/work_packages/:work_package_id/file_links as defined
+# in modules/storages/lib/api/v3/file_links/work_packages_file_links_api.rb
+#
+# Multiple classes are involved during its lifecycle:
+#   - Storages::Peripherals::ParseCreateParamsService
+#   - API::V3::FileLinks::FileLinkCollectionRepresenter
+#   - Storages::FileLinks::CreateService
+#
+# These classes are either deduced from the model class, or given as parameter
+# on class instantiation.
+class API::V3::FileLinks::CreateEndpoint < API::Utilities::Endpoints::Create
+  include ::API::V3::Utilities::Endpoints::V3Deductions
+  include ::API::V3::Utilities::Endpoints::V3PresentSingle
 
-    # As this endpoint receives a list of file links to create, it calls the
-    # create service multiple times, one time for each file link to create. The
-    # call is done by calling the `super` method. Results are aggregated in
-    # global_result using the `add_dependent!` method.
-    def process(request, params_elements)
-      global_result = ServiceResult.success
+  # As this endpoint receives a list of file links to create, it calls the
+  # create service multiple times, one time for each file link to create. The
+  # call is done by calling the `super` method. Results are aggregated in
+  # global_result using the `add_dependent!` method.
+  def process(request, params_elements)
+    global_result = ServiceResult.success
 
-      Storages::FileLink.transaction do
-        params_elements.each do |params|
-          # call the default API::Utilities::Endpoints::Create#process
-          # implementation for each of the params_element array
-          one_result = super(request, params)
-          # merge service result in one
-          global_result.add_dependent!(one_result)
-        end
-
-        # rollback records created if an error occurred (validation failed)
-        raise ActiveRecord::Rollback if global_result.failure?
+    Storages::FileLink.transaction do
+      params_elements.each do |params|
+        # call the default API::Utilities::Endpoints::Create#process
+        # implementation for each of the params_element array
+        one_result = super(request, params)
+        # merge service result in one
+        global_result.add_dependent!(one_result)
       end
-      global_result
-    end
 
-    def present_success(request, service_call)
-      render_representer.create(
-        service_call.all_results,
-        self_link: request.api_v3_paths.file_links(request.work_package.id),
-        current_user: request.current_user
-      )
+      # rollback records created if an error occurred (validation failed)
+      raise ActiveRecord::Rollback if global_result.failure?
     end
+    global_result
+  end
 
-    private
+  def present_success(request, service_call)
+    render_representer.create(
+      service_call.all_results,
+      self_link: self_link(request),
+      current_user: request.current_user
+    )
+  end
 
-    def params_modifier
-      ->(params) do
-        params[:container_id] = work_package.id
-        params[:container_type] = work_package.class.name
-        params
-      end
-    end
+  private
+
+  def self_link(_request)
+    "#{::API::V3::URN_PREFIX}file_links:no_link_provided"
   end
 end

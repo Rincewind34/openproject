@@ -284,12 +284,6 @@ OPENPROJECT_SECURITY__BADGE__URL (default="https://releases.openproject.com/v1/c
 OPENPROJECT_SELF__REGISTRATION (default=2)
 OPENPROJECT_SENDMAIL__ARGUMENTS (default="-i")
 OPENPROJECT_SENDMAIL__LOCATION (default="/usr/sbin/sendmail")
-OPENPROJECT_SENTRY__BREADCRUMB__LOGGERS (default=["active_support_logger"])
-OPENPROJECT_SENTRY__DSN (default=nil)
-OPENPROJECT_SENTRY__FRONTEND__DSN (default=nil)
-OPENPROJECT_SENTRY__FRONTEND__TRACE__FACTOR (default=0)
-OPENPROJECT_SENTRY__HOST (default=nil)
-OPENPROJECT_SENTRY__TRACE__FACTOR (default=0)
 OPENPROJECT_SESSION__COOKIE__NAME (default="_open_project_session")
 OPENPROJECT_SESSION__STORE (default=:active_record_store)
 OPENPROJECT_SESSION__TTL (default=120)
@@ -340,4 +334,4 @@ OPENPROJECT_YOUTUBE__CHANNEL (default="https://www.youtube.com/c/OpenProjectComm
 
 ### PostgreSQL statement_timeout
 
-In docker installations, there is a default `statement_timeout` of 90s set for the docker image. To override this value in case you're getting statement timeout errros such as "ERROR:  canceling statement due to statement timeout", use the environment variable `POSTGRES_STATEMENT_TIMEOUT`
+In docker installations, there is a default `statement_timeout` of 90s set for the docker image. To override this value in case you're getting statement timeout errors such as "ERROR:  canceling statement due to statement timeout", use the environment variable `POSTGRES_STATEMENT_TIMEOUT`

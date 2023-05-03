@@ -1,6 +1,6 @@
 // -- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2022 the OpenProject GmbH
+// Copyright (C) 2012-2023 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,6 @@
 
 import { Injectable } from '@angular/core';
 import {
-  HttpClient,
   HttpHeaders,
 } from '@angular/common/http';
 import { applyTransaction } from '@datorama/akita';
@@ -52,7 +51,6 @@ import {
 import { OpenProjectDirectFileUploadService } from 'core-app/core/file-upload/op-direct-file-upload.service';
 import { I18nService } from 'core-app/core/i18n/i18n.service';
 import { HalResource } from 'core-app/features/hal/resources/hal-resource';
-import { ApiV3Service } from 'core-app/core/apiv3/api-v3.service';
 import { HalLink } from 'core-app/features/hal/hal-link/hal-link';
 import isNewResource, { HAL_NEW_RESOURCE_ID } from 'core-app/features/hal/helpers/is-new-resource';
 import { ConfigurationService } from 'core-app/core/config/configuration.service';
@@ -61,20 +59,19 @@ import {
   CollectionStore,
   ResourceCollectionService,
 } from 'core-app/core/state/resource-collection.service';
+import { InjectField } from 'core-app/shared/helpers/angular/inject-field.decorator';
 
 @Injectable()
 export class AttachmentsResourceService extends ResourceCollectionService<IAttachment> {
-  constructor(
-    private readonly I18n:I18nService,
-    private readonly http:HttpClient,
-    private readonly apiV3Service:ApiV3Service,
-    private readonly fileUploadService:OpenProjectFileUploadService,
-    private readonly directFileUploadService:OpenProjectDirectFileUploadService,
-    private readonly configurationService:ConfigurationService,
-    private readonly toastService:ToastService,
-  ) {
-    super();
-  }
+  @InjectField() I18n:I18nService;
+
+  @InjectField() fileUploadService:OpenProjectFileUploadService;
+
+  @InjectField() directFileUploadService:OpenProjectDirectFileUploadService;
+
+  @InjectField() configurationService:ConfigurationService;
+
+  @InjectField() toastService:ToastService;
 
   /**
    * This method ensures that a specific collection is fetched, if not available.
@@ -245,5 +242,9 @@ export class AttachmentsResourceService extends ResourceCollectionService<IAttac
 
   protected createStore():CollectionStore<IAttachment> {
     return new AttachmentsStore();
+  }
+
+  protected basePath():string {
+    return this.apiV3Service.attachments.path;
   }
 }

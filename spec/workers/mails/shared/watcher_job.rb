@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -126,25 +126,25 @@ shared_examples "watcher job" do |action|
 
   it_behaves_like 'notifies the watcher' do
     let(:notification_settings) do
-      [build_stubbed(:notification_setting, mentioned: false, involved: false, watched: true)]
+      [build_stubbed(:notification_setting, mentioned: false, assignee: false, responsible: false, watched: true)]
     end
   end
 
   it_behaves_like 'notifies the watcher' do
     let(:notification_settings) do
-      [build_stubbed(:notification_setting, mentioned: false, involved: false, watched: true)]
+      [build_stubbed(:notification_setting, mentioned: false, assignee: false, responsible: false, watched: true)]
     end
   end
 
   it_behaves_like 'does not notify the watcher' do
     let(:notification_settings) do
-      [build_stubbed(:notification_setting, mentioned: false, involved: true, watched: false)]
+      [build_stubbed(:notification_setting, mentioned: false, assignee: true, responsible: true, watched: false)]
     end
   end
 
   it_behaves_like 'does not notify the watcher' do
     let(:notification_settings) do
-      [build_stubbed(:notification_setting, mentioned: true, involved: false, watched: false)]
+      [build_stubbed(:notification_setting, mentioned: true, assignee: false, responsible: false, watched: false)]
     end
   end
 

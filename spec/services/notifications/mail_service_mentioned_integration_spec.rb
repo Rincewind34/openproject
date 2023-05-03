@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,7 +33,7 @@ describe Notifications::MailService, 'Mentioned integration', type: :model do
   include_context 'with a mentioned work package being updated again'
 
   let(:assignee) do
-    create :user,
+    create(:user,
            preferences: {
              immediate_reminders: {
                mentioned: true
@@ -42,10 +42,11 @@ describe Notifications::MailService, 'Mentioned integration', type: :model do
            notification_settings: [
              build(:notification_setting,
                    mentioned: true,
-                   involved: true)
+                   assignee: true,
+                   responsible: true)
            ],
            member_in_project: project,
-           member_through_role: role
+           member_through_role: role)
   end
 
   let(:assigned_notification) do
@@ -62,7 +63,12 @@ describe Notifications::MailService, 'Mentioned integration', type: :model do
   end
 
   def expect_no_assigned_notification
-    expect(Notification.where(recipient:, resource: work_package, reason: :involved))
+    expect(Notification.where(recipient:, resource: work_package, reason: :assignee))
+      .to be_empty
+  end
+
+  def expect_no_responsible_notification
+    expect(Notification.where(recipient:, resource: work_package, reason: :responsible))
       .to be_empty
   end
 
@@ -94,9 +100,10 @@ describe Notifications::MailService, 'Mentioned integration', type: :model do
       .to have_received(:mentioned)
             .once
 
-    # No involved notification since the assignee is also mentioned which trumps
+    # No assignee and responsible notification since the assignee is also mentioned which trumps
     # being assignee and a user will only get one notification for a journal.
     expect_no_assigned_notification
+    expect_no_responsible_notification
     expect_mentioned_notification
 
     update_assignee!(assignee)

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -105,7 +105,8 @@ RSpec.describe 'Work package copy', js: true, selenium: true do
     to_copy_work_package_page.save!
 
     expect(page).to have_selector('.op-toast--content',
-                                  text: I18n.t('js.notice_successful_create'))
+                                  text: I18n.t('js.notice_successful_create'),
+                                  wait: 20)
 
     copied_work_package = WorkPackage.order(created_at: 'desc').first
 
@@ -127,7 +128,7 @@ RSpec.describe 'Work package copy', js: true, selenium: true do
     work_package_page.visit_tab! :relations
     expect_angular_frontend_initialized
     expect(page).to have_selector('.relation-group--header', text: 'RELATED TO', wait: 20)
-    expect(page).to have_selector('.wp-relations--subject-field', text: original_work_package.subject)
+    expect(page).to have_selector("[data-qa-selector='op-relation--row-subject']", text: original_work_package.subject)
   end
 
   describe 'when source work package has an attachment' do
@@ -140,7 +141,7 @@ RSpec.describe 'Work package copy', js: true, selenium: true do
       find('#action-show-more-dropdown-menu .button').click
       find('.menu-item', text: 'Copy', exact_text: true).click
 
-      to_copy_work_package_page = Pages::FullWorkPackageCreate.new original_work_package: original_work_package
+      to_copy_work_package_page = Pages::FullWorkPackageCreate.new(original_work_package:)
       to_copy_work_package_page.update_attributes Description: 'Copied WP Description'
       to_copy_work_package_page.save!
 
@@ -156,10 +157,9 @@ RSpec.describe 'Work package copy', js: true, selenium: true do
     to_copy_work_package_page.expect_fully_loaded
 
     to_copy_work_package_page.update_attributes Description: 'Copied WP Description'
-    to_copy_work_package_page.save!
 
-    expect(page).to have_selector('.op-toast--content',
-                                  text: I18n.t('js.notice_successful_create'))
+    to_copy_work_package_page.save!
+    find('.op-toast--content', text: I18n.t('js.notice_successful_create'), wait: 20)
 
     copied_work_package = WorkPackage.order(created_at: 'desc').first
 
@@ -181,6 +181,6 @@ RSpec.describe 'Work package copy', js: true, selenium: true do
     work_package_page.visit_tab!('relations')
     expect_angular_frontend_initialized
     expect(page).to have_selector('.relation-group--header', text: 'RELATED TO', wait: 20)
-    expect(page).to have_selector('.wp-relations--subject-field', text: original_work_package.subject)
+    expect(page).to have_selector("[data-qa-selector='op-relation--row-subject']", text: original_work_package.subject)
   end
 end

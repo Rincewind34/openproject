@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -87,7 +87,7 @@ class Repository::Subversion < Repository
 
   # Returns a path relative to the url of the repository
   def relative_path(path)
-    path.gsub(Regexp.new("^\/?#{Regexp.escape(relative_url)}\/"), '')
+    path.gsub(Regexp.new("^/?#{Regexp.escape(relative_url)}/"), '')
   end
 
   def fetch_changesets

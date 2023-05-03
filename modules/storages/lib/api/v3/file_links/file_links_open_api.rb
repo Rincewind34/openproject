@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,20 +26,14 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-module API
-  module V3
-    module FileLinks
-      class FileLinksOpenAPI < ::API::OpenProjectAPI
-        helpers API::V3::FileLinks::StorageUrlHelper
+class API::V3::FileLinks::FileLinksOpenAPI < API::OpenProjectAPI
+  helpers Storages::Peripherals::StorageUrlHelper
 
-        resources :open do
-          get do
-            url = storage_url_open_file(@file_link, open_location: params[:location])
-            redirect url, body: "The requested resource can be viewed at #{url}"
-            status 303 # The follow-up request to the resource must be GET
-          end
-        end
-      end
+  resources :open do
+    get do
+      url = storage_url_open_file(@file_link, open_location: params[:location])
+      redirect url, body: "The requested resource can be viewed at #{url}"
+      status 303 # The follow-up request to the resource must be GET
     end
   end
 end

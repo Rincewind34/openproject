@@ -6,7 +6,7 @@ sidebar_navigation:
 
 # Install OpenProject with Docker
 
-[Docker](https://www.docker.com/) is a way to distribute self-contained applications easily. We provide a Docker image for the Community Edition that you can very easily
+[Docker](https://www.docker.com/) is a way to distribute self-contained applications easily. We provide a Docker image for the Community edition that you can very easily
 install and upgrade on your servers. However, contrary to the manual or package-based installation, your machine needs to have the Docker Engine
 installed first, which usually requires a recent operating system. Please see the [Docker Engine installation page](https://docs.docker.com/install) if you don't have Docker installed.
 
@@ -67,9 +67,9 @@ If you want to start from scratch and remove the existing data you will have to 
 
 ### Configuration
 
-Please see the [advanced configuration guide's docker paragraphs](../configuration#docker)
+Please see the [advanced configuration guide's docker paragraphs](../../configuration/#docker)
 
-#### BIM Edition
+#### BIM edition
 
 In order to install or change to BIM inside a Docker environment, please navigate to the [Docker Installation for OpenProject BIM](../../bim-edition/#docker-installation-openproject-bim) paragraph at the BIM edition documentation. 
 
@@ -177,7 +177,7 @@ docker rm openproject
 
 ### Configuration
 
-Please see the [advanced configuration guide's docker paragraphs](../configuration#docker)
+Please see the [advanced configuration guide's docker paragraphs](../../configuration#docker)
 
 #### Disabling HTTPS mode
 
@@ -198,11 +198,16 @@ If you _really_ want to disable HSTS headers and request upgrades, you will need
 
 For more advanced configuration, please have a look at the [Advanced configuration](../../configuration) section.
 
-### Apache Reverse Proxy Setup
+### Reverse Proxy Setup
 
-The containers above are not meant as public facing endpoints. Always use an existing proxying web server or load balancer to provide access to OpenProject
+The containers above are not meant as public facing endpoints.
+Always use an existing proxying web server or load balancer to provide access to OpenProject.
 
 There are two ways to run OpenProject. We'll cover each configuration in a separate of the following sections.
+Moreover we're going to give basic configurations for both the [Apache](https://httpd.apache.org/)
+and [nginx](https://nginx.org/en/) web servers.
+
+**Apache**
 
 For both configurations the following Apache mods are required:
 
@@ -214,14 +219,21 @@ For both configurations the following Apache mods are required:
 In each case you will create a file `/usr/local/apache2/conf/sites/openproject.conf`
 with the contents as described in the respective sections.
 
-Both configuration examples are based on the following assumptions:
+**Nginx**
+
+The nginx configuration will go into `/etc/nginx/conf.d/openproject.conf`.
+
+**Assumptions**
+
+All examples are based on the following assumptions:
 
 * the site is accessed via https
 * certificate and key are located under `/etc/ssl/crt/server.{crt, key}`
 * the OpenProject docker container's port 80 is mapped to the docker host's port 8080
 
-*Important:* Once OpenProject is running make sure to also set the host name and protocol
-accordingly under Administration -> System Settings.
+*Important:* Once OpenProject is running make sure to also set the host name accordingly under Administration -> System Settings or set it directly during startup by setting `OPENPROJECT_HOST__NAME`.
+
+> **NOTE:** There is [another example](../packaged/#external-ssltls-termination) for external SSL/TLS termination for **packaged** installations
 
 #### 1) Virtual host root
 
@@ -229,10 +241,9 @@ The default scenario is to have OpenProject serve the whole virtual host.
 This requires no further configuration for the docker container beyond what is
 described above.
 
-Assuming the desired *server name* is `openproject.example.com` the configuration
-will look like this:
+Let's assume we want OpenProject to be accessed under https://openproject.example.com.
 
-> **NOTE:** There is [another example](../packaged/#external-ssltls-termination) for external SSL/TLS termination for **packaged** installations
+The **apache** configuration for this looks as follows.
 
 ```
 <VirtualHost *:80>
@@ -265,6 +276,37 @@ will look like this:
 </VirtualHost>
 ```
 
+The **nginx** counterpart can be seen below.
+
+```
+server {
+    listen 80;
+
+    server_name openproject.example.com;
+
+    return 301 https://$host$request_uri;
+}
+
+server {
+  listen 443 ssl;
+  server_name openproject.example.com;
+
+  ssl_certificate     /etc/ssl/crt/server.crt;
+  ssl_certificate_key /etc/ssl/crt/server.key;
+
+  proxy_redirect    off;
+
+  location / {
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP  $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto https;
+
+    proxy_pass http://127.0.0.1:8080;
+  }
+}
+```
+
 #### 2) Location (subdirectory)
 
 Let's assume you want OpenProject to run on your host with the *server name* `example.com`
@@ -277,7 +319,7 @@ need to configure OpenProject accordingly by adding the following options to the
 -e OPENPROJECT_RAILS__RELATIVE__URL__ROOT=/openproject
 ```
 
-The apache configuration for this configuration then looks like this:
+The **apache** configuration for this configuration then looks like this:
 
 ```
 <VirtualHost *:80>
@@ -308,6 +350,39 @@ The apache configuration for this configuration then looks like this:
       ProxyPassReverse http://127.0.0.1:8080/openproject/
     </Location>
 </VirtualHost>
+```
+
+The equivalent **nginx** configuration looks as follows.
+
+```
+server {
+    listen 80;
+
+    server_name example.com;
+
+    location /openproject {
+      return 301 https://$host$request_uri;
+    }
+}
+
+server {
+  listen 443 ssl;
+  server_name example.com;
+
+  ssl_certificate     /etc/ssl/crt/server.crt;
+  ssl_certificate_key /etc/ssl/crt/server.key;
+
+  proxy_redirect    off;
+
+  location /openproject {
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP  $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto https;
+
+    proxy_pass http://127.0.0.1:8080/openproject;
+  }
+}
 ```
 
 ### OpenProject plugins

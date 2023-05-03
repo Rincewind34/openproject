@@ -55,18 +55,18 @@ module OpenIDConnect
     private
 
     def check_ee
-      if EnterpriseToken.show_banners?
+      unless EnterpriseToken.allows_to?(:openid_providers)
         render template: '/openid_connect/providers/upsale'
         false
       end
     end
 
     def create_params
-      params.require(:openid_connect_provider).permit(:name, :display_name, :identifier, :secret)
+      params.require(:openid_connect_provider).permit(:name, :display_name, :identifier, :secret, :limit_self_registration)
     end
 
     def update_params
-      params.require(:openid_connect_provider).permit(:display_name, :identifier, :secret)
+      params.require(:openid_connect_provider).permit(:display_name, :identifier, :secret, :limit_self_registration)
     end
 
     def find_provider

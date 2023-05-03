@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -64,7 +64,7 @@ module API
                              calculated_self_path(request),
                              scope ? request.instance_exec(&scope) : model)
             else
-              render_error(query)
+              raise_query_errors(query)
             end
           end
 
@@ -92,7 +92,7 @@ module API
             render_representer
               .create(results,
                       self_link: self_path,
-                      query: resulting_params,
+                      query_params: resulting_params,
                       page: resulting_params[:offset],
                       per_page: resulting_params[:pageSize],
                       groups: calculate_groups(query),
@@ -132,10 +132,6 @@ module API
 
           def paginated_representer?
             render_representer.ancestors.include?(::API::Decorators::OffsetPaginatedCollection)
-          end
-
-          def render_error(query)
-            raise ::API::Errors::InvalidQuery.new(query.errors.full_messages)
           end
 
           def calculated_self_path(request)

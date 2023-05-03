@@ -4,9 +4,9 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { UIRouterModule } from '@uirouter/angular';
+import { A11yModule } from '@angular/cdk/a11y';
+
 import { I18nService } from 'core-app/core/i18n/i18n.service';
-import { SPOT_DOCS_ROUTES } from './spot.routes';
 import { SpotCheckboxComponent } from './components/checkbox/checkbox.component';
 import { SpotSwitchComponent } from './components/switch/switch.component';
 import { SpotToggleComponent } from './components/toggle/toggle.component';
@@ -16,17 +16,16 @@ import { SpotDropModalComponent } from './components/drop-modal/drop-modal.compo
 import { SpotTooltipComponent } from './components/tooltip/tooltip.component';
 import { SpotFormFieldComponent } from './components/form-field/form-field.component';
 import { SpotFormBindingDirective } from './components/form-field/form-binding.directive';
-import { SpotDocsComponent } from './spot-docs.component';
-import { SpotSelectorFieldComponent } from 'core-app/spot/components/selector-field/selector-field.component';
-import { AttributeHelpTextModule } from 'core-app/shared/components/attribute-help-texts/attribute-help-text.module';
+import { SpotBreadcrumbsComponent } from './components/breadcrumbs/breadcrumbs.component';
+import { SpotSelectorFieldComponent } from './components/selector-field/selector-field.component';
+import { SpotDropModalPortalComponent } from './components/drop-modal/drop-modal-portal.component';
 
 @NgModule({
   imports: [
-    // Routes for /spot-docs
-    UIRouterModule.forChild({ states: SPOT_DOCS_ROUTES }),
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
+    A11yModule,
   ],
 
   providers: [
@@ -34,14 +33,15 @@ import { AttributeHelpTextModule } from 'core-app/shared/components/attribute-he
   ],
 
   declarations: [
-    SpotDocsComponent,
-
+    SpotBreadcrumbsComponent,
     SpotCheckboxComponent,
     SpotSwitchComponent,
     SpotToggleComponent,
     SpotTextFieldComponent,
     SpotFilterChipComponent,
     SpotDropModalComponent,
+    SpotDropModalPortalComponent,
+    SpotDropModalPortalComponent,
     SpotFormFieldComponent,
     SpotFormBindingDirective,
     SpotTooltipComponent,
@@ -49,12 +49,15 @@ import { AttributeHelpTextModule } from 'core-app/shared/components/attribute-he
   ],
 
   exports: [
+    SpotBreadcrumbsComponent,
     SpotCheckboxComponent,
     SpotSwitchComponent,
     SpotToggleComponent,
     SpotTextFieldComponent,
     SpotFilterChipComponent,
     SpotDropModalComponent,
+    SpotDropModalPortalComponent,
+    SpotDropModalPortalComponent,
     SpotFormFieldComponent,
     SpotFormBindingDirective,
     SpotTooltipComponent,

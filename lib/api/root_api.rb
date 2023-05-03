@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -185,17 +185,21 @@ module API
         authorize_by_with_raise((current_user.logged? && current_user.active?) || current_user.is_a?(SystemUser))
       end
 
+      def raise_query_errors(object)
+        api_errors = object.errors.full_messages.map do |message|
+          ::API::Errors::InvalidQuery.new(message)
+        end
+
+        raise ::API::Errors::MultipleErrors.create_if_many api_errors
+      end
+
       def raise_invalid_query_on_service_failure
         service = yield
 
         if service.success?
           service
         else
-          api_errors = service.errors.full_messages.map do |message|
-            ::API::Errors::InvalidQuery.new(message)
-          end
-
-          raise ::API::Errors::MultipleErrors.create_if_many api_errors
+          raise_query_errors(service)
         end
       end
     end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -145,7 +145,7 @@ describe Redmine::UnifiedDiff do
       +      @truncated = false
              diff_table = DiffTable.new(diff_type)
              diff.each do |line|
-               if line =~ /^(---|\+\+\+) (.*)$/
+               if line =~ /^(---|+++) (.*)$/
       @@ -28,10 +31,17 @@
                  diff_table = DiffTable.new(diff_type)
                end

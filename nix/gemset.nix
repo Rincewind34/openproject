@@ -801,38 +801,6 @@
     };
     version = "1.0.0";
   };
-  database_cleaner = {
-    dependencies = ["database_cleaner-active_record"];
-    groups = ["test"];
-    platforms = [];
-    source = {
-      remotes = ["https://rubygems.org"];
-      sha256 = "1x4r22rnpwnm9yln88vhzqj4cl3sbd26c4j50g9k6wp7y01rln4w";
-      type = "gem";
-    };
-    version = "2.0.1";
-  };
-  database_cleaner-active_record = {
-    dependencies = ["activerecord" "database_cleaner-core"];
-    groups = ["default" "test"];
-    platforms = [];
-    source = {
-      remotes = ["https://rubygems.org"];
-      sha256 = "1jg7jd7w65hdarzbi8f252la3qgsnd2sjavhlmc82kwzfx37k38m";
-      type = "gem";
-    };
-    version = "2.0.0";
-  };
-  database_cleaner-core = {
-    groups = ["default" "test"];
-    platforms = [];
-    source = {
-      remotes = ["https://rubygems.org"];
-      sha256 = "0v44bn386ipjjh4m2kl53dal8g4d41xajn2jggnmjbhn6965fil6";
-      type = "gem";
-    };
-    version = "2.0.1";
-  };
   date_validator = {
     dependencies = ["activemodel" "activesupport"];
     groups = ["default"];
@@ -1163,17 +1131,6 @@
       type = "gem";
     };
     version = "6.1.0";
-  };
-  faker = {
-    dependencies = ["i18n"];
-    groups = ["development"];
-    platforms = [];
-    source = {
-      remotes = ["https://rubygems.org"];
-      sha256 = "0z3d4y6xg8prn3zdjw1qpqrnziq1d3zigqil4sxjj0pbr46gc1d6";
-      type = "gem";
-    };
-    version = "2.17.0";
   };
   faraday = {
     dependencies = ["faraday-net_http" "multipart-post" "ruby2_keywords"];

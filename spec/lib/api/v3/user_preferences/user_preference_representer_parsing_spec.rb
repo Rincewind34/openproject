@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,11 +28,11 @@
 
 require 'spec_helper'
 
-describe ::API::V3::UserPreferences::UserPreferenceRepresenter,
+describe API::V3::UserPreferences::UserPreferenceRepresenter,
          'parsing' do
   subject(:parsed) { representer.from_hash request_body }
 
-  include ::API::V3::Utilities::PathHelper
+  include API::V3::Utilities::PathHelper
 
   let(:preference) { OpenStruct.new }
   let(:user) { build_stubbed(:user) }
@@ -43,7 +43,8 @@ describe ::API::V3::UserPreferences::UserPreferenceRepresenter,
       {
         'notifications' => [
           {
-            'involved' => true,
+            'assignee' => true,
+            'responsible' => true,
             '_links' => {
               'project' => {
                 'href' => '/api/v3/projects/1'
@@ -51,7 +52,8 @@ describe ::API::V3::UserPreferences::UserPreferenceRepresenter,
             }
           },
           {
-            'involved' => false,
+            'assignee' => false,
+            'responsible' => false,
             'mentioned' => true,
             '_links' => {
               'project' => {
@@ -69,11 +71,13 @@ describe ::API::V3::UserPreferences::UserPreferenceRepresenter,
       in_project, global = subject.notification_settings
 
       expect(in_project[:project_id]).to eq "1"
-      expect(in_project[:involved]).to be_truthy
+      expect(in_project[:assignee]).to be_truthy
+      expect(in_project[:responsible]).to be_truthy
       expect(in_project[:mentioned]).to be_nil
 
       expect(global[:project_id]).to be_nil
-      expect(global[:involved]).to be false
+      expect(global[:assignee]).to be_falsey
+      expect(global[:responsible]).to be_falsey
       expect(global[:mentioned]).to be true
     end
   end

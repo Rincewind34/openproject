@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -60,7 +60,8 @@ describe UserPreferences::UpdateService, 'integration', type: :model do
             {
               project_id: nil,
               watched: false,
-              involved: true,
+              assignee: true,
+              responsible: true,
               work_package_commented: false,
               work_package_created: true,
               work_package_processed: true,
@@ -76,18 +77,20 @@ describe UserPreferences::UpdateService, 'integration', type: :model do
 
         expect(default_ian.watched).to be true
         expect(default_ian.mentioned).to be true
-        expect(default_ian.involved).to be true
-        expect(default_ian.work_package_commented).to be true
-        expect(default_ian.work_package_created).to be true
-        expect(default_ian.work_package_processed).to be true
-        expect(default_ian.work_package_prioritized).to be true
-        expect(default_ian.work_package_scheduled).to be true
+        expect(default_ian.assignee).to be true
+        expect(default_ian.responsible).to be true
+        expect(default_ian.work_package_commented).to be false
+        expect(default_ian.work_package_created).to be false
+        expect(default_ian.work_package_processed).to be false
+        expect(default_ian.work_package_prioritized).to be false
+        expect(default_ian.work_package_scheduled).to be false
 
         expect(subject.count).to eq 1
         expect(subject.first.project_id).to be_nil
-        expect(subject.first.mentioned).to be false
+        expect(subject.first.mentioned).to be true
         expect(subject.first.watched).to be false
-        expect(subject.first.involved).to be true
+        expect(default_ian.assignee).to be true
+        expect(default_ian.responsible).to be true
         expect(subject.first.work_package_commented).to be false
         expect(subject.first.work_package_created).to be true
         expect(subject.first.work_package_processed).to be true
@@ -101,11 +104,11 @@ describe UserPreferences::UpdateService, 'integration', type: :model do
     end
 
     context 'with a full replacement' do
-      let(:project) { create :project }
+      let(:project) { create(:project) }
       let(:attributes) do
         {
           notification_settings: [
-            { project_id: project.id, mentioned: true }
+            { project_id: project.id, mentioned: false }
           ]
         }
       end
@@ -117,9 +120,24 @@ describe UserPreferences::UpdateService, 'integration', type: :model do
         expect(subject.count).to eq 1
         expect(subject.first.project_id).to eq project.id
 
+        expected_default_settings = {
+          NotificationSetting::START_DATE => 1,
+          NotificationSetting::DUE_DATE => 1,
+          NotificationSetting::OVERDUE => nil,
+          NotificationSetting::ASSIGNEE => true,
+          NotificationSetting::RESPONSIBLE => true,
+          NotificationSetting::WATCHED => true
+        }
+
         NotificationSetting.all_settings.each do |key|
           val = subject.first.send key
-          expect(val).to eq(key == :mentioned)
+
+          if key.in?(expected_default_settings)
+            expect(key => val).to eq(key => expected_default_settings[key])
+          else
+            # Settings with default value false
+            expect(key => val).to eq(key => false)
+          end
         end
 
         expect(current_user.notification_settings.count).to eq(1)

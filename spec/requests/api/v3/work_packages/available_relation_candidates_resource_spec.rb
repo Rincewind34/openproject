@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,12 +28,11 @@
 
 require 'spec_helper'
 
-describe ::API::V3::WorkPackages::AvailableRelationCandidatesAPI do
+describe API::V3::WorkPackages::AvailableRelationCandidatesAPI do
   shared_let(:user) { create(:admin) }
 
   shared_let(:project1) { create(:project) }
 
-  # rubocop:disable Naming/VariableNumber
   shared_let(:wp1) { create(:work_package, project: project1, subject: "WP 1") }
 
   shared_let(:wp1_1) do
@@ -57,8 +56,6 @@ describe ::API::V3::WorkPackages::AvailableRelationCandidatesAPI do
   shared_let(:relation_wp2_1_to_wp2_2) do
     create(:relation, from: wp2_1, to: wp2_2, relation_type: "relates")
   end
-  # rubocop:enable Naming/VariableNumber
-
   let(:href) { "/api/v3/work_packages/#{wp1.id}/available_relation_candidates?query=WP" }
   let(:request) { get href }
   let(:result) do
@@ -84,8 +81,8 @@ describe ::API::V3::WorkPackages::AvailableRelationCandidatesAPI do
   context "without cross project relations",
           with_settings: { cross_project_work_package_relations: false } do
     describe "relation candidates for wp1 (in hierarchy)" do
-      it "returns an empty list" do # as relations to ancestors or descendents is not allowed
-        expect(result["count"]).to eq 0
+      it "returns an empty list" do
+        expect(subjects).to match_array ["WP 1.2.1"]
       end
     end
 
@@ -119,8 +116,8 @@ describe ::API::V3::WorkPackages::AvailableRelationCandidatesAPI do
     describe "relation candidates for wp1 (in hierarchy)" do
       let(:href) { "/api/v3/work_packages/#{wp1.id}/available_relation_candidates?query=WP" }
 
-      it "returns WP 2 and all WP 2.x" do
-        expect(subjects).to match_array ["WP 2", "WP 2.1", "WP 2.2"]
+      it "returns WP 2 and all WP 2.x as well at the grandchild WP 1.2.1" do
+        expect(subjects).to match_array ["WP 2", "WP 2.1", "WP 2.2", "WP 1.2.1"]
       end
     end
 
@@ -133,7 +130,7 @@ describe ::API::V3::WorkPackages::AvailableRelationCandidatesAPI do
       end
 
       it "returns WP 2 and all WP 2.x sorted by updated_at DESC" do
-        expect(subjects).to match ["WP 2.1", "WP 2", "WP 2.2"]
+        expect(subjects).to match ["WP 2.1", "WP 1.2.1", "WP 2", "WP 2.2"]
       end
     end
 
@@ -145,26 +142,47 @@ describe ::API::V3::WorkPackages::AvailableRelationCandidatesAPI do
       end
 
       describe 'with an already existing relationship from the work package' do
-        # rubocop:disable Naming/VariableNumber
         shared_let(:relation_wp2_to_wp2_2) do
-          create(:relation, from: wp2, to: wp2_2, relation_type: "relates")
+          create(:relation, from: wp2, to: wp2_2, relation_type: "follows")
         end
 
         shared_let(:relation_wp1_1_to_wp2) do
-          create(:relation, from: wp1_1, to: wp2, relation_type: "relates")
+          create(:relation, from: wp1_1, to: wp2, relation_type: "follows")
         end
-        # rubocop:enable Naming/VariableNumber
-
         context 'for a follows relationship' do
-          it 'does not contain the work packages with which a relationship already exists but the parent' do
+          it 'does not contain the work packages already related in the opposite direction nor the parent' do
+            expect(subjects).to match_array ["WP 1.2", "WP 1.2.1", "WP 2.1"]
+          end
+        end
+
+        context 'for a precedes relationship' do
+          let(:href) { "/api/v3/work_packages/#{wp2.id}/available_relation_candidates?query=WP&type=precedes" }
+
+          it 'does not contain the work packages already related but the parent' do
             expect(subjects).to match_array ["WP 1", "WP 1.2", "WP 1.2.1", "WP 2.1"]
+          end
+        end
+
+        context 'for a parent relationship' do
+          let(:href) { "/api/v3/work_packages/#{wp2.id}/available_relation_candidates?query=WP&type=parent" }
+
+          it 'does not contain the work packages already related but the parent' do
+            expect(subjects).to match_array ["WP 1", "WP 1.2", "WP 1.2.1", "WP 2.1"]
+          end
+        end
+
+        context 'for a child relationship' do
+          let(:href) { "/api/v3/work_packages/#{wp2.id}/available_relation_candidates?query=WP&type=child" }
+
+          it 'does not contain the work packages already related nor the parent' do
+            expect(subjects).to match_array ["WP 1.2", "WP 1.2.1", "WP 2.1"]
           end
         end
 
         context 'for a relates relationship' do
           let(:href) { "/api/v3/work_packages/#{wp2.id}/available_relation_candidates?query=WP&type=relates" }
 
-          it 'does not contain the work packages with which a relationship already exists but the parent' do
+          it 'does not contain the work packages already related but the parent' do
             expect(subjects).to match_array ["WP 1", "WP 1.2", "WP 1.2.1", "WP 2.1"]
           end
         end

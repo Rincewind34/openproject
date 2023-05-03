@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -64,15 +64,14 @@ module API
         end
 
         def update_query(query, request_body, current_user)
-          rep = representer.new query, current_user: current_user
+          rep = representer.new(query, current_user:)
           query = rep.from_hash request_body
-          call = ::Queries::UpdateService.new(model: query, user: current_user).call query
 
-          if call.success?
-            representer.new call.result, current_user: current_user, embed_links: true
-          else
-            fail ::API::Errors::ErrorBase.create_and_merge_errors(call.errors)
+          call = raise_invalid_query_on_service_failure do
+            ::Queries::UpdateService.new(model: query, user: current_user).call query
           end
+
+          representer.new call.result, current_user:, embed_links: true
         end
 
         def representer
@@ -88,7 +87,7 @@ module API
         end
 
         def update_query_from_body_and_params(query)
-          representer = ::API::V3::Queries::QueryRepresenter.create query, current_user: current_user
+          representer = ::API::V3::Queries::QueryRepresenter.create(query, current_user:)
 
           # Update the query from the hash
           representer.from_hash(Hash(request_body)).tap do |parsed_query|

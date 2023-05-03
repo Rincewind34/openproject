@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -54,7 +54,7 @@ class User < Principal
      inverse_of: :user
   has_one :rss_token, class_name: '::Token::RSS', dependent: :destroy
   has_one :api_token, class_name: '::Token::API', dependent: :destroy
-  belongs_to :auth_source
+  belongs_to :auth_source, optional: true
 
   # Authorized OAuth grants
   has_many :oauth_grants,
@@ -83,6 +83,7 @@ class User < Principal
          :newest,
          :notified_globally,
          :watcher_recipients,
+         :with_time_zone,
          :having_reminder_mail_to_send
 
   def self.create_blocked_scope(scope, blocked)
@@ -164,7 +165,6 @@ class User < Principal
 
   def reload(*args)
     @name = nil
-    @projects_by_role = nil
     @user_allowed_service = nil
     @project_role_cache = nil
 
@@ -480,37 +480,6 @@ class User < Principal
     roles_for_project(project).any?(&:member?)
   end
 
-  # Returns a hash of user's projects grouped by roles
-  def projects_by_role
-    return @projects_by_role if @projects_by_role
-
-    @projects_by_role = Hash.new { |h, k| h[k] = [] }
-    memberships.each do |membership|
-      membership.roles.each do |role|
-        @projects_by_role[role] << membership.project if membership.project
-      end
-    end
-    @projects_by_role.each do |_role, projects|
-      projects.uniq!
-    end
-
-    @projects_by_role
-  end
-
-  # Returns true if user is arg or belongs to arg
-  # rubocop:disable Naming/PredicateName
-  def is_or_belongs_to?(arg)
-    case arg
-    when User
-      self == arg
-    when Group
-      arg.users.include?(self)
-    else
-      false
-    end
-  end
-  # rubocop:enable Naming/PredicateName
-
   def self.allowed(action, project)
     Authorization.users(action, project)
   end
@@ -578,6 +547,7 @@ class User < Principal
           u.mail = ''
           u.status = User.statuses[:active]
         end).save
+
         raise 'Unable to create the anonymous user.' if anonymous_user.new_record?
       end
       anonymous_user
@@ -638,7 +608,7 @@ class User < Principal
     separators = Regexp.escape(Setting.mail_suffix_separators)
     recipient, domain = mail.split('@').map { |part| Regexp.escape(part) }
     skip_suffix_check = recipient.nil? || Setting.mail_suffix_separators.empty? || recipient.match?(/.+[#{separators}].+/)
-    regexp = "#{recipient}([#{separators}][^@]+)*@#{domain}"
+    regexp = "^#{recipient}([#{separators}][^@]+)*@#{domain}$"
 
     [skip_suffix_check, regexp]
   end

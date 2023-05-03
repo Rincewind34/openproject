@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,8 @@
 
 require 'spec_helper'
 
-describe MyController, type: :controller do
+describe MyController,
+         skip_2fa_stage: true do
   render_views
 
   let(:sso_config) do
@@ -42,7 +43,7 @@ describe MyController, type: :controller do
   let(:secret) { "42" }
 
   let!(:auth_source) { DummyAuthSource.create name: "Dummy LDAP" }
-  let!(:user) { create :user, login:, auth_source_id: auth_source.id, last_login_on: 5.days.ago }
+  let!(:user) { create(:user, login:, auth_source_id: auth_source.id, last_login_on: 5.days.ago) }
   let(:login) { "h.wurst" }
   let(:header_login_value) { login }
   let(:header_value) { "#{header_login_value}#{secret ? ':' : ''}#{secret}" }
@@ -130,7 +131,7 @@ describe MyController, type: :controller do
 
     context 'when the user is invited' do
       let!(:user) do
-        create :user, login:, status: Principal.statuses[:invited], auth_source_id: auth_source.id
+        create(:user, login:, status: Principal.statuses[:invited], auth_source_id: auth_source.id)
       end
 
       it "logs in given user and activate it" do
@@ -149,7 +150,7 @@ describe MyController, type: :controller do
     end
 
     context "with a non-active user user" do
-      let(:user) { create :user, login:, auth_source_id: auth_source.id, status: 2 }
+      let(:user) { create(:user, login:, auth_source_id: auth_source.id, status: 2) }
 
       it_behaves_like "auth source sso failure"
     end
@@ -157,11 +158,11 @@ describe MyController, type: :controller do
     context "with an invalid user" do
       let(:auth_source) { DummyAuthSource.create name: "Onthefly LDAP", onthefly_register: true }
 
-      let!(:duplicate) { create :user, mail: "login@DerpLAP.net" }
+      let!(:duplicate) { create(:user, mail: "login@DerpLAP.net") }
       let(:login) { "dummy_dupuser" }
 
       let(:user) do
-        build :user, login:, mail: duplicate.mail, auth_source_id: auth_source.id
+        build(:user, login:, mail: duplicate.mail, auth_source_id: auth_source.id)
       end
 
       it_behaves_like "auth source sso failure"
@@ -197,7 +198,7 @@ describe MyController, type: :controller do
   end
 
   context 'when the logged-in user differs from the header' do
-    let(:other_user) { create :user, login: 'other_user' }
+    let(:other_user) { create(:user, login: 'other_user') }
     let(:session_update_time) { 1.minute.ago }
     let(:service) { Users::LogoutService.new(controller:) }
 
@@ -207,7 +208,7 @@ describe MyController, type: :controller do
     end
 
     it 'logs out the user and logs it in again' do
-      allow(::Users::LogoutService).to receive(:new).and_return(service)
+      allow(Users::LogoutService).to receive(:new).and_return(service)
       allow(service).to receive(:call).with(other_user).and_call_original
 
       get :account

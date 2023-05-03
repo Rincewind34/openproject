@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -90,8 +90,12 @@ module UserPreferences
             conflict_target:,
             index_predicate:,
             columns: %i[watched
-                        involved
+                        assignee
+                        responsible
                         mentioned
+                        start_date
+                        due_date
+                        overdue
                         work_package_commented
                         work_package_created
                         work_package_processed

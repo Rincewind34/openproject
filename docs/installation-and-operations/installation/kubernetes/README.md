@@ -1,5 +1,7 @@
 ---
-sidebar_navigation: false
+sidebar_navigation:
+  title: Kubernetes
+  priority: 290
 ---
 
 # Kubernetes

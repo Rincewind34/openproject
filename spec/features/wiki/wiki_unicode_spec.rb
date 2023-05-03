@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,22 +28,22 @@
 
 require 'spec_helper'
 
-describe 'Wiki unicode title spec', type: :feature, js: true do
-  shared_let(:admin) { create :admin }
+describe 'Wiki unicode title spec', js: true do
+  shared_let(:admin) { create(:admin) }
   let(:user) { admin }
 
-  let(:project) { create :project }
+  let(:project) { create(:project) }
   let(:wiki_page_1) do
-    build :wiki_page_with_content,
-          title: '<script>alert("FOO")</script>'
+    build(:wiki_page_with_content,
+          title: '<script>alert("FOO")</script>')
   end
   let(:wiki_page_2) do
-    build :wiki_page_with_content,
-          title: 'Base de données'
+    build(:wiki_page_with_content,
+          title: 'Base de données')
   end
   let(:wiki_page_3) do
-    build :wiki_page_with_content,
-          title: 'Base_de_données'
+    build(:wiki_page_with_content,
+          title: 'Base_de_données')
   end
 
   let(:wiki_body) do
@@ -102,7 +102,7 @@ describe 'Wiki unicode title spec', type: :feature, js: true do
       target_link = all('div.wiki-content a.wiki-page')[i]
 
       expect(target_link.text).to eq(title)
-      expect(target_link[:href]).to match("\/wiki\/#{expected_slugs[i]}")
+      expect(target_link[:href]).to match("/wiki/#{expected_slugs[i]}")
       target_link.click
 
       expect(page).to have_selector('.title-container h2', text: title)

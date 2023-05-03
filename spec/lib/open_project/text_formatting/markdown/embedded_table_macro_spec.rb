@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -37,7 +37,7 @@ describe OpenProject::TextFormatting,
     let(:raw) do
       <<~RAW
         <macro class="embedded-table op-uc-placeholder"
-               data-query-props="{&quot;columns[]&quot;:[&quot;id&quot;,&quot;subject&quot;,&quot;type&quot;,&quot;status&quot;,&quot;assignee&quot;,&quot;updatedAt&quot;],&quot;showSums&quot;:false,&quot;timelineVisible&quot;:false,&quot;highlightingMode&quot;:&quot;inline&quot;,&quot;highlightedAttributes[]&quot;:[&quot;/api/v3/queries/columns/status&quot;,&quot;/api/v3/queries/columns/priority&quot;,&quot;/api/v3/queries/columns/dueDate&quot;],&quot;showHierarchies&quot;:true,&quot;groupBy&quot;:&quot;&quot;,&quot;filters&quot;:&quot;[{\&quot;status\&quot;:{\&quot;operator\&quot;:\&quot;o\&quot;,\&quot;values\&quot;:[]}}]&quot;,&quot;sortBy&quot;:&quot;[[\&quot;id\&quot;,\&quot;asc\&quot;]]&quot;}">
+               data-query-props="{&quot;columns[]&quot;:[&quot;id&quot;,&quot;subject&quot;,&quot;type&quot;,&quot;status&quot;,&quot;assignee&quot;,&quot;updatedAt&quot;],&quot;showSums&quot;:false,&quot;timelineVisible&quot;:false,&quot;highlightingMode&quot;:&quot;inline&quot;,&quot;highlightedAttributes[]&quot;:[&quot;/api/v3/queries/columns/status&quot;,&quot;/api/v3/queries/columns/priority&quot;,&quot;/api/v3/queries/columns/dueDate&quot;],&quot;showHierarchies&quot;:true,&quot;groupBy&quot;:&quot;&quot;,&quot;filters&quot;:&quot;[{&quot;status&quot;:{&quot;operator&quot;:&quot;o&quot;,&quot;values&quot;:[]}}]&quot;,&quot;sortBy&quot;:&quot;[[&quot;id&quot;,&quot;asc&quot;]]&quot;}">
         </macro>
       RAW
     end

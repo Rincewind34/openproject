@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -55,7 +55,7 @@ class AdminUserSeeder < Seeder
       user.language = I18n.locale.to_s
       user.status = User.statuses[:active]
       user.force_password_change = force_password_change?
-      user.notification_settings.build(involved: true, mentioned: true, watched: true)
+      user.notification_settings.build(assignee: true, responsible: true, mentioned: true, watched: true)
     end
   end
 

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,16 +29,18 @@
 module API
   module V3
     module Principals
-      class PrincipalRepresenterFactory
+      module PrincipalRepresenterFactory
+        module_function
+
         ##
         # Create the appropriate subclass representer
         # for each principal entity
-        def self.create(model, **args)
+        def create(model, **args)
           representer_class(model)
             .create(model, **args)
         end
 
-        def self.representer_class(model)
+        def representer_class(model)
           case model
           when User
             ::API::V3::Users::UserRepresenter
@@ -51,7 +53,7 @@ module API
           end
         end
 
-        def self.create_link_lambda(name, getter: "#{name}_id")
+        def create_link_lambda(name, getter: "#{name}_id")
           ->(*) {
             v3_path = API::V3::Principals::PrincipalType.for(represented.send(name))
 
@@ -63,7 +65,7 @@ module API
           }
         end
 
-        def self.create_setter_lambda(name, property_name: name, namespaces: %i(groups users placeholder_users))
+        def create_setter_lambda(name, property_name: name, namespaces: %i(groups users placeholder_users))
           ->(fragment:, **) {
             ::API::Decorators::LinkObject
               .new(represented,
@@ -75,7 +77,7 @@ module API
           }
         end
 
-        def self.create_getter_lambda(name)
+        def create_getter_lambda(name)
           ->(*) {
             next unless embed_links
 

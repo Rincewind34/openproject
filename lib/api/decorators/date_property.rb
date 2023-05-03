@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -37,6 +37,10 @@ module API
         base.extend ClassMethods
       end
 
+      def datetime_formatter
+        ::API::V3::Utilities::DateTimeFormatter
+      end
+
       module ClassMethods
         def date_property(name,
                           getter: default_date_getter(name),
@@ -66,6 +70,19 @@ module API
                    attributes.merge(args)
         end
 
+        def duration_property(name,
+                              getter: default_duration_getter(name),
+                              setter: default_duration_setter(name),
+                              **args)
+          attributes = {
+            getter:,
+            setter:
+          }
+
+          property name,
+                   attributes.merge(args)
+        end
+
         private
 
         def default_date_getter(name)
@@ -89,6 +106,23 @@ module API
         def default_date_time_getter(name)
           ->(represented:, decorator:, **) {
             decorator.datetime_formatter.format_datetime(represented.send(name), allow_nil: true)
+          }
+        end
+
+        def default_duration_getter(name)
+          ->(represented:, decorator:, **) {
+            decorator.datetime_formatter.format_duration_from_days(represented.send(name), allow_nil: true)
+          }
+        end
+
+        def default_duration_setter(name)
+          ->(fragment:, decorator:, **) {
+            days = decorator
+                   .datetime_formatter
+                   .parse_duration_to_days(fragment,
+                                           name.to_s.camelize(:lower),
+                                           allow_nil: true)
+            send(:"#{name}=", days)
           }
         end
       end

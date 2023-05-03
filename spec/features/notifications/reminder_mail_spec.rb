@@ -1,9 +1,9 @@
 require 'spec_helper'
 require_relative '../users/notifications/shared_examples'
 
-describe "Reminder email sending", type: :feature, js: true do
-  let!(:project) { create :project, members: { current_user => role } }
-  let!(:mute_project) { create :project, members: { current_user => role } }
+describe "Reminder email sending", js: true do
+  let!(:project) { create(:project, members: { current_user => role }) }
+  let!(:mute_project) { create(:project, members: { current_user => role }) }
   let(:role) { create(:role, permissions: %i[view_work_packages]) }
   let(:other_user) { create(:user) }
   let(:work_package) { create(:work_package, project:) }
@@ -32,11 +32,15 @@ describe "Reminder email sending", type: :feature, js: true do
         daily_reminders: {
           enabled: true,
           times: [hitting_reminder_slot_for('Pacific/Honolulu', current_utc_time)]
+        },
+        immediate_reminders: {
+          mentioned: false
         }
       },
       notification_settings: [
         build(:notification_setting,
-              involved: true,
+              assignee: true,
+              responsible: true,
               watched: true,
               mentioned: true,
               work_package_commented: true,
@@ -66,10 +70,10 @@ describe "Reminder email sending", type: :feature, js: true do
     # Perform some actions the user listens to
     User.execute_as other_user do
       note = <<~NOTE
-        Hey <mention class=\"mention\"
-                     data-id=\"#{current_user.id}\"
-                     data-type=\"user\"
-                     data-text=\"@#{current_user.name}\">
+        Hey <mention class="mention"
+                     data-id="#{current_user.id}"
+                     data-type="user"
+                     data-text="@#{current_user.name}">
               @#{current_user.name}
             </mention>
       NOTE

@@ -320,6 +320,20 @@ Then finish the installation by reading the [*Initial configuration*](#initial-c
 
 > **Note:** On this distribution full-text extraction for attachments [*is not supported*](#full-text-extraction-not-supported) by default.
 
+**Workaround for outdated PostgreSQL library package**
+
+Depending on your version and installation variant, you might receive errors like `symbol lookup error: /opt/openproject/vendor/bundle/ruby/3.1.0/gems/pg-1.4.3/lib/pg_ext.so: undefined symbol: PQconninfo`.
+
+This happens when your local postgresql-libs package is outdated. You'll have to install a newer version manually like so:
+
+1. Add the package source for PostgreSQL (the exact URL might differ, double check https://www.postgresql.org/download/linux/redhat/)
+
+`yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm`
+
+2. Install postgresql13-libs
+
+`yum install postgresql13-libs`
+
 ## SUSE Linux Enterprise Server (SLES) Installation
 
 ### SLES 12
@@ -378,7 +392,7 @@ sudo openproject configure #non-interactive - using values stored in /etc/openpr
 > * In the interactive way you can skip dialogs you do not want to change simply by confirming them with `ENTER`.
 >
 
-## Step 1: Select your OpenProject Edition
+## Step 1: Select your OpenProject edition
 
 OpenProject comes in two editions:
 
@@ -462,7 +476,7 @@ If you wish to install OpenProject under a server path prefix, such as `yourdoma
 
 #### SSL/TLS configuration
 
-> **Note:** With OpenProject version 12.2 **HTTPS confugration** was set to be **default** for every installation. **Now best practice is to proceed by selecting `yes` for using HTTPS (SSL/TLS)** and generating the needed certificates, otherwise you will have to manually deactivate HTTPS on the command line.
+> **Note:** With OpenProject version 12.2 **HTTPS configuration** was set to be **default** for every installation. **Now best practice is to proceed by selecting `yes` for using HTTPS (SSL/TLS)** and generating the needed certificates, otherwise you will have to manually deactivate HTTPS on the command line.
 
 OpenProject can configure Apache to support HTTPS (SSL/TLS). If you have SSL certificates and want to use SSL/TLS (recommended), select **Yes**.
 
