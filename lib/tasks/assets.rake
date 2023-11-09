@@ -52,8 +52,6 @@ namespace :assets do
     # We skip angular compilation if backend was requested
     # but frontend was not explicitly set
     if ENV['RECOMPILE_RAILS_ASSETS'] == 'true' && ENV['RECOMPILE_ANGULAR_ASSETS'] != 'true'
-      warn "RECOMPILE_RAILS_ASSETS was set by installation, but RECOMPILE_ANGULAR_ASSETS is false. " \
-           "Skipping angular compilation. Set RECOMPILE_ANGULAR_ASSETS='true' if you need to force it."
       next
     end
 
@@ -64,7 +62,16 @@ namespace :assets do
 
     puts "Building angular frontend"
     Dir.chdir Rails.root.join('frontend') do
-      sh 'npm run build' do |ok, res|
+      cmd =
+        if ENV['CI']
+          'npm run build:ci'
+        elsif ENV['OPENPROJECT_ANGULAR_UGLIFY'] == 'false'
+          'npm run build:fast'
+        else
+          'npm run build'
+        end
+
+      sh(cmd) do |ok, res|
         raise "Failed to compile angular frontend: #{res.exitstatus}" if !ok
       end
     end
@@ -79,5 +86,11 @@ namespace :assets do
   end
 
   desc 'Export frontend locale files'
-  task export_locales: ['i18n:js:export']
+  task export_locales: :environment do
+    puts "Exporting I18n.js locales"
+    time = Benchmark.realtime do
+      I18nJS.call(config_file: Rails.root.join('config/i18n.yml'))
+    end
+    puts "=> Done in #{time.round(2)}s"
+  end
 end

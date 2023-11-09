@@ -21,6 +21,10 @@
 #++
 #English strings go here for Rails i18n
 ar:
+  plugin_openproject_meeting:
+    name: "OpenProject Meeting"
+    description: >-
+      This module adds functions to support project meetings to OpenProject. Meetings can be scheduled selecting invitees from the same project to take part in the meeting. An agenda can be created and sent to the invitees. After the meeting, attendees can be selected and minutes can be created based on the agenda. Finally, the minutes can be sent to all attendees and invitees.
   activerecord:
     attributes:
       meeting:
@@ -29,6 +33,7 @@ ar:
         participants: "المشاركون"
         participants_attended: "الحضور"
         participants_invited: "المدعوّون"
+        project: "Project"
         start_time: "الوقت"
         start_time_hour: "وقت البدء"
     errors:
@@ -39,7 +44,7 @@ ar:
       meeting_minutes: "محضر الجلسة"
   activity:
     filter:
-      meeting: "Meetings"
+      meeting: "الاجتماعات"
   description_attended: "حَضَر"
   description_invite: "دعا"
   events:
@@ -61,6 +66,13 @@ ar:
   label_meeting_agenda_close: "أغلِق جدول الأعمال للبدء في محضر الجلسة"
   label_meeting_date_time: "التاريخ/الوقت"
   label_meeting_diff: "الاختلاف"
+  label_upcoming_meetings: "Upcoming meetings"
+  label_past_meetings: "Past meetings"
+  label_involvement: "Involvement"
+  label_upcoming_invitations: "Upcoming invitations"
+  label_past_invitations: "Past invitations"
+  label_attendee: "Attendee"
+  label_author: "Creator"
   label_notify: "إرسال للمراجعة"
   label_icalendar: "إرسال iCalendar"
   label_version: "النسخة"
@@ -85,7 +97,7 @@ ar:
   text_duration_in_hours: "المدة بالساعات"
   text_in_hours: "في الساعات"
   text_meeting_agenda_for_meeting: 'جدول أعمال للاجتماع "%{meeting}"'
-  text_meeting_closing_are_you_sure: "Are you sure you want to close the agenda?"
+  text_meeting_closing_are_you_sure: "Are you sure you want to close the meeting agenda?"
   text_meeting_agenda_open_are_you_sure: "سيؤدي هذا إلى استبدال جميع التغييرات في المقرر! هل تريد المتابعة؟"
   text_meeting_minutes_for_meeting: 'محضر الجسلة للاجتماع "%{meeting}"'
   text_review_meeting_agenda: "%{author} طرح %{link} للمراجعة."

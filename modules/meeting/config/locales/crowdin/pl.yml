@@ -21,6 +21,10 @@
 #++
 #English strings go here for Rails i18n
 pl:
+  plugin_openproject_meeting:
+    name: "Spotkania OpenProject"
+    description: >-
+      This module adds functions to support project meetings to OpenProject. Meetings can be scheduled selecting invitees from the same project to take part in the meeting. An agenda can be created and sent to the invitees. After the meeting, attendees can be selected and minutes can be created based on the agenda. Finally, the minutes can be sent to all attendees and invitees.
   activerecord:
     attributes:
       meeting:
@@ -29,6 +33,7 @@ pl:
         participants: "Uczestnicy"
         participants_attended: "Uczestnicy"
         participants_invited: "Zaproszone osoby"
+        project: "Projekt"
         start_time: "Czas"
         start_time_hour: "Czas rozpoczęcia"
     errors:
@@ -61,6 +66,13 @@ pl:
   label_meeting_agenda_close: "Zamknij agendę aby zacząć protokół ze spotkania"
   label_meeting_date_time: "Data/Czas"
   label_meeting_diff: "Różnice"
+  label_upcoming_meetings: "Nadchodzące spotkania"
+  label_past_meetings: "Przeszłe spotkania"
+  label_involvement: "Zaangażowanie"
+  label_upcoming_invitations: "Nadchodzące zaproszenia"
+  label_past_invitations: "Poprzednie zaproszenia"
+  label_attendee: "Uczestnik"
+  label_author: "Twórca"
   label_notify: "Wyślij do przeglądu"
   label_icalendar: "Wyślij iCalendar"
   label_version: "Wersja"

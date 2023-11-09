@@ -20,20 +20,18 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 ar:
+  plugin_openproject_documents:
+    name: "OpenProject Documents"
+    description: "An OpenProject plugin to allow creation of documents in projects."
   activerecord:
     models:
       document: "الوثيقة"
   activity:
     filter:
-      document: "Documents"
+      document: "الوثائق"
   default_doc_category_tech: "التوثيق التقني"
   default_doc_category_user: "توثيق المستخدم"
   enumeration_doc_categories: "فئات الوثائق"
-  enumeration:
-    document_category:
-      documentation: التوثيق
-      specification: المواصفة
-      other: أخرى
   documents:
     label_attachment_author: "مؤلف مرفق"
   label_document_added: "تم إضافة وثيقة"

@@ -21,6 +21,10 @@
 #++
 #English strings go here for Rails i18n
 uk:
+  plugin_openproject_meeting:
+    name: "OpenProject Meeting"
+    description: >-
+      This module adds functions to support project meetings to OpenProject. Meetings can be scheduled selecting invitees from the same project to take part in the meeting. An agenda can be created and sent to the invitees. After the meeting, attendees can be selected and minutes can be created based on the agenda. Finally, the minutes can be sent to all attendees and invitees.
   activerecord:
     attributes:
       meeting:
@@ -29,6 +33,7 @@ uk:
         participants: "Учасники"
         participants_attended: "Учасники"
         participants_invited: "Запрошені"
+        project: "Проєкт"
         start_time: "Час"
         start_time_hour: "Початковий час"
     errors:
@@ -61,6 +66,13 @@ uk:
   label_meeting_agenda_close: "Закрийте порядок денний, щоб розпочати протоколи"
   label_meeting_date_time: "Дата, час"
   label_meeting_diff: "Відмінність"
+  label_upcoming_meetings: "Майбутні заходи"
+  label_past_meetings: "Минулі заходи"
+  label_involvement: "Участь"
+  label_upcoming_invitations: "Майбутні запрошення"
+  label_past_invitations: "Минулі запрошення"
+  label_attendee: "Учасник"
+  label_author: "Автор"
   label_notify: "Надіслати на розгляд"
   label_icalendar: "Надіслати iCalendar"
   label_version: "Версія"
@@ -85,7 +97,7 @@ uk:
   text_duration_in_hours: "Тривалість у годинах"
   text_in_hours: "у годинах"
   text_meeting_agenda_for_meeting: 'порядку денного засідання %{meeting}'
-  text_meeting_closing_are_you_sure: "Справді закрити порядок денний?"
+  text_meeting_closing_are_you_sure: "Справді закрити порядок денний заходу?"
   text_meeting_agenda_open_are_you_sure: "Це вмить призведе до виправлення усіх змін! Бажаєте продовжити?"
   text_meeting_minutes_for_meeting: 'протокол засідання %{meeting}'
   text_review_meeting_agenda: "%{author} поставив %{link} на розгляд."

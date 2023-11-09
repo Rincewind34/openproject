@@ -32,13 +32,12 @@ module OpenProject::Avatars
                partial: 'settings/openproject_avatars',
                menu_item: :user_avatars
              },
-             name: :label_avatar_plural,
              bundled: true do
       add_menu_item :my_menu, :avatar,
                     { controller: '/avatars/my_avatar', action: 'show' },
                     caption: ->(*) { I18n.t('avatars.label_avatar') },
                     if: ->(*) { ::OpenProject::Avatars::AvatarManager::avatars_enabled? },
-                    icon: 'icon2 icon-image1'
+                    icon: 'image1'
     end
 
     add_api_endpoint 'API::V3::Users::UsersAPI', :id do

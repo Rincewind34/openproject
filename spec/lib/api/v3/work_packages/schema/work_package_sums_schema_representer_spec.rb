@@ -28,10 +28,10 @@
 
 require 'spec_helper'
 
-describe API::V3::WorkPackages::Schema::WorkPackageSumsSchemaRepresenter do
+RSpec.describe API::V3::WorkPackages::Schema::WorkPackageSumsSchemaRepresenter do
   include API::V3::Utilities::PathHelper
 
-  let(:custom_field) { build_stubbed(:integer_issue_custom_field) }
+  let(:custom_field) { build_stubbed(:issue_custom_field, :integer) }
   let(:available_custom_fields) { [custom_field] }
   let(:schema) { double('wp_schema', available_custom_fields:) }
   let(:current_user) { double('user', admin?: false) }

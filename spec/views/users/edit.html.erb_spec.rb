@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe 'users/edit' do
+RSpec.describe 'users/edit' do
   let(:admin) { build(:admin) }
 
   before do
@@ -84,8 +84,8 @@ describe 'users/edit' do
       end
     end
 
-    context 'for a non-admin' do
-      let(:non_admin) { create(:user) }
+    context 'for a non-admin with manage_user global permission' do
+      let(:non_admin) { create(:user, global_permissions: [:manage_user]) }
 
       before do
         allow(view).to receive(:current_user).and_return(non_admin)
@@ -136,7 +136,7 @@ describe 'users/edit' do
       end
 
       context 'with auth sources' do
-        let(:auth_sources) { [create(:auth_source)] }
+        let(:auth_sources) { create_list(:ldap_auth_source, 1) }
 
         before do
           assign :auth_sources, auth_sources
@@ -162,7 +162,7 @@ describe 'users/edit' do
       end
 
       context 'with auth sources' do
-        let(:auth_sources) { [create(:auth_source)] }
+        let(:auth_sources) { create_list(:ldap_auth_source, 1) }
 
         before do
           assign :auth_sources, auth_sources
@@ -171,7 +171,7 @@ describe 'users/edit' do
         it 'shows the auth source selection' do
           render
 
-          expect(rendered).to have_selector('#user_auth_source_id')
+          expect(rendered).to have_selector('#user_ldap_auth_source_id')
         end
       end
 

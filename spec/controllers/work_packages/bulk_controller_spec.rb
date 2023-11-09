@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe WorkPackages::BulkController, with_settings: { journal_aggregation_time_minutes: 0 } do
+RSpec.describe WorkPackages::BulkController, with_settings: { journal_aggregation_time_minutes: 0 } do
   let(:user) { create(:user) }
   let(:user2) { create(:user) }
   let(:custom_field_value) { '125' }
@@ -38,7 +38,7 @@ describe WorkPackages::BulkController, with_settings: { journal_aggregation_time
            is_for_all: true)
   end
   let(:custom_field2) { create(:work_package_custom_field) }
-  let(:custom_field_user) { create(:user_issue_custom_field) }
+  let(:custom_field_user) { create(:issue_custom_field, :user) }
   let(:status) { create(:status) }
   let(:type) do
     create(:type_standard,

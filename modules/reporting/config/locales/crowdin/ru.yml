@@ -20,6 +20,9 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 ru:
+  plugin_openproject_reporting:
+    name: "Отчёт OpenProject"
+    description: "Этот плагин позволяет создавать пользовательские отчеты о стоимости с фильтрацией и группировкой, созданной плагином OpenProject Time и затратами."
   button_save_as: "Сохранить отчет как..."
   comments: "Комментарий"
   cost_reports_title: "Время и затраты"
@@ -81,6 +84,9 @@ ru:
   units: "Модули"
   validation_failure_date: "не является допустимой датой"
   validation_failure_integer: "не является допустимым целым числом"
+  export:
+    cost_reports:
+      title: "Экспорт ваших отчетов о затратах в XLS"
   reporting:
     group_by:
       selected_columns: "Выбранные столбцы"

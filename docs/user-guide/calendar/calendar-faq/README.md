@@ -18,14 +18,14 @@ To use the calendar in a project, you need to [activate the “Calendar” modul
 
 ## Is there an option to export or sync my calendar (e.g. Outlook)?
 
-It is currently not possible to export or sync the calendar. 
+You cannot synchronize a personal calendar in OpenProject. However, you can [subscribe to a calendar](../#subscribe-to-a-calendar) using an external client that supports the iCalendar format.
 
-You can however use the meeting module in OpenProject to organize meetings and invite project members.  You can [export meetings as iCalendar file](../../meetings/#create-or-edit-the-meeting-agenda) and import them to your external calendar. If you would like Microsoft Outlook to automatically import calendar invites, please check your Outlook settings and make sure to give permission from that side.
+You can also use the meeting module in OpenProject to organize meetings and invite project members.  You can [export meetings as iCalendar file](../../meetings/#create-or-edit-the-meeting-agenda) and import them to your external calendar. If you would like Microsoft Outlook to automatically import calendar invites, please check your Outlook settings and make sure to give permission from that side.
 
 ## Are holidays considered in the calendar?
 
-Currently, the calendar does not consider weekends or holidays as non-working days, i.e. the end date for a task could e.g. be set on a Sunday. This is important for businesses that are working on weekends or holidays. Please note that we are currently working on a feature for free days and weekends that can be adjusted as needed. 
+Since the [12.3 release](https://www.openproject.org/docs/release-notes/12/12-3-0/) it is possible to specify  working and non-working days on an overall instance-level and consequently define a global work week. The default value for non-working days is set to Saturday and Sunday, but can be adjusted to your specific needs. Read more [here](https://www.openproject.org/docs/user-guide/work-packages/set-change-dates/#working-days).
 
 ## Is there a limit for the number of work packages displayed in the calendar?
 
-The limit is 100 and can't be changed at the moment. Find the respective feature request [here](https://community.openproject.com/projects/openproject/work_packages/35062/activity).
+The limit is 100 and can't be changed at the moment. Find the respective feature request [here](https://community.openproject.com/wp/35062).

@@ -20,20 +20,18 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 ja:
+  plugin_openproject_documents:
+    name: "OpenProject Documents"
+    description: "An OpenProject plugin to allow creation of documents in projects."
   activerecord:
     models:
       document: "ドキュメント"
   activity:
     filter:
-      document: "Documents"
+      document: "ドキュメント"
   default_doc_category_tech: "技術文書"
   default_doc_category_user: "ユーザー文書"
   enumeration_doc_categories: "ドキュメントのカテゴリ"
-  enumeration:
-    document_category:
-      documentation: 文章
-      specification: 仕様
-      other: その他
   documents:
     label_attachment_author: "添付ファイルの作成者"
   label_document_added: "追加されたドキュメント"

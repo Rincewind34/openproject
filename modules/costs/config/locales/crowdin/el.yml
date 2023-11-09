@@ -20,6 +20,9 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 el:
+  plugin_costs:
+    name: "Χρόνος και κόστος"
+    description: "This module adds features for planning and tracking costs of projects."
   activerecord:
     attributes:
       cost_entry:
@@ -80,7 +83,7 @@ el:
   label_costlog: "Καταγεγραμμένο κόστος μονάδας"
   label_cost_plural: "Κόστος"
   label_cost_type_plural: "Τύποι κόστους"
-  label_cost_type_specific: "Τύπος κόστους #%{id}: %{name}" #%{id}: %{name}"
+  label_cost_type_specific: "Τύπος κόστους #%{id}: %{name}"
   label_costs_per_page: "Κόστος ανά σελίδα"
   label_currency: "Νόμισμα"
   label_currency_format: "Μορφοποίηση του νομίσματος"

@@ -20,20 +20,18 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 da:
+  plugin_openproject_documents:
+    name: "OpenProject Documents"
+    description: "An OpenProject plugin to allow creation of documents in projects."
   activerecord:
     models:
       document: "Dokument"
   activity:
     filter:
-      document: "Documents"
+      document: "Dokumenter"
   default_doc_category_tech: "Teknisk dokumentation"
   default_doc_category_user: "Brugerdokumentation"
   enumeration_doc_categories: "Dokumentkategorier"
-  enumeration:
-    document_category:
-      documentation: Documentation
-      specification: Specifikation
-      other: Andet
   documents:
     label_attachment_author: "Attachment author"
   label_document_added: "Dokument tilføjet"

@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe API::V3::WorkPackages::WorkPackagePayloadRepresenter do
+RSpec.describe API::V3::WorkPackages::WorkPackagePayloadRepresenter do
   include API::V3::Utilities::PathHelper
 
   let(:work_package) do
@@ -447,7 +447,7 @@ describe API::V3::WorkPackages::WorkPackagePayloadRepresenter do
     end
 
     describe 'custom fields' do
-      let(:available_custom_fields) { [build_stubbed(:int_wp_custom_field)] }
+      let(:available_custom_fields) { [build_stubbed(:integer_wp_custom_field)] }
 
       it 'uses a CustomFieldInjector' do
         allow(API::V3::Utilities::CustomFieldInjector).to receive(:create_value_representer)

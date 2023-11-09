@@ -78,7 +78,7 @@ module OpenProject
         if Rails.env.production?
           self['enterprise_trial_creation_host']
         else
-          'https://augur.openproject-edge.com'
+          'https://start.openproject-edge.com'
         end
       end
 
@@ -188,6 +188,10 @@ module OpenProject
 
       def statsd_port
         Integer(ENV['STATSD_PORT'].presence || statsd['port'].presence)
+      end
+
+      def lookbook_enabled?
+        self['lookbook_enabled']
       end
 
       private

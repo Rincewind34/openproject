@@ -28,7 +28,7 @@
 require 'spec_helper'
 require 'rack/test'
 
-describe API::V3::Versions::CreateFormAPI, content_type: :json do
+RSpec.describe API::V3::Versions::CreateFormAPI, content_type: :json do
   include Rack::Test::Methods
   include API::V3::Utilities::PathHelper
 
@@ -109,8 +109,8 @@ describe API::V3::Versions::CreateFormAPI, content_type: :json do
     end
 
     context 'with all parameters' do
-      let!(:int_cf) { create(:int_version_custom_field) }
-      let!(:list_cf) { create(:list_version_custom_field) }
+      let!(:int_cf) { create(:version_custom_field, :integer) }
+      let!(:list_cf) { create(:version_custom_field, :list) }
       let(:parameters) do
         {
           name: 'New version',

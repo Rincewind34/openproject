@@ -21,6 +21,10 @@
 #++
 #English strings go here for Rails i18n
 ro:
+  plugin_openproject_meeting:
+    name: "OpenProject Meeting"
+    description: >-
+      This module adds functions to support project meetings to OpenProject. Meetings can be scheduled selecting invitees from the same project to take part in the meeting. An agenda can be created and sent to the invitees. After the meeting, attendees can be selected and minutes can be created based on the agenda. Finally, the minutes can be sent to all attendees and invitees.
   activerecord:
     attributes:
       meeting:
@@ -29,6 +33,7 @@ ro:
         participants: "Participanţi"
         participants_attended: "Participanți"
         participants_invited: "Invitaţi"
+        project: "Proiect"
         start_time: "Ora"
         start_time_hour: "Ora de începere"
     errors:
@@ -61,6 +66,13 @@ ro:
   label_meeting_agenda_close: "Închideți ordinea de zi pentru a începe procesul-verbal"
   label_meeting_date_time: "Dată/Timp"
   label_meeting_diff: "Dif"
+  label_upcoming_meetings: "Upcoming meetings"
+  label_past_meetings: "Past meetings"
+  label_involvement: "Involvement"
+  label_upcoming_invitations: "Upcoming invitations"
+  label_past_invitations: "Past invitations"
+  label_attendee: "Attendee"
+  label_author: "Creator"
   label_notify: "Trimiteți pentru revizuire"
   label_icalendar: "Trimiteți iCalendar"
   label_version: "Versiune"
@@ -85,7 +97,7 @@ ro:
   text_duration_in_hours: "Durata în ore"
   text_in_hours: "Ore"
   text_meeting_agenda_for_meeting: 'ordinea de zi a reuniunii "%{meeting}"'
-  text_meeting_closing_are_you_sure: "Sunteţi sigur că doriţi să închideţi agenda?"
+  text_meeting_closing_are_you_sure: "Are you sure you want to close the meeting agenda?"
   text_meeting_agenda_open_are_you_sure: "Acest lucru va suprascrie toate modificările din procesul-verbal! Doriți să continuați?"
   text_meeting_minutes_for_meeting: 'procesul-verbal al reuniunii "%{meeting}"'
   text_review_meeting_agenda: "%{author} a pus %{link} pentru revizuire."

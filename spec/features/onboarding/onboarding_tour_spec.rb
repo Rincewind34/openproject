@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe 'onboarding tour for new users', js: true do
+RSpec.describe 'onboarding tour for new users', js: true do
   let(:user) { create(:admin) }
   let(:project) do
     create(:project, name: 'Demo project', identifier: 'demo-project', public: true,
@@ -61,6 +61,12 @@ describe 'onboarding tour for new users', js: true do
       click_button 'Save'
 
       expect(page).to have_text "Neueste sichtbare Projekte in dieser Instanz."
+    end
+
+    it 'I can start the tour without selecting a language' do
+      visit home_path start_home_onboarding_tour: true
+      expect(page).to have_text sanitize_string(I18n.t('js.onboarding.steps.welcome')), normalize_ws: true
+      expect(page).to have_selector '.enjoyhint_next_btn:not(.enjoyhint_hide)'
     end
 
     context 'the tutorial does not start' do

@@ -1,5 +1,9 @@
 #English strings go here
 ckb-IR:
+  plugin_openproject_avatars:
+    name: "ئاڤاتارەکان"
+    description: >-
+      This plugin allows OpenProject users to upload a picture to be used as an avatar or use registered images from Gravatar.
   label_avatar: "ئاڤاتار"
   label_avatar_plural: "ئاڤاتارەکان"
   label_current_avatar: "ئاڤاتاری ئێستا"
@@ -14,7 +18,7 @@ ckb-IR:
   wrong_file_format: "Allowed formats are jpg, png, gif"
   empty_file_error: "Please upload a valid image (jpg, png, gif)"
   avatars:
-    label_avatar: "Avatar"
+    label_avatar: "ئاڤاتار"
     label_gravatar: 'Gravatar'
     label_current_avatar: 'Current avatar'
     label_local_avatar: 'Custom avatar'
@@ -35,6 +39,3 @@ ckb-IR:
       enable_gravatars: 'Enable user gravatars'
       gravatar_default: "Default Gravatar image"
       enable_local_avatars: 'Enable user custom avatars'
-
-
-

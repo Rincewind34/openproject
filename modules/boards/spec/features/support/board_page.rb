@@ -47,6 +47,10 @@ module Pages
       @board
     end
 
+    def filters
+      Components::WorkPackages::Filters.new
+    end
+
     def free?
       @board.options['type'] == 'free'
     end
@@ -169,6 +173,14 @@ module Pages
       drag_n_drop_element(from: source, to: target)
     end
 
+    def wait_for_lists_reload
+      # wait for reload of lists to start and finish
+      # Not sure if that's the most reliable way to do it, but there is nothing visible
+      # about the PATCH request being sent and executed successfully after moving a card.
+      expect(page).to have_selector('.op-loading-indicator', wait: 5)
+      expect(page).not_to have_selector('.op-loading-indicator')
+    end
+
     def add_list(option: nil, query: option)
       if option.nil? && action?
         raise "Must pass value option for action boards"
@@ -252,9 +264,9 @@ module Pages
 
     def visit!
       if board.project
-        visit project_work_package_boards_path(project_id: board.project.id, state: board.id)
+        visit project_work_package_board_path(board.project, board)
       else
-        visit work_package_boards_path(state: board.id)
+        visit work_package_board_path(board)
       end
     end
 

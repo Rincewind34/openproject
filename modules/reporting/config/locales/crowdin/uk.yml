@@ -20,6 +20,9 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 uk:
+  plugin_openproject_reporting:
+    name: "OpenProject Reporting"
+    description: "This plugin allows creating custom cost reports with filtering and grouping created by the OpenProject Time and costs plugin."
   button_save_as: "Зберегти звіт до:"
   comments: "Коментар"
   cost_reports_title: "Час і витрати"
@@ -81,6 +84,9 @@ uk:
   units: "Одиниці"
   validation_failure_date: "є недійсною датою"
   validation_failure_integer: "не є дійсним цілим числом"
+  export:
+    cost_reports:
+      title: "Експорт звітів про витрати у форматі XLS"
   reporting:
     group_by:
       selected_columns: "Вибрані стовпці"

@@ -20,6 +20,9 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 uk:
+  plugin_openproject_documents:
+    name: "OpenProject Documents"
+    description: "An OpenProject plugin to allow creation of documents in projects."
   activerecord:
     models:
       document: "Документ"
@@ -29,11 +32,6 @@ uk:
   default_doc_category_tech: "Технічна документація"
   default_doc_category_user: "Документація користувача"
   enumeration_doc_categories: "Категорії документів"
-  enumeration:
-    document_category:
-      documentation: Документація
-      specification: Специфікація
-      other: Інше
   documents:
     label_attachment_author: "Автор додатку"
   label_document_added: "Документ додано"

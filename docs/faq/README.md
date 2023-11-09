@@ -49,7 +49,7 @@ Here are resources to get to know OpenProject:
 - Our [English demo video](https://www.youtube.com/watch?v=un6zCm8_FT4) or [German demo video](https://www.youtube.com/watch?v=doVtVArSSvk) to get an overview of Openproject. There are additional videos explaining certain features to be found on our [YouTube channel](https://www.youtube.com/c/OpenProjectCommunity/videos), too.
 - The [Getting started guide](../getting-started) and the [User guide](../user-guide)
 - Our free trial: Click the green button [here](https://www.openproject.org/enterprise-edition) for Enterprise on-premises or go to [start.openproject.com](https://start.openproject.com) for the Enterprise cloud.
-- Our [development roadmap](https://community.openproject.com/projects/openproject/work_packages?query_id=1993) (to get to know future features)
+- Our [development roadmap](https://community.openproject.com/projects/openproject/roadmap) (to get to know future features)
 - Our [training and consulting offers](https://www.openproject.org/training-and-consulting)
 
 ### Can I run OpenProject as a single user?
@@ -123,7 +123,7 @@ If you are using the Enterprise cloud, you can easily upgrade or downgrade the n
 
 ### How can I change the day my week starts with, etc.?
 
-You can do this as a system administrator in the [System settings](../system-admin-guide/system-settings/display-settings/#time-and-date-formatting).
+You can do this as a system administrator in the [System settings](../system-admin-guide/calendars-and-dates).
 
 ### How can I add a RACI matrix in OpenProject?
 
@@ -135,7 +135,7 @@ On a work package level you could use "Assignee" for "Responsible", "Accountable
 
 To create and print/export reports you can...
 
-- use the [global work packages list](../user-guide/projects/#global-work-packages-list): Filter for e.g. phases and milestones (which would make sense to use in your projects in this case). Then use the [export feature](../user-guide/work-packages/exporting/#exporting-work-packages). This will give you an overview over all projects' work packages (or all projects' milestones and phases, respectively).
+- use the [global work packages list](../user-guide/projects/#global-work-package-tables): Filter for e.g. phases and milestones (which would make sense to use in your projects in this case). Then use the [export feature](../user-guide/work-packages/exporting/). This will give you an overview over all projects' work packages (or all projects' milestones and phases, respectively).
 - use the [Wiki module](../user-guide/wiki) to document your project reports. The Wiki pages is optimized for being printed using your browser's print feature. You could even insert a work packages list there. If you want to use the Wiki we suggest setting it up in a (global) parent project.
 
 The projects overview is not optimized for export via PDF, yet. Nevertheless, you can try to use your browser's print feature.
@@ -181,7 +181,7 @@ Apart from that, you can use [placeholder users](../system-admin-guide/users-per
 
 ### Can I get a notification when a deadline approaches?
 
-Yes, you can. Starting with OpenProject 12.4 we implemented date alerts and email reminders about upcoming deadlines and overdue tasks. Please refer to [this guide](../user-guide/notifications/) for more details. 
+Yes, you can. Starting with OpenProject 12.4 we implemented date alerts and email reminders about upcoming deadlines and overdue tasks. Please refer to [this guide](../user-guide/notifications/) for more details.
 
 ### Does OpenProject offer resource management?
 
@@ -191,7 +191,7 @@ More infomation regarding resource management in OpenProject can be found in the
 
 ### Does OpenProject offer portfolio management?
 
-For portfolio management or custom reporting, you can use either the project list, or the global work package table. Both views can be used to create optimal reports via filtering, sorting and other configuration options. 
+For portfolio management or custom reporting, you can use either the project list, or the global work package table. Both views can be used to create optimal reports via filtering, sorting and other configuration options.
 
 For more information on portfolio management options in OpenProject please refer to this [Use Case](../use-cases/portfolio-management).
 
@@ -209,6 +209,10 @@ A (very rough) diagram can be found on [https://www.openproject.org/hosting/](ht
 ### Can I set up an entity-relationship diagram in OpenProject?
 
 No, currently we do not have an entity-relationship diagram for OpenProject.
+
+### Can I edit the Home page?
+
+Only the welcome block/text can be edited, the rest cannot. However, you can [change the theme and logo](../system-admin-guide/design) of your OpenProject instance if you use Enterprise on-premises or Enterprise cloud.
 
 ## FAQ regarding OpenProject BIM edition
 

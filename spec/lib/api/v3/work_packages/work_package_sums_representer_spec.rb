@@ -28,9 +28,9 @@
 
 require 'spec_helper'
 
-describe API::V3::WorkPackages::WorkPackageSumsRepresenter do
+RSpec.describe API::V3::WorkPackages::WorkPackageSumsRepresenter do
   let(:custom_field) do
-    build_stubbed(:int_wp_custom_field, id: 1).tap do |cf|
+    build_stubbed(:integer_wp_custom_field, id: 1) do |cf|
       allow(WorkPackageCustomField)
         .to receive(:summable)
               .and_return([cf])

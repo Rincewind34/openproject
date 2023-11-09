@@ -20,20 +20,18 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 lv:
+  plugin_openproject_documents:
+    name: "OpenProject Documents"
+    description: "An OpenProject plugin to allow creation of documents in projects."
   activerecord:
     models:
       document: "Dokuments"
   activity:
     filter:
-      document: "Documents"
+      document: "Dokumenti"
   default_doc_category_tech: "Tehniskā dokumentācija"
   default_doc_category_user: "Lietotāja dokumentācija"
   enumeration_doc_categories: "Dokumentu kategorijas"
-  enumeration:
-    document_category:
-      documentation: Dokumentācija
-      specification: Specification
-      other: Other
   documents:
     label_attachment_author: "Attachment author"
   label_document_added: "Dokuments pievienots"

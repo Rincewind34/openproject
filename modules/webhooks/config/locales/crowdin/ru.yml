@@ -1,4 +1,7 @@
 ru:
+  plugin_openproject_webhooks:
+    name: "Веб-хуки OpenProject"
+    description: "Предоставляет плагин API для поддержки вебхуков OpenProject для лучшей сторонней интеграции."
   activerecord:
     attributes:
       webhooks/webhook:

@@ -28,16 +28,16 @@
 
 require 'spec_helper'
 
-describe API::V3::Projects::ProjectRepresenter, 'rendering' do
+RSpec.describe API::V3::Projects::ProjectRepresenter, 'rendering' do
   include API::V3::Utilities::PathHelper
 
   subject(:generated) { representer.to_json }
 
   let(:project) do
     build_stubbed(:project,
+                  :with_status,
                   parent: parent_project,
-                  description: 'some description',
-                  status:).tap do |p|
+                  description: 'some description').tap do |p|
       allow(p)
         .to receive(:available_custom_fields)
               .and_return([int_custom_field, version_custom_field])
@@ -55,9 +55,6 @@ describe API::V3::Projects::ProjectRepresenter, 'rendering' do
         .to receive(:ancestors_from_root)
               .and_return(ancestors)
     end
-  end
-  let(:status) do
-    build_stubbed(:project_status)
   end
   let(:parent_project) do
     build_stubbed(:project).tap do |parent|
@@ -79,7 +76,7 @@ describe API::V3::Projects::ProjectRepresenter, 'rendering' do
     end
   end
 
-  let(:int_custom_field) { build_stubbed(:int_project_custom_field, visible: false) }
+  let(:int_custom_field) { build_stubbed(:integer_project_custom_field, visible: false) }
   let(:version_custom_field) { build_stubbed(:version_project_custom_field, visible: true) }
   let(:int_custom_value) do
     CustomValue.new(custom_field: int_custom_field,
@@ -131,7 +128,7 @@ describe API::V3::Projects::ProjectRepresenter, 'rendering' do
     end
 
     it_behaves_like 'formattable property', 'statusExplanation' do
-      let(:value) { status.explanation }
+      let(:value) { project.status_explanation }
     end
 
     it_behaves_like 'has UTC ISO 8601 date and time' do
@@ -345,12 +342,13 @@ describe API::V3::Projects::ProjectRepresenter, 'rendering' do
     describe 'status' do
       it_behaves_like 'has a titled link' do
         let(:link) { 'status' }
-        let(:href) { api_v3_paths.project_status(project.status.code) }
-        let(:title) { I18n.t(:"activerecord.attributes.projects/status.codes.#{project.status.code}") }
+        let(:status_code) { project.status_code }
+        let(:href) { api_v3_paths.project_status(status_code) }
+        let(:title) { I18n.t(:"activerecord.attributes.project.status_codes.#{status_code}") }
       end
 
-      context 'if the status is nil' do
-        let(:status) { nil }
+      context 'if the status_code is nil' do
+        before { project.status_code = nil }
 
         it_behaves_like 'has an untitled link' do
           let(:link) { 'status' }
@@ -640,19 +638,12 @@ describe API::V3::Projects::ProjectRepresenter, 'rendering' do
         expect(representer.json_cache_key)
           .not_to eql former_cache_key
       end
-
-      it 'changes when the project status is updated' do
-        project.status.updated_at = 20.seconds.from_now
-
-        expect(representer.json_cache_key)
-          .not_to eql former_cache_key
-      end
     end
   end
 
   describe '.checked_permissions' do
     it 'lists add_work_packages' do
-      expect(described_class.checked_permissions).to match_array([:add_work_packages])
+      expect(described_class.checked_permissions).to contain_exactly(:add_work_packages)
     end
   end
 end

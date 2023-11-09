@@ -28,8 +28,8 @@
 
 require 'spec_helper'
 
-describe API::V3::WorkPackageCollectionFromQueryService,
-         type: :model do
+RSpec.describe API::V3::WorkPackageCollectionFromQueryService,
+               type: :model do
   include API::V3::Utilities::PathHelper
 
   let(:query) do
@@ -190,7 +190,7 @@ describe API::V3::WorkPackageCollectionFromQueryService,
       context 'work_packages' do
         it "has the query's work_package results set" do
           expect(subject.work_packages)
-            .to match_array([work_package])
+            .to contain_exactly(work_package)
         end
       end
 
@@ -236,7 +236,7 @@ describe API::V3::WorkPackageCollectionFromQueryService,
       end
 
       context 'when timestamps are given' do
-        let(:timestamps) { [Timestamp.parse("P-1Y"), Timestamp.now] }
+        let(:timestamps) { [Timestamp.parse("P-1Y"), Timestamp.parse("oneWeekAgo@12:00+00:00"), Timestamp.now] }
         let(:query) { build_stubbed(:query, timestamps:) }
 
         it 'has the query timestamps' do
@@ -267,7 +267,7 @@ describe API::V3::WorkPackageCollectionFromQueryService,
             query.display_sums = true
 
             custom_fields = [build_stubbed(:text_wp_custom_field),
-                             build_stubbed(:int_wp_custom_field)]
+                             build_stubbed(:integer_wp_custom_field)]
 
             allow(WorkPackageCustomField)
               .to receive(:summable)

@@ -20,6 +20,9 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 zh-TW:
+  plugin_openproject_reporting:
+    name: "OpenProject Reporting"
+    description: "This plugin allows creating custom cost reports with filtering and grouping created by the OpenProject Time and costs plugin."
   button_save_as: "將報表另存為..。"
   comments: "評論"
   cost_reports_title: "時程與成本"
@@ -69,7 +72,7 @@ zh-TW:
   label_inactive: "«不活動»"
   label_no: "否"
   label_none: "(沒有資料)"
-  label_no_reports: "There are no cost reports yet."
+  label_no_reports: "尚無費用報告"
   label_report: "報表"
   label_yes: "是"
   load_query_question: "報告含有 %{size} 個儲存格，將要花一些時間呈現。你仍然想要嘗試顯示它嗎？"
@@ -81,6 +84,9 @@ zh-TW:
   units: "單位"
   validation_failure_date: "不是一個有效日期"
   validation_failure_integer: "不是一個有效的整數"
+  export:
+    cost_reports:
+      title: "Your Cost Reports XLS export"
   reporting:
     group_by:
       selected_columns: "選擇列"

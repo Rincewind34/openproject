@@ -20,6 +20,9 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 ru:
+  plugin_costs:
+    name: "Время и затраты"
+    description: "Этот модуль добавляет возможности для планирования и отслеживания затрат на проекты."
   activerecord:
     attributes:
       cost_entry:
@@ -82,7 +85,7 @@ ru:
   label_costlog: "Журналированные затраты на единицу"
   label_cost_plural: "Расходы"
   label_cost_type_plural: "Типы затрат"
-  label_cost_type_specific: "Затраты типа #%{id}: %{name}" #%{id}: %{name}"
+  label_cost_type_specific: "Затраты типа #%{id}: %{name}"
   label_costs_per_page: "Расходов на странице"
   label_currency: "Валюта"
   label_currency_format: "Формат валюты"

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2023 the OpenProject GmbH
@@ -28,27 +30,18 @@
 
 require_relative '../spec_helper'
 
-describe 'Managing file links in work package', js: true, webmock: true do
+RSpec.describe 'Managing file links in work package', js: true, webmock: true do
   let(:permissions) { %i(view_work_packages edit_work_packages view_file_links manage_file_links) }
   let(:project) { create(:project) }
   let(:current_user) { create(:user, member_in_project: project, member_with_permissions: permissions) }
   let(:work_package) { create(:work_package, project:, description: 'Initial description') }
 
   let(:oauth_application) { create(:oauth_application) }
-  let(:storage) { create(:storage, oauth_application:) }
+  let(:storage) { create(:nextcloud_storage, oauth_application:) }
   let(:oauth_client) { create(:oauth_client, integration: storage) }
   let(:oauth_client_token) { create(:oauth_client_token, oauth_client:, user: current_user) }
-  let(:project_storage) { create(:project_storage, project:, storage:) }
+  let(:project_storage) { create(:project_storage, project:, storage:, project_folder_id: nil, project_folder_mode: 'inactive') }
   let(:file_link) { create(:file_link, container: work_package, storage:, origin_id: '22', origin_name: 'jingle.ogg') }
-
-  let(:connection_manager) do
-    connection_manager = instance_double(OAuthClients::ConnectionManager)
-    allow(connection_manager).to receive(:refresh_token).and_return(ServiceResult.success(result: oauth_client_token))
-    allow(connection_manager).to receive(:get_access_token).and_return(ServiceResult.success(result: oauth_client_token))
-    allow(connection_manager).to receive(:authorization_state).and_return(:connected)
-    allow(connection_manager).to receive(:request_with_token_refresh).and_yield(oauth_client_token)
-    connection_manager
-  end
 
   let(:root_xml_response) { create(:webdav_data) }
   let(:folder1_xml_response) { create(:webdav_data_folder) }
@@ -66,10 +59,18 @@ describe 'Managing file links in work package', js: true, webmock: true do
   let(:confirmation_dialog) { Components::ConfirmationDialog.new }
 
   before do
-    allow(OAuthClients::ConnectionManager).to receive(:new).and_return(connection_manager)
     allow(Storages::FileLinkSyncService).to receive(:new).and_return(sync_service)
 
-    stub_request(:propfind, "#{storage.host}/remote.php/dav/files/#{oauth_client_token.origin_user_id}")
+    stub_request(:get, "#{storage.host}/ocs/v1.php/cloud/user")
+      .with(
+        headers: {
+          'Authorization' => "Bearer #{oauth_client_token.access_token}",
+          'Ocs-Apirequest' => 'true',
+          'Accept' => "application/json"
+        }
+      )
+      .to_return(status: 200, body: "", headers: {})
+    stub_request(:propfind, "#{storage.host}/remote.php/dav/files/#{oauth_client_token.origin_user_id}/")
       .to_return(status: 207, body: root_xml_response, headers: {})
     stub_request(:propfind, "#{storage.host}/remote.php/dav/files/#{oauth_client_token.origin_user_id}/Folder1")
       .to_return(status: 207, body: folder1_xml_response, headers: {})

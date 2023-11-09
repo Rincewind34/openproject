@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe API::V3::Versions::Schemas::VersionSchemaRepresenter do
+RSpec.describe API::V3::Versions::Schemas::VersionSchemaRepresenter do
   include API::V3::Utilities::PathHelper
 
   let(:current_user) { build_stubbed(:user) }
@@ -39,7 +39,7 @@ describe API::V3::Versions::Schemas::VersionSchemaRepresenter do
   let(:allowed_sharings) { %w(tree system) }
   let(:allowed_status) { %w(open fixed closed) }
   let(:custom_field) do
-    build_stubbed(:int_version_custom_field)
+    build_stubbed(:version_custom_field, :integer)
   end
   let(:version) { build_stubbed(:version) }
 

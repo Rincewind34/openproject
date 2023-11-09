@@ -20,6 +20,8 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 hu:
+  plugin_budgets_engine:
+    name: 'Költségvetések'
   activerecord:
     attributes:
       budget:
@@ -41,7 +43,7 @@ hu:
       material_budget_item: "Egység"
   activity:
     filter:
-      budget: "Budgets"
+      budget: "Költségvetések"
   attributes:
     budget: "Költségvetés"
   button_add_budget_item: "Új tervezett költség"

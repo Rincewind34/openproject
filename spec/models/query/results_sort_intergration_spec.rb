@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe Query::Results, 'sorting and grouping', with_mail: false do
+RSpec.describe Query::Results, 'sorting and grouping' do
   create_shared_association_defaults_for_work_package_factory
 
   let(:query) do
@@ -463,7 +463,7 @@ describe Query::Results, 'sorting and grouping', with_mail: false do
     let(:work_package1) { create(:work_package, project: project1) }
     let(:work_package2) { create(:work_package, project: project1) }
     let(:work_package3) { create(:work_package, project: project1) }
-    let(:int_cf) { create(:int_wp_custom_field, is_filter: true) }
+    let(:int_cf) { create(:integer_wp_custom_field, is_filter: true) }
     let!(:custom_value) do
       create(:custom_value,
              custom_field: int_cf,

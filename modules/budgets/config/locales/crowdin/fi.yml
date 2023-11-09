@@ -20,6 +20,8 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 fi:
+  plugin_budgets_engine:
+    name: 'Budjetit'
   activerecord:
     attributes:
       budget:
@@ -41,7 +43,7 @@ fi:
       material_budget_item: "Yksikkö"
   activity:
     filter:
-      budget: "Budgets"
+      budget: "Budjetit"
   attributes:
     budget: "Budjetti"
   button_add_budget_item: "Lisää suunniteltuja kustannuksia"

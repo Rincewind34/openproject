@@ -28,7 +28,9 @@
 
 require 'spec_helper'
 
-describe 'Projects custom fields', js: true do
+RSpec.describe 'Projects custom fields',
+               js: true,
+               with_cuprite: true do
   shared_let(:current_user) { create(:admin) }
   shared_let(:project) { create(:project, name: 'Foo project', identifier: 'foo-project') }
   let(:name_field) { FormFields::InputFormField.new :name }
@@ -61,7 +63,7 @@ describe 'Projects custom fields', js: true do
 
   describe 'with default values' do
     let!(:default_int_custom_field) do
-      create(:int_project_custom_field, default_value: 123)
+      create(:integer_project_custom_field, default_value: 123)
     end
     let!(:default_string_custom_field) do
       create(:string_project_custom_field, default_value: 'lorem')
@@ -161,7 +163,8 @@ describe 'Projects custom fields', js: true do
     end
 
     context 'with german locale',
-            driver: :firefox_de do
+            driver: :firefox_de,
+            with_cuprite: false do
       let(:current_user) { create(:admin, language: 'de') }
 
       it 'displays the float with german locale' do
@@ -192,7 +195,7 @@ describe 'Projects custom fields', js: true do
 
   describe 'with boolean CF' do
     let!(:custom_field) do
-      create(:bool_project_custom_field)
+      create(:boolean_project_custom_field)
     end
 
     it 'allows settings the project boolean CF (regression #26313)' do
@@ -274,6 +277,18 @@ describe 'Projects custom fields', js: true do
       project.reload
       cv = project.custom_values.find_by(custom_field_id: custom_field.id).typed_value
       expect(cv).to eq invisible_user
+    end
+
+    it 'does not show invite user button when there is no project selected' do
+      visit new_project_path
+
+      name_field.set_value 'My project name'
+
+      find('.op-fieldset--toggle', text: 'ADVANCED SETTINGS').click
+
+      cf_field.expect_visible
+      cf_field.expect_no_option invisible_user
+      expect(page).not_to have_selector('.ng-dropdown-footer button', text: 'Invite')
     end
   end
 end

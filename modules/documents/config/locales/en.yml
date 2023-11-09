@@ -27,6 +27,10 @@
 #++
 
 en:
+  plugin_openproject_documents:
+    name: "OpenProject Documents"
+    description: "An OpenProject plugin to allow creation of documents in projects."
+
   activerecord:
     models:
       document: "Document"
@@ -39,11 +43,6 @@ en:
   default_doc_category_user: "User documentation"
 
   enumeration_doc_categories: "Document categories"
-  enumeration:
-    document_category:
-      documentation: Documentation
-      specification: Specification
-      other: Other
 
   documents:
     label_attachment_author: "Attachment author"

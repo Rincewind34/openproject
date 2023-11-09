@@ -4,8 +4,7 @@ module Budgets
 
     register 'budgets',
              author_url: 'https://www.openproject.org',
-             bundled: true,
-             name: 'Budgets' do
+             bundled: true do
       project_module :budgets do
         permission :view_budgets, { budgets: %i[index show] }
         permission :edit_budgets, { budgets: %i[index show edit update destroy destroy_info new create copy] }
@@ -17,10 +16,8 @@ module Budgets
            if: ->(project) { project.module_enabled?(:budgets) },
            after: :costs,
            caption: :budgets_title,
-           icon: 'icon2 icon-budget'
+           icon: 'budget'
     end
-
-    activity_provider :budgets, class_name: 'Activities::BudgetActivityProvider', default: false
 
     add_api_path :budget do |id|
       "#{root}/budgets/#{id}"

@@ -29,7 +29,7 @@
 class HomescreenController < ApplicationController
   skip_before_action :check_if_login_required, only: [:robots]
 
-  layout 'no_menu'
+  layout 'global'
 
   def index
     @newest_projects = Project.visible.newest.take(3)
@@ -40,7 +40,15 @@ class HomescreenController < ApplicationController
     @homescreen = OpenProject::Static::Homescreen
   end
 
+  current_menu_item [:index] do
+    :home
+  end
+
   def robots
-    @projects = Project.active.public_projects
+    if Setting.login_required?
+      render template: 'homescreen/robots-login-required', format: :text
+    else
+      @projects = Project.active.public_projects
+    end
   end
 end

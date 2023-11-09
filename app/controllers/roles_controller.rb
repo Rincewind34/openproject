@@ -28,11 +28,13 @@
 
 class RolesController < ApplicationController
   include PaginationHelper
-  include Roles::NotifyMixin
 
   layout 'admin'
 
   before_action :require_admin, except: [:autocomplete_for_role]
+
+  menu_item :roles, except: :report
+  menu_item :permissions_report, only: :report
 
   def index
     @roles = roles_scope
@@ -54,7 +56,7 @@ class RolesController < ApplicationController
   end
 
   def create
-    @call = create_role
+    @call = Roles::CreateService.new(user: current_user).call(create_params)
     @role = @call.result
 
     if @call.success?
@@ -80,13 +82,16 @@ class RolesController < ApplicationController
   end
 
   def destroy
-    @role = Role.find(params[:id])
-    @role.destroy
-    flash[:notice] = I18n.t(:notice_successful_delete)
-    redirect_to action: 'index'
-    notify_changed_roles(:removed, @role)
-  rescue StandardError
-    flash[:error] = I18n.t(:error_can_not_remove_role)
+    service_result = Roles::DeleteService.new(
+      model: Role.find(params[:id]),
+      user: current_user
+    ).call
+
+    if service_result.success?
+      flash[:notice] = I18n.t(:notice_successful_delete)
+    else
+      flash[:error] = I18n.t(:error_can_not_remove_role)
+    end
     redirect_to action: 'index'
   end
 
@@ -146,12 +151,6 @@ class RolesController < ApplicationController
 
       update_role(role, new_permissions)
     end
-  end
-
-  def create_role
-    Roles::CreateService
-      .new(user: current_user)
-      .call(create_params)
   end
 
   def roles_scope

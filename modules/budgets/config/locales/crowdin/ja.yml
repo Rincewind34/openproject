@@ -20,6 +20,8 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 ja:
+  plugin_budgets_engine:
+    name: '予算'
   activerecord:
     attributes:
       budget:
@@ -41,7 +43,7 @@ ja:
       material_budget_item: "ユニット"
   activity:
     filter:
-      budget: "Budgets"
+      budget: "予算"
   attributes:
     budget: "予算"
   button_add_budget_item: "計画コストを追加"

@@ -20,6 +20,9 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 pt:
+  plugin_openproject_documents:
+    name: "OpenProject Documents"
+    description: "An OpenProject plugin to allow creation of documents in projects."
   activerecord:
     models:
       document: "Documento"
@@ -29,11 +32,6 @@ pt:
   default_doc_category_tech: "Documentação técnica"
   default_doc_category_user: "Documentação do usuário"
   enumeration_doc_categories: "Categorias de documento"
-  enumeration:
-    document_category:
-      documentation: Documentação
-      specification: Especificação
-      other: Outro
   documents:
     label_attachment_author: "Autor do anexo"
   label_document_added: "Documento adicionado"

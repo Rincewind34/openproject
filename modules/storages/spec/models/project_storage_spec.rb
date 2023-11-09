@@ -28,7 +28,7 @@
 
 require_relative '../spec_helper'
 
-describe Storages::ProjectStorage do
+RSpec.describe Storages::ProjectStorage do
   let(:creator) { create(:user) }
   let(:project) { create(:project, enabled_module_names: %i[storages work_packages]) }
   let(:storage) { create(:storage) }
@@ -36,7 +36,8 @@ describe Storages::ProjectStorage do
     {
       storage:,
       creator:,
-      project:
+      project:,
+      project_folder_mode: :inactive
     }
   end
 
@@ -74,6 +75,49 @@ describe Storages::ProjectStorage do
     it "does not destroy associated FileLink records" do
       expect(Storages::ProjectStorage.count).to eq 0
       expect(Storages::FileLink.count).not_to eq 0
+    end
+  end
+
+  describe '#automatic_management_possible?' do
+    let(:project_storage) { build_stubbed(:project_storage, storage:) }
+
+    context 'when the storage is not a NextcloudStorage' do
+      let(:storage) { build_stubbed(:storage, :as_generic) }
+
+      it "returns false" do
+        expect(project_storage.automatic_management_possible?).to be false
+      end
+    end
+
+    context 'when the storage is a NextcloudStorage' do
+      let(:storage) { build_stubbed(:nextcloud_storage) }
+
+      context 'when the storage is not automatically managed' do
+        it "returns false" do
+          expect(project_storage.automatic_management_possible?).to be false
+        end
+      end
+
+      context 'when the storage is automatically managed' do
+        before do
+          storage.automatically_managed = true
+        end
+
+        it "returns true" do
+          expect(project_storage.automatic_management_possible?).to be true
+        end
+      end
+    end
+  end
+
+  describe '#project_folder_mode' do
+    let(:project_storage) { build(:project_storage) }
+
+    it do
+      expect(project_storage).to define_enum_for(:project_folder_mode)
+        .with_values(inactive: 'inactive', manual: 'manual', automatic: 'automatic')
+        .with_prefix(:project_folder)
+        .backed_by_column_of_type(:enum)
     end
   end
 end

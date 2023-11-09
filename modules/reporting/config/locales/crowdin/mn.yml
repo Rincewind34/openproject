@@ -20,6 +20,9 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 mn:
+  plugin_openproject_reporting:
+    name: "OpenProject Reporting"
+    description: "This plugin allows creating custom cost reports with filtering and grouping created by the OpenProject Time and costs plugin."
   button_save_as: "Save report as..."
   comments: "Comment"
   cost_reports_title: "Time and costs"
@@ -81,6 +84,9 @@ mn:
   units: "Units"
   validation_failure_date: "is not a valid date"
   validation_failure_integer: "is not a valid integer"
+  export:
+    cost_reports:
+      title: "Your Cost Reports XLS export"
   reporting:
     group_by:
       selected_columns: "Selected columns"
