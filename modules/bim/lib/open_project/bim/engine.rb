@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -37,8 +37,7 @@ module OpenProject::Bim
     register 'openproject-bim',
              author_url: 'https://www.openproject.org',
              settings: {
-               default: {
-               }
+               default: {}
              } do
       project_module(:bim,
                      dependencies: :work_package_tracking,
@@ -92,7 +91,7 @@ module OpenProject::Bim
                   { controller: '/bim/ifc_models/ifc_models', action: 'defaults' },
                   caption: :'bcf.label_bcf',
                   after: :work_packages,
-                  icon: 'icon2 icon-bcf',
+                  icon: 'bcf',
                   badge: :label_new)
 
         menu.push :ifc_viewer_panels,
@@ -199,23 +198,18 @@ module OpenProject::Bim
       Mime::Type.register "application/octet-stream", :bcfzip unless Mime::Type.lookup_by_extension(:bcfzip)
     end
 
-    # rubocop:disable Naming/VariableNumber
     config.to_prepare do
       Doorkeeper.configuration.scopes.add(:bcf_v2_1)
 
-      # rubocop:disable Lint/ConstantDefinitionInBlock
-      module OpenProject::Authentication::Scope
-        BCF_V2_1 = :bcf_v2_1
+      unless defined? OpenProject::Authentication::Scope::BCF_V2_1
+        OpenProject::Authentication::Scope::BCF_V2_1 = :bcf_v2_1
       end
-      # rubocop:enable Lint/ConstantDefinitionInBlock
 
       OpenProject::Authentication.update_strategies(OpenProject::Authentication::Scope::BCF_V2_1,
                                                     store: false) do |_strategies|
         %i[oauth session]
       end
     end
-    # rubocop:enable Naming/VariableNumber
-
     config.to_prepare do
       ::Exports::Register.register do
         list ::WorkPackage, OpenProject::Bim::BcfXml::Exporter

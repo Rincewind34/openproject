@@ -1,6 +1,6 @@
 #-- copyright
 #OpenProject is an open source project management software.
-#Copyright (C) 2012-2022 the OpenProject GmbH
+#Copyright (C) 2012-2023 the OpenProject GmbH
 #This program is free software; you can redistribute it and/or
 #modify it under the terms of the GNU General Public License version 3.
 #OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
@@ -21,6 +21,10 @@
 #++
 #English strings go here for Rails i18n
 pl:
+  plugin_openproject_meeting:
+    name: "Spotkania OpenProject"
+    description: >-
+      This module adds functions to support project meetings to OpenProject. Meetings can be scheduled selecting invitees from the same project to take part in the meeting. An agenda can be created and sent to the invitees. After the meeting, attendees can be selected and minutes can be created based on the agenda. Finally, the minutes can be sent to all attendees and invitees.
   activerecord:
     attributes:
       meeting:
@@ -29,6 +33,7 @@ pl:
         participants: "Uczestnicy"
         participants_attended: "Uczestnicy"
         participants_invited: "Zaproszone osoby"
+        project: "Projekt"
         start_time: "Czas"
         start_time_hour: "Czas rozpoczęcia"
     errors:
@@ -37,6 +42,9 @@ pl:
     models:
       meeting_agenda: "Plan spotkania"
       meeting_minutes: "Protokół ze spotkania"
+  activity:
+    filter:
+      meeting: "Spotkania"
   description_attended: "Obecny"
   description_invite: "Zaproszony"
   events:
@@ -58,6 +66,13 @@ pl:
   label_meeting_agenda_close: "Zamknij agendę aby zacząć protokół ze spotkania"
   label_meeting_date_time: "Data/Czas"
   label_meeting_diff: "Różnice"
+  label_upcoming_meetings: "Nadchodzące spotkania"
+  label_past_meetings: "Przeszłe spotkania"
+  label_involvement: "Zaangażowanie"
+  label_upcoming_invitations: "Nadchodzące zaproszenia"
+  label_past_invitations: "Poprzednie zaproszenia"
+  label_attendee: "Uczestnik"
+  label_author: "Twórca"
   label_notify: "Wyślij do przeglądu"
   label_icalendar: "Wyślij iCalendar"
   label_version: "Wersja"
@@ -82,7 +97,7 @@ pl:
   text_duration_in_hours: "Czas trwania w godzinach"
   text_in_hours: "w godzinach"
   text_meeting_agenda_for_meeting: 'agenda spotkania "%{meeting}"'
-  text_meeting_closing_are_you_sure: "Czy na pewno chcesz zamknąć spotkanie?"
+  text_meeting_closing_are_you_sure: "Czy na pewno chcesz zamknąć plan spotkania?"
   text_meeting_agenda_open_are_you_sure: "To zastąpił wszystkie zmiany w protokołach! Czy chcesz kontynuować?"
   text_meeting_minutes_for_meeting: 'protokół ze spotkania "%{meeting}"'
   text_review_meeting_agenda: "%{author} umieścił %{link} do przeglądu."

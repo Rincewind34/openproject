@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -32,6 +32,7 @@ class TypesController < ApplicationController
   layout 'admin'
 
   before_action :require_admin
+  before_action :find_type, only: %i[update move destroy]
 
   def index
     @types = ::Type.page(page_param).per_page(per_page_param)
@@ -44,6 +45,19 @@ class TypesController < ApplicationController
   def new
     @type = Type.new(params[:type])
     load_projects_and_types
+  end
+
+  def edit
+    if params[:tab].blank?
+      redirect_to tab: :settings
+    else
+      type = ::Type
+             .includes(:projects,
+                       :custom_fields)
+             .find(params[:id])
+
+      render_edit_tab(type)
+    end
   end
 
   def create
@@ -64,22 +78,7 @@ class TypesController < ApplicationController
     end
   end
 
-  def edit
-    if params[:tab].blank?
-      redirect_to tab: :settings
-    else
-      type = ::Type
-             .includes(:projects,
-                       :custom_fields)
-             .find(params[:id])
-
-      render_edit_tab(type)
-    end
-  end
-
   def update
-    @type = ::Type.find(params[:id])
-
     UpdateTypeService
       .new(@type, current_user)
       .call(permitted_type_params) do |call|
@@ -95,19 +94,16 @@ class TypesController < ApplicationController
   end
 
   def move
-    @type = ::Type.find(params[:id])
-
     if @type.update(permitted_params.type_move)
       flash[:notice] = I18n.t(:notice_successful_update)
+      redirect_to types_path
     else
-      flash.now[:error] = t('type_could_not_be_saved')
+      flash.now[:error] = I18n.t(:error_type_could_not_be_saved)
       render action: 'edit'
     end
-    redirect_to types_path
   end
 
   def destroy
-    @type = ::Type.find(params[:id])
     # types cannot be deleted when they have work packages
     # or they are standard types
     # put that into the model and do a `if @type.destroy`
@@ -121,6 +117,10 @@ class TypesController < ApplicationController
   end
 
   protected
+
+  def find_type
+    @type = ::Type.find(params[:id])
+  end
 
   def permitted_type_params
     # having to call #to_unsafe_h as a query hash the attribute_groups
@@ -160,7 +160,7 @@ class TypesController < ApplicationController
   end
 
   def update_success_message
-    if params[:tab].in?(["form_configuration", "projects"])
+    if params[:tab].in?(%w[form_configuration projects])
       t(:notice_successful_update_custom_fields_added_to_type)
     else
       t(:notice_successful_update)
@@ -178,11 +178,11 @@ class TypesController < ApplicationController
         )
       ]
 
-      archived_projects = @type.projects.filter(&:archived?)
-      if !archived_projects.empty?
-        error_message.push(
-          t(:'error_can_not_delete_type.archived_projects',
-            archived_projects: archived_projects.map(&:name).join(', '))
+      if archived_projects.any?
+        error_message << ApplicationController.helpers.sanitize(
+          t(:error_can_not_delete_in_use_archived_work_packages,
+            archived_projects_urls: helpers.archived_projects_urls_for(archived_projects)),
+          attributes: %w(href target)
         )
       end
 
@@ -191,6 +191,10 @@ class TypesController < ApplicationController
   end
 
   def belonging_wps_url(type_id)
-    work_packages_path query_props: "{\"f\":[{\"n\":\"type\",\"o\":\"=\",\"v\":[#{type_id}]}]}"
+    work_packages_path query_props: { f: [{ n: "type", o: "=", v: [type_id] }] }.to_json
+  end
+
+  def archived_projects
+    @archived_projects ||= @type.projects.archived
   end
 end

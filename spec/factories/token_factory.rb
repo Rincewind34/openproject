@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -60,6 +60,22 @@ FactoryBot.define do
       after(:build) do |token, factory|
         token.created_at = DateTime.now - factory.since
       end
+    end
+  end
+
+  factory :ical_token, class: '::Token::ICal' do
+    user
+
+    transient do
+      query { nil }
+      name { nil }
+    end
+
+    after(:build) do |token, evaluator|
+      token.ical_token_query_assignment = build(:ical_token_query_assignment,
+                                                query: evaluator.query,
+                                                name: evaluator.name,
+                                                ical_token: token)
     end
   end
 end

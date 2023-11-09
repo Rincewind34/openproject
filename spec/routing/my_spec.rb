@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe 'my routes', type: :routing do
+RSpec.describe 'my routes' do
   it '/my/account GET routes to my#account' do
     expect(get('/my/account')).to route_to('my#account')
   end
@@ -64,5 +64,9 @@ describe 'my routes', type: :routing do
   it '/my/deletion_info GET routes to users#deletion_info' do
     expect(get('/my/deletion_info')).to route_to(controller: 'users',
                                                  action: 'deletion_info')
+  end
+
+  it '/my/revoke_ical_token DELETE routes to my#revoke_ical_token' do
+    expect(delete('/my/revoke_ical_token')).to route_to('my#revoke_ical_token')
   end
 end

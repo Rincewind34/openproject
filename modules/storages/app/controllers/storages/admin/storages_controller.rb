@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,6 +30,8 @@
 
 # Purpose: CRUD the global admin page of Storages (=Nextcloud servers)
 class Storages::Admin::StoragesController < ApplicationController
+  using Storages::Peripherals::ServiceResultRefinements
+
   # See https://guides.rubyonrails.org/layouts_and_rendering.html for reference on layout
   layout 'admin'
 
@@ -50,10 +54,6 @@ class Storages::Admin::StoragesController < ApplicationController
     @storages = Storages::Storage.all
   end
 
-  # Show page with details of one Storage object.
-  # Called by: Global app/config/routes.rb to serve Web page
-  def show; end
-
   # Show the admin page to create a new Storage object.
   # Sets the attributes provider_type and name as default values and then
   # renders the new page (allowing the user to overwrite these values and to
@@ -63,11 +63,10 @@ class Storages::Admin::StoragesController < ApplicationController
   def new
     # Set default parameters using a "service".
     # See also: storages/services/storages/storages/set_attributes_services.rb
-    # See also: https://www.openproject.org/docs/development/concepts/contracted-services/
     # That service inherits from ::BaseServices::SetAttributes
     @object = ::Storages::Storages::SetAttributesService
                 .new(user: current_user,
-                     model: Storages::Storage.new,
+                     model: Storages::NextcloudStorage.new,
                      contract_class: EmptyContract)
                 .call
                 .result
@@ -77,7 +76,6 @@ class Storages::Admin::StoragesController < ApplicationController
   # Overwrite the creator_id with the current_user. Is this this pattern always used?
   # Use service pattern to create a new Storage
   # See also: storages/services/storages/storages/create_service.rb
-  # See also: https://www.openproject.org/docs/development/concepts/contracted-services/
   # Called by: Global app/config/routes.rb to serve Web page
   def create
     service_result = Storages::Storages::CreateService.new(user: current_user).call(permitted_storage_params)
@@ -100,7 +98,6 @@ class Storages::Admin::StoragesController < ApplicationController
 
   # Update is similar to create above
   # See also: create above
-  # See also: https://www.openproject.org/docs/development/concepts/contracted-services/
   # Called by: Global app/config/routes.rb to serve Web page
   def update
     service_result = ::Storages::Storages::UpdateService
@@ -110,24 +107,24 @@ class Storages::Admin::StoragesController < ApplicationController
 
     if service_result.success?
       flash[:notice] = I18n.t(:notice_successful_update)
-      redirect_to admin_settings_storage_path(@object)
+      redirect_to edit_admin_settings_storage_path(@object)
     else
       @errors = service_result.errors
       render :edit
     end
   end
 
-  # Purpose: Destroy a specific Storage
-  # Called by: Global app/config/routes.rb to serve Web page
   def destroy
     Storages::Storages::DeleteService
       .new(user: User.current, model: @object)
       .call
+      .match(
+        # rubocop:disable Rails/ActionControllerFlashBeforeRender
+        on_success: ->(*) { flash[:notice] = I18n.t(:notice_successful_delete) },
+        on_failure: ->(error) { flash[:error] = error.full_messages }
+        # rubocop:enable Rails/ActionControllerFlashBeforeRender
+      )
 
-    # Displays a message box on the next page
-    flash[:notice] = I18n.t(:notice_successful_delete)
-
-    # Redirect to the index page
     redirect_to admin_settings_storages_path
   end
 

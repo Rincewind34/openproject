@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -54,6 +54,9 @@ module TimeEntries
     attribute :work_package_id
     attribute :activity_id do
       validate_activity_active
+    end
+    attribute :ongoing do
+      validate_self_timer
     end
     attribute :hours
     attribute :comments
@@ -113,6 +116,10 @@ module TimeEntries
 
     def validate_logged_by_current_user
       errors.add :logged_by_id, :not_current_user if model.logged_by != logged_by
+    end
+
+    def validate_self_timer
+      errors.add :ongoing, :not_current_user if model.ongoing? && model.user != user
     end
   end
 end

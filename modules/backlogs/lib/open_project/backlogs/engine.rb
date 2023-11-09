@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -39,7 +39,8 @@ module OpenProject::Backlogs
         default: {
           'story_types' => nil,
           'task_type' => nil,
-          'card_spec' => nil
+          'points_burn_direction' => 'up',
+          'wiki_template' => ''
         },
         menu_item: :backlogs_settings
       }
@@ -47,10 +48,10 @@ module OpenProject::Backlogs
 
     include OpenProject::Plugins::ActsAsOpEngine
 
-    register 'openproject-backlogs',
+    register('openproject-backlogs',
              author_url: 'https://www.openproject.org',
              bundled: true,
-             settings: settings do
+             settings:) do
       Rails.application.reloader.to_prepare do
         OpenProject::AccessControl.permission(:add_work_packages).tap do |add|
           add.controller_actions << 'rb_stories/create'
@@ -75,8 +76,7 @@ module OpenProject::Backlogs
                    rb_wikis: :show,
                    rb_stories: %i[index show],
                    rb_queries: :show,
-                   rb_burndown_charts: :show,
-                   rb_export_card_configurations: %i[index show]
+                   rb_burndown_charts: :show
 
         permission :view_taskboards,
                    rb_taskboards: :show,
@@ -85,8 +85,7 @@ module OpenProject::Backlogs
                    rb_tasks: %i[index show],
                    rb_impediments: %i[index show],
                    rb_wikis: :show,
-                   rb_burndown_charts: :show,
-                   rb_export_card_configurations: %i[index show]
+                   rb_burndown_charts: :show
 
         permission :select_done_statuses,
                    {
@@ -109,7 +108,7 @@ module OpenProject::Backlogs
            { controller: '/rb_master_backlogs', action: :index },
            caption: :project_module_backlogs,
            after: :work_packages,
-           icon: 'icon2 icon-backlogs'
+           icon: 'backlogs'
 
       menu :project_menu,
            :settings_backlogs,
@@ -139,7 +138,7 @@ module OpenProject::Backlogs
     patch_with_namespace :WorkPackages, :UpdateService
     patch_with_namespace :WorkPackages, :SetAttributesService
     patch_with_namespace :WorkPackages, :BaseContract
-    patch_with_namespace :Versions, :RowCell
+    patch_with_namespace :Versions, :RowComponent
 
     config.to_prepare do
       next if Versions::BaseContract.included_modules.include?(OpenProject::Backlogs::Patches::Versions::BaseContractPatch)

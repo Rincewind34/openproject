@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -44,8 +44,8 @@ module Pages
       end
 
       # only notice is used as opposed to op-toast
-      def expect_toast(message:, type: :notice)
-        expect(page).to have_selector(".flash.#{type}", text: message, wait: 10)
+      def expect_toast(message:, type: :success)
+        expect(page).to have_selector(".op-toast.-#{type}", text: message, wait: 10)
       end
 
       def expect_type_active(type)

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,10 +28,10 @@
 
 require 'spec_helper'
 
-describe ::API::V3::Queries::QueryRepresenter, 'parsing' do
-  include ::API::V3::Utilities::PathHelper
+RSpec.describe API::V3::Queries::QueryRepresenter, 'parsing' do
+  include API::V3::Utilities::PathHelper
 
-  let(:query) { ::API::ParserStruct.new }
+  let(:query) { API::ParserStruct.new }
   let(:project) { build_stubbed(:project) }
   let(:user) { build_stubbed(:user) }
   let(:representer) do
@@ -86,7 +86,7 @@ describe ::API::V3::Queries::QueryRepresenter, 'parsing' do
     end
   end
 
-  describe 'highlighted_attributes', with_ee: [:conditional_highlighting] do
+  describe 'highlighted_attributes', with_ee: %i[conditional_highlighting] do
     let(:request_body) do
       {
         '_links' => {
@@ -167,6 +167,18 @@ describe ::API::V3::Queries::QueryRepresenter, 'parsing' do
         expect(subject.project_id)
           .to eql project.id
       end
+    end
+  end
+
+  describe 'timestamps' do
+    let(:timestamp_params) { [1.week.ago.iso8601, 'lastWorkingDay@12:00', 'P0D'] }
+    let(:request_body) do
+      { 'timestamps' => timestamp_params }
+    end
+
+    it 'sets timestamps' do
+      expect(subject.timestamps)
+        .to eq([1.week.ago.iso8601, 'lastWorkingDay@12:00', 'P0D'])
     end
   end
 end

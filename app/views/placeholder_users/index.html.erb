@@ -1,6 +1,6 @@
 <%#-- copyright
 OpenProject is an open source project management software.
-Copyright (C) 2012-2020 the OpenProject GmbH
+Copyright (C) 2012-2023 the OpenProject GmbH
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License version 3.
@@ -49,9 +49,9 @@ See COPYRIGHT and LICENSE files for more details.
 
 
 <% if has_ee %>
-  <%= rails_cell PlaceholderUsers::PlaceholderUserFilterCell, params %>
+  <%= render PlaceholderUsers::PlaceholderUserFilterComponent.new(params) %>
   &nbsp;
-  <%= rails_cell PlaceholderUsers::TableCell, @placeholder_users, project: @project, current_user: current_user %>
+  <%= render PlaceholderUsers::TableComponent.new(rows: @placeholder_users) %>
 <% else %>
   <%= render template: 'common/upsale',
         locals: {

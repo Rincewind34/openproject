@@ -1,17 +1,19 @@
 require "spec_helper"
 require "support/pages/work_packages/abstract_work_package"
 
-describe "multi select custom values", js: true do
-  let(:type) { create :type }
+RSpec.describe "multi select custom values",
+               js: true,
+               with_cuprite: true do
+  let(:type) { create(:type) }
   let(:wp_page) { Pages::FullWorkPackage.new work_package }
   let(:wp_table) { Pages::WorkPackagesTable.new project }
-  let(:hierarchy) { ::Components::WorkPackages::Hierarchies.new }
-  let(:columns) { ::Components::WorkPackages::Columns.new }
-  let(:group_by) { ::Components::WorkPackages::GroupBy.new }
-  let(:sort_by) { ::Components::WorkPackages::SortBy.new }
-  let(:user) { create :admin }
-  let(:cf_frontend) { "customField#{custom_field.id}" }
-  let(:project) { create :project, types: [type] }
+  let(:hierarchy) { Components::WorkPackages::Hierarchies.new }
+  let(:columns) { Components::WorkPackages::Columns.new }
+  let(:group_by) { Components::WorkPackages::GroupBy.new }
+  let(:sort_by) { Components::WorkPackages::SortBy.new }
+  let(:user) { create(:admin) }
+  let(:cf_frontend) { custom_field.attribute_name(:camel_case) }
+  let(:project) { create(:project, types: [type]) }
   let(:multi_value) { true }
 
   let(:custom_field) do
@@ -30,7 +32,7 @@ describe "multi select custom values", js: true do
   end
 
   def table_edit_field(work_package)
-    field = wp_table.edit_field work_package, "customField#{custom_field.id}"
+    field = wp_table.edit_field work_package, custom_field.attribute_name(:camel_case)
     field.field_type = 'create-autocompleter'
     field
   end
@@ -38,7 +40,7 @@ describe "multi select custom values", js: true do
   context "with existing custom values" do
     let(:work_package_options) { %w[ham pineapple onions] }
     let(:work_package) do
-      wp = build :work_package, project: project, type: type, subject: 'First'
+      wp = build(:work_package, project:, type:, subject: 'First')
 
       wp.custom_field_values = {
         custom_field.id => work_package_options.map { |s| custom_value_for(s) }
@@ -50,7 +52,7 @@ describe "multi select custom values", js: true do
 
     let(:work_package2_options) { %w[ham] }
     let(:work_package2) do
-      wp = build :work_package, project: project, type: type, subject: 'Second'
+      wp = build(:work_package, project:, type:, subject: 'Second')
 
       wp.custom_field_values = {
         custom_field.id => work_package2_options.map { |s| custom_value_for(s) }
@@ -62,7 +64,7 @@ describe "multi select custom values", js: true do
 
     describe 'in single view' do
       let(:edit_field) do
-        field = wp_page.edit_field "customField#{custom_field.id}"
+        field = wp_page.edit_field custom_field.attribute_name(:camel_case)
         field.field_type = 'create-autocompleter'
         field
       end
@@ -99,7 +101,14 @@ describe "multi select custom values", js: true do
     end
 
     describe 'in the WP table' do
-      let(:wp1_field) { table_edit_field(work_package) }
+      # Memoizing wp1_field via a let does not work. After a couple of updates to the custom field,
+      # an expectation like
+      #   wp1_field.expect_state_text "ham, onions, pineapple"
+      # fails with unhandled inspector error: {"code":-32000,"message":"No node with given id found"}
+      # as of chrome 113. The context memoized in the wp1_field seems to become an invalid reference.
+      def wp1_field
+        table_edit_field(work_package)
+      end
 
       before do
         work_package
@@ -120,7 +129,7 @@ describe "multi select custom values", js: true do
         hierarchy.expect_no_hierarchies
 
         # Should show truncated values
-        expect(page).to have_text "ham, pineapple, ...\n3"
+        expect(page).to have_text "ham, pineapple, ...3"
         expect(page).not_to have_text "onions"
 
         # Group by the CF
@@ -147,7 +156,7 @@ describe "multi select custom values", js: true do
 
         # Open split view
         split_view = wp_table.open_split_view work_package
-        field = SelectField.new(split_view.container, "customField#{custom_field.id}")
+        field = SelectField.new(split_view.container, custom_field.attribute_name(:camel_case))
 
         field.activate!
         field.unset_value "ham", multi: true
@@ -159,6 +168,11 @@ describe "multi select custom values", js: true do
         field.expect_state_text '-'
         wp1_field.expect_state_text '-'
 
+        # Expect changed groups
+        expect(page).to have_selector('.group--value .count', count: 2)
+        expect(page).to have_selector('.group--value', text: '- (1)')
+        expect(page).to have_selector('.group--value', text: 'ham (1)')
+
         # Activate again
         field.activate!
 
@@ -166,6 +180,11 @@ describe "multi select custom values", js: true do
         field.set_value "onions"
 
         field.submit_by_dashboard
+
+        # Expect changed groups
+        expect(page).to have_selector('.group--value .count', count: 2)
+        expect(page).to have_selector('.group--value', text: 'ham, onions (1)')
+        expect(page).to have_selector('.group--value', text: 'ham (1)')
 
         expect(field.display_element).to have_text('ham')
         expect(field.display_element).to have_text('onions')
@@ -181,7 +200,12 @@ describe "multi select custom values", js: true do
         expect(field.display_element).to have_text('pineapple')
         expect(field.display_element).to have_text('mushrooms')
 
-        wp1_field.expect_state_text ", ...\n4"
+        # Expect changed groups
+        expect(page).to have_selector('.group--value .count', count: 2)
+        expect(page).to have_selector('.group--value', text: 'ham, mushrooms, onions, pineapple (1)')
+        expect(page).to have_selector('.group--value', text: 'ham (1)')
+
+        wp1_field.expect_state_text ", ...4"
       end
     end
 
@@ -190,10 +214,10 @@ describe "multi select custom values", js: true do
       let(:wp2_field) { table_edit_field(work_package2) }
       let!(:query) do
         query = build(:query, user:, project:)
-        query.column_names = ['id', 'type', 'subject', "cf_#{custom_field.id}"]
+        query.column_names = ['id', 'type', 'subject', custom_field.column_name]
         query.filters.clear
         query.timeline_visible = false
-        query.sort_criteria = [["cf_#{custom_field.id}", 'asc']]
+        query.sort_criteria = [[custom_field.column_name, 'asc']]
 
         query.save!
         query

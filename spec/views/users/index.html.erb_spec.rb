@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,9 +28,9 @@
 
 require 'spec_helper'
 
-describe 'users/index', type: :view do
-  shared_let(:admin) { create :admin }
-  let!(:user) { create :user, firstname: "Scarlet", lastname: "Scallywag" }
+RSpec.describe 'users/index' do
+  shared_let(:admin) { create(:admin) }
+  let!(:user) { create(:user, firstname: "Scarlet", lastname: "Scallywag") }
 
   before do
     User.system # create system user which is active but should not count towards limit
@@ -40,9 +40,8 @@ describe 'users/index', type: :view do
     assign(:groups, Group.all)
 
     allow(view).to receive(:current_user).and_return(admin)
-
-    allow_any_instance_of(TableCell).to receive(:controller_name).and_return("users")
-    allow_any_instance_of(TableCell).to receive(:action_name).and_return("index")
+    allow(view).to receive(:controller_name).and_return("users")
+    allow(view).to receive(:action_name).and_return("index")
   end
 
   subject { rendered.squish }

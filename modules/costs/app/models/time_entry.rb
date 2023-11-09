@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -40,22 +40,30 @@ class TimeEntry < ApplicationRecord
 
   acts_as_journalized
 
-  validates_presence_of :user_id, :activity_id, :project_id, :hours, :spent_on
+  validates_presence_of :user_id, :project_id, :spent_on
+  validates_presence_of :hours, if: -> { !ongoing? }
   validates_numericality_of :hours, allow_nil: true, message: :invalid
-  validates_length_of :comments, maximum: 255, allow_nil: true
 
   scope :on_work_packages, ->(work_packages) { where(work_package_id: work_packages) }
 
-  include ::Scopes::Scoped
   extend ::TimeEntries::TimeEntryScopes
+  include ::Scopes::Scoped
   include Entry::Costs
   include Entry::SplashedDates
 
   scopes :of_user_and_day,
-         :visible
+         :visible,
+         :ongoing
 
   # TODO: move into service
   before_save :update_costs
+
+  register_journal_formatted_fields(:time_entry_hours, 'hours')
+  register_journal_formatted_fields(:time_entry_named_association, 'user_id')
+  register_journal_formatted_fields(:named_association, 'work_package_id')
+  register_journal_formatted_fields(:named_association, 'activity_id')
+  register_journal_formatted_fields(:plaintext, 'comments')
+  register_journal_formatted_fields(:plaintext, 'spent_on')
 
   def self.update_all(updates, conditions = nil, options = {})
     # instead of a update_all, perform an individual update during work_package#move

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -58,11 +58,10 @@ class Storages::FileLinks::CreateContract < ModelContract
     end
   end
 
-  # Check that the current has the permission on the project.
-  # model variable is available because the concern is executed inside a contract.
   def validate_user_allowed_to_manage
-    unless user.allowed_to?(:manage_file_links, model.container&.project)
-      errors.add :base, :error_unauthorized
+    container = model.container
+    if container.present? && !user.allowed_to?(:manage_file_links, container.project)
+      errors.add(:base, :error_unauthorized)
     end
   end
 
@@ -77,7 +76,7 @@ class Storages::FileLinks::CreateContract < ModelContract
 
   def validate_project_storage_link
     return if errors.include?(:storage)
-    return if model.project.storages.include?(model.storage)
+    return if model.container.nil? || model.project.storages.include?(model.storage)
 
     errors.add(:storage, :not_linked_to_project)
   end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -37,28 +37,41 @@ module OpenProject::Backlogs
           ->(*) do
             property :position,
                      render_nil: true,
-                     skip_render: ->(*) { !(backlogs_enabled? && type && type.passes_attribute_constraint?(:position)) }
+                     skip_render: ->(*) do
+                       !(backlogs_enabled? && type && type.passes_attribute_constraint?(:position))
+                     end
 
             property :story_points,
                      render_nil: true,
-                     skip_render: ->(*) { !(backlogs_enabled? && type && type.passes_attribute_constraint?(:story_points)) }
+                     skip_render: ->(*) do
+                       !(backlogs_enabled? && type && type.passes_attribute_constraint?(:story_points))
+                     end
 
             property :remaining_time,
                      exec_context: :decorator,
                      render_nil: true,
-                     skip_render: ->(represented:, **) { !represented.backlogs_enabled? }
+                     skip_render: ->(represented:, **) { !represented.backlogs_enabled? },
+                     getter: ->(*) do
+                       datetime_formatter.format_duration_from_hours(represented.remaining_hours, allow_nil: true)
+                     end
+
+            property :derived_remaining_time,
+                     exec_context: :decorator,
+                     render_nil: true,
+                     skip_render: ->(represented:, **) { !represented.backlogs_enabled? },
+                     getter: ->(*) do
+                       datetime_formatter.format_duration_from_hours(represented.derived_remaining_hours, allow_nil: true)
+                     end
 
             # cannot use def here as it wouldn't define the method on the representer
-            define_method :remaining_time do
-              datetime_formatter.format_duration_from_hours(represented.remaining_hours,
-                                                            allow_nil: true)
+            define_method :remaining_time= do |value|
+              represented.remaining_hours = datetime_formatter
+                                              .parse_duration_to_hours(value, 'remainingTime', allow_nil: true)
             end
 
-            define_method :remaining_time= do |value|
-              remaining = datetime_formatter.parse_duration_to_hours(value,
-                                                                     'remainingTime',
-                                                                     allow_nil: true)
-              represented.remaining_hours = remaining
+            define_method :derived_remaining_time= do |value|
+              represented.derived_remaining_hours = datetime_formatter
+                                                      .parse_duration_to_hours(value, 'derivedRemainingTime', allow_nil: true)
             end
           end
         end

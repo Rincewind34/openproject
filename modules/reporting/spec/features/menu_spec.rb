@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,9 +28,9 @@
 
 require 'spec_helper'
 
-describe 'project menu', type: :feature do
-  let(:current_user) { create :admin }
-  let!(:project) { create :valid_project, identifier: 'ponyo', name: 'Ponyo' }
+RSpec.describe 'project menu' do
+  let(:current_user) { create(:admin) }
+  let!(:project) { create(:valid_project, identifier: 'ponyo', name: 'Ponyo') }
 
   before do
     allow(User).to receive(:current).and_return current_user
@@ -67,7 +67,7 @@ describe 'project menu', type: :feature do
         end
 
         it 'leads to cost reports' do
-          click_on 'Time and costs'
+          find('#main-menu [data-qa-selector="op-menu--item-action"]', text: 'Time and costs').click
 
           expect(page).to have_current_path("/projects/ponyo/cost_reports")
         end
@@ -95,9 +95,7 @@ describe 'project menu', type: :feature do
         it 'leads to cost reports' do
           # doing what no human can - click on invisible items.
           # This way, we avoid having to use selenium and by that increase stability.
-          within '#more-menu', visible: false do
-            click_on 'Time and costs', visible: false
-          end
+          find('#main-menu [data-qa-selector="op-menu--item-action"]', text: 'Time and costs').click
 
           # to make sure we're not seeing the project cost reports:
           expect(page).not_to have_text('Ponyo')

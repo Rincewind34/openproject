@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,11 +28,17 @@
 
 require 'spec_helper'
 
-describe ::Users::LoginService, type: :model do
+RSpec.describe Users::LoginService, type: :model do
   let(:input_user) { build_stubbed(:user) }
-  let(:controller) { double('ApplicationController') }
   let(:request) { {} }
   let(:session) { {} }
+  let(:browser) do
+    instance_double(Browser::Safari,
+                    name: 'Safari',
+                    version: '13.2',
+                    platform: instance_double(Browser::Platform::Linux, name: 'Linux'))
+  end
+  let(:controller) { double(ApplicationController, browser:) } # rubocop:disable RSpec/VerifiedDoubles
   let(:flash) { ActionDispatch::Flash::FlashHash.new }
 
   let(:instance) { described_class.new(controller:, request:) }
@@ -49,7 +55,7 @@ describe ::Users::LoginService, type: :model do
       end
 
       before do
-        allow(::OpenProject::Plugins::AuthPlugin)
+        allow(OpenProject::Plugins::AuthPlugin)
           .to(receive(:find_provider_by_name))
           .with('provider_name')
           .and_return sso_provider
@@ -89,7 +95,7 @@ describe ::Users::LoginService, type: :model do
       end
 
       it 'retains present flash values' do
-        flash[:notice] = 'bar'
+        flash[:notice] = 'bar' # rubocop:disable Rails/I18nLocaleTexts
 
         subject
 

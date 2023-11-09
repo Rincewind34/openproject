@@ -1,12 +1,10 @@
 require_relative '../spec_helper'
 
-describe 'My Account 2FA configuration',
-         type: :feature,
-         with_settings: {
-           plugin_openproject_two_factor_authentication: { 'active_strategies' => %i[developer totp] }
-         },
-         js: true do
-  let(:dialog) { ::Components::PasswordConfirmationDialog.new }
+RSpec.describe 'My Account 2FA configuration',
+               js: true, with_settings: {
+                 plugin_openproject_two_factor_authentication: { 'active_strategies' => %i[developer totp] }
+               } do
+  let(:dialog) { Components::PasswordConfirmationDialog.new }
   let(:user_password) { 'boB!4' * 4 }
   let(:user) do
     create(:user,
@@ -48,7 +46,7 @@ describe 'My Account 2FA configuration',
     # Log token for next access
     sms_token = nil
     # rubocop:disable RSpec/AnyInstance
-    allow_any_instance_of(::OpenProject::TwoFactorAuthentication::TokenStrategy::Developer)
+    allow_any_instance_of(OpenProject::TwoFactorAuthentication::TokenStrategy::Developer)
       .to receive(:create_mobile_otp).and_wrap_original do |m|
       sms_token = m.call
     end
@@ -58,7 +56,7 @@ describe 'My Account 2FA configuration',
 
     expect(page).to have_selector('h2', text: I18n.t('two_factor_authentication.devices.confirm_device'))
     expect(page).to have_selector('input#otp')
-    expect(page).to have_selector('.flash.error',
+    expect(page).to have_selector('.op-toast.-error',
                                   text: I18n.t('two_factor_authentication.devices.registration_failed_token_invalid'))
 
     # Fill in correct token
@@ -141,7 +139,7 @@ describe 'My Account 2FA configuration',
   end
 
   context 'when a device has been registered already' do
-    let!(:device) { create :two_factor_authentication_device_totp, user: }
+    let!(:device) { create(:two_factor_authentication_device_totp, user:) }
 
     it 'loads the page correctly (Regression #41719)' do
       visit my_2fa_devices_path

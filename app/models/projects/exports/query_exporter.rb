@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -44,7 +44,7 @@ module Projects::Exports
         .results
         .with_required_storage
         .with_latest_activity
-        .includes(:custom_values, :status)
+        .includes(:custom_values)
         .page(page)
         .per_page(Setting.work_packages_projects_export_limit.to_i)
     end
@@ -61,8 +61,8 @@ module Projects::Exports
     end
 
     def selected_columns
-      ::Projects::TableCell
-        .new(nil, current_user: User.current)
+      ::Projects::TableComponent
+        .new(current_user: User.current)
         .all_columns
         .reject { |_, options| options[:builtin] } # We add builtin columns ourselves
         .select { |name, _| Setting.enabled_projects_columns.include?(name.to_s) }

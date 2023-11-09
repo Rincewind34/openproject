@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,22 +29,22 @@
 require 'spec_helper'
 require 'features/page_objects/notification'
 
-describe 'Upload attachment to work package', js: true do
+RSpec.describe 'Upload attachment to work package', js: true, with_cuprite: true do
   let(:role) do
-    create :role,
-           permissions: %i[view_work_packages add_work_packages edit_work_packages add_work_package_notes]
+    create(:role,
+           permissions: %i[view_work_packages add_work_packages edit_work_packages add_work_package_notes])
   end
   let(:dev) do
-    create :user,
+    create(:user,
            firstname: 'Dev',
            lastname: 'Guy',
            member_in_project: project,
-           member_through_role: role
+           member_through_role: role)
   end
   let(:project) { create(:project) }
   let(:work_package) { create(:work_package, project:, description: 'Initial description') }
-  let(:wp_page) { ::Pages::FullWorkPackage.new(work_package, project) }
-  let(:attachments) { ::Components::Attachments.new }
+  let(:wp_page) { Pages::FullWorkPackage.new(work_package, project) }
+  let(:attachments) { Components::Attachments.new }
   let(:field) { TextEditorField.new wp_page, 'description' }
   let(:image_fixture) { UploadedFile.load_from('spec/fixtures/files/image.png') }
   let(:editor) { Components::WysiwygEditor.new }
@@ -78,8 +78,8 @@ describe 'Upload attachment to work package', js: true do
 
       context 'with a user that is not allowed to add images (Regression #28541)' do
         let(:role) do
-          create :role,
-                 permissions: %i[view_work_packages add_work_packages add_work_package_notes]
+          create(:role,
+                 permissions: %i[view_work_packages add_work_packages add_work_package_notes])
         end
         let(:selector) { '.work-packages--activity--add-comment' }
         let(:comment_field) do
@@ -111,9 +111,9 @@ describe 'Upload attachment to work package', js: true do
       let!(:project) do
         create(:project, types: [type])
       end
-      let!(:table) { ::Pages::WorkPackagesTable.new project }
+      let!(:table) { Pages::WorkPackagesTable.new project }
 
-      it 'can add two work packages in a row when uploading (Regression #42933)' do
+      it 'can add two work packages in a row when uploading (Regression #42933)' do |example|
         table.visit!
         new_page = table.create_wp_by_button type
         subject = new_page.edit_field :subject
@@ -122,23 +122,23 @@ describe 'Upload attachment to work package', js: true do
         target = find('.ck-content')
         attachments.drag_and_drop_file(target, image_fixture.path)
 
-        sleep 2
-        expect(page).not_to have_selector('op-toasters-upload-progress')
+        sleep 2 unless example.metadata[:with_cuprite]
+        editor.wait_until_upload_progress_toaster_cleared
 
         editor.in_editor do |_container, editable|
           expect(editable).to have_selector('img[src*="/api/v3/attachments/"]', wait: 20)
           expect(editable).not_to have_selector('.ck-upload-placeholder-loader')
         end
 
-        sleep 2
+        sleep 2 unless example.metadata[:with_cuprite]
 
-        scroll_to_and_click find('#work-packages--edit-actions-save')
+        scroll_to_and_click find_by_id('work-packages--edit-actions-save')
 
         new_page.expect_and_dismiss_toaster(
           message: 'Successful creation.'
         )
 
-        split_view = ::Pages::SplitWorkPackage.new(WorkPackage.last)
+        split_view = Pages::SplitWorkPackage.new(WorkPackage.last)
 
         field = split_view.edit_field :description
         expect(field.display_element).to have_selector('img')
@@ -152,7 +152,7 @@ describe 'Upload attachment to work package', js: true do
         subject = new_page.edit_field :subject
         subject.set_value 'A second task'
 
-        scroll_to_and_click find('#work-packages--edit-actions-save')
+        scroll_to_and_click find_by_id('work-packages--edit-actions-save')
 
         new_page.expect_toast(
           message: 'Successful creation.'
@@ -183,24 +183,24 @@ describe 'Upload attachment to work package', js: true do
           visit new_project_work_packages_path(project.identifier, type: type.id)
         end
 
-        it 'can upload an image via drag & drop (Regression #28189)' do
+        it 'can upload an image via drag & drop (Regression #28189)' do |example|
           subject = new_page.edit_field :subject
           subject.set_value 'My subject'
 
           target = find('.ck-content')
           attachments.drag_and_drop_file(target, image_fixture.path)
 
-          sleep 2
-          expect(page).not_to have_selector('op-toasters-upload-progress')
+          sleep 2 unless example.metadata[:with_cuprite]
+          editor.wait_until_upload_progress_toaster_cleared
 
           editor.in_editor do |_container, editable|
             expect(editable).to have_selector('img[src*="/api/v3/attachments/"]', wait: 20)
             expect(editable).not_to have_selector('.ck-upload-placeholder-loader')
           end
 
-          sleep 2
+          sleep 2 unless example.metadata[:with_cuprite]
 
-          scroll_to_and_click find('#work-packages--edit-actions-save')
+          scroll_to_and_click find_by_id('work-packages--edit-actions-save')
 
           wp_page.expect_toast(
             message: 'Successful creation.'
@@ -224,7 +224,9 @@ describe 'Upload attachment to work package', js: true do
       # Technically one could test this not only for new work packages, but also for existing
       # ones, and for new and existing other attachable resources. But the code is the same
       # everywhere so if this works it should work everywhere else too.
-      context 'with direct uploads', with_direct_uploads: true do
+      # TODO: Add better_cuprite_billy. I'm not sure what needs to be set up so the request to AWS passes.
+      # Need help
+      context 'with direct uploads', with_cuprite: false, with_direct_uploads: true do
         before do
           allow_any_instance_of(Attachment).to receive(:diskfile).and_return Struct.new(:path).new(image_fixture.path.to_s)
         end
@@ -237,7 +239,7 @@ describe 'Upload attachment to work package', js: true do
             expect(a[:file]).to eq image_fixture.basename.to_s
 
             # check /api/v3/attachments/:id/uploaded was called
-            expect(::Attachments::FinishDirectUploadJob).to have_been_enqueued
+            expect(Attachments::FinishDirectUploadJob).to have_been_enqueued
           end
         end
       end
@@ -250,10 +252,11 @@ describe 'Upload attachment to work package', js: true do
       attachments.drag_and_drop_file '[data-qa-selector="op-attachments--drop-box"]',
                                      image_fixture.path,
                                      :center,
-                                     page.find('[data-qa-tab-id="files"]')
+                                     page.find('[data-qa-tab-id="files"]'),
+                                     delay_dragleave: true
 
       expect(page).to have_selector('[data-qa-selector="op-files-tab--file-list-item-title"]', text: 'image.png', wait: 10)
-      expect(page).not_to have_selector('op-toasters-upload-progress')
+      editor.wait_until_upload_progress_toaster_cleared
       wp_page.expect_tab 'Files'
     end
 
@@ -263,7 +266,8 @@ describe 'Upload attachment to work package', js: true do
       attachments.drag_and_drop_file '.work-package-comment',
                                      image_fixture.path,
                                      :center,
-                                     page.find('[data-qa-tab-id="activity"]')
+                                     page.find('[data-qa-tab-id="activity"]'),
+                                     delay_dragleave: true
 
       wp_page.expect_tab 'Activity'
     end
@@ -274,17 +278,53 @@ describe 'Upload attachment to work package', js: true do
 
       ##
       # Attach file manually
-      expect(page).to have_no_selector('[data-qa-selector="op-files-tab--file-list-item-title"]')
+      expect(page).not_to have_selector('[data-qa-selector="op-files-tab--file-list-item-title"]')
       attachments.attach_file_on_input(image_fixture.path)
-      expect(page).not_to have_selector('op-toasters-upload-progress')
+      editor.wait_until_upload_progress_toaster_cleared
       expect(page).to have_selector('[data-qa-selector="op-files-tab--file-list-item-title"]', text: 'image.png', wait: 5)
+
+      # Drop zone should become hidden again
+      expect(container).not_to be_visible
 
       ##
       # and via drag & drop
       attachments.drag_and_drop_file(container, image_fixture.path)
-      expect(page).not_to have_selector('op-toasters-upload-progress')
+      editor.wait_until_upload_progress_toaster_cleared
       expect(page)
         .to have_selector('[data-qa-selector="op-files-tab--file-list-item-title"]', text: 'image.png', count: 2, wait: 5)
+
+      # Drop zone should become hidden again
+      expect(container).not_to be_visible
+
+      ##
+      # and via drag & drop having a stopover over a ckEditor input field (Regression#49507)
+      attachments.drag_and_drop_file container,
+                                     image_fixture.path,
+                                     :center,
+                                     ["#{field.selector} #{field.display_selector}", '.work-package--single-view']
+
+      editor.wait_until_upload_progress_toaster_cleared
+      expect(page)
+        .to have_css('[data-qa-selector="op-files-tab--file-list-item-title"]', text: 'image.png', count: 3, wait: 5)
+
+      # Drop zone should become hidden again
+      expect(container).not_to be_visible
+
+      ##
+      # and via drag & drop having a stopover and canceling the action, should restore the drop zones
+      # (Regression#45782)
+      attachments.drag_and_drop_file container,
+                                     image_fixture.path,
+                                     :center,
+                                     field.input_element,
+                                     cancel_drop: true
+
+      editor.wait_until_upload_progress_toaster_cleared
+      expect(page)
+        .to have_css('[data-qa-selector="op-files-tab--file-list-item-title"]', text: 'image.png', count: 3, wait: 5)
+
+      # Drop zone should become hidden again
+      expect(container).not_to be_visible
     end
   end
 end

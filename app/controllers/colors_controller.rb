@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -53,6 +53,13 @@ class ColorsController < ApplicationController
     end
   end
 
+  def edit
+    @color = Color.find(params[:id])
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def create
     @color = Color.new(permitted_params.color)
 
@@ -60,15 +67,8 @@ class ColorsController < ApplicationController
       flash[:notice] = I18n.t(:notice_successful_create)
       redirect_to colors_path
     else
-      flash.now[:error] = I18n.t('timelines.color_could_not_be_saved')
+      flash.now[:error] = I18n.t(:error_color_could_not_be_saved)
       render action: 'new'
-    end
-  end
-
-  def edit
-    @color = Color.find(params[:id])
-    respond_to do |format|
-      format.html
     end
   end
 
@@ -79,7 +79,7 @@ class ColorsController < ApplicationController
       flash[:notice] = I18n.t(:notice_successful_update)
       redirect_to colors_path
     else
-      flash.now[:error] = I18n.t('timelines.color_could_not_be_saved')
+      flash.now[:error] = I18n.t(:error_color_could_not_be_saved)
       render action: 'edit'
     end
   end
@@ -103,9 +103,9 @@ class ColorsController < ApplicationController
 
   def default_breadcrumb
     if action_name == 'index'
-      t('timelines.admin_menu.colors')
+      t(:label_color_plural)
     else
-      ActionController::Base.helpers.link_to(t('timelines.admin_menu.colors'), colors_path)
+      ActionController::Base.helpers.link_to(t(:label_color_plural), colors_path)
     end
   end
 

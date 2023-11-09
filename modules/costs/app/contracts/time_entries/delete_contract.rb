@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -31,9 +31,10 @@ module TimeEntries
     delete_permission -> {
       edit_all = user.allowed_to?(:edit_time_entries, model.project)
       edit_own = user.allowed_to?(:edit_own_time_entries, model.project)
+      edit_ongoing = model.ongoing && user.allowed_to?(:log_own_time, model.project)
 
       if model.user == user
-        edit_own || edit_all
+        edit_own || edit_all || edit_ongoing
       else
         edit_all
       end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,7 +29,7 @@
 require 'spec_helper'
 require_relative './shared_contract_examples'
 
-describe WikiPages::CreateContract do
+RSpec.describe WikiPages::CreateContract do
   it_behaves_like 'wiki page contract' do
     subject(:contract) { described_class.new(page, current_user, options: {}) }
 
@@ -38,11 +38,11 @@ describe WikiPages::CreateContract do
                    title: page_title,
                    slug: page_slug,
                    protected: page_protected,
-                   parent: page_parent).tap do |page|
-        page.build_content text: page_text,
-                           author: page_author
-        page.content.extend(OpenProject::ChangedBySystem)
-        page.content.changed_by_system(changed_by_system)
+                   parent: page_parent,
+                   text: page_text,
+                   author: page_author).tap do |page|
+        page.extend(OpenProject::ChangedBySystem)
+        page.changed_by_system(changed_by_system)
 
         allow(page)
           .to receive(:project)

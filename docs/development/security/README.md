@@ -10,13 +10,36 @@ For more information on security and data privacy for OpenProject, please visit:
 
 ## Security announcements mailing list
 
-We provide a mailing list for security advisories on OpenProject at [groups.google.com/g/openproject-security](https://groups.google.com/g/openproject-security). Please register there to get immediate notifications as we publish them. No messages except for security advisories or security related announcements will be sent there.
+If you want to receive immediate security notifications via email as we publish them, please sign up to our security mailing list: https://www.openproject.org/security-and-privacy/#mailing-list.
 
-Any security related information will also be published on our [blog and website](https://www.openproject.org)
+No messages except for security advisories or security related announcements will be sent there.
 
-To join this mailing list, please use the UI if you have a google account. If you don't, you can send an empty email to [openproject-security+subscribe@googlegroups.com](mailto:openproject-security+subscribe@googlegroups.com). You will get a join request, which you again have to reply with any content.
+To unsubscribe, you will find a link at the end of every email.
 
-To unsubscribe, you will find a link at the end of every submission.
+Any security related information will also be published on our [blog](https://www.openproject.org/blog/) and in the [release notes](../../release-notes/).
+
+
+
+## Security advisory list
+
+OpenProject uses GitHub to manage and publish security advisory listings: https://github.com/opf/openproject/security/advisories
+
+
+
+## Security vulnerability processing
+
+When we receive vulnerability reports from researchers or through internal identification, the following process is taking place immediately:
+
+1. A security vulnerability is reported internally or through security@openproject.com (see below on how to disclose vulnerabilities responsibly).
+2. A security engineer is receiving and validating the report. An internal tracking ticket is created with a checklist template on how to process the report.
+3. The reporter receives a timely response with an acknowledgement of the report, further questions if present, and an estimated timeline and complexity of a potential fix.
+4. The security engineer coordinates with the security and development team to prepare and test a fix for the report.
+5. A GitHub advisory draft is created and a CVE is requested, if appropriate. Security researchers are invited to collaborate on the draft, if available.
+6. A patch is returned to the reporter and awaited for confirmation unless fix is trivial
+7. A patch release is created, published and distributed for all supported installations
+8. The security vulnerability is publicly disclosed on GitHub and communicated through the mailing list
+
+
 
 ## Reporting a vulnerability
 
@@ -24,13 +47,11 @@ We take all facets of security seriously at OpenProject. If you want to report a
 
 If you can, please send us a PGP-encrypted email using the following key:
 
-- Key ID: [0x7D669C6D47533958](https://pgp.mit.edu/pks/lookup?op=get&search=0x7D669C6D47533958) , 
+- Key ID: [0x7D669C6D47533958](https://keys.openpgp.org/vks/v1/by-fingerprint/BDCFE01EDE84EA199AE172CE7D669C6D47533958),
 - Fingerprint BDCF E01E DE84 EA19 9AE1 72CE 7D66 9C6D 4753 3958
 - You may also find the key [attached in our OpenProject repository.](https://github.com/opf/openproject/blob/dev/docs/development/security/security-at-openproject.com.asc)
 
 Please include a description on how to reproduce the issue if possible. Our security team will get your email and will attempt to reproduce and fix the issue as soon as possible.
-
-
 
 ## OpenProject security features
 
@@ -56,7 +77,7 @@ This badge shows the current status of your OpenProject installation. It will in
 
 ### Security alerts
 
-Security updates allow a fast fix of security issues in the system. Relevant channels will be monitored regarding security topics and the responsible contact person will be informed. Software packages for security fixes will be provided promptly.
+Security updates allow a fast fix of security issues in the system. Relevant channels will be monitored regarding security topics and the responsible contact person will be informed. Software packages for security fixes will be provided promptly. Sign up to our [security mailing list](#security-announcements-mailing-list) to receive all security notifications via e-mail.
 
 ### LDAP sync (Enterprise add-on)
 
@@ -69,4 +90,3 @@ With the single sign-on feature you can securely access OpenProject. Control and
 
 
 Find out more about our [GDPR compliance](../../enterprise-guide/enterprise-cloud-guide/gdpr-compliance/).
-

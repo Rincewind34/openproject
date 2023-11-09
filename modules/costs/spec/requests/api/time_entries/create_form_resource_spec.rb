@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2020 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 require 'spec_helper'
 require 'rack/test'
 
-describe ::API::V3::TimeEntries::CreateFormAPI, content_type: :json do
+RSpec.describe API::V3::TimeEntries::CreateFormAPI, content_type: :json do
   include Rack::Test::Methods
   include API::V3::Utilities::PathHelper
 
@@ -39,7 +39,7 @@ describe ::API::V3::TimeEntries::CreateFormAPI, content_type: :json do
       TimeEntryActivitiesProject.insert(project_id: project.id, activity_id: tea.id, active: false)
     end
   end
-  let(:custom_field) { create(:text_time_entry_custom_field) }
+  let(:custom_field) { create(:time_entry_custom_field) }
   let(:user) do
     create(:user,
            member_in_project: project,
@@ -80,12 +80,7 @@ describe ::API::V3::TimeEntries::CreateFormAPI, content_type: :json do
 
     context 'with empty parameters' do
       it 'has 4 validation errors' do
-        # There are 4 validation errors instead of 3 with two duplicating each other
-        expect(subject.body).to have_json_size(4).at_path('_embedded/validationErrors')
-      end
-
-      it 'has a validation error on activity' do
-        expect(subject.body).to have_json_path('_embedded/validationErrors/activity')
+        expect(subject.body).to have_json_size(3).at_path('_embedded/validationErrors')
       end
 
       it 'has a validation error on project' do
@@ -125,7 +120,7 @@ describe ::API::V3::TimeEntries::CreateFormAPI, content_type: :json do
           comment: {
             raw: "some comment"
           },
-          "customField#{custom_field.id}": {
+          custom_field.attribute_name(:camel_case) => {
             raw: 'some cf text'
           }
         }

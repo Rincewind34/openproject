@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -144,6 +144,17 @@ module API
           {
             href: api_v3_paths.query(represented.id),
             method: :delete
+          }
+        end
+
+        link :icalUrl do
+          next if represented.new_record? ||
+                  !allowed_to?(:share_via_ical) ||
+                  !Setting.ical_enabled?
+
+          {
+            href: api_v3_paths.query_ical_url(represented.id),
+            method: :post
           }
         end
 
@@ -297,6 +308,9 @@ module API
         property :timeline_zoom_level
 
         property :timeline_labels
+
+        property :timestamps,
+                 getter: ->(*) { timestamps.map(&:to_s) }
 
         # Visible representation of the results
         property :display_representation

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -50,7 +50,7 @@ module Components
       end
 
       def inactive_group
-        page.find '#type-form-conf-inactive-group'
+        page.find_by_id 'type-form-conf-inactive-group'
       end
 
       def inactive_drop
@@ -58,7 +58,7 @@ module Components
       end
 
       def expect_empty
-        expect(page).to have_no_selector('#draggable-groups .group-head')
+        expect(page).not_to have_selector('#draggable-groups .group-head')
       end
 
       def find_group(name)
@@ -127,7 +127,7 @@ module Components
       end
 
       def add_query_group(name, relation_filter, expect: true)
-        SeleniumHubWaiter.wait
+        SeleniumHubWaiter.wait unless using_cuprite?
 
         add_button_dropdown.click
         add_table_button.click
@@ -161,16 +161,16 @@ module Components
 
         input = find('.group-edit-in-place--input')
         input.set(name)
-        input.send_keys(:return)
 
         expect_group(name, name) if expect
       end
 
       def edit_query_group(name)
-        SeleniumHubWaiter.wait
+        SeleniumHubWaiter.wait unless using_cuprite?
 
         group = find_group(name)
         group.find('.type-form-query-group--edit-button').click
+        wait_for_reload if using_cuprite?
       end
 
       def add_attribute_group(name, expect: true)
@@ -206,7 +206,7 @@ module Components
 
         container.find('.delete-group').click
 
-        expect(page).to have_no_selector('.group-head', text: name.upcase)
+        expect(page).not_to have_selector('.group-head', text: name.upcase)
       end
 
       def expect_no_attribute(attribute, group)

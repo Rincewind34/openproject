@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -46,6 +46,25 @@ module Migration
       if index_name_exists? table_name, index_name
         remove_index table_name, name: index_name
       end
+    end
+
+    ##
+    # Executes the given SQL query while passing in sanitized parameters.
+    #
+    # @param query [String] SQL query including parameter references like `:param`
+    # @param params [Hash] Hash containing values for referenced parameters
+    #
+    # @raise [ActiveRecord::ActiveRecordError] If the query fails
+    # @return [PG::Result]
+    #
+    # Example:
+    #
+    #   execute_sql "select id from users where mail = :email", email: params[:email]
+    #
+    def execute_sql(query, params = {})
+      query = ActiveRecord::Base.sanitize_sql [query, params]
+
+      ActiveRecord::Base.connection.execute query
     end
   end
 end

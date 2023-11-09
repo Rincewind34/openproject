@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,11 +29,11 @@
 require 'spec_helper'
 require_relative '../../../support/storage_server_helpers'
 
-shared_examples_for 'storage contract', :storage_server_helpers, webmock: true do
+RSpec.shared_examples_for 'storage contract', :storage_server_helpers, webmock: true do
   # Only admins have the right to create/delete storages.
   let(:current_user) { create(:admin) }
   let(:storage_name) { 'Storage 1' }
-  let(:storage_provider_type) { ::Storages::Storage::PROVIDER_TYPE_NEXTCLOUD }
+  let(:storage_provider_type) { Storages::Storage::PROVIDER_TYPE_NEXTCLOUD }
   let(:storage_host) { 'https://host1.example.com' }
   let(:storage_creator) { current_user }
 
@@ -41,6 +41,7 @@ shared_examples_for 'storage contract', :storage_server_helpers, webmock: true d
     if storage_host.present?
       mock_server_capabilities_response(storage_host)
       mock_server_config_check_response(storage_host)
+      mock_nextcloud_application_credentials_validation(storage_host)
     end
   end
 
@@ -72,12 +73,6 @@ shared_examples_for 'storage contract', :storage_server_helpers, webmock: true d
     end
 
     context 'when provider_type is invalid' do
-      context 'as it is unknown' do
-        let(:storage_provider_type) { 'unknown_provider_type' }
-
-        include_examples 'contract is invalid', provider_type: :inclusion
-      end
-
       context 'as it is empty' do
         let(:storage_provider_type) { '' }
 
@@ -95,13 +90,13 @@ shared_examples_for 'storage contract', :storage_server_helpers, webmock: true d
       context 'as host is not a URL' do
         let(:storage_host) { '---invalid-url---' }
 
-        include_examples 'contract is invalid', host: :url
+        include_examples 'contract is invalid', host: I18n.t('activerecord.errors.messages.invalid_url')
       end
 
       context 'as host is an empty string' do
         let(:storage_host) { '' }
 
-        include_examples 'contract is invalid', host: :url
+        include_examples 'contract is invalid', host: I18n.t('activerecord.errors.messages.invalid_url')
       end
 
       context 'as host is longer than 255' do
@@ -228,6 +223,45 @@ shared_examples_for 'storage contract', :storage_server_helpers, webmock: true d
 
         include_examples 'contract is valid'
       end
+    end
+
+    context 'when automatically managed, no username or password' do
+      before { storage.automatically_managed = true }
+
+      it_behaves_like 'contract is invalid', password: :blank
+    end
+
+    context 'when automatically managed, with username and password' do
+      before do
+        storage.assign_attributes(automatically_managed: true, username: 'OpenProject', password: 'Password')
+      end
+
+      it_behaves_like 'contract is valid'
+    end
+
+    context 'when not automatically managed, no username or password' do
+      before do
+        storage.provider_fields = {}
+        storage.assign_attributes(automatically_managed: false)
+      end
+
+      it_behaves_like 'contract is valid'
+    end
+
+    context 'when not automatically managed, with username default and password' do
+      before do
+        storage.assign_attributes(automatically_managed: false, username: 'OpenProject', password: 'Password')
+      end
+
+      it_behaves_like 'contract is invalid', password: :present
+    end
+
+    context 'when not automatically managed, with user defined username and password' do
+      before do
+        storage.assign_attributes(automatically_managed: false, username: 'Username', password: 'Password')
+      end
+
+      it_behaves_like 'contract is invalid', username: :present, password: :present
     end
   end
 end

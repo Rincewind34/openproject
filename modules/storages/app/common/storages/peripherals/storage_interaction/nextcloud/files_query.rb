@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,22 +27,20 @@
 #++
 
 module Storages::Peripherals::StorageInteraction::Nextcloud
-  class FilesQuery < Storages::Peripherals::StorageInteraction::StorageQuery
-    def initialize(base_uri:, token:, retry_proc:)
-      super()
-      @uri = base_uri
-      @token = token
-      @retry_proc = retry_proc
-      @base_path = "/remote.php/dav/files/#{token.origin_user_id}"
+  class FilesQuery
+    def initialize(storage)
+      @uri = URI(storage.host).normalize
+      @oauth_client = storage.oauth_client
     end
 
-    def query(parent)
-      http = Net::HTTP.new(@uri.host, @uri.port)
-      http.use_ssl = @uri.scheme == 'https'
+    # rubocop:disable Metrics/AbcSize
+    def call(user:, folder:)
+      result = Util.token(user:, oauth_client: @oauth_client) do |token|
+        base_path = Util.join_uri_path(@uri.path, "remote.php/dav/files")
+        @location_prefix = Util.join_uri_path(base_path, token.origin_user_id.gsub(' ', '%20'))
 
-      result = @retry_proc.call(@token) do |token|
-        response = http.propfind(
-          "#{@base_path}#{requested_folder(parent)}",
+        response = Util.http(@uri).propfind(
+          Util.join_uri_path(base_path, CGI.escapeURIComponent(token.origin_user_id), requested_folder(folder)),
           requested_properties,
           {
             'Depth' => '1',
@@ -50,20 +48,32 @@ module Storages::Peripherals::StorageInteraction::Nextcloud
           }
         )
 
-        response.is_a?(Net::HTTPSuccess) ? ServiceResult.success(result: response.body) : error(response)
+        case response
+        when Net::HTTPSuccess
+          ServiceResult.success(result: response.body)
+        when Net::HTTPNotFound
+          Util.error(:not_found)
+        when Net::HTTPUnauthorized
+          Util.error(:not_authorized)
+        else
+          Util.error(:error)
+        end
       end
 
       storage_files(result)
     end
+
+    # rubocop:enable Metrics/AbcSize
 
     private
 
     def requested_folder(folder)
       return '' if folder.nil?
 
-      folder.gsub(' ', '%20')
+      Util.escape_path(folder)
     end
 
+    # rubocop:disable Metrics/AbcSize
     def requested_properties
       Nokogiri::XML::Builder.new do |xml|
         xml['d'].propfind(
@@ -75,53 +85,64 @@ module Storages::Peripherals::StorageInteraction::Nextcloud
             xml['oc'].size
             xml['d'].getcontenttype
             xml['d'].getlastmodified
+            xml['oc'].permissions
             xml['oc'].send('owner-display-name')
           end
         end
       end.to_xml
     end
 
-    def error(response)
-      case response
-      when Net::HTTPNotFound
-        error_result(:not_found)
-      when Net::HTTPUnauthorized
-        error_result(:not_authorized)
-      else
-        error_result(:error)
-      end
-    end
-
-    def error_result(code, log_message = nil, data = nil)
-      ServiceResult.failure(
-        result: code, # This is needed to work with the ConnectionManager token refresh mechanism.
-        errors: Storages::StorageError.new(code:, log_message:, data:)
-      )
-    end
+    # rubocop:enable Metrics/AbcSize
 
     def storage_files(response)
       response.map do |xml|
-        Nokogiri::XML(xml)
-          .xpath('//d:response')
-          .drop(1) # drop current directory
-          .map { |file_element| storage_file(file_element) }
+        a = Nokogiri::XML(xml)
+              .xpath('//d:response')
+              .to_a
+
+        parent, *files =
+          a.map do |file_element|
+            storage_file(file_element)
+          end
+
+        ::Storages::StorageFiles.new(files, parent, ancestors(parent.location))
       end
     end
 
+    def ancestors(parent_location)
+      path = parent_location.split('/')
+      return [] if path.count == 0
+
+      path.take(path.count - 1).reduce([]) do |list, item|
+        last = list.last
+        prefix = last.nil? || last.location[-1] != '/' ? '/' : ''
+        location = "#{last&.location}#{prefix}#{item}"
+        list.append(forge_ancestor(location))
+      end
+    end
+
+    # The ancestors are simply derived objects from the parents location string. Until we have real information
+    # from the nextcloud API about the path to the parent, we need to derive name, location and forge an ID.
+    def forge_ancestor(location)
+      ::Storages::StorageFile.new(id: Digest::SHA256.hexdigest(location), name: name(location), location:)
+    end
+
+    def name(location)
+      location == '/' ? location : CGI.unescape(location.split('/').last)
+    end
+
     def storage_file(file_element)
-      location = name(file_element)
-      name = CGI.unescape(location.split('/').last)
+      location = location(file_element)
 
       ::Storages::StorageFile.new(
-        id(file_element),
-        name,
-        size(file_element),
-        mime_type(file_element),
-        nil,
-        last_modified_at(file_element),
-        created_by(file_element),
-        nil,
-        location
+        id: id(file_element),
+        name: name(location),
+        size: size(file_element),
+        mime_type: mime_type(file_element),
+        last_modified_at: last_modified_at(file_element),
+        created_by_name: created_by(file_element),
+        location:,
+        permissions: permissions(file_element)
       )
     end
 
@@ -133,17 +154,18 @@ module Storages::Peripherals::StorageInteraction::Nextcloud
         .first
     end
 
-    def name(element)
+    def location(element)
       texts = element
                 .xpath('d:href')
                 .map(&:inner_text)
 
       return nil if texts.empty?
 
-      texts
-        .first
-        .delete_prefix(@base_path)
-        .delete_suffix('/')
+      element_name = texts.first.delete_prefix(@location_prefix)
+
+      return element_name if element_name == '/'
+
+      element_name.delete_suffix('/')
     end
 
     def size(element)
@@ -175,6 +197,22 @@ module Storages::Peripherals::StorageInteraction::Nextcloud
         .map(&:inner_text)
         .reject(&:empty?)
         .first
+    end
+
+    def permissions(element)
+      permissions_string =
+        element
+          .xpath('.//oc:permissions')
+          .map(&:inner_text)
+          .reject(&:empty?)
+          .first
+
+      # Nextcloud Dav permissions:
+      # https://github.com/nextcloud/server/blob/66648011c6bc278ace57230db44fd6d63d67b864/lib/public/Files/DavUtil.php
+      result = []
+      result << :readable if permissions_string.include?('G')
+      result << :writeable if %w[CK W].reduce(false) { |s, v| s || permissions_string.include?(v) }
+      result
     end
   end
 end

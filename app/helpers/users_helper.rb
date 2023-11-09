@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -34,7 +34,7 @@ module UsersHelper
   # @param extra [Hash] A hash containing extra entries with a count for each.
   #                     For example: { random: 42 }
   def users_status_options_for_select(selected, extra: {})
-    statuses = Users::StatusOptions.user_statuses_with_count extra: extra
+    statuses = Users::StatusOptions.user_statuses_with_count(extra:)
 
     options = statuses.map do |sym, count|
       ["#{translate_user_status(sym)} (#{count})", sym]
@@ -118,11 +118,23 @@ module UsersHelper
     end
   end
 
+  def visible_user_information?(user)
+    user.pref.can_expose_mail? || user.visible_custom_field_values.any? { _1.value.present? }
+  end
+
   def user_name(user)
     user ? user.name : I18n.t('user.deleted')
   end
 
+  def allowed_management_user_profile_path(user)
+    if User.current.allowed_to_globally?(:manage_user)
+      edit_user_path(user)
+    else
+      user_path(user)
+    end
+  end
+
   def can_users_have_auth_source?
-    AuthSource.any? && !OpenProject::Configuration.disable_password_login?
+    LdapAuthSource.any? && !OpenProject::Configuration.disable_password_login?
   end
 end

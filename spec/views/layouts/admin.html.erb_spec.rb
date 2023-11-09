@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,8 +28,8 @@
 
 require 'spec_helper'
 
-describe 'layouts/admin', type: :view do
-  shared_let(:admin) { create :admin }
+RSpec.describe 'layouts/admin' do
+  shared_let(:admin) { create(:admin) }
 
   include Redmine::MenuManager::MenuHelper
   helper Redmine::MenuManager::MenuHelper
@@ -59,7 +59,7 @@ describe 'layouts/admin', type: :view do
       end
 
       it 'is shown' do
-        expect(rendered).to have_selector('a', text: I18n.t('label_ldap_authentication'))
+        expect(rendered).to have_selector('a', text: I18n.t(:label_ldap_auth_source_plural))
       end
     end
 
@@ -70,7 +70,7 @@ describe 'layouts/admin', type: :view do
       end
 
       it 'is hidden' do
-        expect(rendered).not_to have_selector('a', text: I18n.t('label_ldap_authentication'))
+        expect(rendered).not_to have_selector('a', text: I18n.t(:label_ldap_auth_source_plural))
       end
     end
   end

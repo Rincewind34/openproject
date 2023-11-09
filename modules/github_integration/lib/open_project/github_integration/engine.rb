@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,11 +27,7 @@
 #++
 
 require 'open_project/plugins'
-
 require_relative './patches/api/work_package_representer'
-require_relative './notification_handler'
-require_relative './hook_handler'
-require_relative './services'
 
 module OpenProject::GithubIntegration
   class Engine < ::Rails::Engine
@@ -81,6 +77,10 @@ module OpenProject::GithubIntegration
 
     add_api_endpoint 'API::V3::WorkPackages::WorkPackagesAPI', :id do
       mount ::API::V3::GithubPullRequests::GithubPullRequestsByWorkPackageAPI
+    end
+
+    add_api_endpoint 'API::V3::Root' do
+      mount ::API::V3::GithubPullRequests::GithubPullRequestsAPI
     end
 
     config.to_prepare do

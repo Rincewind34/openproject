@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -41,7 +41,8 @@ class QueryPolicy < BasePolicy
         depublicize: depublicize_allowed?(cached_query),
         star: persisted_and_own_or_public?(cached_query),
         unstar: persisted_and_own_or_public?(cached_query),
-        reorder_work_packages: reorder_work_packages?(cached_query)
+        reorder_work_packages: reorder_work_packages?(cached_query),
+        share_via_ical: share_via_ical_allowed?(cached_query)
       }
     end
 
@@ -118,5 +119,13 @@ class QueryPolicy < BasePolicy
     end
 
     @manage_public_queries_cache[query.project]
+  end
+
+  def share_via_ical_allowed?(query)
+    @share_via_ical_cache ||= Hash.new do |hash, project|
+      hash[project] = user.allowed_to?(:share_calendars, project, global: project.nil?)
+    end
+
+    @share_via_ical_cache[query.project]
   end
 end

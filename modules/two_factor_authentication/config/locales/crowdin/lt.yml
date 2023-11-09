@@ -1,5 +1,9 @@
 #English strings go here for Rails i18n
 lt:
+  plugin_openproject_two_factor_authentication:
+    name: "OpenProject dviejų faktorių autentifikacija"
+    description: >-
+      OpenProject priedas autentifikuoja jūsų naudotojus naudojant dviejų faktorių autentifikaciją naudojant vieno karto slaptažodį per TOTP standartą (Google Autentifikatorius) arba išsiųstą į naudotojo telefoną per SMS arba balso žinutę.
   activerecord:
     attributes:
       two_factor_authentication/device:
@@ -73,7 +77,7 @@ lt:
       text_2fa_disabled: "Naudotojas nenustatė savo 2FA įrenginio savo „Mano paskyros puslapyje“"
     upsale:
       title: 'Dviejų veiksnių autentifikavimas'
-      description: 'Strenghten the security of your OpenProject instance by offering (or enforcing) two-factor authentification to all project members.'
+      description: 'Sustiprinkite savo OpenProject sistemos saugumą pasiūlydami (ar reikalaudami) dviejų faktorių autentifikacijos visiems projekto nariams.'
     backup_codes:
       none_found: Ši paskyra neturi atsarginių kodų.
       singular: Atsarginis kodas

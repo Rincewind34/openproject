@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,13 +28,13 @@
 
 require 'spec_helper'
 
-describe 'form query configuration', type: :feature, js: true do
-  shared_let(:admin) { create :admin }
-  let(:type_bug) { create :type_bug }
-  let(:type_task) { create :type_task }
+RSpec.describe 'form query configuration', js: true, with_cuprite: true do
+  shared_let(:admin) { create(:admin) }
+  let(:type_bug) { create(:type_bug) }
+  let(:type_task) { create(:type_task) }
 
-  let(:project) { create :project, types: [type_bug, type_task] }
-  let(:other_project) { create :project, types: [type_task] }
+  let(:project) { create(:project, types: [type_bug, type_task]) }
+  let(:other_project) { create(:project, types: [type_task]) }
   let!(:work_package) do
     create(:work_package,
            project:,
@@ -62,31 +62,30 @@ describe 'form query configuration', type: :feature, js: true do
     relation
   end
   let!(:related_task) do
-    create :work_package, project:, type: type_task
+    create(:work_package, project:, type: type_task)
   end
   let!(:unrelated_task) do
-    create :work_package, subject: 'Unrelated task', type: type_task, project:
+    create(:work_package, subject: 'Unrelated task', type: type_task, project:)
   end
   let!(:unrelated_bug) do
-    create :work_package, subject: 'Unrelated bug', type: type_bug, project:
+    create(:work_package, subject: 'Unrelated bug', type: type_bug, project:)
   end
   let!(:related_task_other_project) do
-    create :work_package, project: other_project, type: type_task
+    create(:work_package, project: other_project, type: type_task)
   end
   let!(:related_bug) do
-    create :work_package, project:, type: type_bug
+    create(:work_package, project:, type: type_bug)
   end
 
   let(:wp_page) { Pages::FullWorkPackage.new(work_package) }
   let(:wp_table) { Pages::WorkPackagesTable.new(project) }
-  let(:form) { ::Components::Admin::TypeConfigurationForm.new }
-  let(:modal) { ::Components::WorkPackages::TableConfigurationModal.new }
-  let(:filters) { ::Components::WorkPackages::TableConfiguration::Filters.new }
-  let(:columns) { ::Components::WorkPackages::Columns.new }
+  let(:form) { Components::Admin::TypeConfigurationForm.new }
+  let(:modal) { Components::WorkPackages::TableConfigurationModal.new }
+  let(:filters) { Components::WorkPackages::TableConfiguration::Filters.new }
+  let(:columns) { Components::WorkPackages::Columns.new }
 
-  describe "with EE token" do
+  describe "with EE token", with_ee: %i[edit_attribute_groups] do
     before do
-      with_enterprise_token(:edit_attribute_groups)
       login_as(admin)
       visit edit_type_tab_path(id: type_bug.id, tab: "form_configuration")
     end
@@ -94,11 +93,11 @@ describe 'form query configuration', type: :feature, js: true do
     it 'can save an empty query group' do
       form.add_query_group('Empty test', :children)
       form.save_changes
-      expect(page).to have_selector('.flash.notice', text: 'Successful update.', wait: 10)
+      expect(page).to have_selector('.op-toast.-success', text: 'Successful update.', wait: 10)
       type_bug.reload
 
       query_group = type_bug.attribute_groups.detect { |x| x.is_a?(Type::QueryGroup) }
-      expect(query_group.attributes).to be_kind_of(::Query)
+      expect(query_group.attributes).to be_a(Query)
       expect(query_group.key).to eq('Empty test')
     end
 
@@ -106,7 +105,7 @@ describe 'form query configuration', type: :feature, js: true do
       form.add_query_group('Subtasks', :children)
       # Save changed query
       form.save_changes
-      expect(page).to have_selector('.flash.notice', text: 'Successful update.', wait: 10)
+      expect(page).to have_selector('.op-toast.-success', text: 'Successful update.', wait: 10)
 
       # Visit wp_table
       wp_table.visit!
@@ -125,25 +124,25 @@ describe 'form query configuration', type: :feature, js: true do
       end
     end
 
-    context 'visiting a new work package screen' do
+    context 'when visiting a new work package screen' do
       let(:wp_page) { Pages::FullWorkPackageCreate.new }
 
       it 'does not show a subgroup (Regression #29582)' do
         form.add_query_group('Subtasks', :children)
         # Save changed query
         form.save_changes
-        expect(page).to have_selector('.flash.notice', text: 'Successful update.', wait: 10)
+        expect(page).to have_selector('.op-toast.-success', text: 'Successful update.', wait: 10)
 
         # Visit new wp page
         visit new_project_work_packages_path(project)
 
         wp_page.expect_no_group 'Subtasks'
-        expect(page).to have_no_text 'Subtasks'
+        expect(page).not_to have_text 'Subtasks'
       end
     end
 
     context 'with an archived project' do
-      let!(:archived) { create :project, name: 'To be archived' }
+      let!(:archived) { create(:project, name: 'To be archived') }
 
       it 'uses the valid subset of the query (Regression #40324)' do
         form.add_query_group('Archived project', :children)
@@ -152,12 +151,12 @@ describe 'form query configuration', type: :feature, js: true do
         # Select the soon archived project
         modal.switch_to 'Filters'
         filters.expect_filter_count 1
-        filters.add_filter_by('Project', 'is', archived.name)
+        filters.add_filter_by('Project', 'is (OR)', archived.name)
         filters.expect_filter_count 2
         filters.save
 
         form.save_changes
-        expect(page).to have_selector('.flash.notice', text: 'Successful update.', wait: 10)
+        expect(page).to have_selector('.op-toast.-success', text: 'Successful update.', wait: 10)
 
         archived.update_attribute(:active, false)
 
@@ -185,7 +184,7 @@ describe 'form query configuration', type: :feature, js: true do
 
       # Save changed query
       form.save_changes
-      expect(page).to have_selector('.flash.notice', text: 'Successful update.', wait: 10)
+      expect(page).to have_selector('.op-toast.-success', text: 'Successful update.', wait: 10)
 
       type_bug.reload
       query = type_bug.attribute_groups.detect { |x| x.key == 'Columns Test' }
@@ -207,7 +206,7 @@ describe 'form query configuration', type: :feature, js: true do
 
       # Save changed query
       form.save_changes
-      expect(page).to have_selector('.flash.notice', text: 'Successful update.', wait: 10)
+      expect(page).to have_selector('.op-toast.-success', text: 'Successful update.', wait: 10)
 
       type_bug.reload
       query = type_bug.attribute_groups.detect { |x| x.key == 'Columns Test' }
@@ -237,7 +236,7 @@ describe 'form query configuration', type: :feature, js: true do
     end
 
     shared_examples_for 'query group' do
-      it '' do
+      it do
         form.add_query_group('Subtasks', frontend_relation_type)
         form.edit_query_group('Subtasks')
 
@@ -250,11 +249,11 @@ describe 'form query configuration', type: :feature, js: true do
         modal.switch_to 'Filters'
         # the templated filter should be hidden in the Filters tab
         filters.expect_filter_count 1
-        filters.add_filter_by('Type', 'is', type_task.name)
+        filters.add_filter_by('Type', 'is (OR)', type_task.name)
         filters.save
 
         form.save_changes
-        expect(page).to have_selector('.flash.notice', text: 'Successful update.', wait: 10)
+        expect(page).to have_selector('.op-toast.-success', text: 'Successful update.', wait: 10)
 
         # Visit work package with that type
         wp_page.visit!
@@ -271,10 +270,11 @@ describe 'form query configuration', type: :feature, js: true do
         autocompleter = embedded_table.click_reference_inline_create
         results = embedded_table.search_autocomplete autocompleter,
                                                      query: 'Unrelated',
-                                                     results_selector: '.ng-dropdown-panel-items'
+                                                     results_selector: '.ng-dropdown-panel-items',
+                                                     wait_for_fetched_options: false
 
         expect(results).to have_text "Unrelated task"
-        expect(results).to have_no_text "Bug ##{unrelated_task.id} Unrelated bug"
+        expect(results).not_to have_text "Bug ##{unrelated_task.id} Unrelated bug"
 
         # Cancel that referencing
         page.find('.wp-create-relation--cancel').click
@@ -292,7 +292,7 @@ describe 'form query configuration', type: :feature, js: true do
         modal.expect_open
         modal.switch_to 'Filters'
         filters.expect_filter_count 2
-        filters.expect_filter_by 'Type', 'is', type_task.name
+        filters.expect_filter_by 'Type', 'is (OR)', type_task.name
 
         # Remove the filter again
         filters.remove_filter 'type'

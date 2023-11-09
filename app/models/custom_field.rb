@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -41,7 +41,7 @@ class CustomField < ApplicationRecord
            inverse_of: 'custom_field'
   accepts_nested_attributes_for :custom_options
 
-  acts_as_list scope: "type = '#{self.class}'"
+  acts_as_list scope: [:type]
 
   validates :field_format, presence: true
   validates :custom_options,
@@ -80,7 +80,7 @@ class CustomField < ApplicationRecord
 
   def default_value
     if list?
-      ids = custom_options.select(&:default_value).map(&:id)
+      ids = custom_options.where(default_value: true).pluck(:id).map(&:to_s)
 
       if multi_value?
         ids
@@ -181,24 +181,26 @@ class CustomField < ApplicationRecord
   end
 
   def cast_value(value)
-    casted = nil
-    if value.present?
-      case field_format
-      when 'string', 'text', 'list'
-        casted = value
-      when 'date'
-        casted = begin; value.to_date; rescue StandardError; nil end
-      when 'bool'
-        casted = ActiveRecord::Type::Boolean.new.cast(value)
-      when 'int'
-        casted = value.to_i
-      when 'float'
-        casted = value.to_f
-      when 'user', 'version'
-        casted = (value.blank? ? nil : field_format.classify.constantize.find_by(id: value.to_i))
+    return if value.blank?
+
+    case field_format
+    when 'string', 'text', 'list'
+      value
+    when 'date'
+      begin
+        value.to_date
+      rescue StandardError
+        nil
       end
+    when 'bool'
+      ActiveRecord::Type::Boolean.new.cast(value)
+    when 'int'
+      value.to_i
+    when 'float'
+      value.to_f
+    when 'user', 'version'
+      field_format.classify.constantize.find_by(id: value.to_i)
     end
-    casted
   end
 
   def <=>(other)
@@ -232,8 +234,22 @@ class CustomField < ApplicationRecord
     where(is_filter: true)
   end
 
-  def accessor_name
+  def attribute_name(format = nil)
+    return "customField#{id}" if format == :camel_case
+
     "custom_field_#{id}"
+  end
+
+  def attribute_getter
+    attribute_name.to_sym
+  end
+
+  def attribute_setter
+    :"#{attribute_name}="
+  end
+
+  def column_name
+    "cf_#{id}"
   end
 
   def type_name
@@ -261,7 +277,7 @@ class CustomField < ApplicationRecord
   end
 
   def multi_value_possible?
-    %w[user list].include?(field_format) &&
+    %w[version user list].include?(field_format) &&
       [ProjectCustomField, WorkPackageCustomField].include?(self.class)
   end
 
@@ -325,7 +341,7 @@ class CustomField < ApplicationRecord
 
   def destroy_help_text
     AttributeHelpText
-      .where(attribute_name: "custom_field_#{id}")
+      .where(attribute_name:)
       .destroy_all
   end
 end

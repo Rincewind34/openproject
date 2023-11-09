@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,14 +26,15 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require File.expand_path("#{File.dirname(__FILE__)}/../spec_helper")
+require 'spec_helper'
 
-describe Burndown, type: :model do
+RSpec.describe Burndown do
   def set_attribute_journalized(story, attribute, value, day)
     story.reload
     story.send(attribute, value)
     story.save!
-    story.last_journal.update(created_at: day, updated_at: day)
+    story.journals[-2].update_columns(validity_period: story.journals[-2].created_at...day) if story.journals.count > 1
+    story.journals[-1].update_columns(created_at: day, updated_at: day, validity_period: day..Float::INFINITY)
   end
 
   let(:user) { create(:user) }
@@ -64,7 +65,6 @@ describe Burndown, type: :model do
 
     allow(Setting).to receive(:plugin_openproject_backlogs).and_return({ 'points_burn_direction' => 'down',
                                                                          'wiki_template' => '',
-                                                                         'card_spec' => 'Sattleford VM-5040',
                                                                          'story_types' => [type_feature.id.to_s],
                                                                          'task_type' => type_task.id.to_s })
 
@@ -157,7 +157,7 @@ describe Burndown, type: :model do
           let!(:stories) do
             stories = []
 
-            (0..9).each do |i|
+            10.times do |i|
               stories[i] = create(:story, subject: "Story #{i}",
                                           project:,
                                           version:,
@@ -166,7 +166,9 @@ describe Burndown, type: :model do
                                           priority: issue_priority,
                                           created_at: Time.zone.today - (20 - i).days,
                                           updated_at: Time.zone.today - (20 - i).days)
-              stories[i].last_journal.update_columns(created_at: stories[i].created_at, updated_at: stories[i].created_at)
+              stories[i].last_journal.update_columns(created_at: stories[i].created_at,
+                                                     updated_at: stories[i].created_at,
+                                                     validity_period: stories[i].created_at..Float::INFINITY)
             end
 
             stories
@@ -181,7 +183,7 @@ describe Burndown, type: :model do
 
             describe 'WITH 5 stories having been reduced to 0 story points, one story per day' do
               before do
-                (0..4).each do |i|
+                5.times do |i|
                   set_attribute_journalized stories[i], :story_points=, nil, version.start_date + i.days + 1.hour
                 end
               end

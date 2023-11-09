@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -43,9 +43,15 @@ module TimeEntries
     # they have the :edit_time_entries or
     # user == editing user and :edit_own_time_entries
     def user_allowed_to_update?
-      with_unchanged_project_id do
-        user_allowed_to_update_in?(model.project)
-      end && user_allowed_to_update_in?(model.project)
+      if model.ongoing || model.ongoing_was
+        with_unchanged_project_id do
+          user_allowed_to_modify_ongoing?(model.project)
+        end && user_allowed_to_modify_ongoing?(model.project)
+      else
+        with_unchanged_project_id do
+          user_allowed_to_update_in?(model.project)
+        end && user_allowed_to_update_in?(model.project)
+      end
     end
 
     private
@@ -53,6 +59,10 @@ module TimeEntries
     def user_allowed_to_update_in?(project)
       user.allowed_to?(:edit_time_entries, project) ||
         (model.user == user && user.allowed_to?(:edit_own_time_entries, project))
+    end
+
+    def user_allowed_to_modify_ongoing?(project)
+      model.user == user && (user.allowed_to?(:log_time, project) || user.allowed_to?(:log_own_time, project))
     end
   end
 end

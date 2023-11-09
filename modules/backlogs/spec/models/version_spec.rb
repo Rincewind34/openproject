@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,9 +26,9 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'spec_helper'
 
-describe Version, type: :model do
+RSpec.describe Version do
   it { is_expected.to have_many :version_settings }
 
   describe 'rebuild positions' do
@@ -54,7 +54,7 @@ describe Version, type: :model do
 
     let(:version) { create(:version, project_id: project.id, name: 'Version') }
 
-    shared_let(:admin) { create :admin }
+    shared_let(:admin) { create(:admin) }
 
     def move_to_project(work_package, project)
       WorkPackages::UpdateService
@@ -64,7 +64,7 @@ describe Version, type: :model do
 
     before do
       # We had problems while writing these specs, that some elements kept
-      # creaping around between tests. This should be fast enough to not harm
+      # creeping around between tests. This should be fast enough to not harm
       # anybody while adding an additional safety net to make sure, that
       # everything runs in isolation.
       WorkPackage.delete_all

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -31,14 +31,15 @@ require_module_spec_helper
 require 'contracts/shared/model_contract_shared_context'
 require_relative 'shared_contract_examples'
 
-describe Storages::ProjectStorages::CreateContract do
+RSpec.describe Storages::ProjectStorages::CreateContract do
   include_context 'ModelContract shared context'
 
   it_behaves_like 'ProjectStorages contract' do
     # current_user, project, storage and other objects defined in the shared_contract_examples
     # that includes all the stuff shared between create and update.
     let(:project_storage) do
-      ::Storages::ProjectStorage.new(
+      build(
+        :project_storage,
         creator: current_user,
         project:,
         storage:

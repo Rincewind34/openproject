@@ -1,6 +1,6 @@
 // -- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2022 the OpenProject GmbH
+// Copyright (C) 2012-2023 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -49,7 +49,7 @@ import { UntilDestroyedMixin } from 'core-app/shared/helpers/angular/until-destr
             aria-hidden="true"
             [textContent]="text[view]">
         </span>
-      <op-icon icon-classes="button--icon icon-small icon-pulldown"></op-icon>
+        <span class="spot-icon spot-icon_dropdown"></span>
     </button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

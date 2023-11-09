@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -41,19 +41,20 @@ module Costs
                default: { 'costs_currency' => 'EUR', 'costs_currency_format' => '%n %u' },
                partial: 'settings/costs',
                menu_item: :costs_setting
-             },
-             name: :project_module_costs do
+             } do
       project_module :costs do
         permission :view_time_entries, {}
         permission :view_own_time_entries, {}
 
         permission :log_own_time,
                    {},
-                   require: :loggedin
+                   require: :loggedin,
+                   dependencies: :view_own_time_entries
 
         permission :log_time,
                    {},
-                   require: :loggedin
+                   require: :loggedin,
+                   dependencies: :view_time_entries
 
         permission :edit_own_time_entries,
                    {},
@@ -101,7 +102,6 @@ module Costs
     activity_provider :time_entries, class_name: 'Activities::TimeEntryActivityProvider', default: false
 
     patches %i[Project User PermittedParams ProjectsController]
-    patch_with_namespace :BasicData, :RoleSeeder
     patch_with_namespace :BasicData, :SettingSeeder
     patch_with_namespace :ActiveSupport, :NumberHelper, :NumberToCurrencyConverter
 
@@ -253,8 +253,7 @@ module Costs
     end
 
     config.to_prepare do
-      OpenProject::ProjectActivity.register on: 'TimeEntry',
-                                            attribute: :updated_at
+      OpenProject::ProjectLatestActivity.register on: 'TimeEntry'
 
       Costs::Patches::MembersPatch.mixin!
 

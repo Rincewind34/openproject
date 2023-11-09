@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,10 +29,12 @@
 module Storages::Peripherals
   # Helper for open links for a file link object.
   module StorageUrlHelper
-    def storage_url_open_file(file_link, open_location: false)
+    module_function
+
+    def storage_url_open_file(storage, file_id, open_location: false)
       location_flag = ActiveModel::Type::Boolean.new.cast(open_location) ? 0 : 1
 
-      "#{file_link.storage.host}/index.php/f/#{file_link.origin_id}?openfile=#{location_flag}"
+      "#{storage.host}/index.php/f/#{file_id}?openfile=#{location_flag}"
     end
 
     def storage_url_open(storage)

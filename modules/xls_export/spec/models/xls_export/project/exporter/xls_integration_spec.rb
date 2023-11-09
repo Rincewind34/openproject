@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'spreadsheet'
 require 'models/projects/exporter/exportable_project_context'
 
-describe XlsExport::Project::Exporter::XLS do
+RSpec.describe XlsExport::Project::Exporter::XLS do
   include_context 'with a project with an arrangement of custom fields'
   include_context 'with an instance of the described exporter'
 
@@ -31,6 +31,18 @@ describe XlsExport::Project::Exporter::XLS do
                                 project.name, project.description, 'Off track', 'false']
   end
 
+  context 'with project description containing html' do
+    before do
+      project.update(description: "This is an <p>html</p> description.")
+    end
+
+    it 'performs a successful export' do
+      expect(rows.count).to eq(1)
+      expect(sheet.row(1)).to eq [project.id.to_s, project.identifier, project.name,
+                                  "This is an html description.", 'Off track', 'false']
+    end
+  end
+
   context 'with status_explanation enabled' do
     before do
       Setting.enabled_projects_columns += ["status_explanation"]
@@ -46,7 +58,7 @@ describe XlsExport::Project::Exporter::XLS do
 
   describe 'custom field columns selected' do
     before do
-      Setting.enabled_projects_columns += custom_fields.map { |cf| "cf_#{cf.id}" }
+      Setting.enabled_projects_columns += custom_fields.map(&:column_name)
     end
 
     context 'when ee enabled', with_ee: %i[custom_fields_in_projects_list] do

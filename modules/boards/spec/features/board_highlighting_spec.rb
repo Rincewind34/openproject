@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,7 +30,7 @@ require 'spec_helper'
 require_relative './support/board_index_page'
 require_relative './support/board_page'
 
-describe 'Work Package boards spec', type: :feature, js: true do
+RSpec.describe 'Work Package boards spec', js: true, with_ee: %i[board_view] do
   let(:user) do
     create(:user,
            member_in_project: project,
@@ -55,19 +55,18 @@ describe 'Work Package boards spec', type: :feature, js: true do
            status: open_status)
   end
 
-  let!(:priority) { create :priority, color: }
-  let!(:priority2) { create :priority, color: color2 }
-  let!(:type) { create :type, color: }
-  let!(:type2) { create :type, color: color2 }
-  let!(:open_status) { create :default_status, name: 'Open' }
+  let!(:priority) { create(:priority, color:) }
+  let!(:priority2) { create(:priority, color: color2) }
+  let!(:type) { create(:type, color:) }
+  let!(:type2) { create(:type, color: color2) }
+  let!(:open_status) { create(:default_status, name: 'Open') }
 
   let(:board_index) { Pages::BoardIndex.new(project) }
 
-  let(:color) { create :color }
-  let(:color2) { create :color }
+  let(:color) { create(:color) }
+  let(:color2) { create(:color) }
 
   before do
-    with_enterprise_token :board_view
     project
     login_as(user)
   end
@@ -75,7 +74,7 @@ describe 'Work Package boards spec', type: :feature, js: true do
   it 'navigates from boards to the WP full view and back' do
     board_index.visit!
 
-    board_page = board_index.create_board action: :Status
+    board_page = board_index.create_board action: 'Status'
 
     # See the work packages
     board_page.expect_query 'Open', editable: false
@@ -83,26 +82,26 @@ describe 'Work Package boards spec', type: :feature, js: true do
     board_page.expect_card 'Open', wp2.subject
 
     # Highlight type inline is always active
-    expect(page).to have_selector('.__hl_inline_type_' + type.id.to_s)
-    expect(page).to have_selector('.__hl_inline_type_' + type2.id.to_s)
+    expect(page).to have_selector(".__hl_inline_type_#{type.id}")
+    expect(page).to have_selector(".__hl_inline_type_#{type2.id}")
 
     # Highlight whole card by priority
     board_page.change_board_highlighting 'inline', 'Priority'
-    expect(page).to have_selector('.__hl_background_priority_' + priority.id.to_s)
-    expect(page).to have_selector('.__hl_background_priority_' + priority2.id.to_s)
+    expect(page).to have_selector(".__hl_background_priority_#{priority.id}")
+    expect(page).to have_selector(".__hl_background_priority_#{priority2.id}")
 
     # Highlight whole card by type
     board_page.change_board_highlighting 'inline', 'Type'
-    expect(page).to have_selector('.__hl_background_type_' + type.id.to_s)
-    expect(page).to have_selector('.__hl_background_type_' + type2.id.to_s)
+    expect(page).to have_selector(".__hl_background_type_#{type.id}")
+    expect(page).to have_selector(".__hl_background_type_#{type2.id}")
 
     # Disable highlighting
     board_page.change_board_highlighting 'none'
-    expect(page).not_to have_selector('.__hl_background_type_' + type.id.to_s)
-    expect(page).not_to have_selector('.__hl_background_type_' + type2.id.to_s)
+    expect(page).not_to have_selector(".__hl_background_type_#{type.id}")
+    expect(page).not_to have_selector(".__hl_background_type_#{type2.id}")
 
     # Type is still shown highlighted
-    expect(page).to have_selector('.__hl_inline_type_' + type.id.to_s)
-    expect(page).to have_selector('.__hl_inline_type_' + type2.id.to_s)
+    expect(page).to have_selector(".__hl_inline_type_#{type.id}")
+    expect(page).to have_selector(".__hl_inline_type_#{type2.id}")
   end
 end

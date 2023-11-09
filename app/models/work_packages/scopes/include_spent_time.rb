@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -58,7 +58,7 @@ module WorkPackages::Scopes::IncludeSpentTime
     end
 
     def allowed_to_view_time_entries(user)
-      time_entries_table[:id].in(TimeEntry.visible(user).select(:id).arel)
+      time_entries_table[:id].in(TimeEntry.not_ongoing.visible(user).select(:id).arel)
     end
 
     def wp_table

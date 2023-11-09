@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -34,10 +34,10 @@ module OnboardingSteps
     next_button.click
     if with_ee_token
       expect(page)
-        .to have_text sanitize_string(I18n.t('js.onboarding.steps.boards.lists_kanban')), normalize_ws: true
+        .to have_text sanitize_string(I18n.t('js.onboarding.steps.boards.lists_kanban')), normalize_ws: true, wait: 20
     else
       expect(page)
-        .to have_text sanitize_string(I18n.t('js.onboarding.steps.boards.lists_basic')), normalize_ws: true
+        .to have_text sanitize_string(I18n.t('js.onboarding.steps.boards.lists_basic')), normalize_ws: true, wait: 20
     end
 
     next_button.click

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2020 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,13 +28,15 @@
 require 'spec_helper'
 require 'rack/test'
 
-describe "POST /api/v3/queries/form", type: :request do
+RSpec.describe "POST /api/v3/queries/form",
+               with_ee: %i[baseline_comparison] do
   include API::V3::Utilities::PathHelper
 
   let(:path) { api_v3_paths.query_form(query.id) }
   let(:user) { create(:admin) }
-  let(:role) { create :existing_role, permissions: }
+  let(:role) { create(:existing_role, permissions:) }
   let(:permissions) { %i(view_work_packages manage_public_queries) }
+  let(:timestamps) { [1.week.ago.iso8601, 'lastWorkingDay@12:00+00:00', "P0D"] }
 
   let!(:project) { create(:project_with_types, members: { user => role }) }
 
@@ -303,7 +305,7 @@ describe "POST /api/v3/queries/form", type: :request do
   end
 
   describe 'with all parameters given' do
-    let(:status) { create :status }
+    let(:status) { create(:status) }
 
     let(:additional_setup) do
       status
@@ -315,6 +317,7 @@ describe "POST /api/v3/queries/form", type: :request do
         name: "Some Query",
         public: true,
         sums: true,
+        timestamps:,
         showHierarchies: false,
         filters: [
           {
@@ -393,7 +396,7 @@ describe "POST /api/v3/queries/form", type: :request do
             },
             "operator" => {
               "href" => "/api/v3/queries/operators/%3D",
-              "title" => 'is'
+              "title" => 'is (OR)'
             },
             "values" => [
               {
@@ -430,6 +433,18 @@ describe "POST /api/v3/queries/form", type: :request do
       ]
 
       expect(form.dig("_embedded", "payload", "_links", "sortBy")).to eq sort_by
+    end
+
+    it 'has the timestamps set' do
+      expect(form.dig("_embedded", "payload", "timestamps")).to eq timestamps
+    end
+
+    context 'with one timestamp is present only' do
+      let(:timestamps) { "PT0S" }
+
+      it 'has the timestamp set' do
+        expect(form.dig("_embedded", "payload", "timestamps")).to eq [timestamps]
+      end
     end
 
     context "with the project referred to by its identifier" do
@@ -513,6 +528,93 @@ describe "POST /api/v3/queries/form", type: :request do
       it "returns a validation error" do
         expect(form.dig("_embedded", "validationErrors", "sortBy", "message"))
           .to eq "Can't sort by column: spent_hours"
+      end
+    end
+
+    context 'with invalid timestamps' do
+      context 'when one timestamp cannot be parsed' do
+        let(:override_params) do
+          { timestamps: ['invalid', 'P0D'] }
+        end
+
+        it "returns a validation error" do
+          expect(form.dig("_embedded", "validationErrors", "timestamps", "message"))
+            .to eq "Timestamps contain invalid values: invalid"
+        end
+      end
+
+      context 'when one timestamp cannot be parsed (malformed)' do
+        let(:override_params) do
+          { timestamps: ['2022-03-02 invalid string 20:45:56Z', 'P0D'] }
+        end
+
+        it "returns a validation error" do
+          expect(form.dig("_embedded", "validationErrors", "timestamps", "message"))
+            .to eq "Timestamps contain invalid values: 2022-03-02 invalid string 20:45:56Z"
+        end
+      end
+
+      context 'when one timestamp cannot be parsed (malformed)#2' do
+        let(:override_params) do
+          { timestamps: ['LastWorkingDayInvalid@12:00', 'P0D'] }
+        end
+
+        it "returns a validation error" do
+          expect(form.dig("_embedded", "validationErrors", "timestamps", "message"))
+            .to eq "Timestamps contain invalid values: LastWorkingDayInvalid@12:00"
+        end
+      end
+
+      context 'when both timestamps cannot be parsed' do
+        let(:override_params) do
+          { timestamps: ['invalid', 'invalid2'] }
+        end
+
+        it "returns a validation error" do
+          expect(form.dig("_embedded", "validationErrors", "timestamps", "message"))
+            .to eq "Timestamps contain invalid values: invalid, invalid2"
+        end
+      end
+    end
+
+    context 'with EE token', with_ee: %i[baseline_comparison] do
+      describe 'timestamps' do
+        context 'with a value within 1 day' do
+          let(:timestamps) { "oneDayAgo@00:00+00:00" }
+
+          it 'has the timestamp set' do
+            expect(form.dig("_embedded", "payload", "timestamps")).to eq [timestamps]
+          end
+        end
+
+        context 'with a value older than 1 day' do
+          let(:timestamps) { "P-2D" }
+
+          it 'has the timestamp set' do
+            expect(form.dig("_embedded", "payload", "timestamps")).to eq [timestamps]
+          end
+        end
+      end
+    end
+
+    context 'without EE token', with_ee: false do
+      describe 'timestamps' do
+        context 'with a value within 1 day' do
+          let(:timestamps) { "oneDayAgo@00:00+00:00" }
+
+          it 'has the timestamp set' do
+            expect(form.dig("_embedded", "payload", "timestamps")).to eq [timestamps]
+          end
+        end
+
+        context 'with a value older than 1 day' do
+          let(:timestamps) { "P-2D" }
+
+          it "returns a validation error" do
+            expect(form.dig("_embedded", "validationErrors", "timestamps", "message"))
+              .to eq "Timestamps contain forbidden values: P-2D"
+          end
+        end
       end
     end
 

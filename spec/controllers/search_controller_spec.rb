@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe SearchController, type: :controller do
+RSpec.describe SearchController do
   shared_let(:project) do
     create(:project,
            name: 'eCookbook')
@@ -138,16 +138,6 @@ describe SearchController, type: :controller do
         it { expect(assigns(:results_count)).to be_a(Hash) }
         it { expect(assigns(:results_count)['work_packages']).to be(3) }
       end
-
-      describe '#view' do
-        render_views
-
-        it 'marks closed work packages' do
-          assert_select 'dt.work_package-closed' do
-            assert_select 'a', text: Regexp.new(work_package_2.status.name)
-          end
-        end
-      end
     end
 
     context 'when searching in project and its subprojects' do
@@ -182,19 +172,17 @@ describe SearchController, type: :controller do
 
     context 'when searching for a note' do
       let!(:note_1) do
-        create :work_package_journal,
+        create(:work_package_journal,
                journable_id: work_package_1.id,
                notes: 'Test note 1',
-               version: 2
+               version: 2)
       end
       let!(:note_2) do
-        create :work_package_journal,
+        create(:work_package_journal,
                journable_id: work_package_1.id,
                notes: 'Special note 2',
-               version: 3
+               version: 3)
       end
-
-      before { allow_any_instance_of(Journal).to receive_messages(predecessor: note_1) }
 
       before do
         get :index, params: { q: 'note' }
@@ -215,21 +203,7 @@ describe SearchController, type: :controller do
 
         it { expect(assigns(:results)).to include work_package_1 }
 
-        describe '#view' do
-          render_views
-
-          it 'highlights last note' do
-            assert_select 'dt.work_package-note + dd' do
-              assert_select '.description', text: note_2.notes
-            end
-          end
-
-          it 'links to work package with anchor to highlighted note' do
-            assert_select 'dt.work_package-note' do
-              assert_select 'a', href: work_package_path(work_package_1, anchor: 'note-2')
-            end
-          end
-        end
+        it { expect(assigns(:tokens)).to include 'note' }
       end
     end
   end

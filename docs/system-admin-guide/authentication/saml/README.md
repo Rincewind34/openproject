@@ -30,7 +30,7 @@ In order to use integrate OpenProject as a service provider (SP) using SAML, you
   - **first name** and **last name** of the user.
 - provides the public certificate or certificate fingerprint (SHA1) in use for communicating with the idP.
 
-### 1: Configuring the SAML integration
+### 1: Configure the SAML integration
 
 The configuration can be provided in one of two ways:
 
@@ -52,7 +52,7 @@ As with [all the rest of the OpenProject configuration settings](../../../instal
 
 Example
 
-```bash
+```shell
 # Name of the provider, leave this at saml unless you use multiple providers
 OPENPROJECT_SAML_SAML_NAME="saml"
 
@@ -102,7 +102,7 @@ The SAML settings can also be changed at runtime in the database through the Ope
 As opposed to other settings there is no user interface for this.
 That means it's best to set them using the console.
 
-```
+```shell
 # package based installation:
 > sudo openproject run console
 
@@ -165,7 +165,7 @@ Setting.plugin_openproject_auth_saml = Hash(Setting.plugin_openproject_auth_saml
 In your OpenProject packaged installation, you can modify the `/opt/openproject/config/configuration.yml` file. 
 Edit the file in your favorite editor
 
-```
+```shell
 vim /opt/openproject/config/configuration.yml
 ```
 
@@ -233,13 +233,13 @@ Be sure to choose the correct indentation and base key. The items below the `sam
 
 In this section, we detail some of the required and optional configuration options for SAML.
 
-**Mandatory: Response signature verification**
+#### 2.1 Mandatory: Response signature verification
 
 SAML responses by identity providers are required to be signed. You can configure this by either specifying the response's certificate fingerprint in `idp_cert_fingerprint` , or by passing the entire PEM-encoded certificate string in `idp_cert` (beware of newlines and formatting the cert, [c.f. the idP certificate options in omniauth-saml](https://github.com/omniauth/omniauth-saml#options))
 
 
 
-**Mandatory: Attribute mapping**
+#### 2.2 Mandatory: Attribute mapping
 
 Use the key `attribute_statements` to provide mappings for attributes returned by the SAML identity provider's response to OpenProject internal attributes. 
 
@@ -291,7 +291,9 @@ default:
         last_name: ['sn']
 ```
 
-**Optional: Setting the attribute format**
+
+
+#### 2.3 Optional: Set the attribute format
 
 By default, the attributes above will be requested with the format `urn:oasis:names:tc:SAML:2.0:attrname-format:basic`.
 That means the response should contain attribute names 'mail', etc. as configured above.
@@ -327,7 +329,9 @@ default:
         last_name: ['urn:oid:2.5.4.4']
 ```
 
-**Optional: Request signature and Assertion Encryption**
+
+
+#### 2.4 Optional: Request signature and Assertion Encryption
 
 Your identity provider may optionally encrypt the assertion response, however note that with the required use of TLS transport security, in many cases this is not necessary. You may wish to use Assertion Encryption if TLS is terminated before the OpenProject application server (e.g., on the load balancer level).
 
@@ -368,11 +372,27 @@ default:
         digest_method: 'http://www.w3.org/2001/04/xmlenc#sha256'
 ```
 
-
 With request signing enabled, the certificate will be added to the identity provider to validate the signature of the service provider's request.
 
 
-### 3: Restarting the server
+
+#### 2.5. Optional: Restrict who can automatically self-register
+
+You can configure OpenProject to restrict which users can register on the system with the [authentication self-registration setting](../authentication-settings)
+
+ By default, users returning from a SAML idP will be automatically created. If you'd like for the SAML integration to respect the configured self-registration option, please use this setting:
+
+```yaml
+default:
+  # <-- other configuration -->
+    mysaml1:
+      # <-- other configuration -->
+      limit_self_registration: true
+```
+
+
+
+### 3: Restart the server
 
 Once the configuration is completed, restart your OpenProject server with `service openproject restart`.  If you configured SAML through settings, this step can be ignored.
 
@@ -381,13 +401,13 @@ Once the configuration is completed, restart your OpenProject server with `servi
 The configuration will enable the SAML XML metadata endpoint at `https://<your openproject host>/auth/saml/metadata`
 for service discovery use with your identity provider.
 
-### 4: Logging in
+### 4: Log in
 
 From there on, you will see a button dedicated to logging in via SAML, e.g named "My SSO" (depending on the name you chose in the configuration), when logging in. Clicking it will redirect to your SSO provider and return with your attribute data to set up the account, or to log in.
 
 ![my-sso](my-sso.png)
 
-### 5: Returning from the authentication provider
+### 5: Return from the authentication provider
 
 When you return from the authentication provider, you might be shown one of these return paths:
 
@@ -442,7 +462,7 @@ Add the following Claim rules:
 
 
 
-#### Exporting the ADFS public certificate
+#### Export the ADFS public certificate
 
 OpenProject needs the certificate or fingerprint of the ADFS to validate the signature of incoming tokens. Here are the steps on how to do that:
 
@@ -455,13 +475,13 @@ OpenProject needs the certificate or fingerprint of the ADFS to validate the sig
 
 
 
-#### Setting up OpenProject for ADFS integration
+#### Set up OpenProject for ADFS integration
 
 
 
 In OpenProject, these are the variables you will need to set. Please refer to the above documentation for the different ways you can configure these variables  OpenProject
 
-```bash
+```shell
 OPENPROJECT_SAML_SAML_NAME="saml"
 OPENPROJECT_SAML_SAML_DISPLAY__NAME="ADFS SSO" # This is the text shown to users in OpenProject, freely change this value
 OPENPROJECT_SAML_SAML_ATTRIBUTE__STATEMENTS_EMAIL="[mail]"
@@ -510,17 +530,17 @@ Go the "Mappers" tab and create the following mappers. Note that the "User attri
 
 
 
-#### Exporting the Keycloak public certificate
+#### Export the Keycloak public certificate
 
 To view the certificate in Base64 encoding, go to the menu "Realm settings" and click on "Endpoints -> SAML 2.0 Identity Provider Metadata". This will open an XML file, and the certificate is stored in the `ds:X509Certificate `node under the signing key. Copy the content of the certificate (`MII.....`)
 
 
 
-#### Setting up OpenProject for Keycloak integration
+#### Set up OpenProject for Keycloak integration
 
 In OpenProject, these are the variables you will need to set. Please refer to the above documentation for the different ways you can configure these variables  OpenProject
 
-```bash
+```shell
 OPENPROJECT_SAML_SAML_NAME="saml"
 OPENPROJECT_SAML_SAML_DISPLAY__NAME="Keycloak SSO" # This is the text shown to users in OpenProject, freely change this value
 OPENPROJECT_SAML_SAML_ATTRIBUTE__STATEMENTS_EMAIL="[mail]"
@@ -548,7 +568,7 @@ A: This can happen if you previously created user accounts in OpenProject with t
 Spawn an interactive console in OpenProject. The following example shows the command for the packaged installation.
 See [our process control guide](../../../installation-and-operations/operation/control/) for information on other installation types.
 
-```bash
+```shell
 sudo openproject run console
 > Setting.oauth_allow_remapping_of_existing_users = true
 > exit
@@ -556,6 +576,7 @@ sudo openproject run console
 
 Then, existing users should be able to log in using their SAML identity. Note that this works only if the user is using password-based authentication, and is not linked to any other authentication source (e.g. LDAP) or OpenID provider.
 
+Note that this setting is set to true by default for new installations already.
 
 
 **Q: Could the users be automatically logged in to OpenProject if they are already authenticated at the SAML Identity Provider?**

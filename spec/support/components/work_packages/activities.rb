@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -57,8 +57,9 @@ module Components
       def hover_action(journal_id, action)
         retry_block do
           # Focus type edit to expose buttons
-          activity = page.find("#activity-#{journal_id} .work-package-details-activities-activity-contents")
-          page.driver.browser.action.move_to(activity.native).perform
+          page
+            .find("#activity-#{journal_id} .work-package-details-activities-activity-contents")
+            .hover
 
           # Click the corresponding action button
           case action

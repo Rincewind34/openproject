@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -50,6 +50,12 @@ module Components
           expect(page).to have_button(disabled: false,
                                       exact_text: I18n.t('js.storages.file_links.selection', count: selection_count))
         end
+      end
+    end
+
+    def wait_for_folder_loaded
+      page.within(container) do
+        expect(page).not_to have_selector('[data-qa-selector="op-file-list--loading-indicator"]')
       end
     end
 

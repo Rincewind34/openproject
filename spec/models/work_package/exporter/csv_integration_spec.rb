@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe WorkPackage::Exports::CSV, 'integration', type: :model do
+RSpec.describe WorkPackage::Exports::CSV, 'integration' do
   before do
     login_as current_user
   end
@@ -41,7 +41,7 @@ describe WorkPackage::Exports::CSV, 'integration', type: :model do
            member_with_permissions: %i(view_work_packages))
   end
   let(:query) do
-    Query.new_default(name: '_').tap do |query|
+    Query.new_default.tap do |query|
       query.column_names = %i(subject assigned_to updated_at estimated_hours)
     end
   end
@@ -76,6 +76,6 @@ describe WorkPackage::Exports::CSV, 'integration', type: :model do
     expect(data.last).to include(work_package.description)
     expect(data.last).to include(current_user.name)
     expect(data.last).to include(work_package.updated_at.localtime.strftime("%m/%d/%Y %I:%M %p"))
-    expect(data.last).to include('(15.0)')
+    expect(data.last).to include('(15.0 h)')
   end
 end

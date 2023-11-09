@@ -1,6 +1,6 @@
 // -- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2022 the OpenProject GmbH
+// Copyright (C) 2012-2023 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -58,6 +58,7 @@ import { DeviceService } from 'core-app/core/browser/device.service';
 import { InjectField } from 'core-app/shared/helpers/angular/inject-field.decorator';
 import { CurrentProjectService } from 'core-app/core/current-project/current-project.service';
 import { UntilDestroyedMixin } from 'core-app/shared/helpers/angular/until-destroyed.mixin';
+import { WorkPackageViewBaselineService } from 'core-app/features/work-packages/routing/wp-view-base/view-services/wp-view-baseline.service';
 
 @Directive()
 export abstract class WorkPackagesViewBase extends UntilDestroyedMixin implements OnInit, OnDestroy {
@@ -108,6 +109,8 @@ export abstract class WorkPackagesViewBase extends UntilDestroyedMixin implement
   @InjectField() wpDisplayRepresentation:WorkPackageViewDisplayRepresentationService;
 
   @InjectField() wpIncludeSubprojects:WorkPackageViewIncludeSubprojectsService;
+
+  @InjectField() wpTableBaseline:WorkPackageViewBaselineService;
 
   @InjectField() halEvents:HalEventsService;
 
@@ -160,6 +163,7 @@ export abstract class WorkPackagesViewBase extends UntilDestroyedMixin implement
     this.setupChangeObserver(this.wpTableOrder);
     this.setupChangeObserver(this.wpDisplayRepresentation);
     this.setupChangeObserver(this.wpIncludeSubprojects);
+    this.setupChangeObserver(this.wpTableBaseline);
   }
 
   /**
@@ -221,7 +225,7 @@ export abstract class WorkPackagesViewBase extends UntilDestroyedMixin implement
    *
    * @param A refresh request
    */
-  public abstract refresh(visibly:boolean, firstPage:boolean):Promise<unknown>;
+  public abstract refresh(visibly:boolean, firstPage:boolean):void;
 
   /**
    * Set the loading indicator for this set instance

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,9 +28,11 @@
 
 require 'spec_helper'
 
-describe 'Projects', 'editing settings', type: :feature, js: true do
-  let(:name_field) { ::FormFields::InputFormField.new :name }
-  let(:parent_field) { ::FormFields::SelectFormField.new :parent }
+RSpec.describe 'Projects', 'editing settings',
+               js: true,
+               with_cuprite: true do
+  let(:name_field) { FormFields::InputFormField.new :name }
+  let(:parent_field) { FormFields::SelectFormField.new :parent }
   let(:permissions) { %i(edit_project) }
 
   current_user do
@@ -46,20 +48,18 @@ describe 'Projects', 'editing settings', type: :feature, js: true do
   it 'hides the field whose functionality is presented otherwise' do
     visit project_settings_general_path(project.id)
 
-    expect(page).to have_no_text :all, 'Active'
-    expect(page).to have_no_text :all, 'Identifier'
+    expect(page).not_to have_text :all, 'Active'
+    expect(page).not_to have_text :all, 'Identifier'
   end
 
-  describe 'identifier edit', js: false do
+  describe 'identifier edit' do
     it 'updates the project identifier' do
       visit projects_path
       click_on project.name
-      SeleniumHubWaiter.wait
       click_on 'Project settings'
-      SeleniumHubWaiter.wait
       click_on 'Change identifier'
 
-      expect(page).to have_content "Change the project's identifier"
+      expect(page).to have_content "Change the project's identifier".upcase
       expect(page).to have_current_path '/projects/foo-project/identifier'
 
       fill_in 'project[identifier]', with: 'foo-bar'
@@ -67,7 +67,7 @@ describe 'Projects', 'editing settings', type: :feature, js: true do
 
       expect(page).to have_content 'Successful update.'
       expect(page)
-        .to have_current_path '/projects/foo-bar/settings/general'
+        .to have_current_path %r{/projects/foo-bar/settings/general}
       expect(Project.first.identifier).to eq 'foo-bar'
     end
 
@@ -115,7 +115,7 @@ describe 'Projects', 'editing settings', type: :feature, js: true do
              max_length: 2,
              is_for_all: true)
     end
-    let(:foo_field) { ::FormFields::InputFormField.new required_custom_field }
+    let(:foo_field) { FormFields::InputFormField.new required_custom_field }
 
     it 'shows the errors of that field when saving (Regression #33766)' do
       visit project_settings_general_path(project.id)
@@ -138,7 +138,7 @@ describe 'Projects', 'editing settings', type: :feature, js: true do
     include_context 'ng-select-autocomplete helpers'
 
     let!(:list_custom_field) { create(:list_project_custom_field, name: 'List CF', multi_value: true) }
-    let(:form_field) { ::FormFields::SelectFormField.new list_custom_field }
+    let(:form_field) { FormFields::SelectFormField.new list_custom_field }
 
     it 'can select multiple values' do
       visit project_settings_general_path(project.id)
@@ -159,13 +159,13 @@ describe 'Projects', 'editing settings', type: :feature, js: true do
 
   context 'with a date custom field' do
     let!(:date_custom_field) { create(:date_project_custom_field, name: 'Date') }
-    let(:form_field) { ::FormFields::InputFormField.new date_custom_field }
+    let(:form_field) { FormFields::InputFormField.new date_custom_field }
 
     it 'can save and remove the date (Regression #37459)' do
       visit project_settings_general_path(project.id)
 
       form_field.set_value '2021-05-26'
-      form_field.send_keys :escape
+      form_field.send_keys :enter
 
       click_on 'Save'
 
@@ -182,7 +182,7 @@ describe 'Projects', 'editing settings', type: :feature, js: true do
     include_context 'ng-select-autocomplete helpers'
 
     let(:parent_project) { create(:project) }
-    let(:parent_field) { ::FormFields::SelectFormField.new 'parent' }
+    let(:parent_field) { FormFields::SelectFormField.new 'parent' }
 
     before do
       project.update_attribute(:parent, parent_project)

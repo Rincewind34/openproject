@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -36,7 +36,7 @@ module Authorization
 
   # Returns all projects a user has a certain permission in
   def projects(action, user)
-    Authorization::ProjectQuery.query(user, action)
+    Project.allowed_to(action, user)
   end
 
   # Returns all roles a user has in a certain project or globally

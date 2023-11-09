@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -78,7 +78,7 @@ module Exports
       end
 
       def format_csv(record, attribute)
-        format_attribute(record, attribute, array_separator: '; ')
+        format_attribute(record, attribute, :csv, array_separator: '; ')
       end
 
       def csv_export_filename

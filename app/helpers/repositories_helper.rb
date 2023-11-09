@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -240,13 +240,17 @@ module RepositoriesHelper
   end
 
   def scm_vendor_tag(repository)
+    # rubocop:disable Rails/HelperInstanceVariable
+    url = url_for(controller: '/projects/settings/repository', action: 'show', id: @project.id)
+    # rubocop:enable Rails/HelperInstanceVariable
+    #
     select_tag('scm_vendor',
                scm_options(repository),
-               class: 'form--select repositories--remote-select',
+               class: 'form--select',
                data: {
-                 url: url_for(controller: '/projects/settings/repository',
-                              action: 'show',
-                              id: @project.id)
+                 url:,
+                 action: 'repository-settings#updateSelectedType',
+                 'repository-settings-target': 'scmVendor'
                },
                disabled: (repository && !repository.new_record?))
   end

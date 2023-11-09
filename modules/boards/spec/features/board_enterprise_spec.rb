@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,19 +27,19 @@
 #++
 
 require 'spec_helper'
-require_relative './support/board_index_page'
-require_relative './support/board_page'
+require_relative 'support/board_index_page'
+require_relative 'support/board_page'
 
-describe 'Boards enterprise spec', type: :feature, js: true do
+RSpec.describe 'Boards enterprise spec', :js, :with_cuprite do
   shared_let(:admin) { create(:admin) }
 
   shared_let(:project) { create(:project, enabled_module_names: %i[work_package_tracking board_view]) }
-  shared_let(:priority) { create :default_priority }
-  shared_let(:status) { create :default_status }
+  shared_let(:priority) { create(:default_priority) }
+  shared_let(:status) { create(:default_status) }
 
   let(:board_index) { Pages::BoardIndex.new(project) }
 
-  shared_let(:manual_board) { create :board_grid_with_query, name: 'My board', project: }
+  shared_let(:manual_board) { create(:board_grid_with_query, name: 'My board', project:) }
   shared_let(:action_board) do
     create(:subproject_board,
            name: 'Subproject board',
@@ -56,8 +56,8 @@ describe 'Boards enterprise spec', type: :feature, js: true do
     it 'disabled all action boards' do
       page.find('.toolbar-item a', text: 'Board').click
 
-      expect(page).to have_selector('[data-qa-selector="op-tile-block"]:not([disabled])', text: 'Basic')
-      expect(page).to have_selector('[data-qa-selector="op-tile-block"]:disabled', count: 5)
+      expect(page).to have_selector('[data-qa-selector="op-tile-block"]:not(.-disabled)', text: 'Basic')
+      expect(page).to have_selector('[data-qa-selector="op-tile-block"].-disabled', count: 5)
     end
 
     it 'shows a banner on the action board' do
@@ -67,7 +67,7 @@ describe 'Boards enterprise spec', type: :feature, js: true do
 
       board_page = board_index.open_board(manual_board)
       board_page.expect_query 'My board'
-      expect(page).to have_no_selector '[data-qa-selector="op-enterprise-banner"]'
+      expect(page).not_to have_selector '[data-qa-selector="op-enterprise-banner"]'
 
       board_index.visit!
       board_page = board_index.open_board(action_board)
@@ -76,9 +76,8 @@ describe 'Boards enterprise spec', type: :feature, js: true do
     end
   end
 
-  context 'when EE active' do
+  context 'when EE active', with_ee: %i[board_view] do
     before do
-      with_enterprise_token :board_view
       login_as(admin)
       board_index.visit!
     end
@@ -86,7 +85,7 @@ describe 'Boards enterprise spec', type: :feature, js: true do
     it 'enables all options' do
       page.find('.toolbar-item a', text: 'Board').click
 
-      expect(page).to have_selector('[data-qa-selector="op-tile-block"]:not([disabled])', count: 6)
+      expect(page).to have_selector('[data-qa-selector="op-tile-block"]:not(.-disabled)', count: 6)
     end
 
     it 'shows the action board' do
@@ -96,12 +95,12 @@ describe 'Boards enterprise spec', type: :feature, js: true do
 
       board_page = board_index.open_board(manual_board)
       board_page.expect_query 'My board'
-      expect(page).to have_no_selector '[data-qa-selector="op-enterprise-banner"]'
+      expect(page).not_to have_selector '[data-qa-selector="op-enterprise-banner"]'
 
       board_index.visit!
       board_page = board_index.open_board(action_board)
       board_page.expect_query 'Subproject board'
-      expect(page).to have_no_selector '[data-qa-selector="op-enterprise-banner"]'
+      expect(page).not_to have_selector '[data-qa-selector="op-enterprise-banner"]'
     end
   end
 end

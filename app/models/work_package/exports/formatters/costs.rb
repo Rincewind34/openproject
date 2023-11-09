@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,8 +28,8 @@
 module WorkPackage::Exports
   module Formatters
     class Costs < ::Exports::Formatters::Default
-      def self.apply?(column)
-        column.is_a? ::Costs::QueryCurrencyColumn
+      def self.apply?(name, export_format)
+        %i[material_costs labor_costs overall_costs].include?(name.to_sym) && export_format == :csv
       end
 
       def format_options

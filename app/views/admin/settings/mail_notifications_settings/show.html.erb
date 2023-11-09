@@ -1,6 +1,6 @@
 <%#-- copyright
 OpenProject is an open source project management software.
-Copyright (C) 2012-2022 the OpenProject GmbH
+Copyright (C) 2012-2023 the OpenProject GmbH
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License version 3.
@@ -40,8 +40,8 @@ See COPYRIGHT and LICENSE files for more details.
     </section>
 
     <fieldset id="emails_decorators" class="form--fieldset"><legend class="form--fieldset-legend"><%= t(:setting_emails_header) %> & <%= t(:setting_emails_footer) %></legend>
-      <%= rails_cell Settings::TextSettingCell, I18n.locale, name: "emails_header" %>
-      <%= rails_cell Settings::TextSettingCell, I18n.locale, name: "emails_footer" %>
+      <%= render Settings::TextSettingComponent.new(I18n.locale, name: "emails_header") %>
+      <%= render Settings::TextSettingComponent.new(I18n.locale, name: "emails_footer") %>
     </fieldset>
   <% else %>
     <div class="nodata">

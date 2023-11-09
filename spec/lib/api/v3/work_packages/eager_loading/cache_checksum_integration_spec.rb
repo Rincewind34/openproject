@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,22 +27,25 @@
 #++require 'rspec'
 
 require 'spec_helper'
-require_relative './eager_loading_mock_wrapper'
+require_relative 'eager_loading_mock_wrapper'
 
-describe ::API::V3::WorkPackages::EagerLoading::Checksum do
+RSpec.describe API::V3::WorkPackages::EagerLoading::Checksum do
+  let(:project) { create(:project) }
   let(:responsible) { create(:user) }
   let(:assignee) { create(:user) }
   let(:category) { create(:category) }
   let(:version) { create(:version) }
+  let(:budget) { create(:budget, project:) }
   let!(:work_package) do
     create(:work_package,
+           project:,
            responsible:,
            assigned_to: assignee,
+           budget:,
            version:,
            category:)
   end
   let!(:type) { work_package.type }
-  let!(:project) { work_package.project }
 
   describe '.apply' do
     let!(:orig_checksum) do
@@ -60,14 +63,16 @@ describe ::API::V3::WorkPackages::EagerLoading::Checksum do
     end
 
     it 'produces a different checksum on changes to the status id' do
-      WorkPackage.where(id: work_package.id).update_all(status_id: 0)
+      new_status = create(:status)
+
+      WorkPackage.where(id: work_package.id).update_all(status_id: new_status.id)
 
       expect(new_checksum)
         .not_to eql orig_checksum
     end
 
     it 'produces a different checksum on changes to the status' do
-      work_package.status.update_attribute(:updated_at, Time.now + 10.seconds)
+      work_package.status.update_attribute(:updated_at, 10.seconds.from_now)
 
       expect(new_checksum)
         .not_to eql orig_checksum
@@ -81,7 +86,7 @@ describe ::API::V3::WorkPackages::EagerLoading::Checksum do
     end
 
     it 'produces a different checksum on changes to the author' do
-      work_package.author.update_attribute(:updated_at, Time.now + 10.seconds)
+      work_package.author.update_attribute(:updated_at, 10.seconds.from_now)
 
       expect(new_checksum)
         .not_to eql orig_checksum
@@ -95,7 +100,7 @@ describe ::API::V3::WorkPackages::EagerLoading::Checksum do
     end
 
     it 'produces a different checksum on changes to the assigned_to' do
-      work_package.assigned_to.update_attribute(:updated_at, Time.now + 10.seconds)
+      work_package.assigned_to.update_attribute(:updated_at, 10.seconds.from_now)
 
       expect(new_checksum)
         .not_to eql orig_checksum
@@ -109,7 +114,7 @@ describe ::API::V3::WorkPackages::EagerLoading::Checksum do
     end
 
     it 'produces a different checksum on changes to the responsible' do
-      work_package.responsible.update_attribute(:updated_at, Time.now + 10.seconds)
+      work_package.responsible.update_attribute(:updated_at, 10.seconds.from_now)
 
       expect(new_checksum)
         .not_to eql orig_checksum
@@ -123,21 +128,22 @@ describe ::API::V3::WorkPackages::EagerLoading::Checksum do
     end
 
     it 'produces a different checksum on changes to the version' do
-      work_package.version.update_attribute(:updated_at, Time.now + 10.seconds)
+      work_package.version.update_attribute(:updated_at, 10.seconds.from_now)
 
       expect(new_checksum)
         .not_to eql orig_checksum
     end
 
     it 'produces a different checksum on changes to the type id' do
-      WorkPackage.where(id: work_package.id).update_all(type_id: 0)
+      new_type = create(:type)
+      WorkPackage.where(id: work_package.id).update_all(type_id: new_type.id)
 
       expect(new_checksum)
         .not_to eql orig_checksum
     end
 
     it 'produces a different checksum on changes to the type' do
-      work_package.type.update_attribute(:updated_at, Time.now + 10.seconds)
+      work_package.type.update_attribute(:updated_at, 10.seconds.from_now)
 
       expect(new_checksum)
         .not_to eql orig_checksum
@@ -151,7 +157,7 @@ describe ::API::V3::WorkPackages::EagerLoading::Checksum do
     end
 
     it 'produces a different checksum on changes to the priority' do
-      work_package.priority.update_attribute(:updated_at, Time.now + 10.seconds)
+      work_package.priority.update_attribute(:updated_at, 10.seconds.from_now)
 
       expect(new_checksum)
         .not_to eql orig_checksum
@@ -165,7 +171,21 @@ describe ::API::V3::WorkPackages::EagerLoading::Checksum do
     end
 
     it 'produces a different checksum on changes to the category' do
-      work_package.category.update_attribute(:updated_at, Time.now + 10.seconds)
+      work_package.category.update_attribute(:updated_at, 10.seconds.from_now)
+
+      expect(new_checksum)
+        .not_to eql orig_checksum
+    end
+
+    it 'produces a different checksum on changes to the budget id' do
+      WorkPackage.where(id: work_package.id).update_all(budget_id: 0)
+
+      expect(new_checksum)
+        .not_to eql orig_checksum
+    end
+
+    it 'produces a different checksum on changes to the budget' do
+      work_package.budget.update_attribute(:updated_at, 10.seconds.from_now)
 
       expect(new_checksum)
         .not_to eql orig_checksum

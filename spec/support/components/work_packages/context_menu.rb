@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,12 +33,22 @@ module Components
       include Capybara::RSpecMatchers
       include RSpec::Matchers
 
-      def open_for(work_package, card_view: false)
+      def open_for(work_package, card_view: nil)
         # Close
         find('body').send_keys :escape
-        sleep 0.5
+        sleep 0.5 unless using_cuprite?
 
-        if card_view || page.has_selector?('#wp-view-toggle-button', text: 'Cards')
+        if card_view.nil?
+          view_toggle_button = find_by_id('wp-view-toggle-button', wait: 0)
+          # DEBUG Remove me
+          if view_toggle_button.nil?
+            puts "DEBUG: #{self}#open_for called for a page without a view toggle button. " \
+                 "Example is #{RSpec.current_example.location} - #{RSpec.current_example.id}"
+          end
+          card_view = view_toggle_button&.text == 'Cards'
+        end
+
+        if card_view
           page.find(".op-wp-single-card-#{work_package.id}").right_click
         else
           page.find(".wp-row-#{work_package.id}-table").right_click
@@ -52,7 +62,7 @@ module Components
       end
 
       def expect_closed
-        expect(page).to have_no_selector(selector)
+        expect(page).not_to have_selector(selector)
       end
 
       def choose(target)
@@ -62,7 +72,7 @@ module Components
       def expect_no_options(*options)
         expect_open
         options.each do |text|
-          expect(page).to have_no_selector("#{selector} .menu-item", text:)
+          expect(page).not_to have_selector("#{selector} .menu-item", text:)
         end
       end
 

@@ -1,6 +1,6 @@
 // -- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2022 the OpenProject GmbH
+// Copyright (C) 2012-2023 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -62,11 +62,11 @@ require('mark.js/dist/jquery.mark.min.js');
 require('fuse.js');
 
 require('moment-timezone/builds/moment-timezone-with-data.min.js');
+// eslint-disable-next-line import/extensions,import/no-extraneous-dependencies
+require('@openproject/primer-view-components/app/assets/javascripts/primer_view_components.js');
 
 require('expose-loader?URI!urijs');
 require('urijs/src/URITemplate');
-
-require('expose-loader?I18n!core-vendor/i18n');
 
 // Localization for fullcalendar
 require('@fullcalendar/core/locales-all');

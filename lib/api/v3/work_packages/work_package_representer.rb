@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -37,17 +37,28 @@ module API
         include ::API::V3::Attachments::AttachableRepresenterMixin
         include ::API::V3::FileLinks::FileLinkRelationRepresenter
         extend ::API::V3::Utilities::CustomFieldInjector::RepresenterClass
+        include TimestampedRepresenter
 
         cached_representer key_parts: %i(project),
                            disabled: false
 
-        def initialize(model, current_user:, embed_links: false)
+        attr_accessor :timestamps, :query
+
+        def initialize(model, current_user:, embed_links: false, timestamps: nil, query: nil)
+          @query = query
+          @timestamps = timestamps || query.try(:timestamps) || []
+
           model = load_complete_model(model)
 
-          super
+          super(model, current_user:, embed_links:)
         end
 
-        self_link title_getter: ->(*) { represented.subject }
+        def self_v3_path(*)
+          api_v3_paths.work_package(represented.id, timestamps:)
+        end
+
+        self_link title_getter: ->(*) { represented.subject },
+                  uncacheable: true
 
         link :update,
              cache_if: -> { current_user_update_allowed? } do
@@ -80,10 +91,7 @@ module API
         end
 
         link :logTime,
-             cache_if: -> do
-               current_user_allowed_to(:log_time, context: represented.project) ||
-                 current_user_allowed_to(:log_own_time, context: represented.project)
-             end do
+             cache_if: -> { log_time_allowed? } do
           next if represented.new_record?
 
           {
@@ -567,6 +575,12 @@ module API
               current_user_allowed_to(:view_own_time_entries, context: represented.project)
         end
 
+        def log_time_allowed?
+          @log_time_allowed ||=
+            current_user_allowed_to(:log_time, context: represented.project) ||
+              current_user_allowed_to(:log_own_time, context: represented.project)
+        end
+
         def view_budgets_allowed?
           @view_budgets_allowed ||= current_user_allowed_to(:view_budgets, context: represented.project)
         end
@@ -647,7 +661,7 @@ module API
         end
 
         def load_complete_model(model)
-          ::API::V3::WorkPackages::WorkPackageEagerLoadingWrapper.wrap_one(model, current_user)
+          ::API::V3::WorkPackages::WorkPackageEagerLoadingWrapper.wrap_one(model, current_user, timestamps:, query:)
         end
       end
     end

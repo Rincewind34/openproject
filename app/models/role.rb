@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -39,7 +39,13 @@ class Role < ApplicationRecord
     where("#{compare} builtin = #{NON_BUILTIN}")
   }
 
-  before_destroy :check_deletable
+  before_destroy(prepend: true) do
+    unless deletable?
+      errors.add(:base, "can't be destroyed")
+      raise ActiveRecord::RecordNotDestroyed
+    end
+  end
+
   has_many :workflows, dependent: :delete_all do
     def copy_from_role(source_role)
       Workflow.copy(nil, source_role, nil, proxy_association.owner)
@@ -58,7 +64,7 @@ class Role < ApplicationRecord
 
   validates :name,
             presence: true,
-            length: { maximum: 30 },
+            length: { maximum: 256 },
             uniqueness: { case_sensitive: true }
 
   def self.givable
@@ -74,7 +80,7 @@ class Role < ApplicationRecord
   end
 
   def permissions=(perms)
-    not_included_yet = (perms.map(&:to_sym) - permissions).reject(&:blank?)
+    not_included_yet = (perms.map(&:to_sym) - permissions).compact_blank
     included_until_now = permissions - perms.map(&:to_sym)
 
     remove_permission!(*included_until_now)
@@ -176,6 +182,10 @@ class Role < ApplicationRecord
       .first
   end
 
+  def deletable?
+    members.none? && !builtin?
+  end
+
   private
 
   def allowed_permissions
@@ -183,14 +193,9 @@ class Role < ApplicationRecord
   end
 
   def allowed_actions
-    @actions_allowed ||= allowed_permissions.map do |permission|
+    @allowed_actions ||= allowed_permissions.flat_map do |permission|
       OpenProject::AccessControl.allowed_actions(permission)
-    end.flatten
-  end
-
-  def check_deletable
-    raise "Can't delete role" if members.any?
-    raise "Can't delete builtin role" if builtin?
+    end
   end
 
   def add_permission(permission)

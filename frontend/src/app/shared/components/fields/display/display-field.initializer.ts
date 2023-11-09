@@ -1,6 +1,6 @@
 // -- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2022 the OpenProject GmbH
+// Copyright (C) 2012-2023 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -51,7 +51,6 @@ import { LinkedWorkPackageDisplayField } from 'core-app/shared/components/fields
 import { CombinedDateDisplayField } from 'core-app/shared/components/fields/display/field-types/combined-date-display.field';
 import { EstimatedTimeDisplayField } from 'core-app/shared/components/fields/display/field-types/estimated-time-display-field.module';
 import { DaysDurationDisplayField } from 'core-app/shared/components/fields/display/field-types/days-duration-display-field.module';
-import { HoursDurationDisplayField } from 'core-app/shared/components/fields/display/field-types/hours-duration-display-field.module';
 
 export function initializeCoreDisplayFields(displayFieldService:DisplayFieldService) {
   return () => {
@@ -72,10 +71,11 @@ export function initializeCoreDisplayFields(displayFieldService:DisplayFieldServ
         'Category',
         'CustomOption'])
       .addFieldType(ResourcesDisplayField, 'resources', ['[]CustomOption'])
+      .addFieldType(ResourcesDisplayField, 'resources', ['[]Version'])
       .addFieldType(MultipleUserFieldModule, 'users', ['[]User'])
       .addFieldType(FormattableDisplayField, 'formattable', ['Formattable'])
       .addFieldType(DaysDurationDisplayField, 'duration', ['duration'])
-      .addFieldType(HoursDurationDisplayField, 'remainingTime', ['remainingTime'])
+      .addFieldType(EstimatedTimeDisplayField, 'remainingTime', ['remainingTime'])
       .addFieldType(EstimatedTimeDisplayField, 'estimatedTime', ['estimatedTime'])
       .addFieldType(DateDisplayField, 'date', ['Date'])
       .addFieldType(DateTimeDisplayField, 'datetime', ['DateTime'])

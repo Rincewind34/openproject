@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,7 +30,7 @@
 require 'spec_helper'
 
 # Purpose: Common testing logic shared between create and update specs.
-shared_examples_for 'ProjectStorages contract' do
+RSpec.shared_examples_for 'ProjectStorages contract' do
   let(:current_user) { create(:user) }
   # The user needs "edit_project" to see the project's settings page
   let(:role) { create(:role, permissions: %i[manage_storages_in_project edit_project]) }

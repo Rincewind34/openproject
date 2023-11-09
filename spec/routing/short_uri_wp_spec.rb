@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe 'routes for old issue uris', type: :request do
+RSpec.describe 'routes for old issue uris', type: :request do
   # These are routing specs and should be moved to
   # spec/routing.
   # As redirect_to is not supported by routing specs they have

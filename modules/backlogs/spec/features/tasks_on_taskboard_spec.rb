@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,9 +29,9 @@
 require 'spec_helper'
 require_relative '../support/pages/taskboard'
 
-describe 'Tasks on taskboard',
-         type: :feature,
-         js: true do
+RSpec.describe 'Tasks on taskboard',
+               js: true,
+               with_cuprite: false do
   let!(:project) do
     create(:project,
            types: [story, task, other_story],
@@ -136,13 +136,6 @@ describe 'Tasks on taskboard',
            status: default_status,
            version: sprint,
            story_points: 10)
-  end
-  let!(:export_card_configurations) do
-    ExportCardConfiguration.create!(name: 'Default',
-                                    per_page: 1,
-                                    page_size: 'A4',
-                                    orientation: 'landscape',
-                                    rows: "group1:\n  has_border: false\n  rows:\n    row1:\n      height: 50\n      priority: 1\n      columns:\n        id:\n          has_label: false")
   end
   let(:taskboard_page) { Pages::Taskboard.new(project, sprint) }
 

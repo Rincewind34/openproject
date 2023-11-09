@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,8 +28,8 @@
 
 require 'spec_helper'
 
-describe 'users/edit', type: :view do
-  let(:admin) { build :admin }
+RSpec.describe 'users/edit' do
+  let(:admin) { build(:admin) }
 
   before do
     # The url_for is missing the users id that is usually taken
@@ -40,8 +40,8 @@ describe 'users/edit', type: :view do
 
   context 'authentication provider' do
     let(:user) do
-      build :user, id: 1, # id is required to create route to edit
-                   identity_url: 'test_provider:veryuniqueid'
+      build(:user, id: 1, # id is required to create route to edit
+                   identity_url: 'test_provider:veryuniqueid')
     end
 
     before do
@@ -66,7 +66,7 @@ describe 'users/edit', type: :view do
   end
 
   context 'with an invited user' do
-    let(:user) { build_stubbed :invited_user }
+    let(:user) { build_stubbed(:invited_user) }
 
     before do
       assign(:user, user)
@@ -84,8 +84,8 @@ describe 'users/edit', type: :view do
       end
     end
 
-    context 'for a non-admin' do
-      let(:non_admin) { create :user }
+    context 'for a non-admin with manage_user global permission' do
+      let(:non_admin) { create(:user, global_permissions: [:manage_user]) }
 
       before do
         allow(view).to receive(:current_user).and_return(non_admin)
@@ -99,7 +99,7 @@ describe 'users/edit', type: :view do
   end
 
   context 'with a normal (not invited) user' do
-    let(:user) { create :user }
+    let(:user) { create(:user) }
 
     before do
       assign(:user, user)
@@ -115,7 +115,7 @@ describe 'users/edit', type: :view do
   end
 
   context 'with password-based login' do
-    let(:user) { build :user, id: 42 }
+    let(:user) { build(:user, id: 42) }
 
     before do
       assign :user, user
@@ -136,7 +136,7 @@ describe 'users/edit', type: :view do
       end
 
       context 'with auth sources' do
-        let(:auth_sources) { [create(:auth_source)] }
+        let(:auth_sources) { create_list(:ldap_auth_source, 1) }
 
         before do
           assign :auth_sources, auth_sources
@@ -162,7 +162,7 @@ describe 'users/edit', type: :view do
       end
 
       context 'with auth sources' do
-        let(:auth_sources) { [create(:auth_source)] }
+        let(:auth_sources) { create_list(:ldap_auth_source, 1) }
 
         before do
           assign :auth_sources, auth_sources
@@ -171,7 +171,7 @@ describe 'users/edit', type: :view do
         it 'shows the auth source selection' do
           render
 
-          expect(rendered).to have_selector('#user_auth_source_id')
+          expect(rendered).to have_selector('#user_ldap_auth_source_id')
         end
       end
 

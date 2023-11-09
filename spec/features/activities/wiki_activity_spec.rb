@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,15 +28,15 @@
 
 require 'spec_helper'
 
-describe 'Wiki activities' do
+RSpec.describe 'Wiki Activity', :js, :with_cuprite do
   let(:user) do
-    create :user,
+    create(:user,
            member_in_project: project,
            member_with_permissions: %w[view_wiki_pages
                                        edit_wiki_pages
-                                       view_wiki_edits]
+                                       view_wiki_edits])
   end
-  let(:project) { create :project, enabled_module_names: %w[wiki activity] }
+  let(:project) { create(:project, enabled_module_names: %w[wiki activity]) }
   let(:wiki) { project.wiki }
   let(:editor) { Components::WysiwygEditor.new }
 
@@ -44,11 +44,11 @@ describe 'Wiki activities' do
     login_as user
   end
 
-  it 'tracks the wiki\'s activities', js: true do
+  it "tracks the wiki's activities" do
     # create a wiki page
     visit project_wiki_path(project, 'mypage')
 
-    fill_in 'content_page_title', with: 'My page'
+    fill_in 'page_title', with: 'My page'
 
     editor.set_markdown('First content')
 
@@ -59,7 +59,6 @@ describe 'Wiki activities' do
     Journal.last.update_columns(created_at: Time.now - 5.days, updated_at: Time.now - 5.days)
 
     # alter the page
-    SeleniumHubWaiter.wait
     click_link 'Edit'
 
     editor.set_markdown('Second content')
@@ -71,20 +70,28 @@ describe 'Wiki activities' do
     # will be two activities to see
     visit project_activity_index_path(project)
 
-    check 'Wiki edits'
+    check 'Wiki'
 
     click_button 'Apply'
 
     expect(page)
-      .to have_link('Wiki edit: My page (#1)')
+      .to have_link('Wiki: My page')
 
     expect(page)
-      .to have_link('Wiki edit: My page (#2)')
+      .to have_link('Wiki: My page')
 
-    click_link('Wiki edit: My page (#2)')
+    within("li.op-activity-list--item", match: :first) do
+      expect(page)
+        .to have_selector('li', text: "Text changed (Details)")
+      expect(page)
+        .to have_link('Details')
+    end
+
+    # Click on the second wiki activity item
+    find(:xpath, "(//a[text()='Wiki: My page'])[1]").click
 
     expect(page)
-      .to have_current_path(project_wiki_path(project.id, 'my-page', version: 2))
+      .to have_current_path(project_wiki_path(project.id, 'my-page'))
 
     # disable the wiki module
 
@@ -97,6 +104,6 @@ describe 'Wiki activities' do
     visit project_activity_index_path(project)
 
     expect(page)
-      .to have_no_content('Wiki edits')
+      .not_to have_content('Wiki edits')
   end
 end

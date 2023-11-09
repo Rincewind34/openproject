@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -54,7 +54,7 @@ module Pages
     end
 
     def custom_edit_field(custom_field)
-      edit_field("customField#{custom_field.id}").tap do |field|
+      edit_field(custom_field.attribute_name(:camel_case)).tap do |field|
         if custom_field.list?
           field.field_type = 'create-autocompleter'
         end
@@ -77,7 +77,7 @@ module Pages
 
     def expect_hidden_field(attribute)
       page.within(container) do
-        expect(page).to have_no_selector(".inline-edit--display-field.#{attribute}")
+        expect(page).not_to have_selector(".inline-edit--display-field.#{attribute}")
       end
     end
 
@@ -88,7 +88,7 @@ module Pages
     end
 
     def open_in_split_view
-      find('#work-packages-details-view-button').click
+      find_by_id('work-packages-details-view-button').click
     end
 
     def ensure_page_loaded
@@ -113,16 +113,16 @@ module Pages
     end
 
     def expect_no_group(name)
-      expect(page).to have_no_selector('.attributes-group--header-text', text: name.upcase)
+      expect(page).not_to have_selector('.attributes-group--header-text', text: name.upcase)
     end
 
     def expect_attributes(attribute_expectations)
       attribute_expectations.each do |label_name, value|
         label = label_name.to_s
         if label == 'status'
-          expect(page).to have_selector("[data-qa-selector='op-wp-status-button'] .button", text: value, wait: 10)
+          expect(page).to have_selector("[data-qa-selector='op-wp-status-button'] .button", text: value)
         else
-          expect(page).to have_selector(".inline-edit--container.#{label.camelize(:lower)}", text: value, wait: 10)
+          expect(page).to have_selector(".inline-edit--container.#{label.camelize(:lower)}", text: value)
         end
       end
     end
@@ -136,7 +136,7 @@ module Pages
       container = '#work-package-activites-container'
       container += " #activity-#{number}" if number
 
-      expect(page).to have_selector(container + ' .op-user-activity--user-line', text: user.name)
+      expect(page).to have_selector("#{container} .op-user-activity--user-line", text: user.name)
     end
 
     def expect_activity_message(message)
@@ -174,7 +174,7 @@ module Pages
 
     def expect_no_custom_action(name)
       expect(page)
-        .to have_no_selector('.custom-action', text: name)
+        .not_to have_selector('.custom-action', text: name)
     end
 
     def expect_custom_action_order(*names)
@@ -207,8 +207,14 @@ module Pages
         DateEditField.new container, key, is_milestone: work_package&.milestone?
       when :description
         TextEditorField.new container, key
+      # The AbstractWorkPackageCreate pages do not require a special WorkPackageStatusField,
+      # because the status field on the create pages is a simple EditField.
       when :status
-        WorkPackageStatusField.new container
+        if is_a?(AbstractWorkPackageCreate)
+          EditField.new container, key
+        else
+          WorkPackageStatusField.new container
+        end
       else
         EditField.new container, key
       end

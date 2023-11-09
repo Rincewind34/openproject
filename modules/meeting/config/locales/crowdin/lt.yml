@@ -1,6 +1,6 @@
 #-- copyright
 #OpenProject is an open source project management software.
-#Copyright (C) 2012-2022 the OpenProject GmbH
+#Copyright (C) 2012-2023 the OpenProject GmbH
 #This program is free software; you can redistribute it and/or
 #modify it under the terms of the GNU General Public License version 3.
 #OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
@@ -21,6 +21,10 @@
 #++
 #English strings go here for Rails i18n
 lt:
+  plugin_openproject_meeting:
+    name: "OpenProject susitikimas"
+    description: >-
+      Šis modulis prideda funkcijas, leidžiančias OpenProject projektų susitikimus. Susitikimus galima planuoti parenkant susitikimo dalyvius iš to paties projekto. Galima sukurti ir išsiųsti dalyviams susitikimo planą. Ir galų gale galima sukurti ir išsiųsti visiems dalyviams ir pakviestiesiems susitikimo protokolą.
   activerecord:
     attributes:
       meeting:
@@ -29,6 +33,7 @@ lt:
         participants: "Dalyviai"
         participants_attended: "Būtinas dalyvis"
         participants_invited: "Pakviestas dalyvauti"
+        project: "Projektas"
         start_time: "Laikas"
         start_time_hour: "Pradžios laikas"
     errors:
@@ -37,6 +42,9 @@ lt:
     models:
       meeting_agenda: "Dienotvarkė"
       meeting_minutes: "Minutės"
+  activity:
+    filter:
+      meeting: "Susitikimai"
   description_attended: "būtinai dalyvavo"
   description_invite: "pakviesta"
   events:
@@ -58,6 +66,13 @@ lt:
   label_meeting_agenda_close: "Uždaryti darbotvarkę, kad būtų pradėtos minutės"
   label_meeting_date_time: "Data/Laikas"
   label_meeting_diff: "skirt."
+  label_upcoming_meetings: "Artėjantys susirinkimai"
+  label_past_meetings: "Įvykę susirinkimai"
+  label_involvement: "Įsitraukimas"
+  label_upcoming_invitations: "Artėjantys pakvietimai"
+  label_past_invitations: "Ankstesni pakvietimai"
+  label_attendee: "Dalyvis"
+  label_author: "Kūrėjas"
   label_notify: "Siųsti peržiūrai"
   label_icalendar: "Siųsti iCalendar formatu"
   label_version: "Versija"
@@ -82,9 +97,9 @@ lt:
   text_duration_in_hours: "Trukmė valandomis"
   text_in_hours: " valandos(-ų) "
   text_meeting_agenda_for_meeting: 'pasitarimo „%{meeting}“ darbotvarkę'
-  text_meeting_closing_are_you_sure: "Ar tikrai norite uždaryti susitikimą?"
+  text_meeting_closing_are_you_sure: "Ar tikrai norite uždaryti susitikimo planą?"
   text_meeting_agenda_open_are_you_sure: "Tai perrašys visus pakeitimus minutėse! Ar norite tęsti?"
   text_meeting_minutes_for_meeting: 'pasitarimo „%{meeting}“ minutės'
   text_review_meeting_agenda: "%{author} įdėjo %{link} peržiūroje."
-  text_review_meeting_minutes: "%{author} įdėjo %{link} peržiūrai."
+  text_review_meeting_minutes: "%{author} įdėjo %{link} peržiūroje."
   text_notificiation_invited: "Šis laiškas turi ics įrašą žemiau nurodytam susitikimui:"

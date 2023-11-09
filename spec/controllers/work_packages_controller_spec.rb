@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe WorkPackagesController, type: :controller do
+RSpec.describe WorkPackagesController do
   before do
     login_as current_user
   end
@@ -288,7 +288,10 @@ describe WorkPackagesController, type: :controller do
     requires_permission_in_project do
       it 'respond with a pdf' do
         pdf_data = 'foobar'
-        expected_name = "#{stub_work_package.project.identifier}-#{stub_work_package.id}.pdf"
+        time = DateTime.new(2023, 6, 30, 23, 59)
+        allow(DateTime).to receive(:now).and_return(time)
+        expected_name = [stub_work_package.project.identifier, "##{stub_work_package.id}",
+                         stub_work_package.subject, '2023-06-30_23-59'].join('_').gsub(' ', '-')
         expected_type = 'application/pdf'
         pdf_result = double('pdf_result',
                             error?: false,

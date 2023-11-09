@@ -1,6 +1,6 @@
 // -- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2022 the OpenProject GmbH
+// Copyright (C) 2012-2023 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -131,5 +131,15 @@ export class ApiV3QueriesPaths extends ApiV3ResourceCollection<QueryResource, Ap
       return query.unstar();
     }
     return query.star();
+  }
+
+  /**
+   * Get the ical url of the given query for the requesting user with the ical token
+   *
+   * @param query
+   * @param tokenName
+   */
+  public getIcalUrl(query:QueryResource, tokenName:string):Promise<unknown> {
+    return query.icalUrl({ token_name: tokenName });
   }
 }

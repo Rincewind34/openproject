@@ -1,8 +1,9 @@
 require 'spec_helper'
 
-describe "Notification center sidemenu",
-         js: true,
-         with_ee: %i[date_alerts] do
+RSpec.describe "Notification center sidemenu",
+               js: true,
+               with_cuprite: true,
+               with_ee: %i[date_alerts] do
   shared_let(:project) { create(:project) }
   shared_let(:project2) { create(:project) }
   shared_let(:project3) { create(:project, parent: project2) }
@@ -64,13 +65,14 @@ describe "Notification center sidemenu",
     [notification, notification2, notification3, notification4, notification5]
   end
 
-  let(:center) { ::Pages::Notifications::Center.new }
-  let(:side_menu) { ::Components::Notifications::Sidemenu.new }
+  let(:center) { Pages::Notifications::Center.new }
+  let(:side_menu) { Components::Notifications::Sidemenu.new }
 
   before do
     notifications
     login_as recipient
     center.visit!
+    wait_for_reload
   end
 
   context 'with no notifications to show' do
@@ -127,7 +129,7 @@ describe "Notification center sidemenu",
     # Empty filter sets have a separate message
     side_menu.click_item 'Watcher'
     side_menu.finished_loading
-    expect(page).to have_text "Looks like you're all caught up for Watcher filter"
+    expect(page).to have_text "Looks like you are all caught up for Watcher filter"
 
     # Marking all as read
     side_menu.click_item 'Inbox'

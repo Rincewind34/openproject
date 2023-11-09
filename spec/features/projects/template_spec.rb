@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,11 +28,11 @@
 
 require 'spec_helper'
 
-describe 'Project templates', type: :feature, js: true do
+RSpec.describe 'Project templates', js: true, with_cuprite: true do
   describe 'making project a template' do
-    let(:project) { create :project }
+    let(:project) { create(:project) }
 
-    shared_let(:admin) { create :admin }
+    shared_let(:admin) { create(:admin) }
 
     before do
       login_as admin
@@ -59,12 +59,15 @@ describe 'Project templates', type: :feature, js: true do
 
   describe 'instantiating templates' do
     let!(:template) do
-      create(:template_project, name: 'My template', enabled_module_names: %w[wiki work_package_tracking])
+      create(:template_project,
+             status_code: 'on_track',
+             status_explanation: 'some explanation',
+             name: 'My template',
+             enabled_module_names: %w[wiki work_package_tracking])
     end
-    let!(:template_status) { create(:project_status, project: template, explanation: 'source') }
     let!(:other_project) { create(:project, name: 'Some other project') }
-    let!(:work_package) { create :work_package, project: template }
-    let!(:wiki_page) { create(:wiki_page_with_content, wiki: template.wiki) }
+    let!(:work_package) { create(:work_package, project: template) }
+    let!(:wiki_page) { create(:wiki_page, wiki: template.wiki) }
 
     let!(:role) do
       create(:role, permissions: %i[view_project view_work_packages copy_projects add_subprojects])
@@ -73,16 +76,16 @@ describe 'Project templates', type: :feature, js: true do
       %i[add_project]
     end
     let(:status_field_selector) { 'ckeditor-augmented-textarea[textarea-selector="#project_status_explanation"]' }
-    let(:status_description) { ::Components::WysiwygEditor.new status_field_selector }
+    let(:status_description) { Components::WysiwygEditor.new status_field_selector }
 
     let!(:other_user) do
       create(:user, member_in_project: template, member_through_role: role)
     end
 
-    let(:name_field) { ::FormFields::InputFormField.new :name }
-    let(:template_field) { ::FormFields::SelectFormField.new :use_template }
-    let(:status_field) { ::FormFields::SelectFormField.new :status }
-    let(:parent_field) { ::FormFields::SelectFormField.new :parent }
+    let(:name_field) { FormFields::InputFormField.new :name }
+    let(:template_field) { FormFields::SelectFormField.new :use_template }
+    let(:status_field) { FormFields::SelectFormField.new :status }
+    let(:parent_field) { FormFields::SelectFormField.new :parent }
 
     current_user do
       create(:user,
@@ -156,7 +159,7 @@ describe 'Project templates', type: :feature, js: true do
       wiki_source = template.wiki.pages.first
       wiki_target = project.wiki.pages.first
       expect(wiki_source.title).to eq(wiki_target.title)
-      expect(wiki_source.content.text).to eq(wiki_target.content.text)
+      expect(wiki_source.text).to eq(wiki_target.text)
     end
   end
 end

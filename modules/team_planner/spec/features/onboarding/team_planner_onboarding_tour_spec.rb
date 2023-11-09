@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,32 +27,35 @@
 #++
 
 require 'spec_helper'
-require_relative './../../support/onboarding/onboarding_steps'
+require_relative '../../support/onboarding/onboarding_steps'
 
-describe 'team planner onboarding tour', js: true do
+RSpec.describe 'team planner onboarding tour',
+               js: true,
+               with_cuprite: false,
+               with_ee: %i[team_planner_view] do
   let(:next_button) { find('.enjoyhint_next_btn') }
 
   let(:demo_project) do
-    create :project,
+    create(:project,
            name: 'Demo project',
            identifier: 'demo-project',
            public: true,
-           enabled_module_names: %w[work_package_tracking wiki team_planner_view]
+           enabled_module_names: %w[work_package_tracking wiki team_planner_view])
   end
   let(:scrum_project) do
-    create :project,
+    create(:project,
            name: 'Scrum project',
            identifier: 'your-scrum-project',
            public: true,
-           enabled_module_names: %w[work_package_tracking wiki]
+           enabled_module_names: %w[work_package_tracking wiki])
   end
 
   let(:user) do
-    create :admin,
+    create(:admin,
            member_in_project: demo_project,
            member_with_permissions: %w[view_work_packages edit_work_packages add_work_packages
                                        view_team_planner manage_team_planner save_queries manage_public_queries
-                                       work_package_assigned]
+                                       work_package_assigned])
   end
 
   let!(:wp1) do
@@ -64,17 +67,16 @@ describe 'team planner onboarding tour', js: true do
   end
   let!(:wp2) { create(:work_package, project: scrum_project) }
 
-  let(:query) { create :query, user:, project: demo_project, public: true, name: 'Team planner' }
+  let(:query) { create(:query, user:, project: demo_project, public: true, name: 'Team planner') }
   let(:team_plan) do
-    create :view_team_planner,
+    create(:view_team_planner,
            query:,
            assignees: [user],
-           projects: [demo_project, scrum_project]
+           projects: [demo_project, scrum_project])
   end
 
   before do
     team_plan
-    with_enterprise_token :team_planner_view
     login_as user
 
     allow(Setting).to receive(:demo_projects_available).and_return(true)

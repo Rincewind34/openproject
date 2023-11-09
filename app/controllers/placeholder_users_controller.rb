@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2020 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -40,7 +40,7 @@ class PlaceholderUsersController < ApplicationController
   before_action :authorize_deletion, only: %i[deletion_info destroy]
 
   def index
-    @placeholder_users = PlaceholderUsers::PlaceholderUserFilterCell.query params
+    @placeholder_users = PlaceholderUsers::PlaceholderUserFilterComponent.query params
 
     respond_to do |format|
       format.html do
@@ -50,9 +50,14 @@ class PlaceholderUsersController < ApplicationController
   end
 
   def show
-    # show projects based on current user visibility
-    @memberships = @placeholder_user.memberships
-      .visible(current_user)
+    # show projects based on current user visibility.
+    # But don't simply concatenate the .visible scope to the memberships
+    # as .memberships has an include and an order which for whatever reason
+    # also gets applied to the Project.allowed_to parts concatenated by a UNION
+    # and an order inside a UNION is not allowed in postgres.
+    @memberships = @placeholder_user
+                     .memberships
+                     .where(id: Member.visible(current_user))
 
     respond_to do |format|
       format.html { render layout: 'no_menu' }
@@ -66,6 +71,11 @@ class PlaceholderUsersController < ApplicationController
            contract_class: EmptyContract)
       .call({})
       .result
+  end
+
+  def edit
+    @membership ||= Member.new
+    @individual_principal = @placeholder_user
   end
 
   def create
@@ -88,11 +98,6 @@ class PlaceholderUsersController < ApplicationController
         end
       end
     end
-  end
-
-  def edit
-    @membership ||= Member.new
-    @individual_principal = @placeholder_user
   end
 
   def update

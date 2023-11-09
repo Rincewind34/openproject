@@ -1,6 +1,8 @@
 require 'spec_helper'
 
-describe "Immediate reminder settings", type: :feature, js: true do
+RSpec.describe "Immediate reminder settings",
+               js: true,
+               with_cuprite: true do
   shared_examples 'immediate reminder settings' do
     it 'allows to configure the reminder settings' do
       # Save prefs so we can reload them later
@@ -9,11 +11,11 @@ describe "Immediate reminder settings", type: :feature, js: true do
       # Configure the reminders
       reminders_settings_page.visit!
 
-      # By default the immediate reminder is unchecked
-      expect(pref.immediate_reminders[:mentioned]).to be false
-      reminders_settings_page.expect_immediate_reminder :mentioned, false
+      # By default the immediate reminder is checked
+      expect(pref.immediate_reminders[:mentioned]).to be true
+      reminders_settings_page.expect_immediate_reminder :mentioned, true
 
-      reminders_settings_page.set_immediate_reminder :mentioned, true
+      reminders_settings_page.set_immediate_reminder :mentioned, false
 
       reminders_settings_page.save
 
@@ -21,9 +23,9 @@ describe "Immediate reminder settings", type: :feature, js: true do
 
       reminders_settings_page.reload!
 
-      reminders_settings_page.expect_immediate_reminder :mentioned, true
+      reminders_settings_page.expect_immediate_reminder :mentioned, false
 
-      expect(pref.reload.immediate_reminders[:mentioned]).to be true
+      expect(pref.reload.immediate_reminders[:mentioned]).to be false
     end
   end
 
@@ -32,7 +34,7 @@ describe "Immediate reminder settings", type: :feature, js: true do
     let(:pref) { current_user.pref }
 
     current_user do
-      create :user
+      create(:user)
     end
 
     it_behaves_like 'immediate reminder settings'
@@ -41,17 +43,17 @@ describe "Immediate reminder settings", type: :feature, js: true do
   context 'with the user administration page' do
     let(:reminders_settings_page) { Pages::Reminders::Settings.new(other_user) }
 
-    let(:other_user) { create :user }
+    let(:other_user) { create(:user) }
     let(:pref) { other_user.pref }
 
     current_user do
-      create :admin
+      create(:admin)
     end
 
     it_behaves_like 'immediate reminder settings'
   end
 
-  describe 'email sending', js: false do
+  describe 'email sending', js: false, with_cuprite: false do
     let(:project) { create(:project) }
     let(:work_package) { create(:work_package, project:) }
     let(:receiver) do
@@ -86,7 +88,7 @@ describe "Immediate reminder settings", type: :feature, js: true do
               </mention>
         NOTE
 
-        work_package.add_journal(current_user, note)
+        work_package.add_journal(user: current_user, notes: note)
         work_package.save!
       end
 

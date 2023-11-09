@@ -3,14 +3,14 @@ require 'support/edit_fields/edit_field'
 require 'features/work_packages/work_packages_page'
 require 'features/page_objects/notification'
 
-describe 'new work package', js: true do
-  let(:type_task) { create(:type_task) }
-  let(:type_milestone) { create(:type_milestone, position: type_task.position + 1) }
-  let(:type_bug) { create(:type_bug, position: type_milestone.position + 1) }
-  let(:types) { [type_task, type_milestone, type_bug] }
-  let!(:status) { create(:status, is_default: true) }
-  let!(:priority) { create(:priority, is_default: true) }
-  let!(:project) do
+RSpec.describe 'new work package', js: true, with_cuprite: true do
+  shared_let(:status) { create(:status, is_default: true) }
+  shared_let(:priority) { create(:priority, is_default: true) }
+  shared_let(:type_task) { create(:type_task) }
+  shared_let(:type_milestone) { create(:type_milestone, position: type_task.position + 1) }
+  shared_let(:type_bug) { create(:type_bug, position: type_milestone.position + 1) }
+  shared_let(:types) { [type_task, type_milestone, type_bug] }
+  shared_let(:project) do
     create(:project, types:)
   end
 
@@ -38,7 +38,7 @@ describe 'new work package', js: true do
   end
 
   def save_work_package!(expect_success = true)
-    scroll_to_and_click find('#work-packages--edit-actions-save')
+    scroll_to_and_click find_by_id('work-packages--edit-actions-save')
 
     if expect_success
       toaster.expect_success('Successful creation.')
@@ -58,7 +58,7 @@ describe 'new work package', js: true do
     expect(page).to have_focus_on('#wp-new-inline-edit--field-subject')
     wp_page.subject_field.set(subject)
 
-    sleep 1
+    wait_for_network_idle
   end
 
   def create_work_package_globally(type, project_name)
@@ -69,13 +69,13 @@ describe 'new work package', js: true do
     project_field.openSelectField
     project_field.set_value project_name
 
-    sleep 1
+    wait_for_network_idle
 
     # Select self as assignee
     assignee_field.openSelectField
     assignee_field.set_value user.name
 
-    sleep 1
+    wait_for_network_idle
   end
 
   before do
@@ -159,7 +159,7 @@ describe 'new work package', js: true do
 
         save_work_package!
 
-        wp_page.expect_attributes subject: subject
+        wp_page.expect_attributes(subject:)
         wp_page.expect_attributes type: type_bug.name.upcase
       end
 
@@ -193,12 +193,12 @@ describe 'new work package', js: true do
 
         it do
           ids = custom_fields.map(&:id)
-          cf1 = find(".customField#{ids.first} input")
+          cf1 = find(".#{custom_fields.first.attribute_name(:camel_case)} input")
           expect(cf1).not_to be_nil
 
-          expect(page).to have_selector(".customField#{ids.last} ng-select")
+          expect(page).to have_selector(".#{custom_fields.last.attribute_name(:camel_case)} ng-select")
 
-          cf = wp_page.edit_field "customField#{ids.last}"
+          cf = wp_page.edit_field custom_fields.last.attribute_name(:camel_case)
           cf.field_type = 'create-autocompleter'
           cf.openSelectField
           cf.set_value 'foo'
@@ -242,7 +242,7 @@ describe 'new work package', js: true do
     end
 
     it 'reloads the table and selects the new work package' do
-      expect(page).to have_no_selector('.wp--row')
+      expect(page).not_to have_selector('.wp--row')
 
       create_work_package(type_task)
       expect(page).to have_selector(safeguard_selector, wait: 10)
@@ -278,7 +278,7 @@ describe 'new work package', js: true do
 
   context 'full screen' do
     let(:safeguard_selector) { '.work-package--new-state' }
-    let(:existing_wp) { create :work_package, type: type_bug, project: }
+    let(:existing_wp) { create(:work_package, type: type_bug, project:) }
     let(:wp_page) { Pages::FullWorkPackage.new(existing_wp) }
 
     before do
@@ -327,7 +327,7 @@ describe 'new work package', js: true do
       click_on 'Cancel'
 
       wp_page.click_create_wp_button type_bug
-      expect(page).to have_no_selector('.ng-value', text: project.name)
+      expect(page).not_to have_selector('.ng-value', text: project.name)
 
       project_field.openSelectField
       project_field.set_value project.name
@@ -372,8 +372,6 @@ describe 'new work package', js: true do
       due = (Time.zone.today + 1.day).iso8601
       date_field.set_due_date due
 
-      date_field.expect_value "#{start} - #{due}"
-
       # Cancel
       date_field.cancel_by_click
       date_field.expect_value 'no start date - no finish date'
@@ -387,20 +385,18 @@ describe 'new work package', js: true do
       it 'will not show that value in the project drop down' do
         create_work_package_globally(type_bug, project.name)
 
-        sleep 2
-
         project_field.openSelectField
 
         expect(page).to have_selector('.ng-dropdown-panel .ng-option', text: project.name)
-        expect(page).to have_no_selector('.ng-dropdown-panel .ng-option', text: project_without_bug.name)
+        expect(page).not_to have_selector('.ng-dropdown-panel .ng-option', text: project_without_bug.name)
       end
     end
   end
 
   context 'as a user with no permissions' do
     let(:user) { create(:user, member_in_project: project, member_through_role: role) }
-    let(:role) { create :role, permissions: %i(view_work_packages) }
-    let(:wp_page) { ::Pages::Page.new }
+    let(:role) { create(:role, permissions: %i(view_work_packages)) }
+    let(:wp_page) { Pages::Page.new }
 
     let(:paths) do
       [
@@ -421,7 +417,7 @@ describe 'new work package', js: true do
 
   context 'as a user with add_work_packages permission, but not edit_work_packages permission (Regression 28580)' do
     let(:user) { create(:user, member_in_project: project, member_through_role: role) }
-    let(:role) { create :role, permissions: %i(view_work_packages add_work_packages) }
+    let(:role) { create(:role, permissions: %i(view_work_packages add_work_packages)) }
     let(:wp_page) { Pages::FullWorkPackageCreate.new }
 
     before do
@@ -447,7 +443,7 @@ describe 'new work package', js: true do
 
   context 'an anonymous user is prompted to login' do
     let(:user) { create(:anonymous) }
-    let(:wp_page) { ::Pages::Page.new }
+    let(:wp_page) { Pages::Page.new }
 
     let(:paths) do
       [
@@ -505,6 +501,22 @@ describe 'new work package', js: true do
       expect(split_create_page).to have_selector('[data-qa-selector="op-wp-breadcrumb"]', text: "Parent:\n#{parent.subject}")
     end
 
+    it 'can navigate to the fullscreen page (Regression #49565)' do
+      work_packages_page.visit_index
+
+      context_menu.open_for(parent)
+      context_menu.choose('Create new child')
+
+      subject_field = split_create_page.edit_field(:subject)
+      subject_field.set_value 'My subtask'
+
+      find('.work-packages-show-view-button').click
+
+      expect(split_create_page).not_to have_alert_dialog
+      subject_field = wp_page_create.edit_field(:subject)
+      subject_field.expect_value 'My subtask'
+    end
+
     it 'from the relations tab' do
       wp_page.visit_tab!('relations')
 
@@ -515,7 +527,6 @@ describe 'new work package', js: true do
       subject.submit_by_enter
 
       wp_page.expect_and_dismiss_toaster(message: I18n.t('js.notice_successful_create'))
-      sleep 1
 
       # Move to the newly created child
       wp_page.find("wp-children-query tbody.results-tbody tr").double_click

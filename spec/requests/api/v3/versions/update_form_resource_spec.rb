@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2020 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 require 'spec_helper'
 require 'rack/test'
 
-describe ::API::V3::Versions::UpdateFormAPI, content_type: :json do
+RSpec.describe API::V3::Versions::UpdateFormAPI, content_type: :json do
   include Rack::Test::Methods
   include API::V3::Utilities::PathHelper
 
@@ -139,21 +139,21 @@ describe ::API::V3::Versions::UpdateFormAPI, content_type: :json do
     end
 
     context 'with all parameters' do
-      let!(:int_cf) { create(:int_version_custom_field) }
-      let!(:list_cf) { create(:list_version_custom_field) }
+      let!(:int_cf) { create(:version_custom_field, :integer) }
+      let!(:list_cf) { create(:version_custom_field, :list) }
       let(:parameters) do
         {
           name: 'New version',
           description: {
             raw: 'A new description'
           },
-          "customField#{int_cf.id}": 5,
+          int_cf.attribute_name(:camel_case) => 5,
           startDate: "2018-01-01",
           endDate: "2018-01-09",
           status: "closed",
           sharing: "descendants",
           _links: {
-            "customField#{list_cf.id}": {
+            list_cf.attribute_name(:camel_case) => {
               href: api_v3_paths.custom_option(list_cf.custom_options.first.id)
             }
           }

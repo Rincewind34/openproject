@@ -2,31 +2,30 @@ require 'spec_helper'
 require_relative 'shared_context'
 require 'features/work_packages/table/context_menu/context_menu_shared_examples'
 
-describe 'Work package table context menu', js: true do
+RSpec.describe 'Work package table context menu', js: true, with_ee: %i[team_planner_view] do
   include_context 'with team planner full access'
 
   let!(:work_package) do
-    create :work_package,
+    create(:work_package,
            project:,
            assigned_to: user,
            start_date: Time.zone.today.beginning_of_week.next_occurring(:tuesday),
-           due_date: Time.zone.today.beginning_of_week.next_occurring(:thursday)
+           due_date: Time.zone.today.beginning_of_week.next_occurring(:thursday))
   end
   let(:menu) { Components::WorkPackages::ContextMenu.new }
 
   shared_let(:user) do
-    create :admin,
+    create(:admin,
            member_in_project: project,
            member_with_permissions: %w[
              view_work_packages edit_work_packages add_work_packages
              view_team_planner manage_team_planner
              save_queries manage_public_queries
              work_package_assigned
-           ]
+           ])
   end
 
   before do
-    with_enterprise_token(:team_planner_view)
     login_as user
     team_planner.visit!
 

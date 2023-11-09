@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,12 @@
 
 require 'spec_helper'
 
-describe Calendar::CalendarsController, type: :routing do
+RSpec.describe Calendar::CalendarsController do
+  it do
+    expect(get('calendars')).to route_to(controller: 'calendar/calendars',
+                                         action: 'index')
+  end
+
   it do
     expect(get('/projects/1/calendars')).to route_to(controller: 'calendar/calendars',
                                                      action: 'index',
@@ -40,6 +45,16 @@ describe Calendar::CalendarsController, type: :routing do
                                                        action: 'show',
                                                        id: '2',
                                                        project_id: '1')
+  end
+
+  it do
+    expect(get('/calendars/new')).to route_to(controller: 'calendar/calendars',
+                                              action: 'new')
+  end
+
+  it do
+    expect(post('/calendars')).to route_to(controller: 'calendar/calendars',
+                                           action: 'create')
   end
 
   it do

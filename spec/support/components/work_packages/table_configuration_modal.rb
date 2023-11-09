@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -94,7 +94,7 @@ module Components
       end
 
       def expect_closed
-        expect(page).to have_no_selector(selector)
+        expect(page).not_to have_selector(selector)
       end
 
       def expect_disabled_tab(name)
@@ -109,7 +109,7 @@ module Components
       def switch_to(target)
         # Switching too fast may result in the click handler not yet firing
         # so wait a bit initially
-        SeleniumHubWaiter.wait
+        SeleniumHubWaiter.wait unless using_cuprite?
 
         retry_block do
           find("#{selector} .op-tab-row--link", text: target.upcase, wait: 2).click

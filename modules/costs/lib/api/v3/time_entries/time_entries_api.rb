@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,7 +33,9 @@ module API
         helpers ::API::Utilities::UrlPropsParsingHelper
 
         resources :time_entries do
-          get &::API::V3::Utilities::Endpoints::Index.new(model: TimeEntry).mount
+          get &::API::V3::Utilities::Endpoints::Index.new(model: TimeEntry,
+                                                          scope: -> { TimeEntry.includes(TimeEntryRepresenter.to_eager_load) })
+                                                     .mount
           post &::API::V3::Utilities::Endpoints::Create.new(model: TimeEntry).mount
 
           mount ::API::V3::TimeEntries::CreateFormAPI
@@ -45,6 +47,7 @@ module API
             after_validation do
               @time_entry = TimeEntry
                             .visible
+                            .or(TimeEntry.where(id: TimeEntry.visible_ongoing.select(:id)))
                             .find(params[:id])
             end
 

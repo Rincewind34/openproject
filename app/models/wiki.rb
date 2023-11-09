@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -99,10 +99,7 @@ class Wiki < ApplicationRecord
       project = Project.find_by(identifier: project_identifier) || Project.find_by(name: project_identifier)
     end
     if project && project.wiki
-      page = project.wiki.find_page(title)
-      if page && page.content
-        page
-      end
+      project.wiki.find_page(title)
     end
   end
 

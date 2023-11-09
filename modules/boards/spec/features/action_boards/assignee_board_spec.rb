@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,9 +30,9 @@ require 'spec_helper'
 require_relative './../support/board_index_page'
 require_relative './../support/board_page'
 
-describe 'Assignee action board',
-         type: :feature,
-         js: true do
+RSpec.describe 'Assignee action board',
+               js: true,
+               with_ee: %i[board_view] do
   let(:bobself_user) do
     create(:user,
            firstname: 'Bob',
@@ -54,7 +54,7 @@ describe 'Assignee action board',
        edit_work_packages view_work_packages manage_public_queries work_package_assigned]
   end
 
-  let!(:priority) { create :default_priority }
+  let!(:priority) { create(:default_priority) }
 
   # Set up other assignees
 
@@ -76,15 +76,14 @@ describe 'Assignee action board',
   end
 
   let!(:work_package) do
-    create :work_package,
+    create(:work_package,
            project:,
            assigned_to: bobself_user,
-           subject: 'Some Task'
+           subject: 'Some Task')
   end
 
   context 'in a project with members' do
     before do
-      with_enterprise_token :board_view
       login_as(bobself_user)
     end
 
@@ -93,7 +92,9 @@ describe 'Assignee action board',
       board_index.visit!
 
       # Create new board
-      board_page = board_index.create_board action: :Assignee, expect_empty: true
+      board_page = board_index.create_board title: 'My Assignee Board',
+                                            action: 'Assignee',
+                                            expect_empty: true
 
       # Expect no assignees to be present
       board_page.expect_empty
@@ -114,7 +115,7 @@ describe 'Assignee action board',
       board_page.expect_list_option '(none)'
 
       board_page.board(reload: true) do |board|
-        expect(board.name).to eq 'Action board (assignee)'
+        expect(board.name).to eq 'My Assignee Board'
         queries = board.contained_queries
         expect(queries.count).to eq(3)
 
@@ -190,7 +191,6 @@ describe 'Assignee action board',
 
   context 'in a project without members' do
     before do
-      with_enterprise_token :board_view
       login_as(admin)
     end
 

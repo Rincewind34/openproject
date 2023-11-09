@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -44,6 +44,7 @@ class UsersController < ApplicationController
   before_action :authorize_for_user, only: [:destroy]
   before_action :check_if_deletion_allowed, only: %i[deletion_info
                                                      destroy]
+  before_action :set_current_activity_page, only: [:show]
 
   # Password confirmation helpers and actions
   include PasswordConfirmation
@@ -59,39 +60,35 @@ class UsersController < ApplicationController
 
   def index
     @groups = Group.all.sort
-    @status = Users::UserFilterCell.status_param params
-    @users = Users::UserFilterCell.filter params
-
-    respond_to do |format|
-      format.html do
-        render layout: !request.xhr?
-      end
-    end
+    @status = Users::UserFilterComponent.status_param params
+    @users = Users::UserFilterComponent.filter params
   end
 
   def show
-    # show projects based on current user visibility
+    # show projects based on current user visibility.
+    # But don't simply concatenate the .visible scope to the memberships
+    # as .memberships has an include and an order which for whatever reason
+    # also gets applied to the Project.allowed_to parts concatenated by a UNION
+    # and an order inside a UNION is not allowed in postgres.
     @memberships = @user.memberships
                         .where.not(project_id: nil)
-                        .visible(current_user)
+                        .where(id: Member.visible(current_user))
 
-    events = Activities::Fetcher.new(User.current, author: @user).events(nil, nil, limit: 10)
-    @events_by_day = events.group_by { |e| e.event_datetime.to_date }
-
-    if !current_user.allowed_to_globally?(:manage_user) &&
-       (!(@user.active? ||
-       @user.registered?) ||
-       (@user != User.current && @memberships.empty? && events.empty?))
-      render_404
+    if can_show_user?
+      @events = events
+      render layout: (can_manage_or_create_users? ? 'admin' : 'no_menu')
     else
-      respond_to do |format|
-        format.html { render layout: 'no_menu' }
-      end
+      render_404
     end
   end
 
   def new
     @user = User.new(language: Setting.default_language)
+  end
+
+  def edit
+    @membership ||= Member.new
+    @individual_principal = @user
   end
 
   def create
@@ -103,16 +100,11 @@ class UsersController < ApplicationController
 
     if call.success?
       flash[:notice] = I18n.t(:notice_successful_create)
-      redirect_to(params[:continue] ? new_user_path : edit_user_path(@user))
+      redirect_to(params[:continue] ? new_user_path : helpers.allowed_management_user_profile_path(@user))
     else
       @errors = call.errors
       render action: 'new'
     end
-  end
-
-  def edit
-    @membership ||= Member.new
-    @individual_principal = @user
   end
 
   def update
@@ -164,7 +156,7 @@ class UsersController < ApplicationController
   def change_status_info
     @status_change = params[:change_action].to_sym
 
-    return render_400 unless %i(activate lock unlock).include? @status_change
+    render_400 unless %i(activate lock unlock).include? @status_change
   end
 
   def change_status
@@ -219,7 +211,7 @@ class UsersController < ApplicationController
       flash[:error] = I18n.t(:notice_internal_server_error, app_title: Setting.app_title)
     end
 
-    redirect_to edit_user_path(@user)
+    redirect_to helpers.allowed_management_user_profile_path(@user)
   end
 
   def destroy
@@ -228,7 +220,7 @@ class UsersController < ApplicationController
 
     Users::DeleteService.new(model: @user, user: User.current).call
 
-    flash[:notice] = I18n.t('account.deleted')
+    flash[:notice] = I18n.t('account.deletion_pending')
 
     respond_to do |format|
       format.html do
@@ -243,8 +235,25 @@ class UsersController < ApplicationController
 
   private
 
+  def can_show_user?
+    return true if can_manage_or_create_users?
+    return true if @user == User.current
+
+    (@user.active? || @user.registered?) \
+    && (@memberships.present? || events.present?)
+  end
+
+  def can_manage_or_create_users?
+    current_user.allowed_to_globally?(:manage_user) ||
+    current_user.allowed_to_globally?(:create_user)
+  end
+
+  def events
+    @events ||= Activities::Fetcher.new(User.current, author: @user).events(limit: 10)
+  end
+
   def find_user
-    if params[:id] == 'current' || params['id'].nil?
+    if params[:id] == User::CURRENT_USER_LOGIN_ALIAS || params[:id].nil?
       require_login || return
       @user = User.current
     else
@@ -274,6 +283,10 @@ class UsersController < ApplicationController
     render_404 unless Users::DeleteContract.deletion_allowed? @user, User.current
   end
 
+  def set_current_activity_page
+    @activity_page = "users/#{@user.id}"
+  end
+
   def my_or_admin_layout
     # TODO: how can this be done better:
     # check if the route used to call the action is in the 'my' namespace
@@ -299,7 +312,7 @@ class UsersController < ApplicationController
   end
 
   def show_local_breadcrumb
-    action_name != 'show'
+    can_manage_or_create_users?
   end
 
   def build_user_update_params

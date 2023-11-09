@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,9 +28,8 @@
 
 require 'spec_helper'
 
-describe 'OAuth authorization code flow',
-         type: :feature,
-         js: true do
+RSpec.describe 'OAuth authorization code flow',
+               js: true do
   let!(:user) { create(:user) }
   let!(:redirect_uri) { 'urn:ietf:wg:oauth:2.0:oob' }
   let!(:allowed_redirect_uri) { redirect_uri }
@@ -78,7 +77,7 @@ describe 'OAuth authorization code flow',
     find('input.button[value="Authorize"]').click
 
     # Expect auth token
-    code = find('#authorization_code').text
+    code = find_by_id('authorization_code').text
 
     # And also have a grant for this application
     user.oauth_grants.reload
@@ -97,19 +96,19 @@ describe 'OAuth authorization code flow',
     # Revoke the application
     within("#oauth-application-grant-#{app.id}") do
       SeleniumHubWaiter.wait
-      click_on 'Revoke'
+      find("[data-qa-selector='oauth-token-row-#{app.id}-revoke']").click
     end
 
     page.driver.browser.switch_to.alert.accept
 
     # Should be back on access_token path
-    expect(page).to have_selector('.flash.notice')
-    expect(page).to have_no_selector("[id^=oauth-application-grant]")
+    expect(page).to have_selector('.op-toast.-success')
+    expect(page).not_to have_selector("[id^=oauth-application-grant]")
 
     expect(page).to have_current_path /\/my\/access_token/
 
     # And all grants have been revoked
-    authorized = ::Doorkeeper::Application.authorized_for(user)
+    authorized = Doorkeeper::Application.authorized_for(user)
     expect(authorized).to be_empty
   end
 

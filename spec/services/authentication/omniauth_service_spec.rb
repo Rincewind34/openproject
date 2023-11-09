@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2020 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,18 +27,19 @@
 
 require 'spec_helper'
 
-describe Authentication::OmniauthService do
+RSpec.describe Authentication::OmniauthService do
   let(:strategy) { double('Omniauth Strategy', name: 'saml') }
   let(:auth_hash) do
     OmniAuth::AuthHash.new(
       provider: 'google',
       uid: '123545',
       info: { name: 'foo',
-              email: 'foo@bar.com',
+              email: auth_email,
               first_name: 'foo',
               last_name: 'bar' }
     )
   end
+  let(:auth_email) { 'foo@bar.com' }
   let(:controller) { double('Controller', session: session_stub) }
   let(:session_stub) { [] }
 
@@ -87,16 +88,10 @@ describe Authentication::OmniauthService do
     let(:call) { instance.call }
 
     context 'with an active found user' do
-      let(:user) { build_stubbed :user }
-
-      before do
-        expect(instance).to receive(:find_existing_user).and_return(user)
-        expect(Users::RegisterUserService).not_to receive(:new)
-      end
+      let!(:user) { create(:user, login: 'foo@bar.com', identity_url: 'google:123545') }
 
       it 'does not call register user service and logs in the user' do
-        # should update the user attributes
-        allow(user).to receive(:save)
+        allow(Users::RegisterUserService).to receive(:new)
 
         expect(OpenProject::OmniAuth::Authorization)
           .to(receive(:after_login!))
@@ -107,62 +102,77 @@ describe Authentication::OmniauthService do
         expect(call.result.firstname).to eq 'foo'
         expect(call.result.lastname).to eq 'bar'
         expect(call.result.mail).to eq 'foo@bar.com'
-        expect(user).to have_received(:save)
+
+        expect(Users::RegisterUserService).not_to have_received(:new)
       end
     end
 
     context 'without remapping allowed',
             with_settings: { oauth_allow_remapping_of_existing_users?: false } do
+      let!(:user) { create(:user, login: 'foo@bar.com') }
+
       it 'does not look for the user by login' do
-        # Regular find
-        expect(User)
-          .to(receive(:find_by))
-          .with(identity_url: 'google:123545')
-          .and_return(nil)
+        allow(Users::RegisterUserService).to receive(:new).and_call_original
 
-        # Remap find
-        expect(User)
-          .not_to(receive(:find_by_login))
-          .with('foo@bar.com')
+        expect(call).not_to be_success
+        expect(call.result.firstname).to eq 'foo'
+        expect(call.result.lastname).to eq 'bar'
+        expect(call.result.mail).to eq 'foo@bar.com'
+        expect(call.result).not_to eq user
+        expect(call.result).to be_new_record
+        expect(call.result.errors[:login]).to eq ['has already been taken.']
 
-        call
+        expect(Users::RegisterUserService).to have_received(:new)
       end
     end
 
     context 'with an active user remapped',
             with_settings: { oauth_allow_remapping_of_existing_users?: true } do
-      let(:user) { build_stubbed :user, identity_url: 'foo' }
+      let!(:user) { create(:user, identity_url: 'foo', login: auth_email.downcase) }
 
-      before do
-        # Regular find
-        expect(User)
-          .to(receive(:find_by))
-          .with(identity_url: 'google:123545')
-          .and_return(nil)
+      shared_examples_for 'a successful remapping of foo' do
+        before do
+          allow(Users::RegisterUserService).to receive(:new)
+          allow(OpenProject::OmniAuth::Authorization)
+            .to(receive(:after_login!))
+            .with(user, auth_hash, instance)
+        end
 
-        # Remap find
-        expect(User)
-          .to(receive(:find_by_login))
-          .with('foo@bar.com')
-          .and_return(user)
+        it 'does not call register user service and logs in the user' do
+          aggregate_failures 'Service call' do
+            expect(call).to be_success
+            expect(call.result).to eq user
+            expect(call.result.firstname).to eq 'foo'
+            expect(call.result.lastname).to eq 'bar'
+            expect(call.result.login).to eq auth_email
+            expect(call.result.mail).to eq auth_email
+          end
 
-        expect(Users::RegisterUserService).not_to receive(:new)
+          user.reload
+
+          aggregate_failures 'User attributes' do
+            expect(user.firstname).to eq 'foo'
+            expect(user.lastname).to eq 'bar'
+            expect(user.identity_url).to eq 'google:123545'
+          end
+
+          aggregate_failures 'Message expectations' do
+            expect(OpenProject::OmniAuth::Authorization)
+              .to(have_received(:after_login!))
+
+            expect(Users::RegisterUserService).not_to have_received(:new)
+          end
+        end
       end
 
-      it 'does not call register user service and logs in the user' do
-        # should update the user attributes
-        allow(user).to receive(:save)
+      context 'with an all lower case login on the IdP side' do
+        it_behaves_like 'a successful remapping of foo'
+      end
 
-        expect(OpenProject::OmniAuth::Authorization)
-          .to(receive(:after_login!))
-          .with(user, auth_hash, instance)
+      context 'with a partially upper case login on the IdP side' do
+        let(:auth_email) { 'FoO@Bar.COM' }
 
-        expect(call).to be_success
-        expect(call.result).to eq user
-        expect(call.result.firstname).to eq 'foo'
-        expect(call.result.lastname).to eq 'bar'
-        expect(call.result.mail).to eq 'foo@bar.com'
-        expect(user).to have_received(:save)
+        it_behaves_like 'a successful remapping of foo'
       end
     end
 

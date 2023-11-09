@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -45,7 +45,14 @@ module API
         end
 
         resources :users do
-          post &::API::V3::Utilities::Endpoints::Create.new(model: User).mount
+          # The namespace only exists to add the after_validation callback
+          namespace '' do
+            after_validation do
+              authorize_by_with_raise(current_user.allowed_to_globally?(:create_user))
+            end
+
+            post &::API::V3::Utilities::Endpoints::Create.new(model: User).mount
+          end
 
           # The namespace only exists to add the after_validation callback
           namespace '' do

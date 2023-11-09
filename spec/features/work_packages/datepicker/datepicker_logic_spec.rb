@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,17 +29,17 @@
 require 'spec_helper'
 require 'support/edit_fields/edit_field'
 
-describe 'Datepicker modal logic test cases (WP #43539)',
-         with_settings: { date_format: '%Y-%m-%d' },
-         js: true do
-  shared_let(:user) { create :admin }
+RSpec.describe 'Datepicker modal logic test cases (WP #43539)',
+               js: true,
+               with_cuprite: true, with_settings: { date_format: '%Y-%m-%d' } do
+  shared_let(:user) { create(:admin) }
 
   shared_let(:type_bug) { create(:type_bug) }
   shared_let(:type_milestone) { create(:type_milestone) }
   shared_let(:project) { create(:project, types: [type_bug, type_milestone]) }
 
-  shared_let(:bug_wp) { create :work_package, project:, type: type_bug }
-  shared_let(:milestone_wp) { create :work_package, project:, type: type_milestone }
+  shared_let(:bug_wp) { create(:work_package, project:, type: type_bug) }
+  shared_let(:milestone_wp) { create(:work_package, project:, type: type_milestone) }
 
   # assume sat+sun are non working days
   shared_let(:week_days) { week_with_saturday_and_sunday_as_weekend }
@@ -222,8 +222,6 @@ describe 'Datepicker modal logic test cases (WP #43539)',
       datepicker.expect_due_date '2021-02-12'
       datepicker.expect_duration 3
 
-      # The spec clears faster than the due date is filled, wait a bit
-      sleep 1
       datepicker.clear_duration
 
       datepicker.expect_start_date '2021-02-09'
@@ -246,8 +244,6 @@ describe 'Datepicker modal logic test cases (WP #43539)',
       datepicker.expect_due_date '2021-02-12'
       datepicker.expect_duration 3
 
-      # The spec clears faster than the due date is filled, wait a bit
-      sleep 1
       datepicker.clear_duration_with_icon
 
       datepicker.expect_start_date '2021-02-09'
@@ -270,8 +266,6 @@ describe 'Datepicker modal logic test cases (WP #43539)',
       datepicker.expect_due_date '2021-02-12'
       datepicker.expect_duration 3
 
-      # The spec clears faster than the due date is filled, wait a bit
-      sleep 1
       datepicker.clear_duration_with_icon
 
       datepicker.expect_start_date '2021-02-09'
@@ -285,8 +279,6 @@ describe 'Datepicker modal logic test cases (WP #43539)',
       datepicker.expect_due_date '2021-02-09'
       datepicker.expect_duration 3
 
-      # Clear again
-      sleep 1
       datepicker.clear_duration_with_icon
 
       datepicker.expect_start_date '2021-02-05'
@@ -314,9 +306,7 @@ describe 'Datepicker modal logic test cases (WP #43539)',
       datepicker.expect_due_date '2021-02-11'
       datepicker.expect_duration 4
 
-      # With start date focused, change date in datepicker
-      datepicker.focus_start_date
-      datepicker.set_date '2021-02-09'
+      datepicker.set_start_date '2021-02-09'
 
       datepicker.expect_start_date '2021-02-09'
       datepicker.expect_due_date '2021-02-11'
@@ -341,7 +331,6 @@ describe 'Datepicker modal logic test cases (WP #43539)',
 
       # simulate someone deleting some chars to type a new date
       datepicker.set_start_date '2021-02-'
-      sleep 2
       datepicker.set_start_date '2021-02-09'
 
       datepicker.expect_start_date '2021-02-09'
@@ -430,7 +419,7 @@ describe 'Datepicker modal logic test cases (WP #43539)',
       datepicker.expect_due_date '2021-02-11'
       datepicker.expect_duration 3
 
-      datepicker.set_date '2021-03-03'
+      datepicker.set_start_date '2021-03-03'
 
       datepicker.expect_start_date '2021-03-03'
       datepicker.expect_due_date ''
@@ -517,7 +506,7 @@ describe 'Datepicker modal logic test cases (WP #43539)',
       datepicker.expect_due_date '2021-02-11'
       datepicker.expect_duration 3
 
-      datepicker.set_date '2021-02-03'
+      datepicker.set_start_date '2021-02-03'
 
       datepicker.expect_start_date '2021-02-03'
       datepicker.expect_due_date '2021-02-05'
@@ -759,8 +748,6 @@ describe 'Datepicker modal logic test cases (WP #43539)',
       datepicker.focus_duration
       datepicker.expect_duration_highlighted
 
-      sleep 1
-
       datepicker.select_day 17
       datepicker.expect_start_date '2021-02-17'
       datepicker.expect_due_date '2021-02-18'
@@ -792,8 +779,6 @@ describe 'Datepicker modal logic test cases (WP #43539)',
 
       datepicker.focus_duration
       datepicker.expect_duration_highlighted
-
-      sleep 1
 
       datepicker.select_day 19
       datepicker.expect_start_date '2021-02-18'
@@ -827,8 +812,6 @@ describe 'Datepicker modal logic test cases (WP #43539)',
       datepicker.focus_duration
       datepicker.expect_duration_highlighted
 
-      sleep 1
-
       datepicker.select_day 19
       datepicker.expect_start_date '2021-02-18'
       datepicker.expect_due_date '2021-02-19'
@@ -860,8 +843,6 @@ describe 'Datepicker modal logic test cases (WP #43539)',
 
       datepicker.focus_duration
       datepicker.expect_duration_highlighted
-
-      sleep 1
 
       datepicker.select_day 17
       datepicker.expect_start_date '2021-02-17'
@@ -935,7 +916,7 @@ describe 'Datepicker modal logic test cases (WP #43539)',
       datepicker.expect_duration_highlighted
 
       # Select date in datepicker
-      datepicker.set_date Date.parse('2021-02-05')
+      datepicker.set_start_date Date.parse('2021-02-05')
 
       datepicker.expect_start_date '2021-02-05'
       datepicker.expect_due_highlighted
@@ -980,6 +961,39 @@ describe 'Datepicker modal logic test cases (WP #43539)',
       apply_and_expect_saved start_date: Date.parse('2022-06-19'),
                              due_date: Date.parse('2022-06-19'),
                              ignore_non_working_days: true
+    end
+  end
+
+  context 'when setting scheduleManually to true for a milestone' do
+    let(:date_attribute) { :date }
+    let(:work_package) { milestone_wp }
+    let(:current_attributes) do
+      {
+        start_date: '2022-06-20',
+        due_date: '2022-06-20',
+        schedule_manually: false
+      }
+    end
+
+    it 'allows to persist that value (Regression #46721)' do
+      datepicker.expect_milestone_date '2022-06-20'
+      datepicker.expect_scheduling_mode false
+
+      datepicker.toggle_scheduling_mode
+
+      datepicker.expect_scheduling_mode true
+      datepicker.expect_milestone_date '2022-06-20'
+
+      apply_and_expect_saved start_date: Date.parse('2022-06-20'),
+                             due_date: Date.parse('2022-06-20'),
+                             schedule_manually: true
+
+      date_field.activate!
+      date_field.expect_active!
+
+      datepicker.expect_visible
+      datepicker.expect_milestone_date '2022-06-20'
+      datepicker.expect_scheduling_mode true
     end
   end
 

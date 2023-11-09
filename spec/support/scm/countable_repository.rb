@@ -1,5 +1,5 @@
 require 'open3'
-shared_examples_for 'is a countable repository' do
+RSpec.shared_examples_for 'is a countable repository' do
   let(:cache_time) { 720 }
 
   before do
@@ -64,7 +64,7 @@ shared_examples_for 'is a countable repository' do
 
   describe 'count methods' do
     it 'uses du when available' do
-      expect(::Open3).to receive(:capture3).with('du', any_args)
+      expect(Open3).to receive(:capture3).with('du', any_args)
         .and_return(["1234\t.", '', 0])
       expect(repository.scm).not_to receive(:count_storage_fallback)
 
@@ -72,7 +72,7 @@ shared_examples_for 'is a countable repository' do
     end
 
     it 'falls back to using ruby when du is unavailable' do
-      expect(::Open3).to receive(:capture3).with('du', any_args)
+      expect(Open3).to receive(:capture3).with('du', any_args)
         .and_raise(SystemCallError.new('foo'))
       expect(repository.scm).to receive(:count_storage_fallback).and_return(12345)
 
@@ -80,7 +80,7 @@ shared_examples_for 'is a countable repository' do
     end
 
     it 'falls back to using ruby when du is incompatible' do
-      expect(::Open3).to receive(:capture3).with('du', any_args)
+      expect(Open3).to receive(:capture3).with('du', any_args)
         .and_return(['no output', nil, 1])
       expect(repository.scm).to receive(:count_storage_fallback).and_return(12345)
 
@@ -89,13 +89,13 @@ shared_examples_for 'is a countable repository' do
   end
 end
 
-shared_examples_for 'is not a countable repository' do
+RSpec.shared_examples_for 'is not a countable repository' do
   it 'is not countable' do
     expect(repository.scm).not_to be_storage_available
   end
 
   it 'does not return or update the count' do
-    expect(::SCM::StorageUpdaterJob).not_to receive(:perform_later)
+    expect(SCM::StorageUpdaterJob).not_to receive(:perform_later)
     expect(repository.update_required_storage).to be false
   end
 end

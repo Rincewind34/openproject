@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -49,16 +49,16 @@ class WorkPackage < ApplicationRecord
   belongs_to :type
   belongs_to :status, class_name: 'Status'
   belongs_to :author, class_name: 'User'
-  belongs_to :assigned_to, class_name: 'Principal'
-  belongs_to :responsible, class_name: 'Principal'
-  belongs_to :version
+  belongs_to :assigned_to, class_name: 'Principal', optional: true
+  belongs_to :responsible, class_name: 'Principal', optional: true
+  belongs_to :version, optional: true
   belongs_to :priority, class_name: 'IssuePriority'
-  belongs_to :category, class_name: 'Category'
+  belongs_to :category, class_name: 'Category', optional: true
 
   has_many :time_entries, dependent: :delete_all
 
-  has_many :file_links,
-           dependent: :delete_all, class_name: 'Storages::FileLink', foreign_key: 'container_id', inverse_of: :container
+  has_many :file_links, dependent: :delete_all, class_name: 'Storages::FileLink', as: :container
+
   has_many :storages, through: :project
 
   has_and_belongs_to_many :changesets, -> { # rubocop:disable Rails/HasAndBelongsToMany
@@ -120,7 +120,7 @@ class WorkPackage < ApplicationRecord
     where(author_id: author.id)
   }
 
-  scopes :covering_days_of_week,
+  scopes :covering_dates_and_days_of_week,
          :for_scheduling,
          :include_derived_dates,
          :include_spent_time,
@@ -140,21 +140,26 @@ class WorkPackage < ApplicationRecord
 
   acts_as_searchable columns: ['subject',
                                "#{table_name}.description",
-                               "#{Journal.table_name}.notes"],
+                               {
+                                 name: "#{Journal.table_name}.notes",
+                                 scope: -> { Journal.for_work_package.where("journable_id = #{table_name}.id") }
+                               }],
                      tsv_columns: [
                        {
                          table_name: Attachment.table_name,
                          column_name: 'fulltext',
-                         normalization_type: :text
+                         normalization_type: :text,
+                         scope: -> { Attachment.where(container_type: name).where("container_id = #{table_name}.id") }
                        },
                        {
                          table_name: Attachment.table_name,
                          column_name: 'file',
-                         normalization_type: :filename
+                         normalization_type: :filename,
+                         scope: -> { Attachment.where(container_type: name).where("container_id = #{table_name}.id") }
                        }
                      ],
-                     include: %i(project journals attachments),
-                     references: %i(projects journals attachments),
+                     include: %i(project journals),
+                     references: %i(projects),
                      date_column: "#{quoted_table_name}.created_at",
                      # sort by id so that limited eager loading doesn't break with postgresql
                      order_column: "#{table_name}.id"
@@ -189,6 +194,7 @@ class WorkPackage < ApplicationRecord
                                        method(:cleanup_time_entries_before_destruction_of)
 
   include WorkPackage::Journalized
+  prepend Journable::Timestamps
 
   def self.done_ratio_disabled?
     Setting.work_package_done_ratio == 'disabled'
@@ -310,8 +316,7 @@ class WorkPackage < ApplicationRecord
 
   def type_id=(tid)
     self.type = nil
-    result = write_attribute(:type_id, tid)
-    result
+    write_attribute(:type_id, tid)
   end
 
   # Overrides attributes= so that type_id gets assigned first
@@ -444,8 +449,49 @@ class WorkPackage < ApplicationRecord
 
   # Overrides Redmine::Acts::Customizable::ClassMethods#available_custom_fields
   def self.available_custom_fields(work_package)
-    WorkPackage::AvailableCustomFields.for(work_package.project, work_package.type)
+    if work_package.project_id && work_package.type_id
+      RequestStore.fetch(available_custom_field_key(work_package)) do
+        available_custom_fields_from_db([work_package])
+      end
+    else
+      []
+    end
   end
+
+  def self.preload_available_custom_fields(work_packages)
+    custom_fields = available_custom_fields_from_db(work_packages)
+                    .select('array_agg(projects.id) available_project_ids',
+                            'array_agg(types.id) available_type_ids',
+                            'custom_fields.*')
+                    .group('custom_fields.id')
+
+    work_packages.each do |work_package|
+      RequestStore.store[available_custom_field_key(work_package)] = custom_fields
+                                                                       .select do |cf|
+        (cf.available_project_ids.include?(work_package.project_id) || cf.is_for_all?) &&
+        cf.available_type_ids.include?(work_package.type_id)
+      end
+    end
+  end
+
+  def self.available_custom_fields_from_db(work_packages)
+    WorkPackageCustomField
+      .left_joins(:projects, :types)
+      .where(projects: { id: work_packages.map(&:project_id).uniq },
+             types: { id: work_packages.map(&:type_id).uniq })
+      .or(WorkPackageCustomField
+            .left_joins(:projects, :types)
+            .references(:projects, :types)
+            .where(is_for_all: true)
+            .where(types: { id: work_packages.map(&:type_id).uniq }))
+      .distinct
+  end
+  private_class_method :available_custom_fields_from_db
+
+  def self.available_custom_field_key(work_package)
+    :"#work_package_custom_fields_#{work_package.project_id}_#{work_package.type_id}"
+  end
+  private_class_method :available_custom_field_key
 
   def custom_field_cache_key
     [project_id, type_id]
@@ -478,7 +524,7 @@ class WorkPackage < ApplicationRecord
     key = 'activity_id'
     id = attributes[key]
     default_id = if id&.present?
-                   Enumeration.exists? id: id, is_default: true, type: 'TimeEntryActivity'
+                   Enumeration.exists? id:, is_default: true, type: 'TimeEntryActivity'
                  else
                    true
                  end
@@ -580,7 +626,7 @@ class WorkPackage < ApplicationRecord
   private_class_method :count_and_group_by
 
   def set_attachments_error_details
-    if invalid_attachment = attachments.detect { |a| !a.valid? }
+    if invalid_attachment = attachments.detect(&:invalid?)
       errors.messages[:attachments].first << " - #{invalid_attachment.errors.full_messages.first}"
     end
   end

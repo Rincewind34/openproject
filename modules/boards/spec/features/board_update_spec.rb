@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,18 +30,17 @@ require 'spec_helper'
 require_relative './support/board_index_page'
 require_relative './support/board_page'
 
-describe 'Work Package boards updating spec', type: :feature, js: true do
+RSpec.describe 'Work Package boards updating spec', js: true, with_ee: %i[board_view] do
   let(:admin) { create(:admin) }
 
   let(:project) { create(:project, enabled_module_names: %i[work_package_tracking board_view]) }
-  let!(:priority) { create :default_priority }
-  let!(:status) { create :default_status }
+  let!(:priority) { create(:default_priority) }
+  let!(:status) { create(:default_status) }
 
   let(:board_index) { Pages::BoardIndex.new(project) }
-  let!(:board_view) { create :board_grid_with_query, name: 'My board', project: }
+  let!(:board_view) { create(:board_grid_with_query, name: 'My board', project:) }
 
   before do
-    with_enterprise_token :board_view
     project
     login_as(admin)
     board_index.visit!

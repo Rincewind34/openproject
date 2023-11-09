@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,10 +30,11 @@ require 'spec_helper'
 
 require_relative '../support/pages/dashboard'
 
-describe 'Project status widget on dashboard', type: :feature, js: true do
-  let!(:project) { create :project, status: project_status }
-  let!(:project_status) do
-    create :project_status
+RSpec.describe 'Project status widget on dashboard', js: true do
+  let!(:project) do
+    create(:project,
+           status_code: 'on_track',
+           status_explanation: 'some explanation')
   end
 
   let(:read_only_permissions) do
@@ -87,7 +88,7 @@ describe 'Project status widget on dashboard', type: :feature, js: true do
           .to have_content('ON TRACK')
 
         expect(page)
-          .to have_content(project_status.explanation)
+          .to have_content(project.status_explanation)
 
         # The status selector does not open
         field = EditField.new(dashboard_page, 'status')
@@ -139,7 +140,7 @@ describe 'Project status widget on dashboard', type: :feature, js: true do
         sleep(0.1)
 
         # Change the value
-        field.expect_value(project_status.explanation)
+        field.expect_value(project.status_explanation)
         field.set_value 'A completely new explanation which is super cool.'
         field.save!
 

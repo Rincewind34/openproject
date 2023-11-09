@@ -28,15 +28,15 @@ The **Gantt chart** in OpenProject displays the work packages in a timeline. You
 
 ## Activate the Gantt chart
 
-A Gantt chart can be activated in any work package list, to display the work packages in a timeline view.
+A Gantt chart can be activated in any work package table, to display the work packages in a timeline view.
 
-To activate the Gantt chart, select the **Gantt** icon at the top right of the work package list.
+To activate the Gantt chart, select the **Gantt** icon at the top right corner of the work package table.
 
 ![activate-gantt](activate-gantt.gif)
 
 ## Create a new element in the Gantt chart
 
-To add a work package (e.g. phase, milestone or task) to a Gantt chart, click the **+ Create new work package** link at the bottom of the work package list view.
+To add a work package (e.g. phase, milestone or task) to a Gantt chart, click the **+ Create new work package** link at the bottom of the work package table view.
 
 You can add a subject and make changes to type, status or more fields.
 
@@ -56,9 +56,9 @@ To change the duration of a work package in the Gantt chart view, hover over the
 
 ## Relations in the Gantt chart
 
-In the Gantt chart you can track dependencies of work packages (e.g. phases, milestones, tasks). This way you can get an easy overview of what needs to be done in which order, e.g. what tasks need to be completed to achieve a milestone.
+You can track dependencies of work packages (e.g. phases, milestones, tasks) in the Gantt chart. This way, you can get an easy overview of what needs to be done in which order, e.g. what tasks need to be completed to achieve a milestone.
 
-To add a dependency right-click on an element in the Gantt chart.
+To add a dependency, right-click on an element in the Gantt chart.
 
 In the menu, choose **Add predecessor** or **Add follower**.
 
@@ -67,11 +67,17 @@ Select the item to which you want to create a dependency. The precede and follow
 
 ![dependencies-gantt-chart](dependencies-gantt-chart-1566556144225.gif)
 
-*OpenProject does not yet include a baseline feature to compare scheduled versions. However, we are aware of the need for it and documented it. Please check [here](https://community.openproject.com/projects/openproject/work_packages/26448/activity) for an update.*
+*OpenProject does not yet include a baseline feature to compare scheduled versions. However, we are aware of the need for it and documented it. Please check [here](https://community.openproject.com/wp/26448) for an update.*
 
-To find out about **how work packages behave**, when you move their predecessor or follower or change the date of a child work package please read our guide for the [Automatic and manual scheduling mode](scheduling).
+When work packages have a precedes/follows relationship:
 
-Relations between work packages that are not predecessor/follower or parent/child relations won't be displayed in the Gantt chart. Find out more about other work package relations [here](../work-packages/work-package-relations-hierarchies).
+- A follower cannot be moved to start earlier the finish date of its predecessor.
+- Moving a predecessor past the start date of the the follower will automatically push the follower into the future (such that it starts the next working day).
+- If there is a gap between the predecessor and the follower, either one can be moved forwards or backwards without affecting the other as long as long as the dates do not overlap.
+
+Scheduling modes can also affect work package relations. Read about [automatic and manual scheduling](scheduling) to find out more.
+
+> **Note:** Relations other than predecessor/follower and parent/child (such as related to, blocked by, includes, duplicates) are not displayed in the Gantt chart. To find out more, read our guide on [work package relations](../work-packages/work-package-relations-hierarchies).
 
 ## Understanding the colors and lines in the Gantt chart
 
@@ -171,9 +177,9 @@ If you want to adjust your work package table and filter, sort or order your wor
 
 ## Aggregation by project
 
-You can get a **quick overview of multiple projects** in the Gantt chart. To accomplish this navigate to the Work packages module of a project or the [project overarching work packages list](../projects/#project-overarching-reports).
+You can get a **quick overview of multiple projects** in the Gantt chart. To accomplish this navigate to the Work packages module of a project or the [project overarching work package table](../projects/#project-overarching-reports).
 
-**Group the list** by project by using the [work packages table configuration](../work-packages/work-package-table-configuration/#flat-list-hierarchy-mode-and-group-by) (accessible in the upper right corner) or by clicking on the small triangle next to "Project" in the table header.
+**Group the work packages** by project by using the [work packages table configuration](../work-packages/work-package-table-configuration/#flat-list-hierarchy-mode-and-group-by) (accessible in the upper right corner) or by clicking on the small triangle next to "Project" in the table header.
  ![group-by-project](image-20201211020614221.png)
 
 **Display the Gantt chart** by clicking on the button in the upper right corner.

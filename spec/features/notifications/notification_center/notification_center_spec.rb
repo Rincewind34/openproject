@@ -1,9 +1,10 @@
 require 'spec_helper'
 
-describe "Notification center",
-         js: true,
-         with_ee: %i[date_alerts],
-         with_settings: { journal_aggregation_time_minutes: 0 } do
+RSpec.describe "Notification center",
+               js: true,
+               with_cuprite: true,
+               with_ee: %i[date_alerts],
+               with_settings: { journal_aggregation_time_minutes: 0 } do
   # Notice that the setup in this file here is not following the normal rules as
   # it also tests notification creation.
   let!(:project1) { create(:project) }
@@ -33,11 +34,12 @@ describe "Notification center",
     work_package2.journals.first.notifications.first
   end
 
-  let(:center) { ::Pages::Notifications::Center.new }
-  let(:side_menu) { ::Components::Notifications::Sidemenu.new }
-  let(:activity_tab) { ::Components::WorkPackages::Activities.new(work_package) }
-  let(:split_screen) { ::Pages::SplitWorkPackage.new work_package }
-  let(:split_screen2) { ::Pages::SplitWorkPackage.new work_package2 }
+  let(:center) { Pages::Notifications::Center.new }
+  let(:side_menu) { Components::Notifications::Sidemenu.new }
+  let(:activity_tab) { Components::WorkPackages::Activities.new(work_package) }
+  let(:split_screen) { Pages::SplitWorkPackage.new work_package }
+  let(:split_screen2) { Pages::SplitWorkPackage.new work_package2 }
+  let(:full_screen) { Pages::FullWorkPackage.new work_package }
 
   let(:notifications) do
     [notification, notification2]
@@ -59,6 +61,7 @@ describe "Notification center",
 
     it 'will not show all details of the journal' do
       visit home_path
+      wait_for_reload
       center.expect_bell_count 2
       center.open
 
@@ -76,12 +79,14 @@ describe "Notification center",
 
     it 'can see the notification and dismiss it' do
       visit home_path
+      wait_for_reload
       center.expect_bell_count 2
       center.open
 
       center.expect_work_package_item notification
       center.expect_work_package_item notification2
       center.mark_all_read
+      wait_for_network_idle
 
       retry_block do
         notification.reload
@@ -95,8 +100,51 @@ describe "Notification center",
       center.expect_bell_count 0
     end
 
-    it 'can open the split screen of the notification' do
+    context 'with more the 100 notifications' do
+      let(:notifications) do
+        attributes = { recipient:, project: project1, resource: work_package }
+        create_list(:notification, 100, attributes.merge(reason: :mentioned)) +
+        create_list(:notification, 105, attributes.merge(reason: :watched))
+      end
+
+      it 'can dismiss all notifications of the currently selected filter' do
+        visit home_path
+        wait_for_reload
+        center.expect_bell_count '99+'
+        center.open
+
+        # side menu items show full count of notifications (inbox has one more due to the "Created" notification)
+        side_menu.expect_item_with_count 'Inbox', 206
+        side_menu.expect_item_with_count 'Mentioned', 100
+        side_menu.expect_item_with_count 'Watcher', 105
+
+        # select watcher filter and mark all as read
+        side_menu.click_item 'Watcher'
+        side_menu.finished_loading
+        center.mark_all_read
+        wait_for_network_idle
+
+        center.expect_bell_count '99+'
+        side_menu.expect_item_with_count 'Inbox', 101
+        side_menu.expect_item_with_count 'Mentioned', 100
+        side_menu.expect_item_with_no_count 'Watcher'
+
+        # select inbox and mark all as read
+        side_menu.click_item 'Inbox'
+        side_menu.finished_loading
+        center.mark_all_read
+        wait_for_network_idle
+
+        center.expect_bell_count 0
+        side_menu.expect_item_with_no_count 'Inbox'
+        side_menu.expect_item_with_no_count 'Mentioned'
+        side_menu.expect_item_with_no_count 'Watcher'
+      end
+    end
+
+    it 'can open the split screen of the work package when clicking the notification' do
       visit home_path
+      wait_for_reload
       center.expect_bell_count 2
       center.open
 
@@ -107,18 +155,31 @@ describe "Notification center",
       center.expect_work_package_item notification2
 
       center.mark_notification_as_read notification
-
+      wait_for_network_idle
       retry_block do
         notification.reload
         raise "Expected notification to be marked read" unless notification.read_ian
       end
 
       visit home_path
+      wait_for_reload
       center.expect_bell_count 1
 
       center.open
       center.expect_no_item notification
       center.expect_work_package_item notification2
+    end
+
+    it 'can open the full view of the work package when double clicking the notification' do
+      visit home_path
+      center.expect_bell_count 2
+      center.open
+
+      center.double_click_item notification
+      full_screen.expect_subject
+
+      full_screen.go_back
+      center.expect_item_not_read notification
     end
 
     context "with a new notification" do
@@ -225,6 +286,7 @@ describe "Notification center",
 
       it "displays the date alerts; allows reading and filtering them" do
         visit home_path
+        wait_for_reload
         center.open
         # Three date alerts and the standard (created) notification
         center.expect_bell_count 4
@@ -235,11 +297,13 @@ describe "Notification center",
 
         # Reading one will update the unread notification list
         center.mark_notification_as_read start_date_notification
+        wait_for_network_idle
 
         center.expect_bell_count 3
 
         # Filtering for only date alert notifications (that are unread)
         side_menu.click_item 'Date alert'
+        wait_for_reload
 
         center.expect_work_package_item due_date_notification
         center.expect_work_package_item overdue_date_notification
@@ -260,6 +324,7 @@ describe "Notification center",
 
     it 'opens the next notification after marking one as read' do
       visit home_path
+      wait_for_reload
       center.expect_bell_count 2
       center.open
 
@@ -268,6 +333,8 @@ describe "Notification center",
 
       # Marking the first notification as read (via icon on the notification row)
       center.mark_notification_as_read notification
+      wait_for_network_idle
+
       retry_block do
         notification.reload
         raise "Expected notification to be marked read" unless notification.read_ian
@@ -279,6 +346,7 @@ describe "Notification center",
       # When marking the second as closed (via the icon in the split screen)
       # the empty state is shown
       split_screen2.mark_notifications_as_read
+      wait_for_network_idle
 
       retry_block do
         notification.reload
@@ -314,6 +382,7 @@ describe "Notification center",
 
       it 'aggregates notifications per work package and sets all as read when opened' do
         visit home_path
+        wait_for_reload
         center.expect_bell_count 4
         center.open
 
@@ -324,6 +393,7 @@ describe "Notification center",
 
         split_screen.expect_open
         center.mark_notification_as_read notification4
+        wait_for_network_idle
 
         retry_block do
           notification4.reload
@@ -341,7 +411,7 @@ describe "Notification center",
 
         split_screen2.expect_open
         center.mark_notification_as_read notification3
-
+        wait_for_network_idle
         retry_block do
           notification3.reload
           raise "Expected notification to be marked read" unless notification3.read_ian
@@ -350,6 +420,18 @@ describe "Notification center",
         expect(notification2.reload.read_ian).to be_truthy
         expect(notification3.reload.read_ian).to be_truthy
       end
+    end
+  end
+
+  describe 'logging into deep link', with_settings: { login_required: true } do
+    it 'redirects to the notification deep link' do
+      visit notifications_center_path(state: "details/#{work_package.id}/activity")
+
+      expect(page).to have_current_path /login/
+
+      login_with recipient.login, 'adminADMIN!', visit_signin_path: false
+
+      expect(page).to have_current_path /notifications\/details\/#{work_package.id}\/activity/
     end
   end
 end

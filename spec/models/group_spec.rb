@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,7 +29,7 @@
 require 'spec_helper'
 require_relative '../support/shared/become_member'
 
-describe Group do
+RSpec.describe Group do
   let(:group) { create(:group) }
   let(:user) { create(:user) }
   let(:watcher) { create(:user) }
@@ -144,6 +144,6 @@ describe Group do
 
   it_behaves_like 'acts_as_customizable included' do
     let(:model_instance) { group }
-    let(:custom_field) { create(:string_group_custom_field) }
+    let(:custom_field) { create(:group_custom_field, :string) }
   end
 end

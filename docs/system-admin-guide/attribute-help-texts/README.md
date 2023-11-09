@@ -1,7 +1,7 @@
 ---
 sidebar_navigation:
   title: Attribute help texts
-  priority: 790
+  priority: 960
 description: Learn how to set attribute help texts in OpenProject
 keywords: attribute help texts, help texts for projects and work packages
 
@@ -19,13 +19,13 @@ This way you will reduce wrong entries for attributes. This is especially releva
 
 ## Overview
 
-| Topic                                                        | Content                                                    |
-| ------------------------------------------------------------ | :--------------------------------------------------------- |
-| [Adding Attribute help texts](#adding-attribute-help-texts)  | How to add and configure an Attribute help text.           |
-| [Editing or deleting Attribute help texts](#editing-or-deleting-attribute-help-texts) | How to edit and how to delete an Attribute help text.      |
-| [Work packages](#work-packages)                              | Where will Attribute help texts for work packages be used? |
-| [Projects](#projects)                                        | Where will Attribute help texts for projects be used?      |
-| [WYSIWYG editor](#wysiwyg-editor)                            | Where can Attribute help texts be displayed?               |
+| Topic                                                                       | Content                                                    |
+|-----------------------------------------------------------------------------|:-----------------------------------------------------------|
+| [Add Attribute help texts](#add-attribute-help-texts)                       | How to add and configure an Attribute help text.           |
+| [Edit or delete Attribute help texts](#edit-or-delete-attribute-help-texts) | How to edit and how to delete an Attribute help text.      |
+| [Work packages](#work-packages)                                             | Where will Attribute help texts for work packages be used? |
+| [Projects](#projects)                                                       | Where will Attribute help texts for projects be used?      |
+| [WYSIWYG editor](#wysiwyg-editor)                                           | Where can Attribute help texts be displayed?               |
 
 Navigate to -> *Administration* -> *Attribute help texts* to set up help texts for attributes and custom fields in work packages and projects. Here you can add, edit and delete Attribute help texts.
 
@@ -33,7 +33,7 @@ Navigate to -> *Administration* -> *Attribute help texts* to set up help texts f
 
 
 
-## Adding Attribute help texts
+## Add Attribute help texts
 
 To add an Attribute help texts for custom fields click on the green **+ Attribute help text** button. 
 
@@ -56,7 +56,7 @@ When the users click on it, they see the description for this attribute.
 
 
 
-## Editing or deleting Attribute help texts
+## Edit or delete Attribute help texts
 
 Navigate to -> *Administration* -> *Work packages* -> *Attribute help texts* in order to edit or remove an attribute help text.
 
@@ -67,7 +67,7 @@ Navigate to -> *Administration* -> *Work packages* -> *Attribute help texts* in 
 
 ## Work packages
 
-The Attribute help texts for work packages will be displayed in the [details view](../../user-guide/work-packages/work-package-views/#work-package-split-screen-view) (as in the screenshot below) and in the [full screen view](../../user-guide/work-packages/work-package-views/#work-package-full-screen-view). They will help the users (e.g. the project managers) understand what kind of information to put in which fields.
+The Attribute help texts for work packages will be displayed in the [details view](../../user-guide/work-packages/work-package-views/#split-screen-view) (as in the screenshot below) and in the [full screen view](../../user-guide/work-packages/work-package-views/#full-screen-view). They will help the users (e.g. the project managers) understand what kind of information to put in which fields.
 
 ![Sys-admin-attribute-help-texts-open](Sys-admin-attribute-help-texts-open.png)
 

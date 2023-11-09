@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,7 +29,7 @@
 require 'spec_helper'
 require_relative './shared_context'
 
-describe 'Team planner index', type: :feature, js: true do
+RSpec.describe 'Team planner index', :js, :with_cuprite do
   include_context 'with team planner full access'
 
   let(:current_user) { user }
@@ -39,6 +39,10 @@ describe 'Team planner index', type: :feature, js: true do
   end
 
   it 'redirects routes to upsale' do
+    visit team_planners_path
+
+    expect(page).to have_text 'Upgrade now'
+
     visit project_team_planners_path(project)
 
     expect(page).to have_text 'Upgrade now'

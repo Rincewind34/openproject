@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,9 +26,16 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-class WorkPackages::UpdateService < ::BaseServices::Update
+class WorkPackages::UpdateService < BaseServices::Update
   include ::WorkPackages::Shared::UpdateAncestors
   include Attachments::ReplaceAttachments
+
+  attr_accessor :cause_of_update
+
+  def initialize(user:, model:, contract_class: nil, contract_options: {}, cause_of_update: nil)
+    super(user:, model:, contract_class:, contract_options:)
+    self.cause_of_update = cause_of_update || model
+  end
 
   private
 
@@ -121,8 +128,7 @@ class WorkPackages::UpdateService < ::BaseServices::Update
 
   def reschedule(work_package, work_packages)
     WorkPackages::SetScheduleService
-      .new(user:,
-           work_package: work_packages)
+      .new(user:, work_package: work_packages, initiated_by: cause_of_update)
       .call(work_package.saved_changes.keys.map(&:to_sym))
   end
 

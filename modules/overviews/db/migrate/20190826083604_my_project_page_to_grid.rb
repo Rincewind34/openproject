@@ -1,4 +1,33 @@
+#-- copyright
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2023 the OpenProject GmbH
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version 3.
+#
+# OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+# Copyright (C) 2006-2013 Jean-Philippe Lang
+# Copyright (C) 2010-2013 the ChiliProject Team
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# See COPYRIGHT and LICENSE files for more details.
+#++
+
 class MyProjectPageToGrid < ActiveRecord::Migration[5.2]
+  # rubocop:disable Rails/ApplicationRecord
   class MyPageEntry < ActiveRecord::Base
     self.table_name = 'my_projects_overviews'
 
@@ -8,6 +37,7 @@ class MyProjectPageToGrid < ActiveRecord::Migration[5.2]
 
     belongs_to :project
   end
+  # rubocop:enable Rails/ApplicationRecord
 
   def up
     return unless applicable?
@@ -190,8 +220,16 @@ class MyProjectPageToGrid < ActiveRecord::Migration[5.2]
     Attachment.where(container_type: 'MyProjectsOverview', container_id: id)
   end
 
+  def new_default_query(attributes = nil)
+    Query.new(attributes).tap do |query|
+      query.add_default_filter
+      query.set_default_sort
+      query.show_hierarchies = true
+    end
+  end
+
   def query(grid, identifier)
-    query = Query.new_default name: '_',
+    query = new_default_query name: '_',
                               is_public: true,
                               hidden: true,
                               project: grid.project,

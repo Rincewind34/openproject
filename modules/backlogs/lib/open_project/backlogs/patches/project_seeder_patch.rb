@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -32,13 +32,14 @@ module OpenProject::Backlogs::Patches::ProjectSeederPatch
   end
 
   module InstanceMethods
-    def seed_versions(project, key)
+    def seed_versions
       super
 
-      return unless project_has_data_for?(key, 'versions')
+      version_data = Array(project_data.lookup('versions'))
+      return if version_data.blank?
 
-      versions = Array(project_data_for(key, 'versions'))
-        .map { |data| Version.find_by(name: data[:name]) }
+      versions = version_data
+        .map { |data| Version.find_by(name: data['name']) }
         .compact
 
       versions.each do |version|

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,7 +30,6 @@ module Projects
   class BaseContract < ::ModelContract
     include AssignableValuesContract
     include AssignableCustomFieldValues
-    include Projects::Archiver
 
     attribute :name
     attribute :identifier
@@ -43,9 +42,10 @@ module Projects
     attribute :parent do
       validate_parent_assignable
     end
-    attribute :status do
+    attribute :status_code do
       validate_status_code_included
     end
+    attribute :status_explanation
     attribute :templated do
       validate_templated_set_by_admin
     end
@@ -69,7 +69,7 @@ module Projects
     delegate :assignable_versions, to: :model
 
     def assignable_status_codes
-      Projects::Status.codes.keys
+      Project.status_codes.keys
     end
 
     private
@@ -90,14 +90,12 @@ module Projects
 
     def validate_user_allowed_to_manage
       with_unchanged_id do
-        with_active_assumed do
-          errors.add :base, :error_unauthorized unless user.allowed_to?(manage_permission, model)
-        end
+        errors.add :base, :error_unauthorized unless user.allowed_to?(manage_permission, model)
       end
     end
 
     def validate_status_code_included
-      errors.add :status, :inclusion if model.status&.code && !Projects::Status.codes.keys.include?(model.status.code.to_s)
+      errors.add :status, :inclusion if model.status_code && Project.status_codes.keys.exclude?(model.status_code.to_s)
     end
 
     def validate_templated_set_by_admin
@@ -119,26 +117,14 @@ module Projects
       model.id = project_id
     end
 
-    def with_active_assumed
-      active = model.active
-      model.active = true
-
-      yield
-    ensure
-      model.active = active
-    end
-
     def validate_changing_active
       return unless model.active_changed?
 
-      RequiresAdminGuard.validate_admin_only(user, errors)
+      contract_klass = model.being_archived? ? ArchiveContract : UnarchiveContract
+      contract = contract_klass.new(model, user)
+      contract.validate
 
-      if model.active?
-        # switched to active -> unarchiving
-        validate_all_ancestors_active
-      else
-        validate_no_foreign_wp_references
-      end
+      errors.merge!(contract.errors)
     end
   end
 end

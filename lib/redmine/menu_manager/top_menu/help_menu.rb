@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -31,8 +31,8 @@ module Redmine::MenuManager::TopMenu::HelpMenu
     cache_key = ['help_top_menu_node',
                  OpenProject::Static::Links.links,
                  I18n.locale,
-                 OpenProject::Static::Links.help_link]
-
+                 OpenProject::Static::Links.help_link,
+                 EnterpriseToken.active?]
     OpenProject::Cache.fetch(cache_key) do
       if OpenProject::Static::Links.help_link_overridden?
         content_tag('li',
@@ -49,7 +49,7 @@ module Redmine::MenuManager::TopMenu::HelpMenu
                                   title: I18n.t(:label_help),
                                   class: 'op-app-menu--item-action',
                                   aria: { haspopup: 'true' } do
-      op_icon('icon-help op-app-help--icon')
+      spot_icon('help', size: '1_25', classnames: 'op-app-help--icon')
     end
 
     render_menu_dropdown(
@@ -102,7 +102,12 @@ module Redmine::MenuManager::TopMenu::HelpMenu
     end
     result << static_link_item(:shortcuts)
     result << static_link_item(:forums)
-    result << static_link_item(:professional_support)
+    enterprise_support_link_key = if EnterpriseToken.active?
+                                    :enterprise_support
+                                  else
+                                    :enterprise_support_as_community
+                                  end
+    result << static_link_item(enterprise_support_link_key)
     result << content_tag(:hr, '', class: 'op-menu--separator')
   end
 

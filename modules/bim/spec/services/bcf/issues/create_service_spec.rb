@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,11 +29,11 @@
 require 'spec_helper'
 require 'services/base_services/behaves_like_create_service'
 
-describe Bim::Bcf::Issues::CreateService, type: :model do
+RSpec.describe Bim::Bcf::Issues::CreateService, type: :model do
   it_behaves_like 'BaseServices create service' do
-    let(:model_class) { ::Bim::Bcf::Issue }
+    let(:model_class) { Bim::Bcf::Issue }
     let(:factory) { :bcf_issue }
-    let(:work_package) { build_stubbed :work_package }
+    let(:work_package) { build_stubbed(:work_package) }
     let(:wp_call) { ServiceResult.success(result: work_package) }
 
     before do

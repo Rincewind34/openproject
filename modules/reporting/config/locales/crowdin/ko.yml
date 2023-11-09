@@ -1,6 +1,6 @@
 #-- copyright
 #OpenProject is an open source project management software.
-#Copyright (C) 2012-2022 the OpenProject GmbH
+#Copyright (C) 2012-2023 the OpenProject GmbH
 #This program is free software; you can redistribute it and/or
 #modify it under the terms of the GNU General Public License version 3.
 #OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
@@ -20,6 +20,9 @@
 #See COPYRIGHT and LICENSE files for more details.
 #++
 ko:
+  plugin_openproject_reporting:
+    name: "OpenProject Reporting"
+    description: "This plugin allows creating custom cost reports with filtering and grouping created by the OpenProject Time and costs plugin."
   button_save_as: "다른 이름으로 보고서로 저장..."
   comments: "코멘트"
   cost_reports_title: "시간 및 비용"
@@ -81,6 +84,9 @@ ko:
   units: "단위"
   validation_failure_date: "은(는) 유효한 날짜가 아닙니다."
   validation_failure_integer: "은(는) 유효한 정수가 아닙니다."
+  export:
+    cost_reports:
+      title: "비용 리포트 XML로 내보내기"
   reporting:
     group_by:
       selected_columns: "선택된 열"

@@ -1132,17 +1132,6 @@
     };
     version = "6.1.0";
   };
-  faker = {
-    dependencies = ["i18n"];
-    groups = ["development"];
-    platforms = [];
-    source = {
-      remotes = ["https://rubygems.org"];
-      sha256 = "0z3d4y6xg8prn3zdjw1qpqrnziq1d3zigqil4sxjj0pbr46gc1d6";
-      type = "gem";
-    };
-    version = "2.17.0";
-  };
   faraday = {
     dependencies = ["faraday-net_http" "multipart-post" "ruby2_keywords"];
     groups = ["default" "development" "sentry" "test"];
@@ -2112,7 +2101,7 @@
     version = "1.0.0";
   };
   openproject-backlogs = {
-    dependencies = ["acts_as_list" "openproject-pdf_export"];
+    dependencies = ["acts_as_list"];
     groups = ["opf_plugins"];
     platforms = [];
     source = {
@@ -2193,16 +2182,6 @@
     platforms = [];
     source = {
       path = ../modules/openid_connect;
-      type = "path";
-    };
-    version = "1.0.0";
-  };
-  openproject-pdf_export = {
-    dependencies = ["pdf-inspector" "prawn"];
-    groups = ["opf_plugins"];
-    platforms = [];
-    source = {
-      path = ../modules/pdf_export;
       type = "path";
     };
     version = "1.0.0";

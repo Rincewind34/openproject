@@ -1,6 +1,6 @@
 #-- copyright
 #OpenProject is an open source project management software.
-#Copyright (C) 2012-2022 the OpenProject GmbH
+#Copyright (C) 2012-2023 the OpenProject GmbH
 #This program is free software; you can redistribute it and/or
 #modify it under the terms of the GNU General Public License version 3.
 #OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
@@ -21,6 +21,10 @@
 #++
 #English strings go here for Rails i18n
 it:
+  plugin_openproject_meeting:
+    name: "OpenProject Meeting"
+    description: >-
+      This module adds functions to support project meetings to OpenProject. Meetings can be scheduled selecting invitees from the same project to take part in the meeting. An agenda can be created and sent to the invitees. After the meeting, attendees can be selected and minutes can be created based on the agenda. Finally, the minutes can be sent to all attendees and invitees.
   activerecord:
     attributes:
       meeting:
@@ -29,6 +33,7 @@ it:
         participants: "Partecipanti"
         participants_attended: "Invitati"
         participants_invited: "Invitati"
+        project: "Progetto"
         start_time: "Tempo"
         start_time_hour: "Ora di inizio"
     errors:
@@ -37,6 +42,9 @@ it:
     models:
       meeting_agenda: "Ordine del giorno"
       meeting_minutes: "Verbali"
+  activity:
+    filter:
+      meeting: "Riunioni"
   description_attended: "ha partecipato"
   description_invite: "invitato"
   events:
@@ -58,6 +66,13 @@ it:
   label_meeting_agenda_close: "Chiudere l'agenda per iniziare i verbali"
   label_meeting_date_time: "Data/ora"
   label_meeting_diff: "Differenza"
+  label_upcoming_meetings: "Prossime riunioni"
+  label_past_meetings: "Riunioni precedenti"
+  label_involvement: "Coinvolgimento"
+  label_upcoming_invitations: "Prossimi inviti"
+  label_past_invitations: "Inviti passati"
+  label_attendee: "Presenti"
+  label_author: "Autore"
   label_notify: "Invia per revisione"
   label_icalendar: "Invia iCalendar"
   label_version: "Versione"
@@ -82,7 +97,7 @@ it:
   text_duration_in_hours: "Durata in ore"
   text_in_hours: "in ore"
   text_meeting_agenda_for_meeting: 'ordine del giorno della riunione "%{meeting}"'
-  text_meeting_closing_are_you_sure: "Sicuri di voler chiudere questo meeting?"
+  text_meeting_closing_are_you_sure: "Vuoi davvero chiudere l'agenda di questa riunione?"
   text_meeting_agenda_open_are_you_sure: "Questo sovrascriverà tutte le modifiche nei verbali! Vuoi continuare?"
   text_meeting_minutes_for_meeting: 'verbali per l''incontro "%{meeting}"'
   text_review_meeting_agenda: "%{author} ha pubblicato %{link} per la revisione."

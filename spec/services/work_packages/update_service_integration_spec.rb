@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe WorkPackages::UpdateService, 'integration tests', type: :model, with_mail: false do
+RSpec.describe WorkPackages::UpdateService, 'integration tests', type: :model do
   let(:user) do
     create(:user,
            member_in_project: project,
@@ -167,7 +167,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
           .to be_success
 
         expect(TimeEntry.where(id: time_entries.map(&:id)).pluck(:project_id).uniq)
-          .to match_array [target_project.id]
+          .to contain_exactly(target_project.id)
       end
     end
 
@@ -424,9 +424,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
         .to eql(sibling2_attributes[:due_date])
 
       expect(subject.all_results)
-        .to match_array([work_package,
-                         parent_work_package,
-                         grandparent_work_package])
+        .to contain_exactly(work_package, parent_work_package, grandparent_work_package)
     end
   end
 
@@ -493,9 +491,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
 
       # Returns changed work packages
       expect(subject.all_results)
-        .to match_array([work_package,
-                         parent_work_package,
-                         grandparent_work_package])
+        .to contain_exactly(work_package, parent_work_package, grandparent_work_package)
     end
   end
 
@@ -560,9 +556,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
 
       # Returns changed work packages
       expect(subject.all_results)
-        .to match_array([work_package,
-                         parent_work_package,
-                         grandparent_work_package])
+        .to contain_exactly(work_package, parent_work_package, grandparent_work_package)
     end
   end
 
@@ -591,9 +585,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
 
       # Returns changed work packages
       expect(subject.all_results)
-        .to match_array([work_package,
-                         parent_work_package,
-                         grandparent_work_package])
+        .to contain_exactly(work_package, parent_work_package, grandparent_work_package)
     end
   end
 
@@ -794,13 +786,8 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
 
       # Returns changed work packages
       expect(subject.all_results)
-        .to match_array([work_package,
-                         following_parent_work_package,
-                         following_work_package,
-                         following2_parent_work_package,
-                         following2_work_package,
-                         following3_parent_work_package,
-                         following3_work_package])
+        .to contain_exactly(work_package, following_parent_work_package, following_work_package, following2_parent_work_package,
+                            following2_work_package, following3_parent_work_package, following3_work_package)
     end
     # rubocop:enable RSpec/ExampleLength
     # rubocop:enable RSpec/MultipleExpectations
@@ -851,8 +838,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
         .to eq(expected_child_dates)
 
       expect(subject.all_results.uniq)
-        .to match_array([work_package,
-                         parent_work_package])
+        .to contain_exactly(work_package, parent_work_package)
     end
   end
 
@@ -957,9 +943,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
         .to eql new_sibling_attributes[:due_date]
 
       expect(subject.all_results.uniq)
-        .to match_array([work_package,
-                         former_parent_work_package,
-                         new_parent_work_package])
+        .to contain_exactly(work_package, former_parent_work_package, new_parent_work_package)
     end
   end
 
@@ -1039,8 +1023,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
         .to eql new_parent_predecessor_attributes[:due_date] + 4.days
 
       expect(subject.all_results.uniq)
-        .to match_array([work_package,
-                         new_parent_work_package])
+        .to contain_exactly(work_package, new_parent_work_package)
     end
   end
 
@@ -1112,8 +1095,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
         .to eql sibling_attributes[:due_date]
 
       expect(subject.all_results.uniq)
-        .to match_array([work_package,
-                         parent_work_package])
+        .to contain_exactly(work_package, parent_work_package)
     end
   end
 
@@ -1138,10 +1120,10 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
         .to be_failure
 
       expect(result.errors.symbols_for(:attachments))
-        .to match_array [:does_not_exist]
+        .to contain_exactly(:does_not_exist)
 
       expect(work_package.attachments.reload)
-        .to match_array [old_attachment]
+        .to contain_exactly(old_attachment)
 
       expect(other_users_attachment.reload.container)
         .to be_nil
@@ -1152,7 +1134,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
         .to be_success
 
       expect(work_package.attachments.reload)
-        .to match_array [new_attachment]
+        .to contain_exactly(new_attachment)
 
       expect(new_attachment.reload.container)
         .to eql work_package
@@ -1169,7 +1151,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
         .to be_empty
 
       expect(Attachment.all)
-        .to match_array [other_users_attachment]
+        .to contain_exactly(other_users_attachment)
     end
     # rubocop:enable RSpec/ExampleLength
   end
@@ -1182,13 +1164,13 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
   #
   # Trying to set parent of C to B failed because parent relation is requested before change is saved.
   describe 'Changing parent to a new one that has the same parent as the current element (Regression #27746)' do
-    shared_let(:admin) { create :admin }
+    shared_let(:admin) { create(:admin) }
     let(:user) { admin }
 
-    let(:project) { create :project }
-    let!(:wp_a) { create :work_package }
-    let!(:wp_b) { create :work_package, parent: wp_a }
-    let!(:wp_c) { create :work_package, parent: wp_a }
+    let(:project) { create(:project) }
+    let!(:wp_a) { create(:work_package) }
+    let!(:wp_b) { create(:work_package, parent: wp_a) }
+    let!(:wp_c) { create(:work_package, parent: wp_a) }
 
     let(:work_package) { wp_c }
 
@@ -1200,8 +1182,8 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
   end
 
   describe 'Changing type to one that does not have the current status (Regression #27780)' do
-    let(:type) { create :type_with_workflow }
-    let(:new_type) { create :type }
+    let(:type) { create(:type_with_workflow) }
+    let(:new_type) { create(:type) }
     let(:project_types) { [type, new_type] }
     let(:attributes) { { type: new_type } }
 
@@ -1216,7 +1198,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
     end
 
     context 'when the work package does have default status' do
-      let(:status) { create :default_status }
+      let(:status) { create(:default_status) }
       let!(:workflow_type) do
         create(:workflow, type: new_type, role:, old_status_id: status.id)
       end
@@ -1241,7 +1223,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
              due_date: Time.zone.today + 5.days)
     end
     let!(:custom_field) do
-      create(:int_wp_custom_field, is_required: true, is_for_all: true, default_value: nil).tap do |cf|
+      create(:integer_wp_custom_field, is_required: true, is_for_all: true, default_value: nil) do |cf|
         project.types.first.custom_fields << cf
         project.work_package_custom_fields << cf
       end
@@ -1253,7 +1235,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
              parent:,
              start_date: Time.zone.today + 1.day,
              due_date: Time.zone.today + 5.days,
-             "custom_field_#{custom_field.id}": 5)
+             custom_field.attribute_name => 5)
     end
     let!(:attributes) { { parent: nil } }
 
@@ -1264,7 +1246,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
         project:,
         type: project.types.first,
         parent:,
-        "custom_field_#{custom_field.id}": 8
+        custom_field.attribute_name => 8
       }
     end
 
@@ -1283,7 +1265,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
   describe 'updating an invalid work package' do
     # The work package does not have a required custom field set.
     let(:custom_field) do
-      create(:int_wp_custom_field, is_required: true, is_for_all: true, default_value: nil).tap do |cf|
+      create(:integer_wp_custom_field, is_required: true, is_for_all: true, default_value: nil) do |cf|
         project.types.first.custom_fields << cf
         project.work_package_custom_fields << cf
       end
@@ -1316,13 +1298,13 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
     let(:project_types) { [type, new_type] }
     let(:new_type) { create(:type) }
     let!(:custom_field_of_current_type) do
-      create(:int_wp_custom_field, default_value: nil).tap do |cf|
+      create(:integer_wp_custom_field, default_value: nil) do |cf|
         type.custom_fields << cf
         project.work_package_custom_fields << cf
       end
     end
     let!(:custom_field_of_new_type) do
-      create(:int_wp_custom_field, default_value: 8).tap do |cf|
+      create(:integer_wp_custom_field, default_value: 8) do |cf|
         new_type.custom_fields << cf
         project.work_package_custom_fields << cf
       end
@@ -1335,7 +1317,7 @@ describe WorkPackages::UpdateService, 'integration tests', type: :model, with_ma
       {
         type:,
         project:,
-        "custom_field_#{custom_field_of_current_type.id}": 5
+        custom_field_of_current_type.attribute_name => 5
       }
     end
 

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -79,7 +79,7 @@ module Redmine # :nodoc:
     @deferred_plugins   = {}
 
     cattr_accessor :public_directory
-    self.public_directory = File.join(Rails.root, 'public', 'plugin_assets')
+    self.public_directory = Rails.public_path.join('plugin_assets')
 
     class << self
       attr_reader :registered_plugins, :deferred_plugins
@@ -95,7 +95,7 @@ module Redmine # :nodoc:
         end
       end
     end
-    def_field :description, :url, :author, :author_url, :version, :settings, :bundled
+    def_field :gem_name, :url, :author, :author_url, :version, :settings, :bundled
     attr_reader :id
 
     # Plugin constructor
@@ -133,15 +133,21 @@ module Redmine # :nodoc:
     def name(*args)
       name = args.empty? ? instance_variable_get("@name") : instance_variable_set("@name", *args)
 
-      case name
-      when Symbol
-        ::I18n.t(name)
-      when NilClass
-        # Default name if it was not provided during registration
-        id.to_s.humanize
-      else
-        name
-      end
+      return ::I18n.t(name) if name.is_a?(Symbol)
+      return name if name
+
+      translated_name = ::I18n.t("plugin_#{id}.name", default: nil)
+      translated_name || gemspec&.summary || id.to_s.humanize
+    end
+
+    def description(*args)
+      description = args.empty? ? instance_variable_get("@description") : instance_variable_set("@description", *args)
+
+      description || ::I18n.t("plugin_#{id}.description", default: gemspec&.description)
+    end
+
+    def gemspec
+      Gem.loaded_specs[gem_name]
     end
 
     # returns an array of all dependencies we know of for plugin id
@@ -201,8 +207,8 @@ module Redmine # :nodoc:
     #   # Requires OpenProject between 1.1.0 and 1.1.5 or higher
     #   requires_openproject ">= 1.1.0", "<= 1.1.5"
 
-    def requires_openproject(*args)
-      required_version = Gem::Requirement.new(*args)
+    def requires_openproject(*)
+      required_version = Gem::Requirement.new(*)
       op_version = Gem::Version.new(OpenProject::VERSION.to_semver)
 
       unless required_version.satisfied_by? op_version
@@ -259,6 +265,10 @@ module Redmine # :nodoc:
       end
     end
     alias :add_menu_item :menu
+
+    def configure_menu(menu_name, &)
+      Redmine::MenuManager.map(menu_name, &)
+    end
 
     # Removes +item+ from the given +menu+.
     def delete_menu_item(menu_name, item)
@@ -358,9 +368,9 @@ module Redmine # :nodoc:
     #   Meeting.find_events('scrums', User.current, 5.days.ago, Date.today, project: foo) # events for project foo only
     #
     # Note that :view_scrums permission is required to view these events in the activity view.
-    def activity_provider(*args)
+    def activity_provider(*)
       ActiveSupport::Deprecation.warn('Use ActsAsOpEngine#activity_provider instead.')
-      OpenProject::Activity.register(*args)
+      OpenProject::Activity.register(*)
     end
 
     # Registers a wiki formatter.
@@ -375,7 +385,7 @@ module Redmine # :nodoc:
 
     # Returns +true+ if the plugin can be configured.
     def configurable?
-      settings && settings.is_a?(Hash) && settings[:partial].present?
+      settings.is_a?(Hash) && settings[:partial].present?
     end
 
     def mirror_assets
@@ -383,7 +393,7 @@ module Redmine # :nodoc:
       destination = public_directory
       return unless File.directory?(source)
 
-      source_files = Dir[source + '/**/*']
+      source_files = Dir["#{source}/**/*"]
       source_dirs = source_files.select { |d| File.directory?(d) }
       source_files -= source_dirs
 

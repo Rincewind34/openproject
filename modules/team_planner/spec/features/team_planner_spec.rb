@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,11 +29,7 @@
 require 'spec_helper'
 require_relative './shared_context'
 
-describe 'Team planner', type: :feature, js: true do
-  before do
-    with_enterprise_token(:team_planner_view)
-  end
-
+RSpec.describe 'Team planner', js: true, with_ee: %i[team_planner_view] do
   include_context 'with team planner full access'
 
   it 'hides the internally used filters' do
@@ -220,8 +216,8 @@ describe 'Team planner', type: :feature, js: true do
       filters.expect_filter_count("1")
       filters.open
 
-      filters.add_filter_by('Type', 'is', [type_task.name])
-      filters.expect_filter_by('Type', 'is', [type_task.name])
+      filters.add_filter_by('Type', 'is (OR)', [type_task.name])
+      filters.expect_filter_by('Type', 'is (OR)', [type_task.name])
       filters.expect_filter_count("2")
 
       team_planner.expect_assignee(user, present: true)
@@ -332,8 +328,7 @@ describe 'Team planner', type: :feature, js: true do
              subject: 'A blocked task')
     end
 
-    it 'disables editing on readonly tasks' do
-      with_enterprise_token(:team_planner_view, :readonly_work_packages)
+    it 'disables editing on readonly tasks', with_ee: %i[team_planner_view readonly_work_packages] do
       team_planner.visit!
 
       team_planner.wait_for_loaded

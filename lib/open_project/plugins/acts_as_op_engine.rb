@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -60,13 +60,6 @@ module OpenProject::Plugins
 
         initializer "#{engine_name}.i18n_load_paths" do |app|
           app.config.i18n.load_path += Dir[config.root.join('config', 'locales', 'crowdin', '*.{rb,yml}').to_s]
-        end
-
-        current_engine = self
-        config.to_prepare do
-          pathname = current_engine.root.join("app/cells/views")
-
-          ::RailsCell.view_paths << pathname.to_path if pathname.exist?
         end
 
         # adds our factories to factory girl's load path
@@ -184,12 +177,11 @@ module OpenProject::Plugins
       # block:         Pass a block to the plugin (for defining permissions, menu items and the like)
       def register(gem_name, options, &block)
         self.class.initializer "#{engine_name}.register_plugin" do
-          spec = Bundler.load.specs[gem_name][0]
+          spec = Gem.loaded_specs[gem_name]
 
           p = Redmine::Plugin.register engine_name.to_sym do
-            name spec.summary
+            gem_name spec.name
             author spec.authors.is_a?(Array) ? spec.authors[0] : spec.authors
-            description spec.description
             version spec.version
             url spec.homepage
 

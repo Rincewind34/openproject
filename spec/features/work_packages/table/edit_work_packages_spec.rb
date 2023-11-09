@@ -1,21 +1,21 @@
 require 'spec_helper'
 
-describe 'Inline editing work packages', js: true do
+RSpec.describe 'Inline editing work packages', js: true do
   let(:manager_role) do
-    create :role,
+    create(:role,
            permissions: %i[view_work_packages
-                           edit_work_packages]
+                           edit_work_packages])
   end
   let(:manager) do
-    create :user,
+    create(:user,
            firstname: 'Manager',
            lastname: 'Guy',
            member_in_project: project,
-           member_through_role: manager_role
+           member_through_role: manager_role)
   end
-  let(:type) { create :type }
-  let(:status1) { create :status }
-  let(:status2) { create :status }
+  let(:type) { create(:type) }
+  let(:status1) { create(:status) }
+  let(:status2) { create(:status) }
 
   let(:project) { create(:project, types: [type]) }
   let(:work_package) do
@@ -29,14 +29,14 @@ describe 'Inline editing work packages', js: true do
   let(:wp_table) { Pages::WorkPackagesTable.new(project) }
 
   let(:workflow) do
-    create :workflow,
+    create(:workflow,
            type_id: type.id,
            old_status: status1,
            new_status: status2,
-           role: manager_role
+           role: manager_role)
   end
-  let(:version) { create :version, project: }
-  let(:category) { create :category, project: }
+  let(:version) { create(:version, project:) }
+  let(:category) { create(:category, project:) }
 
   before do
     login_as(manager)
@@ -116,28 +116,32 @@ describe 'Inline editing work packages', js: true do
   end
 
   context 'custom field' do
-    let(:custom_fields) do
+    let!(:custom_fields) do
       fields = [
         create(
           :work_package_custom_field,
           field_format: 'list',
           possible_values: %w(foo bar xyz),
-          is_required: true,
-          is_for_all: false
+          is_required: false,
+          is_for_all: false,
+          types: [type],
+          projects: [project]
         ),
         create(
           :work_package_custom_field,
           field_format: 'string',
-          is_required: true,
-          is_for_all: false
+          is_required: false,
+          is_for_all: false,
+          types: [type],
+          projects: [project]
         )
       ]
 
       fields
     end
-    let(:type) { create(:type_task, custom_fields:) }
+    let(:type) { create(:type_task) }
     let(:project) { create(:project, types: [type]) }
-    let(:work_package) do
+    let!(:work_package) do
       create(:work_package,
              subject: 'Foobar',
              status: status1,
@@ -146,12 +150,11 @@ describe 'Inline editing work packages', js: true do
     end
 
     before do
-      work_package
       workflow
 
-      # Require custom fields for this project
-      project.work_package_custom_fields = custom_fields
-      project.save!
+      custom_fields.each do |custom_field|
+        custom_field.update_attribute(:is_required, true)
+      end
 
       wp_table.visit!
       wp_table.expect_work_package_listed(work_package)
@@ -177,10 +180,10 @@ describe 'Inline editing work packages', js: true do
       expect(page).to have_selector('th a', text: cf_text_name.upcase)
       expect(wp_table.row(work_package)).to have_selector('.wp-table--cell-container.-error', count: 2)
 
-      cf_text = wp_table.edit_field(work_package, "customField#{custom_fields.last.id}")
+      cf_text = wp_table.edit_field(work_package, custom_fields.last.attribute_name(:camel_case))
       cf_text.update('my custom text', expect_failure: true)
 
-      cf_list = wp_table.edit_field(work_package, "customField#{custom_fields.first.id}")
+      cf_list = wp_table.edit_field(work_package, custom_fields.first.attribute_name(:camel_case))
       cf_list.field_type = 'create-autocompleter'
       cf_list.openSelectField
       cf_list.set_value('bar')
@@ -193,8 +196,8 @@ describe 'Inline editing work packages', js: true do
       )
 
       work_package.reload
-      expect(work_package.send(custom_fields.first.accessor_name)).to eq('bar')
-      expect(work_package.send(custom_fields.last.accessor_name)).to eq('my custom text')
+      expect(work_package.send(custom_fields.first.attribute_getter)).to eq('bar')
+      expect(work_package.send(custom_fields.last.attribute_getter)).to eq('my custom text')
 
       # Saveguard to let the background update complete
       wp_table.visit!

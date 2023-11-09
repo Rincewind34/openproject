@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -57,6 +57,10 @@ module API
                  type: 'Formattable',
                  required: false
 
+          schema :ongoing,
+                 type: 'Boolean',
+                 required: false
+
           schema_with_allowed_link :user,
                                    has_default: false,
                                    required: true,
@@ -82,7 +86,7 @@ module API
                                          type: 'TimeEntriesActivity',
                                          value_representer: TimeEntriesActivityRepresenter,
                                          has_default: true,
-                                         required: true,
+                                         required: false,
                                          link_factory: ->(value) {
                                            {
                                              href: api_v3_paths.time_entries_activity(value.id),

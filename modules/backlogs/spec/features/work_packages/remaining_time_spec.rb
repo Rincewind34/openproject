@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,12 +28,11 @@
 
 require 'spec_helper'
 
-describe 'Work packages remaining time', type: :feature, js: true do
+RSpec.describe 'Work packages remaining time', js: true do
   before do
     allow(User).to receive(:current).and_return current_user
     allow(Setting).to receive(:plugin_openproject_backlogs).and_return('points_burn_direction' => 'down',
                                                                        'wiki_template' => '',
-                                                                       'card_spec' => 'Sattleford VM-5040',
                                                                        'story_types' => [story_type.id.to_s],
                                                                        'task_type' => task_type.id.to_s)
   end
@@ -43,16 +42,16 @@ describe 'Work packages remaining time', type: :feature, js: true do
     create(:project,
            enabled_module_names: %w(work_package_tracking backlogs))
   end
-  let(:status) { create :default_status }
+  let(:status) { create(:default_status) }
   let(:story_type) { create(:type_feature) }
   let(:task_type) { create(:type_feature) }
 
   let(:work_package) do
-    create :story,
+    create(:story,
            type: task_type,
            author: current_user,
            project:,
-           status:
+           status:)
   end
 
   it 'can set and edit the remaining time in hours (Regression #43549)' do

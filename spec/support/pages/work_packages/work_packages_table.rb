@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -88,7 +88,7 @@ module Pages
 
     def expect_work_package_count(count)
       within(table_container) do
-        expect(page).to have_selector(".wp--row", count: count, wait: 20)
+        expect(page).to have_selector(".wp--row", count:, wait: 20)
       end
     end
 
@@ -107,7 +107,7 @@ module Pages
       retry_block(args: { tries: 3, base_interval: 5 }) do
         within(table_container) do
           work_packages.each do |wp|
-            page.raise_if_found(".wp-row-#{wp.id} td.subject", text: wp.subject, wait: 1)
+            expect(page).not_to have_selector(".wp-row-#{wp.id} td.subject", text: wp.subject)
           end
         end
       end
@@ -183,13 +183,13 @@ module Pages
     end
 
     def open_full_screen_by_link(work_package)
-      row(work_package).click_link(work_package.id)
+      row(work_package).click_link(work_package.id.to_s)
 
       FullWorkPackage.new(work_package)
     end
 
     def drag_and_drop_work_package(from:, to:)
-      drag_and_drop_list(from: from, to: to, elements: '.wp-table--row', handler: '.wp-table--drag-and-drop-handle')
+      drag_and_drop_list(from:, to:, elements: '.wp-table--row', handler: '.wp-table--drag-and-drop-handle')
     end
 
     def row(work_package)

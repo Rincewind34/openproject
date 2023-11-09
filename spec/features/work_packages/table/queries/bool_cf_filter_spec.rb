@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,13 +28,13 @@
 
 require 'spec_helper'
 
-describe 'Work package filtering by bool custom field', js: true do
-  let(:project) { create :project }
+RSpec.describe 'Work package filtering by bool custom field', js: true do
+  let(:project) { create(:project) }
   let(:type) { project.types.first }
-  let(:wp_table) { ::Pages::WorkPackagesTable.new(project) }
-  let(:filters) { ::Components::WorkPackages::Filters.new }
+  let(:wp_table) { Pages::WorkPackagesTable.new(project) }
+  let(:filters) { Components::WorkPackages::Filters.new }
   let!(:bool_cf) do
-    create(:bool_wp_custom_field).tap do |cf|
+    create(:boolean_wp_custom_field) do |cf|
       type.custom_fields << cf
       project.work_package_custom_fields << cf
     end
@@ -43,7 +43,7 @@ describe 'Work package filtering by bool custom field', js: true do
   let!(:work_package_true) do
     create(:work_package,
            type:,
-           project:).tap do |wp|
+           project:) do |wp|
       wp.custom_field_values = { bool_cf.id => true }
       wp.save!
     end
@@ -51,7 +51,7 @@ describe 'Work package filtering by bool custom field', js: true do
   let!(:work_package_false) do
     create(:work_package,
            type:,
-           project:).tap do |wp|
+           project:) do |wp|
       wp.custom_field_values = { bool_cf.id => false }
       wp.save!
     end
@@ -70,9 +70,9 @@ describe 'Work package filtering by bool custom field', js: true do
   end
 
   current_user do
-    create :user,
+    create(:user,
            member_in_project: project,
-           member_with_permissions: %i[view_work_packages save_queries]
+           member_with_permissions: %i[view_work_packages save_queries])
   end
 
   it 'shows the work package matching the bool cf filter' do

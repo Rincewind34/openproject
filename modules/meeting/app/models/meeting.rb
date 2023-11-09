@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -42,9 +42,15 @@ class Meeting < ApplicationRecord
     order("#{Meeting.table_name}.start_time DESC")
   end
   scope :from_tomorrow, -> { where(['start_time >= ?', Date.tomorrow.beginning_of_day]) }
+  scope :from_today, -> { where(['start_time >= ?', Time.zone.today.beginning_of_day]) }
   scope :with_users_by_date, -> {
     order("#{Meeting.table_name}.title ASC")
       .includes({ participants: :user }, :author)
+  }
+  scope :visible, ->(*args) {
+    includes(:project)
+      .references(:projects)
+      .merge(Project.allowed_to(args.first || User.current, :view_meetings))
   }
 
   acts_as_watchable
@@ -64,14 +70,14 @@ class Meeting < ApplicationRecord
                 author: Proc.new(&:user),
                 description: ''
 
-  register_on_journal_formatter(:plaintext, 'title')
-  register_on_journal_formatter(:fraction, 'duration')
-  register_on_journal_formatter(:datetime, 'start_time')
-  register_on_journal_formatter(:plaintext, 'location')
+  register_journal_formatted_fields(:plaintext, 'title')
+  register_journal_formatted_fields(:fraction, 'duration')
+  register_journal_formatted_fields(:datetime, 'start_time')
+  register_journal_formatted_fields(:plaintext, 'location')
 
   accepts_nested_attributes_for :participants, allow_destroy: true
 
-  validates_presence_of :title, :duration
+  validates_presence_of :title, :project_id, :duration
 
   # We only save start_time as an aggregated value of start_date and hour,
   # but still need start_date and _hour for validation purposes
@@ -129,7 +135,7 @@ class Meeting < ApplicationRecord
     participants.build(user:, invited: true) if new_record? && participants.empty? && user
   end
 
-  # Returns true if usr or current user is allowed to view the meeting
+  # Returns true if user or current user is allowed to view the meeting
   def visible?(user = nil)
     (user || User.current).allowed_to?(:view_meetings, project)
   end
@@ -256,7 +262,7 @@ class Meeting < ApplicationRecord
   ##
   # Determines whether new raw values were provided.
   def parse_start_time?
-    !(changed & %w(start_date start_time_hour)).empty?
+    changed.intersect?(%w(start_date start_time_hour))
   end
 
   ##

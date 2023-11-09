@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -25,10 +25,8 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 #++
-require_relative './base_service'
-
 module Sessions
-  class InitializeSessionService < BaseService
+  class InitializeSessionService
     class << self
       ##
       # Initializes a new session for the given user.
@@ -52,7 +50,7 @@ module Sessions
       # We can only drop old sessions if they're stored in the database
       # and enabled by configuration.
       def drop_old_sessions?
-        active_record_sessions? && OpenProject::Configuration.drop_old_sessions_on_login?
+        OpenProject::Configuration.drop_old_sessions_on_login?
       end
     end
   end

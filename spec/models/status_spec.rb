@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe Status, type: :model do
+RSpec.describe Status do
   let(:stubbed_status) { build_stubbed(:status) }
 
   describe 'default status' do
@@ -74,7 +74,7 @@ describe Status, type: :model do
       end
     end
 
-    context 'when EE no longer enabled', with_ee: %i[] do
+    context 'when EE no longer enabled', with_ee: false do
       it 'is still marked read only' do
         expect(status.is_readonly).to be_falsey
         expect(status).not_to be_is_readonly
@@ -90,7 +90,7 @@ describe Status, type: :model do
     it 'updates when the updated_at field changes' do
       old_cache_key = stubbed_status.cache_key
 
-      stubbed_status.updated_at = Time.now
+      stubbed_status.updated_at = Time.zone.now
 
       expect(stubbed_status.cache_key)
         .not_to eql old_cache_key

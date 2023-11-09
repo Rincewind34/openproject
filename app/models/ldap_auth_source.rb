@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,23 @@
 
 require 'net/ldap'
 
-class LdapAuthSource < AuthSource
+class LdapAuthSource < ApplicationRecord
+  class Error < ::StandardError; end
+
+  include Redmine::Ciphering
+
+  has_many :users,
+           dependent: :nullify
+
+  validates :name,
+            uniqueness: { case_sensitive: false },
+            length: { maximum: 60 }
+
+  def self.unique_attribute
+    :name
+  end
+  prepend ::Mixins::UniqueFinder
+
   enum tls_mode: {
     plain_ldap: 0,
     simple_tls: 1,
@@ -36,17 +52,59 @@ class LdapAuthSource < AuthSource
   }.freeze, _default: :start_tls
   validates :tls_mode, inclusion: { in: tls_modes.keys }
 
-  validates_presence_of :host, :port, :attr_login
-  validates_length_of :name, :host, maximum: 60, allow_nil: true
-  validates_length_of :account, :account_password, :base_dn, maximum: 255, allow_nil: true
-  validates_length_of :attr_login, :attr_firstname, :attr_lastname, :attr_mail, :attr_admin, maximum: 30, allow_nil: true
-  validates_numericality_of :port, only_integer: true
+  validates :host, :port, :attr_login, presence: true
+  validates :name, :host, length: { maximum: 60, allow_nil: true }
+  validates :account, :account_password, :base_dn, length: { maximum: 255, allow_nil: true }
+  validates :attr_login, :attr_firstname, :attr_lastname, :attr_mail, :attr_admin, length: { maximum: 30, allow_nil: true }
+  validates :port, numericality: { only_integer: true }
 
   validate :validate_filter_string
   validate :validate_tls_certificate_string, if: -> { tls_certificate_string.present? }
 
   after_initialize :set_default_port
   before_validation :strip_ldap_attributes
+
+  # Try to authenticate a user not yet registered against available sources
+  def self.authenticate(login, password)
+    where(onthefly_register: true).find_each do |source|
+      begin
+        Rails.logger.debug { "Authenticating '#{login}' against '#{source.name}'" }
+        attrs = source.authenticate(login, password)
+      rescue StandardError => e
+        Rails.logger.error "Error during authentication: #{e.message}"
+        attrs = nil
+      end
+      return attrs if attrs
+    end
+    nil
+  end
+
+  def self.find_user(login)
+    where(onthefly_register: true).find_each do |source|
+      begin
+        Rails.logger.debug { "Looking up '#{login}' in '#{source.name}'" }
+        attrs = source.find_user login
+      rescue StandardError => e
+        Rails.logger.error "Error during authentication: #{e.message}"
+        attrs = nil
+      end
+
+      return attrs if attrs
+    end
+    nil
+  end
+
+  def seeded_from_env?
+    Setting.seed_ldap&.key?(name)
+  end
+
+  def account_password
+    read_ciphered_attribute(:account_password)
+  end
+
+  def account_password=(arg)
+    write_ciphered_attribute(:account_password, arg)
+  end
 
   def authenticate(login, password)
     return nil if login.blank? || password.blank?
@@ -58,7 +116,7 @@ class LdapAuthSource < AuthSource
       attrs.except(:dn)
     end
   rescue Net::LDAP::Error => e
-    raise AuthSource::Error, "LdapError: #{e.message}"
+    raise LdapAuthSource::Error, "LdapError: #{e.message}"
   end
 
   def find_user(login)
@@ -71,7 +129,7 @@ class LdapAuthSource < AuthSource
       attrs.except(:dn)
     end
   rescue Net::LDAP::Error => e
-    raise AuthSource::Error, "LdapError: #{e.message}"
+    raise LdapAuthSource::Error, "LdapError: #{e.message}"
   end
 
   # Open and return a system connection
@@ -82,20 +140,18 @@ class LdapAuthSource < AuthSource
   # test the connection to the LDAP
   def test_connection
     unless authenticate_dn(account, account_password)
-      raise AuthSource::Error, I18n.t('auth_source.ldap_error', error_message: I18n.t('auth_source.ldap_auth_failed'))
+      raise LdapAuthSource::Error,
+            I18n.t('ldap_auth_sources.ldap_error', error_message: I18n.t('ldap_auth_sources.ldap_auth_failed'))
     end
   rescue Net::LDAP::Error => e
-    raise AuthSource::Error, I18n.t('auth_source.ldap_error', error_message: e.to_s)
-  end
-
-  def auth_method_name
-    'LDAP'
+    raise LdapAuthSource::Error,
+          I18n.t('ldap_auth_sources.ldap_error', error_message: e.to_s)
   end
 
   def get_user_attributes_from_ldap_entry(entry)
     base_attributes = {
       dn: entry.dn,
-      auth_source_id: id
+      ldap_auth_source_id: id
     }
 
     base_attributes.merge mapped_attributes(entry)
@@ -163,7 +219,7 @@ class LdapAuthSource < AuthSource
 
   def strip_ldap_attributes
     %i[attr_login attr_firstname attr_lastname attr_mail attr_admin].each do |attr|
-      write_attribute(attr, read_attribute(attr).strip) unless read_attribute(attr).nil?
+      self[attr] = self[attr].strip unless self[attr].nil?
     end
   end
 
@@ -231,7 +287,7 @@ class LdapAuthSource < AuthSource
     end
 
     ldap_con.search(base: base_dn,
-                    filter: filter,
+                    filter:,
                     attributes: search_attributes) do |entry|
       attrs =
         if onthefly_register?
@@ -247,7 +303,7 @@ class LdapAuthSource < AuthSource
   end
 
   def self.get_attr(entry, attr_name)
-    if !attr_name.blank?
+    if attr_name.present?
       entry[attr_name].is_a?(Array) ? entry[attr_name].first : entry[attr_name]
     end
   end

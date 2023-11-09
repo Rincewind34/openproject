@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,9 +33,6 @@ OpenProject::Application.configure do
   # every request. This slows down response time but is perfect for development
   # since you don't have to restart the web server when you make code changes.
   config.cache_classes = false
-
-  # Automatically refresh translations with I18n middleware
-  config.middleware.use ::I18n::JS::Middleware
 
   # Do not eager load code on boot by default.
   config.eager_load = ENV['EAGER_LOAD'].present?

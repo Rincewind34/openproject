@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,9 +28,12 @@
 
 require 'spec_helper'
 require 'services/base_services/behaves_like_create_service'
+require_relative 'shared_event_gun_examples'
 
-describe ::Storages::ProjectStorages::CreateService, type: :model do
+RSpec.describe Storages::ProjectStorages::CreateService, type: :model do
   it_behaves_like 'BaseServices create service' do
     let(:factory) { :project_storage }
+
+    it_behaves_like('an event gun', OpenProject::Events::PROJECT_STORAGE_CREATED)
   end
 end

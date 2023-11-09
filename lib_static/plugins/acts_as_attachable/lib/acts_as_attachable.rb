@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -190,6 +190,10 @@ module Redmine
               (persisted? && allowed_to_on_attachment?(user, self.class.attachable_options[:add_on_persisted_permission]))
           end
 
+          def attachable?
+            true
+          end
+
           private
 
           def allowed_to_on_attachment?(user, permissions)
@@ -242,6 +246,10 @@ module Redmine
             attachments_claimed.any?(&:containered?)
           end
         end
+      end
+
+      def attachable?
+        false
       end
     end
   end

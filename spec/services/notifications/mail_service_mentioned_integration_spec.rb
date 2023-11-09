@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,11 +29,11 @@
 require 'spec_helper'
 require_relative './mentioned_journals_shared'
 
-describe Notifications::MailService, 'Mentioned integration', type: :model do
+RSpec.describe Notifications::MailService, 'Mentioned integration', type: :model do
   include_context 'with a mentioned work package being updated again'
 
   let(:assignee) do
-    create :user,
+    create(:user,
            preferences: {
              immediate_reminders: {
                mentioned: true
@@ -46,7 +46,7 @@ describe Notifications::MailService, 'Mentioned integration', type: :model do
                    responsible: true)
            ],
            member_in_project: project,
-           member_through_role: role
+           member_through_role: role)
   end
 
   let(:assigned_notification) do

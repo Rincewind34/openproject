@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -42,13 +42,6 @@ module Projects
       ret
     end
 
-    def persist(service_result)
-      # Needs to take place before awesome_nested_set reloads the model (in case the parent changes)
-      persist_status
-
-      super
-    end
-
     def after_perform(service_call)
       touch_on_custom_values_update
       notify_on_identifier_renamed
@@ -83,24 +76,22 @@ module Projects
       WorkPackage.update_versions_from_hierarchy_change(model)
     end
 
-    def persist_status
-      model.status.save if model.status.changed?
-    end
-
     def handle_archiving
       return unless model.saved_change_to_active?
 
-      if model.active?
-        # was unarchived
-        Projects::UnarchiveService
-          .new(user:, model:)
-          .call
-      else
-        # as archived
-        Projects::ArchiveService
-          .new(user:, model:)
-          .call
-      end
+      service_class =
+        if model.active?
+          # was unarchived
+          Projects::UnarchiveService
+        else
+          # was archived
+          Projects::ArchiveService
+        end
+
+      # EmptyContract is used because archive/unarchive conditions have
+      # already been checked in Projects::UpdateContract
+      service = service_class.new(user:, model:, contract_class: EmptyContract)
+      service.call
     end
   end
 end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,12 +26,15 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-class WorkPackages::SetAttributesService < ::BaseServices::SetAttributes
+class WorkPackages::SetAttributesService < BaseServices::SetAttributes
   include Attachments::SetReplacements
 
   private
 
   def set_attributes(attributes)
+    file_links_ids = attributes.delete(:file_links_ids)
+    model.file_links = Storages::FileLink.where(id: file_links_ids) if file_links_ids
+
     set_attachments_attributes(attributes)
     set_static_attributes(attributes)
 
@@ -317,14 +320,14 @@ class WorkPackages::SetAttributesService < ::BaseServices::SetAttributes
   def reassign_status(available_statuses)
     return if available_statuses.include?(work_package.status) || work_package.status.is_a?(Status::InexistentStatus)
 
-    new_status = available_statuses.detect(&:is_default) || available_statuses.first
+    new_status = available_statuses.detect(&:is_default) || available_statuses.first || Status.default
     work_package.status = new_status if new_status.present?
   end
 
   def reassign_invalid_status_if_type_changed
     # Checks that the issue can not be moved to a type with the status unchanged
     # and the target type does not have this status
-    if work_package.type_id_changed? && !work_package.status_id_changed?
+    if work_package.type_id_changed?
       reassign_status work_package.type.statuses(include_default: true)
     end
   end
@@ -382,6 +385,7 @@ class WorkPackages::SetAttributesService < ::BaseServices::SetAttributes
     max = max_child_date
 
     return unless max
+
     days.duration(min_child_date, max_child_date)
   end
 

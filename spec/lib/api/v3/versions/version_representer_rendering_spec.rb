@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe ::API::V3::Versions::VersionRepresenter, 'rendering' do
+RSpec.describe API::V3::Versions::VersionRepresenter, 'rendering' do
   let(:version) { build_stubbed(:version) }
   let(:permissions) { [:manage_versions] }
   let(:permissions) { [:manage_versions] }
@@ -132,7 +132,7 @@ describe ::API::V3::Versions::VersionRepresenter, 'rendering' do
     end
 
     context 'custom value' do
-      let(:custom_field) { build_stubbed(:list_version_custom_field) }
+      let(:custom_field) { build_stubbed(:version_custom_field, :list) }
       let(:custom_value) do
         build_stubbed(:custom_value, custom_field:, value: '1')
       end
@@ -211,7 +211,7 @@ describe ::API::V3::Versions::VersionRepresenter, 'rendering' do
           .and_return([custom_field])
 
         allow(version)
-          .to receive(:"custom_field_#{custom_field.id}")
+          .to receive(custom_field.attribute_getter)
           .and_return(custom_value.value)
       end
 
@@ -283,7 +283,7 @@ describe ::API::V3::Versions::VersionRepresenter, 'rendering' do
             .and_return([custom_field])
 
           allow(version)
-            .to receive(:"custom_field_#{custom_field.id}")
+            .to receive(custom_field.attribute_getter)
             .and_return('123')
         end
 

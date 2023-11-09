@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2020 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 require 'spec_helper'
 require 'rack/test'
 
-describe ::API::V3::TimeEntries::UpdateFormAPI, content_type: :json do
+RSpec.describe API::V3::TimeEntries::UpdateFormAPI, content_type: :json do
   include Rack::Test::Methods
   include API::V3::Utilities::PathHelper
 
@@ -40,7 +40,7 @@ describe ::API::V3::TimeEntries::UpdateFormAPI, content_type: :json do
       TimeEntryActivitiesProject.insert(project_id: project.id, activity_id: tea.id, active: false)
     end
   end
-  let(:custom_field) { create(:text_time_entry_custom_field) }
+  let(:custom_field) { create(:time_entry_custom_field) }
   let(:user) do
     create(:user,
            member_in_project: project,
@@ -93,7 +93,7 @@ describe ::API::V3::TimeEntries::UpdateFormAPI, content_type: :json do
           comment: {
             raw: "some comment"
           },
-          "customField#{custom_field.id}": {
+          custom_field.attribute_name(:camel_case) => {
             raw: 'some cf text'
           }
         }

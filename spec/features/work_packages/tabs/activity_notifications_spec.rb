@@ -3,31 +3,27 @@ require 'spec_helper'
 require 'features/work_packages/work_packages_page'
 require 'support/edit_fields/edit_field'
 
-describe 'Activity tab notifications', js: true, selenium: true do
-  shared_let(:project) { create :project_with_types, public: true }
+RSpec.describe 'Activity tab notifications', js: true, selenium: true do
+  shared_let(:project) { create(:project_with_types, public: true) }
   shared_let(:work_package) do
-    work_package = create(:work_package,
-                          project:,
-                          created_at: 5.days.ago.to_date.to_fs(:db))
-
-    work_package.update({ journal_notes: 'First comment on this wp.',
-                          updated_at: 5.days.ago.to_date.to_s })
-    work_package.update({ journal_notes: 'Second comment on this wp.',
-                          updated_at: 4.days.ago.to_date.to_s })
-    work_package.update({ journal_notes: 'Third comment on this wp.',
-                          updated_at: 3.days.ago.to_date.to_s })
-
-    work_package
+    create(:work_package,
+           project:,
+           journals: {
+             6.days.ago => {},
+             5.days.ago => { notes: 'First comment on this wp.' },
+             4.days.ago => { notes: 'Second comment on this wp.' },
+             3.days.ago => { notes: 'Third comment on this wp.' }
+           })
   end
   shared_let(:admin) { create(:admin) }
 
   shared_examples_for 'when there are notifications for the work package' do
     shared_let(:notification) do
-      create :notification,
+      create(:notification,
              recipient: admin,
              project:,
              resource: work_package,
-             journal: work_package.journals.last
+             journal: work_package.journals.last)
     end
     it 'shows a notification bubble with the right number' do
       expect(page).to have_selector('[data-qa-selector="tab-counter-Activity"]', text: '1')
@@ -35,7 +31,7 @@ describe 'Activity tab notifications', js: true, selenium: true do
 
     it 'shows a notification icon next to activities that have an unread notification' do
       expect(page).to have_selector('[data-qa-selector="user-activity-bubble"]', count: 1)
-      expect(page).to have_selector('[data-qa-activity-number="3"] [data-qa-selector="user-activity-bubble"]')
+      expect(page).to have_selector('[data-qa-activity-number="4"] [data-qa-selector="user-activity-bubble"]')
     end
 
     it 'shows a button to mark the notifications as read' do
@@ -94,7 +90,7 @@ describe 'Activity tab notifications', js: true, selenium: true do
   context 'when visiting as an anonymous user', with_settings: { login_required?: false } do
     let(:full_view) { Pages::FullWorkPackage.new(work_package, project) }
     let!(:anonymous_role) do
-      create :anonymous_role, permissions: [:view_work_packages]
+      create(:anonymous_role, permissions: [:view_work_packages])
     end
 
     it 'does not show an error' do

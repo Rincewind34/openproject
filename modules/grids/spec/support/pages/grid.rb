@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -35,14 +35,15 @@ module Pages
         expect(page)
           .to have_content(I18n.t('js.grid.add_widget'))
 
-        SeleniumHubWaiter.wait
+        SeleniumHubWaiter.wait unless using_cuprite?
+
         page.find('[data-qa-selector="op-grid--addable-widget"]', text: Regexp.new("^#{name}$")).click
       end
     end
 
     def expect_no_help_mode
       expect(page)
-        .to have_no_selector('.toolbar-item .icon-add')
+        .not_to have_selector('.toolbar-item .icon-add')
     end
 
     def expect_unable_to_add_widget(row_number, column_number, location, name = nil)
@@ -81,7 +82,14 @@ module Pages
     def within_add_widget_modal(row_number, column_number, location, &)
       area = area_of(row_number, column_number, location)
       area.hover
-      area.find('.grid--widget-add', visible: :all).click
+
+      add_widget_button = if using_cuprite?
+                            area.find('.grid--widget-add')
+                          else
+                            area.find('.grid--widget-add', visible: :all)
+                          end
+
+      add_widget_button.click
 
       within('.spot-modal', &)
     end
@@ -91,7 +99,7 @@ module Pages
       area.hover
 
       expect(area)
-        .to have_no_selector('.grid--widget-add')
+        .not_to have_selector('.grid--widget-add')
     end
 
     def expect_specific_widget_unaddable(row_number, column_number, location, name)

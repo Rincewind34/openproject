@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe Setting, type: :model do
+RSpec.describe Setting do
   before do
     described_class.clear_cache
     described_class.destroy_all
@@ -254,7 +254,7 @@ describe Setting, type: :model do
     end
 
     it "returns unknown if the settings table isn't available yet" do
-      allow(Setting)
+      allow(described_class)
         .to receive(:settings_table_exists_yet?)
         .and_return(false)
       expect(described_class.installation_uuid).to eq("unknown")
@@ -268,7 +268,7 @@ describe Setting, type: :model do
 
       it "returns the existing value if any" do
         # can't use with_settings since described_class.installation_uuid has a custom implementation
-        allow(Setting).to receive(:installation_uuid).and_return "abcd1234"
+        allow(described_class).to receive(:installation_uuid).and_return "abcd1234"
 
         expect(described_class.installation_uuid).to eq("abcd1234")
       end
@@ -297,7 +297,7 @@ describe Setting, type: :model do
 
   # Check that when reading certain setting values that they get overwritten if needed.
   describe "filter saved settings" do
-    describe "with EE token", with_ee: [:conditional_highlighting] do
+    describe "with EE token", with_ee: %i[conditional_highlighting] do
       it "returns the value for 'work_package_list_default_highlighting_mode' without changing it" do
         expect(described_class.work_package_list_default_highlighting_mode).to eq("inline")
       end
@@ -382,12 +382,12 @@ describe Setting, type: :model do
 
     context 'when cache is empty' do
       it 'requests the settings once from database' do
-        expect(Setting).to receive(:pluck).with(:name, :value)
+        allow(described_class).to receive(:pluck).with(:name, :value)
           .once
           .and_call_original
 
-        expect(Rails.cache).to receive(:fetch).once.and_call_original
-        expect(RequestStore).to receive(:fetch).exactly(3).times.and_call_original
+        allow(Rails.cache).to receive(:fetch).once.and_call_original
+        allow(RequestStore).to receive(:fetch).exactly(3).times.and_call_original
 
         # Settings are empty by default
         expect(RequestStore.read(:cached_settings)).to be_nil
@@ -397,6 +397,10 @@ describe Setting, type: :model do
         value = described_class.app_title
         expect(described_class.app_title).to eq 'OpenProject'
         expect(value).to eq(described_class.app_title)
+
+        expect(described_class).to have_received(:pluck).with(:name, :value).once
+        expect(Rails.cache).to have_received(:fetch).once
+        expect(RequestStore).to have_received(:fetch).exactly(3)
 
         # Settings are empty by default
         expect(RequestStore.read(:cached_settings)).to eq({})
@@ -452,68 +456,6 @@ describe Setting, type: :model do
         expect(Rails.cache.read(new_cache_key)).to eq(new_hash)
         expect(RequestStore.read(:cached_settings)).to eq(new_hash)
       end
-    end
-  end
-
-  # tests stuff regarding settings callbacks
-  describe 'callbacks' do
-    # collects data for the dummy callback
-    let(:collector) { [] }
-
-    # a dummy callback that collects data
-    let(:callback)  { lambda { |args| collector << args[:value] } }
-
-    # registers the dummy callback
-    before do
-      described_class.register_callback(:default_projects_modules, &callback)
-    end
-
-    it 'calls a callback when a setting is set' do
-      described_class.default_projects_modules = [:some_value]
-      expect(collector).not_to be_empty
-    end
-
-    it 'calls no callback on invalid setting' do
-      allow_any_instance_of(Setting).to receive(:valid?).and_return(false)
-      described_class.default_projects_modules = 'invalid'
-      expect(collector).to be_empty
-    end
-
-    it 'calls multiple callbacks when a setting is set' do
-      described_class.register_callback(:default_projects_modules, &callback)
-      described_class.default_projects_modules = [:some_value]
-      expect(collector.size).to eq 2
-    end
-
-    it 'calls callbacks every time a setting is set' do
-      described_class.default_projects_modules = [:some_value]
-      described_class.default_projects_modules = [:some_value]
-      expect(collector.size).to eq 2
-    end
-
-    it 'calls only the callbacks belonging to the changed setting' do
-      described_class.register_callback(:host_name, &callback)
-      described_class.default_projects_modules = [:some_value]
-      expect(collector.size).to eq 1
-    end
-
-    it 'attaches to the right setting by passing a string' do
-      described_class.register_callback('app_title', &callback)
-      described_class.app_title = 'some title'
-      expect(collector).not_to be_empty
-    end
-
-    it 'passes the new setting value to the callback' do
-      described_class.default_projects_modules = [:some_value]
-      expect(collector).to include [:some_value]
-    end
-
-    it 'optionally passes the old setting value to the callback as the second argument' do
-      described_class.host_name = 'some name' # set old value
-      cb = lambda { |args| collector << args[:old_value] }
-      described_class.register_callback(:host_name, &cb)
-      described_class.host_name = 'some other name'
-      expect(collector).to include 'some name'
     end
   end
 

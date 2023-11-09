@@ -1,6 +1,6 @@
 // -- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2022 the OpenProject GmbH
+// Copyright (C) 2012-2023 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -53,7 +53,7 @@ export class DateDisplayField extends HighlightableDisplayField {
     }
 
     // Highlight overdue tasks
-    if (this.shouldHighlight && this.canOverdue) {
+    if (this.shouldHighlight && this.canOverdue && !!this.resource.status) {
       const diff = this.timezoneService.daysFromToday(this.value);
 
       this
@@ -61,8 +61,7 @@ export class DateDisplayField extends HighlightableDisplayField {
         .statuses
         .id(this.resource.status.id)
         .get()
-        .toPromise()
-        .then((status) => {
+        .subscribe((status) => {
           if (!status.isClosed) {
             element.classList.add(Highlighting.overdueDate(diff));
           }

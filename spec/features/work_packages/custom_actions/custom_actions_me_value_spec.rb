@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,8 +28,8 @@
 
 require 'spec_helper'
 
-describe 'Custom actions me value', type: :feature, js: true do
-  shared_let(:admin) { create :admin }
+RSpec.describe 'Custom actions me value', js: true, with_cuprite: true, with_ee: %i[custom_actions] do
+  shared_let(:admin) { create(:admin) }
 
   let(:permissions) { %i(view_work_packages edit_work_packages) }
   let(:role) { create(:role, permissions:) }
@@ -40,7 +40,7 @@ describe 'Custom actions me value', type: :feature, js: true do
   end
   let(:type) { create(:type_task) }
   let(:project) { create(:project, types: [type], name: 'This project') }
-  let!(:custom_field) { create :user_wp_custom_field, types: [type], projects: [project] }
+  let!(:custom_field) { create(:user_wp_custom_field, types: [type], projects: [project]) }
   let!(:work_package) do
     create(:work_package,
            type:,
@@ -54,7 +54,6 @@ describe 'Custom actions me value', type: :feature, js: true do
   let(:index_ca_page) { Pages::Admin::CustomActions::Index.new }
 
   before do
-    with_enterprise_token(:custom_actions)
     login_as(admin)
   end
 
@@ -63,11 +62,8 @@ describe 'Custom actions me value', type: :feature, js: true do
     index_ca_page.visit!
 
     new_ca_page = index_ca_page.new
-    retry_block do
-      new_ca_page.visit!
-      new_ca_page.set_name('Set CF to me')
-      new_ca_page.add_action(custom_field.name, I18n.t('custom_actions.actions.assigned_to.executing_user_value'))
-    end
+    new_ca_page.set_name('Set CF to me')
+    new_ca_page.add_action(custom_field.name, I18n.t('custom_actions.actions.assigned_to.executing_user_value'))
 
     new_ca_page.create
 

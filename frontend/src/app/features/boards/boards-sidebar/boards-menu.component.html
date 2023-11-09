@@ -11,8 +11,8 @@
 <div class="op-sidebar--footer">
   <button
     *ngIf="canCreateBoards$ | async"
-    class="button -alt-highlight"
-    (click)="showNewBoardModal()"
+    class="button -alt-highlight -expand"
+    (click)="redirectToNewBoardForm()"
     [title]="text.create_new_board"
     data-qa-selector="sidebar--create-board-button"
   >

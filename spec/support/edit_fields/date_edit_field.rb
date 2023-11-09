@@ -95,7 +95,7 @@ class DateEditField < EditField
     if active?
       modal_element.find(input_selector)
     else
-      page.find(".#{property_name} input")
+      page.find(".#{property_name} .spot-input")
     end
   end
 
@@ -115,7 +115,7 @@ class DateEditField < EditField
 
   def expect_inactive!
     expect(context).to have_selector(display_selector, wait: 10)
-    expect(page).to have_no_selector("#{modal_selector} #{input_selector}")
+    expect(page).not_to have_selector("#{modal_selector} #{input_selector}")
   end
 
   def expect_calendar
@@ -142,7 +142,6 @@ class DateEditField < EditField
       datepicker.set_start_date value.first
       datepicker.set_due_date value.last
 
-      sleep 1
       datepicker.expect_start_date value.first
       datepicker.expect_due_date value.last
     else
@@ -151,7 +150,7 @@ class DateEditField < EditField
   end
 
   def expect_value(value)
-    expect(page).to have_selector(".#{property_name} input", value:)
+    expect(page).to have_selector(".#{property_name} .spot-input", value:)
   end
 
   def set_active_date(value)

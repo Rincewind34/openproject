@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -41,11 +41,29 @@ class WorkPackagesController < ApplicationController
   before_action :load_and_validate_query, only: :index, unless: -> { request.format.html? }
   before_action :load_work_packages, only: :index, if: -> { request.format.atom? }
 
+  def index
+    respond_to do |format|
+      format.html do
+        render :index,
+               locals: { query: @query, project: @project, menu_name: project_or_global_menu },
+               layout: 'angular/angular'
+      end
+
+      format.any(*supported_list_formats) do
+        export_list(request.format.symbol)
+      end
+
+      format.atom do
+        atom_list
+      end
+    end
+  end
+
   def show
     respond_to do |format|
       format.html do
         render :show,
-               locals: { work_package:, menu_name: project_or_wp_query_menu },
+               locals: { work_package:, menu_name: project_or_global_menu },
                layout: 'angular/angular'
       end
 
@@ -59,24 +77,6 @@ class WorkPackagesController < ApplicationController
 
       format.all do
         head :not_acceptable
-      end
-    end
-  end
-
-  def index
-    respond_to do |format|
-      format.html do
-        render :index,
-               locals: { query: @query, project: @project, menu_name: project_or_wp_query_menu },
-               layout: 'angular/angular'
-      end
-
-      format.any(*supported_list_formats) do
-        export_list(request.format.symbol)
-      end
-
-      format.atom do
-        atom_list
       end
     end
   end
@@ -145,7 +145,8 @@ class WorkPackagesController < ApplicationController
   end
 
   def load_and_validate_query
-    @query ||= retrieve_query
+    @query ||= retrieve_query(@project)
+    @query.name = params[:title] if params[:title].present?
 
     unless @query.valid?
       # Ensure outputting an html response

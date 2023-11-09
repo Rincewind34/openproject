@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,8 +28,8 @@
 
 require 'spec_helper'
 
-describe ::API::V3::Groups::GroupRepresenter, 'rendering' do
-  include ::API::V3::Utilities::PathHelper
+RSpec.describe API::V3::Groups::GroupRepresenter, 'rendering' do
+  include API::V3::Utilities::PathHelper
 
   subject(:generated) { representer.to_json }
 
@@ -81,6 +81,18 @@ describe ::API::V3::Groups::GroupRepresenter, 'rendering' do
 
       context 'without the necessary permissions' do
         let(:permissions) { [] }
+
+        it_behaves_like 'has no link'
+      end
+
+      context 'when first having the necessary permissions and then not (caching)' do
+        before do
+          representer.to_json
+
+          allow(current_user)
+            .to receive(:allowed_to_globally?)
+                  .and_return false
+        end
 
         it_behaves_like 'has no link'
       end

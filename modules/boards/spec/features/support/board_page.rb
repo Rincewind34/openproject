@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -47,6 +47,10 @@ module Pages
       @board
     end
 
+    def filters
+      Components::WorkPackages::Filters.new
+    end
+
     def free?
       @board.options['type'] == 'free'
     end
@@ -83,7 +87,7 @@ module Pages
       # Add item in dropdown
       page.find('.menu-item', text: 'Add new card').click
 
-      subject = page.find('#wp-new-inline-edit--field-subject')
+      subject = page.find_by_id('wp-new-inline-edit--field-subject')
       subject.set card_title
       subject.send_keys :enter
 
@@ -126,7 +130,7 @@ module Pages
                                             query: work_package.subject,
                                             results_selector: '.work-packages-partitioned-query-space--container')
 
-      expect(target_dropdown).to have_no_selector('.ui-menu-item', text: work_package.subject)
+      expect(target_dropdown).not_to have_selector('.ui-menu-item', text: work_package.subject)
     end
 
     ##
@@ -169,6 +173,14 @@ module Pages
       drag_n_drop_element(from: source, to: target)
     end
 
+    def wait_for_lists_reload
+      # wait for reload of lists to start and finish
+      # Not sure if that's the most reliable way to do it, but there is nothing visible
+      # about the PATCH request being sent and executed successfully after moving a card.
+      expect(page).to have_selector('.op-loading-indicator', wait: 5)
+      expect(page).not_to have_selector('.op-loading-indicator')
+    end
+
     def add_list(option: nil, query: option)
       if option.nil? && action?
         raise "Must pass value option for action boards"
@@ -202,7 +214,7 @@ module Pages
     end
 
     def expect_not_changed
-      expect(page).to have_no_selector('.editable-toolbar-title--save')
+      expect(page).not_to have_selector('.editable-toolbar-title--save')
     end
 
     def expect_list(name)
@@ -214,7 +226,7 @@ module Pages
     end
 
     def expect_empty
-      expect(page).to have_no_selector('.boards-list--item', wait: 10)
+      expect(page).not_to have_selector('.boards-list--item', wait: 10)
     end
 
     def remove_list(name)
@@ -223,7 +235,7 @@ module Pages
       accept_alert_dialog!
       expect_and_dismiss_toaster message: I18n.t('js.notice_successful_update')
 
-      expect(page).to have_no_selector list_selector(name)
+      expect(page).not_to have_selector list_selector(name)
     end
 
     def click_list_dropdown(list_name, action)
@@ -252,9 +264,9 @@ module Pages
 
     def visit!
       if board.project
-        visit project_work_package_boards_path(project_id: board.project.id, state: board.id)
+        visit project_work_package_board_path(board.project, board)
       else
-        visit work_package_boards_path(state: board.id)
+        visit work_package_board_path(board)
       end
     end
 

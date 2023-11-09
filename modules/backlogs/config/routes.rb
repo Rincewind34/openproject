@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -43,10 +43,6 @@ OpenProject::Application.routes.draw do
         resources :impediments,      controller: :rb_impediments,      only: %i[create update]
 
         resources :tasks,            controller: :rb_tasks,            only: %i[create update]
-
-        resources :export_card_configurations, controller: :rb_export_card_configurations, only: %i[index show] do
-          resources :stories, controller: :rb_stories, only: [:index]
-        end
 
         resources :stories, controller: :rb_stories, only: %i[create update]
       end

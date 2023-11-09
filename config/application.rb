@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -32,11 +32,13 @@ require 'rails/all'
 require 'active_support'
 require 'active_support/dependencies'
 require 'core_extensions'
+require "view_component"
+require "primer/view_components/engine"
 
 # Silence deprecations early on for testing on CI and production
 ActiveSupport::Deprecation.silenced =
   (Rails.env.production? && !ENV['OPENPROJECT_SHOW_DEPRECATIONS']) ||
-  (Rails.env.test? && ENV['CI'])
+  (Rails.env.test? && ENV.fetch('CI', nil))
 
 if defined?(Bundler)
   # Require the gems listed in Gemfile, including any gems
@@ -52,6 +54,31 @@ module OpenProject
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
 
+    # Initialize configuration defaults for a Rails version.
+    #
+    # This includes defaults for versions prior to the target version. See the
+    # configuration guide at
+    # https://guides.rubyonrails.org/configuring.html#versioned-default-values
+    # for the default values associated with a particular version.
+    #
+    # Goal is to reach 7.0 defaults. Overridden defaults should be stored in
+    # specific initializers files. See
+    # https://community.openproject.org/wp/45463 for details.
+    config.load_defaults 5.0
+
+    # Do not require `belongs_to` associations to be present by default.
+    # Rails 5.0+ default is true. Because of history, lots of tests fail when
+    # set to true.
+    config.active_record.belongs_to_required_by_default = false
+
+    # Use new connection handling API. For most applications this won't have any
+    # effect. For applications using multiple databases, this new API provides
+    # support for granular connection swapping.
+    # It has to be done here to prevent having the deprecation warning
+    # displayed. This line and its comment can safely be removed
+    # once `config.load_defaults 6.1` is used.
+    config.active_record.legacy_connection_handling = false
+
     # Sets up logging for STDOUT and configures the default logger formatter
     # so that all environments receive level and timestamp information
     #
@@ -63,7 +90,7 @@ module OpenProject
 
     # Set up STDOUT logging if requested
     if ENV["RAILS_LOG_TO_STDOUT"].present?
-      logger           = ActiveSupport::Logger.new(STDOUT)
+      logger           = ActiveSupport::Logger.new($stdout)
       logger.formatter = config.log_formatter
       config.logger    = ActiveSupport::TaggedLogging.new(logger)
     end
@@ -93,6 +120,13 @@ module OpenProject
     config.paths.add Rails.root.join('lib').to_s, eager_load: true
     config.paths.add Rails.root.join('lib/constraints').to_s, eager_load: true
 
+    # Add lookbook preview paths when enabled
+    if OpenProject::Configuration.lookbook_enabled?
+      config.paths.add Primer::ViewComponents::Engine.root.join('app/components').to_s, eager_load: true
+      config.paths.add Rails.root.join("lookbook/previews").to_s, eager_load: true
+      config.paths.add Primer::ViewComponents::Engine.root.join('previews').to_s, eager_load: true
+    end
+
     # Constants in lib_static should only be loaded once and never be unloaded.
     # That directory contains configurations and patches to rails core functionality.
     config.autoload_once_paths << Rails.root.join('lib_static').to_s
@@ -117,6 +151,9 @@ module OpenProject
 
     # Enable serialization of types [Symbol, Date, Time]
     config.active_record.yaml_column_permitted_classes = [Symbol, Date, Time, ActiveSupport::HashWithIndifferentAccess]
+
+    # Include tstzrange columns in the list of time zone aware types
+    ActiveRecord::Base.time_zone_aware_types += [:tstzrange]
 
     # Activate being able to specify the format in which full_message works.
     # Doing this, it is e.g. possible to avoid having the format of '%{attribute} %{message}' which
@@ -194,8 +231,12 @@ module OpenProject
     # Enable the Rails 7 cache format
     config.active_support.cache_format_version = 7.0
 
+    config.after_initialize do
+      Settings::Definition.add_all
+    end
+
     def self.root_url
-      Setting.protocol + "://" + Setting.host_name
+      "#{Setting.protocol}://#{Setting.host_name}"
     end
 
     ##

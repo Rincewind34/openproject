@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2020 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -25,7 +25,7 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 
-shared_context 'create placeholder user request context' do
+RSpec.shared_context 'create placeholder user request context' do
   include API::V3::Utilities::PathHelper
 
   let(:parameters) do
@@ -40,7 +40,7 @@ shared_context 'create placeholder user request context' do
   let(:parsed_response) { JSON.parse(last_response.body) }
 end
 
-shared_examples 'create placeholder user request flow' do
+RSpec.shared_examples 'create placeholder user request flow' do
   include_context 'create placeholder user request context'
 
   describe 'with EE', with_ee: %i[placeholder_users] do
@@ -69,7 +69,7 @@ shared_examples 'create placeholder user request flow' do
     end
 
     describe 'when the user name already exists' do
-      let!(:placeholder) { create :placeholder_user, name: 'PLACEHOLDER' }
+      let!(:placeholder) { create(:placeholder_user, name: 'PLACEHOLDER') }
 
       it 'returns an error' do
         send_request

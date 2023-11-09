@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,7 +29,7 @@
 require 'spec_helper'
 require File.expand_path('../support/permission_specs', __dir__)
 
-describe ForumsController, 'manage_forums permission', type: :controller do
+RSpec.describe ForumsController, 'manage_forums permission', type: :controller do
   include PermissionSpecs
 
   check_permission_required_for('forums#create', :manage_forums)

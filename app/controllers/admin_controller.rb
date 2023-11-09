@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -72,16 +72,6 @@ class AdminController < ApplicationController
     end
     ActionMailer::Base.raise_delivery_errors = raise_delivery_errors
     redirect_to admin_settings_mail_notifications_path
-  end
-
-  def force_user_language
-    available_languages = Setting.find_by(name: 'available_languages').value
-    User.where.not(language: available_languages).each do |u|
-      u.language = Setting.default_language
-      u.save
-    end
-
-    redirect_to :back
   end
 
   def info

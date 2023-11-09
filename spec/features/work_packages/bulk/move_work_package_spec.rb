@@ -2,8 +2,8 @@ require 'spec_helper'
 require 'features/page_objects/notification'
 require 'support/components/autocompleter/ng_select_autocomplete_helpers'
 
-describe 'Moving a work package through Rails view', js: true do
-  include ::Components::Autocompleter::NgSelectAutocompleteHelpers
+RSpec.describe 'Moving a work package through Rails view', js: true do
+  include Components::Autocompleter::NgSelectAutocompleteHelpers
 
   let(:dev_role) do
     create(:role,
@@ -51,9 +51,10 @@ describe 'Moving a work package through Rails view', js: true do
   let(:status) { create(:status) }
   let(:work_package2_status) { status }
 
-  let(:wp_table) { ::Pages::WorkPackagesTable.new(project) }
+  let(:wp_table) { Pages::WorkPackagesTable.new(project) }
+
   let(:context_menu) { Components::WorkPackages::ContextMenu.new }
-  let(:display_representation) { ::Components::WorkPackages::DisplayRepresentation.new }
+  let(:display_representation) { Components::WorkPackages::DisplayRepresentation.new }
   let(:current_user) { mover }
   let(:work_packages) { [work_package, work_package2] }
 
@@ -88,17 +89,37 @@ describe 'Moving a work package through Rails view', js: true do
                             query: 'Target',
                             select_text: 'Target',
                             results_selector: 'body'
-        SeleniumHubWaiter.wait
+        if using_cuprite?
+          wait_for_network_idle
+        else
+          SeleniumHubWaiter.wait
+        end
       end
 
-      it 'moves parent and child wp to a new project' do
-        # Clicking move and follow might be broken due to the location.href
-        # in the refresh-on-form-changes component
-        retry_block do
+      context 'when the limit to move in the frontend is 1',
+              with_settings: { work_packages_bulk_request_limit: 1 } do
+        it 'copies them in the background and shows a status page', :with_cuprite do
           click_on 'Move and follow'
-          page.find('.inline-edit--container.subject', text: work_package.subject, wait: 10)
+          wait_for_reload
+          page.find('[data-qa-selector="job-status--header"]')
+
+          expect(page).to have_text 'The job has been queued and will be processed shortly.'
+
+          perform_enqueued_jobs
+
+          work_package.reload
+          expect(work_package.project_id).to eq(project2.id)
+
+          expect(page).to have_current_path "/projects/#{project2.identifier}/work_packages/#{work_package.id}/activity"
           page.find_by_id('projects-menu', text: 'Target')
         end
+      end
+
+      it 'moves parent and child wp to a new project', :with_cuprite do
+        click_on 'Move and follow'
+        wait_for_reload
+        page.find('.inline-edit--container.subject', text: work_package.subject)
+        page.find_by_id('projects-menu', text: 'Target')
 
         # Should move its children
         child_wp.reload
@@ -108,14 +129,11 @@ describe 'Moving a work package through Rails view', js: true do
       context 'when the target project does not have the type' do
         let!(:project2) { create(:project, name: 'Target', types: [type2]) }
 
-        it 'does moves the work package and changes the type' do
-          # Clicking move and follow might be broken due to the location.href
-          # in the refresh-on-form-changes component
-          retry_block do
-            click_on 'Move and follow'
-            page.find('.inline-edit--container.subject', text: work_package.subject, wait: 10)
-            page.find_by_id('projects-menu', text: 'Target')
-          end
+        it 'does moves the work package and changes the type', :with_cuprite do
+          click_on 'Move and follow'
+          wait_for_reload
+          page.find('.inline-edit--container.subject', text: work_package.subject)
+          page.find_by_id('projects-menu', text: 'Target')
 
           # Should NOT have moved
           child_wp.reload
@@ -128,7 +146,7 @@ describe 'Moving a work package through Rails view', js: true do
       end
 
       context 'when the target project has a type with a required field' do
-        let(:required_cf) { create(:int_wp_custom_field, is_required: true) }
+        let(:required_cf) { create(:integer_wp_custom_field, is_required: true) }
         let(:type2) { create(:type, name: 'Risk', custom_fields: [required_cf]) }
         let!(:project2) { create(:project, name: 'Target', types: [type2], work_package_custom_fields: [required_cf]) }
 
@@ -143,7 +161,7 @@ describe 'Moving a work package through Rails view', js: true do
           end
 
           expect(page)
-            .to have_selector('.flash.error',
+            .to have_selector('.op-toast.-error',
                               text: I18n.t(:'work_packages.bulk.none_could_be_saved',
                                            total: 1))
           child_wp.reload
@@ -164,7 +182,7 @@ describe 'Moving a work package through Rails view', js: true do
             click_on 'Move and follow'
           end
 
-          expect(page).to have_selector('.flash.notice')
+          expect(page).to have_selector('.op-toast.-success')
 
           child_wp.reload
           work_package.reload
@@ -208,17 +226,17 @@ describe 'Moving a work package through Rails view', js: true do
 
     it 'displays an error message explaining which work package could not be moved and why' do
       expect(page)
-        .to have_selector('.flash.error',
+        .to have_selector('.op-toast.-error',
                           text: I18n.t('work_packages.bulk.could_not_be_saved'))
 
       expect(page)
         .to have_selector(
-          '.flash.error',
+          '.op-toast.-error',
           text: "#{work_package2.id}: Project #{I18n.t('activerecord.errors.messages.error_readonly')}"
         )
 
       expect(page)
-        .to have_selector('.flash.error',
+        .to have_selector('.op-toast.-error',
                           text: I18n.t('work_packages.bulk.x_out_of_y_could_be_saved',
                                        failing: 1,
                                        total: 2,

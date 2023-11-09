@@ -13,7 +13,7 @@ keywords: projects FAQ, project questions
 There are several possibilities:
 
 1. To see only the projects without their work packages go to [Projects](../#projects-list) ("View all projects"). Here yo can also display the Project list in a Gantt chart view with all important milestones of all Projects. Therefore you have to click on "Open as Gantt view".
-2. For work packages of all projects click on *Modules -> Work packages* in the upper right hand corner (9 squares) in the navigation bar, to access the [global work packages list](../#global-work-packages-list). Use the view configuration to group the work packages by project.
+2. For work packages of all projects click on *Modules -> Work packages* in the upper right hand corner (9 squares) in the navigation bar, to access the [global work packages list](../#global-work-package-tables). Use the view configuration to group the work packages by project.
 3. Select a project with subprojects, go to the Project overview, add the widget "Work package table" and set the filter "Including subproject". Find more information on this topic [here](../../project-overview/#add-a-widget-to-the-project-overview). Additionally you could add the column "Progress" to compare your different Project progress.
 4. Add the widget "Work package table" to your My page and set the filter mentioned above. Find more information on this topic [here](../../../getting-started/my-page/#configure-the-my-page). Additionally you could add the column "Progress".
 
@@ -53,3 +53,9 @@ Go to the projects overview ("View all projects") and change the filter to not o
 Please navigate to the global projects overview and change the filter to include non-active projects. If you take a look at the project name on the left side (in front of "ARCHIVED project name") there should be an arrow. It is not possible to directly unarchive subprojects (without their parent project) since then it would be unclear in which hierarchy they should be located.
 However, you should be able to unarchive the parent project. Once you have done this, the "unarchive" option should be shown for the project and you can unarchive it.
 Afterwards, you could adjust the hierarchy of the child project (which you originally wanted to unarchive). This way you can archive / unarchive it independently of its parent project.
+
+## Does OpenProject offer portfolio management?
+
+For portfolio management or custom reporting, you can use either the project list, or the global work package table. Both views can be used to create optimal reports via filtering, sorting and other configuration options. 
+
+For more information on portfolio management options in OpenProject please refer to this [Use Case](../../../use-cases/resource-management).

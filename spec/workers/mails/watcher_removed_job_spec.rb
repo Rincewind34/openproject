@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,7 +29,7 @@
 require 'spec_helper'
 require_relative 'shared/watcher_job'
 
-describe Mails::WatcherRemovedJob, type: :model do
+RSpec.describe Mails::WatcherRemovedJob, type: :model do
   include_examples "watcher job", 'removed' do
     let(:watcher_parameter) { watcher.attributes }
 

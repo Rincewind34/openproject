@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,7 +30,7 @@ require 'spec_helper'
 require 'contracts/shared/model_contract_shared_context'
 require_relative 'shared_contract_examples'
 
-describe Users::UpdateContract do
+RSpec.describe Users::UpdateContract do
   include_context 'ModelContract shared context'
 
   it_behaves_like 'user contract' do
@@ -41,22 +41,27 @@ describe Users::UpdateContract do
         firstname: user_firstname,
         lastname: user_lastname,
         login: user_login,
-        mail: user_mail
+        mail: user_mail,
+        password: nil,
+        password_confirmation: nil
       }
     end
 
     context 'when global user' do
-      let(:current_user) { create :user, global_permission: :manage_user }
+      let(:current_user) { create(:user, global_permission: :manage_user) }
 
       describe 'can lock the user' do
         before do
-          # needed for the stub
-          user.password = user.password_confirmation = nil
-
           user.status = Principal.statuses[:locked]
         end
 
         it_behaves_like 'contract is valid'
+      end
+
+      describe 'cannot update an administrator' do
+        let(:user) { build_stubbed(:admin, attributes) }
+
+        it_behaves_like 'contract is invalid'
       end
     end
 
@@ -68,9 +73,6 @@ describe Users::UpdateContract do
 
       context 'when setting status' do
         before do
-          # needed for the stub
-          user.password = user.password_confirmation = nil
-
           user.status = Principal.statuses[:locked]
         end
 

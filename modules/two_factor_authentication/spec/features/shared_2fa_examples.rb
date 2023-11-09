@@ -23,19 +23,19 @@ end
 
 def expect_not_logged_in
   visit my_account_path
-  expect(page).to have_no_selector('.form--field-container', text: user.login)
+  expect(page).not_to have_selector('.form--field-container', text: user.login)
 end
 
-shared_examples 'login without 2FA' do
+RSpec.shared_examples 'login without 2FA' do
   it 'logs in the user without any active devices' do
     first_login_step
     expect_logged_in
   end
 end
 
-shared_examples 'create enforced sms device' do
+RSpec.shared_examples 'create enforced sms device' do
   it do
-    expect(page).to have_selector('.flash.info',
+    expect(page).to have_selector('.op-toast.-info',
                                   text: I18n.t('two_factor_authentication.forced_registration.required_to_add_device'))
 
     SeleniumHubWaiter.wait
@@ -62,7 +62,7 @@ shared_examples 'create enforced sms device' do
 
     # Log token for next access
     sms_token = nil
-    allow_any_instance_of(::OpenProject::TwoFactorAuthentication::TokenStrategy::Developer)
+    allow_any_instance_of(OpenProject::TwoFactorAuthentication::TokenStrategy::Developer)
         .to receive(:create_mobile_otp).and_wrap_original do |m|
       sms_token = m.call
     end
@@ -71,7 +71,7 @@ shared_examples 'create enforced sms device' do
 
     expect(page).to have_selector('h2', text: I18n.t('two_factor_authentication.devices.confirm_device'))
     expect(page).to have_selector('input#otp')
-    expect(page).to have_selector('.flash.error',
+    expect(page).to have_selector('.op-toast.-error',
                                   text: I18n.t('two_factor_authentication.devices.registration_failed_token_invalid'))
 
     SeleniumHubWaiter.wait

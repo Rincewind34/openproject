@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,21 +28,21 @@
 
 require 'spec_helper'
 
-describe 'wiki child pages', type: :feature, js: true do
+RSpec.describe 'wiki child pages', js: true do
   let(:project) do
     create(:project)
   end
   let(:user) do
-    create :user,
+    create(:user,
            member_in_project: project,
-           member_through_role: role
+           member_through_role: role)
   end
   let(:role) do
     create(:role,
            permissions: %i[view_wiki_pages edit_wiki_pages])
   end
   let(:parent_page) do
-    create(:wiki_page_with_content,
+    create(:wiki_page,
            wiki: project.wiki)
   end
   let(:child_page_name) { 'The child page !@#{$%^&*()_},./<>?;\':' }
@@ -57,7 +57,7 @@ describe 'wiki child pages', type: :feature, js: true do
     click_on 'Wiki page'
 
     SeleniumHubWaiter.wait
-    fill_in 'content_page_title', with: child_page_name
+    fill_in 'page_title', with: child_page_name
 
     find('.ck-content').set('The child page\'s content')
 

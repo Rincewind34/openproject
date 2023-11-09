@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,34 +28,34 @@
 
 require 'spec_helper'
 
-describe 'Wysiwyg child pages spec',
-         type: :feature, js: true do
+RSpec.describe 'Wysiwyg child pages spec',
+               js: true do
   let(:project) do
-    create :project,
-           enabled_module_names: %w[wiki]
+    create(:project,
+           enabled_module_names: %w[wiki])
   end
-  let(:editor) { ::Components::WysiwygEditor.new }
+  let(:editor) { Components::WysiwygEditor.new }
   let(:role) { create(:role, permissions: %i[view_wiki_pages edit_wiki_pages]) }
   let(:user) do
     create(:user, member_in_project: project, member_through_role: role)
   end
 
   let(:wiki_page) do
-    create :wiki_page,
+    create(:wiki_page,
            title: 'Test',
-           content: build(:wiki_content, text: '# My page')
+           text: '# My page')
   end
 
   let(:parent_page) do
-    create :wiki_page,
+    create(:wiki_page,
            title: 'Parent page',
-           content: build(:wiki_content, text: '# parent page')
+           text: '# parent page')
   end
 
   let(:child_page) do
-    create :wiki_page,
+    create(:wiki_page,
            title: 'Child page',
-           content: build(:wiki_content, text: '# child page')
+           text: '# child page')
   end
 
   before do
@@ -116,7 +116,7 @@ describe 'Wysiwyg child pages spec',
         # Save wiki page
         click_on 'Save'
 
-        expect(page).to have_selector('.flash.notice')
+        expect(page).to have_selector('.op-toast.-success')
 
         within('#content') do
           expect(page).to have_selector('.pages-hierarchy')
@@ -149,7 +149,7 @@ describe 'Wysiwyg child pages spec',
         # Save wiki page
         click_on 'Save'
 
-        expect(page).to have_selector('.flash.notice')
+        expect(page).to have_selector('.op-toast.-success')
 
         within('#content') do
           expect(page).to have_selector('.pages-hierarchy')

@@ -1,19 +1,21 @@
 require "spec_helper"
 require "support/pages/work_packages/abstract_work_package"
 
-describe "multi select custom values", js: true do
-  shared_let(:admin) { create :admin }
+RSpec.describe "multi select custom values",
+               js: true,
+               with_cuprite: true do
+  shared_let(:admin) { create(:admin) }
   let(:current_user) { admin }
   let(:wp_page) { Pages::FullWorkPackage.new work_package }
   let(:cf_edit_field) do
-    field = wp_page.edit_field "customField#{custom_field.id}"
+    field = wp_page.edit_field custom_field.attribute_name(:camel_case)
     field.field_type = 'create-autocompleter'
     field
   end
 
-  shared_let(:type) { create :type }
-  shared_let(:project) { create :project, types: [type] }
-  shared_let(:role) { create :role }
+  shared_let(:type) { create(:type) }
+  shared_let(:project) { create(:project, types: [type]) }
+  shared_let(:role) { create(:role) }
 
   shared_let(:custom_field) do
     create(
@@ -28,32 +30,32 @@ describe "multi select custom values", js: true do
   before do
     login_as current_user
     wp_page.visit!
-    wp_page.ensure_page_loaded
+    wait_for_reload
   end
 
-  describe 'with mixed users, group, and placeholdders' do
-    let(:work_package) { create :work_package, project:, type: }
+  describe 'with mixed users, group, and placeholders' do
+    let(:work_package) { create(:work_package, project:, type:) }
 
     let!(:user) do
-      create :user,
+      create(:user,
              firstname: 'Da Real',
              lastname: 'User',
              member_in_project: project,
-             member_through_role: role
+             member_through_role: role)
     end
 
     let!(:group) do
-      create :group,
+      create(:group,
              name: 'groupfoo',
              member_in_project: project,
-             member_through_role: role
+             member_through_role: role)
     end
 
     let!(:placeholder) do
-      create :placeholder_user,
+      create(:placeholder_user,
              name: 'PLACEHOLDER',
              member_in_project: project,
-             member_through_role: role
+             member_through_role: role)
     end
 
     it "is shown and allowed to be updated" do
@@ -88,7 +90,7 @@ describe "multi select custom values", js: true do
 
       expect(page).to have_text "groupfoo"
       expect(page).to have_text "PLACEHOLDER"
-      expect(page).to have_no_text "Da Real"
+      expect(page).not_to have_text "Da Real"
 
       work_package.reload
       cvs = work_package
@@ -101,33 +103,33 @@ describe "multi select custom values", js: true do
 
   describe 'with all users' do
     let!(:user1) do
-      create :user,
+      create(:user,
              firstname: 'Billy',
              lastname: 'Nobbler',
              member_in_project: project,
-             member_through_role: role
+             member_through_role: role)
     end
 
     let!(:user2) do
-      create :user,
+      create(:user,
              firstname: 'Cooper',
              lastname: 'Quatermaine',
              member_in_project: project,
-             member_through_role: role
+             member_through_role: role)
     end
 
     let!(:user3) do
-      create :user,
+      create(:user,
              firstname: 'Anton',
              lastname: 'Lupin',
              status: User.statuses[:invited],
              member_in_project: project,
-             member_through_role: role
+             member_through_role: role)
     end
 
     context "with existing custom values" do
       let(:work_package) do
-        wp = build :work_package, project: project, type: type
+        wp = build(:work_package, project:, type:)
 
         wp.custom_field_values = {
           custom_field.id => [user1.id.to_s, user3.id.to_s]
@@ -143,6 +145,8 @@ describe "multi select custom values", js: true do
         expect(page).to have_text "Anton Lupin"
 
         page.find(".inline-edit--display-field", text: "Billy Nobbler").click
+
+        wait_for_reload
 
         cf_edit_field.unset_value "Anton Lupin", multi: true
         cf_edit_field.set_value "Cooper Quatermaine"

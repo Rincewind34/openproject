@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,11 +27,11 @@
 #++
 
 OpenProject::Application.routes.draw do
-  scope 'projects/:project_id' do
-    resources :meetings, only: %i[new create index]
+  resources :projects, only: %i[] do
+    resources :meetings, only: %i[index new create]
   end
 
-  resources :meetings, except: %i[new create index] do
+  resources :meetings do
     resource :agenda, controller: 'meeting_agendas', only: [:update] do
       member do
         get :history

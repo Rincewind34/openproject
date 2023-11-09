@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 require 'spec_helper'
 require 'ostruct'
 
-describe CustomFieldFormBuilder do
+RSpec.describe CustomFieldFormBuilder do
   include Capybara::RSpecMatchers
 
   let(:helper) { ActionView::Base.new(ActionView::LookupContext.new(''), {}, @controller) }
@@ -59,7 +59,7 @@ describe CustomFieldFormBuilder do
 
     before do
       allow(resource)
-        .to receive(custom_field.accessor_name)
+        .to receive(custom_field.attribute_getter)
               .and_return(typed_value)
     end
 
@@ -93,17 +93,21 @@ describe CustomFieldFormBuilder do
         custom_field.field_format = 'date'
       end
 
-      it_behaves_like 'wrapped in container', 'text-field-container' do
+      it_behaves_like 'wrapped in container', 'field-container' do
         let(:container_count) { 2 }
       end
 
       it 'outputs element' do
-        expect(output).to be_html_eql(%{
-          <input class="custom-class -augmented-datepicker form--text-field"
-                 id="user#{custom_field.id}"
-                 name="user[#{custom_field.id}]"
-                 type="text" />
-        }).at_path('input')
+        expect(output).to be_html_eql(
+          <<~HTML
+            <op-basic-single-date-picker
+              class="custom-class"
+              data-value="null"
+              data-id='"user_custom_field_#{custom_field.id}"'
+              data-name='"user[custom_field_#{custom_field.id}]"'
+            ></op-basic-single-date-picker>
+          HTML
+        ).at_path('op-basic-single-date-picker')
       end
     end
 
@@ -188,11 +192,11 @@ describe CustomFieldFormBuilder do
 
     context 'for a list custom field' do
       let(:custom_field) do
-        build_stubbed(:list_wp_custom_field,
-                      custom_options: [custom_option])
+        create(:list_wp_custom_field,
+               custom_options: [custom_option])
       end
       let(:custom_option) do
-        build_stubbed(:custom_option, value: 'my_option')
+        create(:custom_option, value: 'my_option')
       end
 
       it_behaves_like 'wrapped in container', 'select-container' do
@@ -212,7 +216,7 @@ describe CustomFieldFormBuilder do
 
       context 'which is required and has no default value' do
         before do
-          custom_field.is_required = true
+          custom_field.update(is_required: true)
         end
 
         it 'outputs element' do
@@ -229,8 +233,8 @@ describe CustomFieldFormBuilder do
 
       context 'which is required and a default value' do
         before do
-          custom_field.is_required = true
-          custom_option.default_value = true
+          custom_field.update(is_required: true)
+          custom_option.update(default_value: true)
         end
 
         it 'outputs element' do
@@ -256,7 +260,7 @@ describe CustomFieldFormBuilder do
         custom_field.field_format = 'user'
 
         allow(project)
-          .to receive(custom_field.accessor_name)
+          .to receive(custom_field.attribute_getter)
           .and_return typed_value
 
         allow(project)
@@ -311,7 +315,7 @@ describe CustomFieldFormBuilder do
       before do
         custom_field.field_format = 'version'
         allow(project)
-          .to receive(custom_field.accessor_name)
+          .to receive(custom_field.attribute_getter)
                 .and_return typed_value
 
         allow(project)

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -90,6 +90,13 @@ module OpenProject
       link_to(h(text), url_opts, html_options)
     end
 
+    # Generates a link to a query
+    def link_to_query(query, options = {}, html_options = nil)
+      text = h(query.name)
+      url = project_work_packages_url([query.project.id], only_path: options.delete(:only_path) { true }, query_id: query.id)
+      link_to(text, url, html_options)
+    end
+
     # Generates a link to a message
     def link_to_message(message, options = {}, html_options = nil)
       link_to(
@@ -131,14 +138,24 @@ module OpenProject
     end
 
     def url_to_attachment(attachment, only_path: true)
-      # Including the module breaks the application in strange and mysterious ways
-      v3_paths = API::V3::Utilities::PathHelper::ApiV3Path
-
       if only_path
         v3_paths.attachment_content(attachment.id)
       else
         v3_paths.url_for(:attachment_content, attachment.id)
       end
+    end
+
+    def url_to_file_link(file_link, only_path: true)
+      if only_path
+        v3_paths.file_link_open(file_link.id)
+      else
+        v3_paths.url_for(:file_link_open, file_link.id)
+      end
+    end
+
+    def v3_paths
+      # Including the module breaks the application in strange and mysterious ways
+      API::V3::Utilities::PathHelper::ApiV3Path
     end
   end
 end

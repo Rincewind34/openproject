@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe SCM::CreateLocalRepositoryJob do
+RSpec.describe SCM::CreateLocalRepositoryJob do
   let(:instance) { described_class.new }
   # Allow to override configuration values to determine
   # whether to activate managed repositories
@@ -44,7 +44,7 @@ describe SCM::CreateLocalRepositoryJob do
     allow(OpenProject::Configuration).to receive(:[]).with('scm').and_return(config)
   end
 
-  describe 'with a managed repository' do
+  describe 'with a managed repository', skip_if_command_unavailable: 'svnadmin' do
     include_context 'with tmpdir'
 
     let(:project) { build(:project) }
@@ -62,7 +62,7 @@ describe SCM::CreateLocalRepositoryJob do
     shared_examples 'creates a directory with mode' do |expected|
       it 'creates the directory' do
         subject
-        expect(Dir.exists?(repository.root_url)).to be true
+        expect(Dir.exist?(repository.root_url)).to be true
 
         file_mode = File.stat(repository.root_url).mode
         expect(sprintf("%o", file_mode)).to end_with(expected)

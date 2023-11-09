@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,8 +28,8 @@
 
 require 'spec_helper'
 
-describe 'Meetings close', type: :feature do
-  let(:project) { create :project, enabled_module_names: %w[meetings] }
+RSpec.describe 'Meetings close' do
+  let(:project) { create(:project, enabled_module_names: %w[meetings]) }
   let(:user) do
     create(:user,
            member_in_project: project,
@@ -41,8 +41,8 @@ describe 'Meetings close', type: :feature do
            member_with_permissions: permissions)
   end
 
-  let!(:meeting) { create :meeting, project:, title: 'Own awesome meeting!', author: user }
-  let!(:meeting_agenda) { create :meeting_agenda, meeting:, text: "asdf" }
+  let!(:meeting) { create(:meeting, project:, title: 'Own awesome meeting!', author: user) }
+  let!(:meeting_agenda) { create(:meeting_agenda, meeting:, text: "asdf") }
 
   before do
     login_as(user)
@@ -57,30 +57,27 @@ describe 'Meetings close', type: :feature do
       click_link meeting.title
 
       # Go to minutes, expect uneditable
-      SeleniumHubWaiter.wait
       find('.op-tab-row--link', text: 'MINUTES').click
 
       expect(page).to have_selector('.button', text: 'Close the agenda to begin the Minutes')
 
       # Close the meeting
-      SeleniumHubWaiter.wait
       find('.op-tab-row--link', text: 'AGENDA').click
-      SeleniumHubWaiter.wait
-      find('.button', text: 'Close').click
-      page.accept_confirm
+      accept_confirm do
+        find('.button', text: 'Close').click
+      end
 
       # Expect to be on minutes
       expect(page).to have_selector('.op-tab-row--link_selected', text: 'MINUTES')
 
       # Copies the text
-      expect(page).to have_selector('#meeting_minutes-text', text: 'asdf')
+      expect(page).to have_selector('#tab-content-minutes', text: 'asdf')
 
       # Go back to agenda, expect we can open it again
-      SeleniumHubWaiter.wait
       find('.op-tab-row--link', text: 'AGENDA').click
-      SeleniumHubWaiter.wait
-      find('.button', text: 'Open').click
-      page.accept_confirm
+      accept_confirm do
+        find('.button', text: 'Open').click
+      end
       expect(page).to have_selector('.button', text: 'Close')
     end
   end
@@ -92,7 +89,7 @@ describe 'Meetings close', type: :feature do
       visit meetings_path(project)
 
       expect(page)
-        .to have_no_link 'Close'
+        .not_to have_link 'Close'
     end
   end
 end

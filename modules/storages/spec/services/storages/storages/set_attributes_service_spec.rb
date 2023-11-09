@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,11 +28,11 @@
 
 require 'spec_helper'
 
-describe ::Storages::Storages::SetAttributesService, type: :model do
+RSpec.describe Storages::Storages::SetAttributesService, type: :model do
   let(:current_user) { build_stubbed(:admin) }
 
   let(:contract_instance) do
-    contract = instance_double(::Storages::Storages::BaseContract, 'contract_instance')
+    contract = instance_double(Storages::Storages::BaseContract, 'contract_instance')
     allow(contract)
       .to receive(:validate)
       .and_return(contract_valid)
@@ -52,16 +52,16 @@ describe ::Storages::Storages::SetAttributesService, type: :model do
                         contract_class:,
                         contract_options: {})
   end
-  let(:model_instance) { ::Storages::Storage.new }
+  let(:model_instance) { Storages::Storage.new }
   let(:contract_class) do
-    allow(::Storages::Storages::CreateContract)
+    allow(Storages::Storages::CreateContract)
       .to receive(:new)
       .and_return(contract_instance)
 
-    ::Storages::Storages::CreateContract
+    Storages::Storages::CreateContract
   end
 
-  let(:params) { {} }
+  let(:params) { { provider_type: Storages::Storage::PROVIDER_TYPE_NEXTCLOUD } }
 
   before do
     allow(model_instance)
@@ -131,10 +131,7 @@ describe ::Storages::Storages::SetAttributesService, type: :model do
 
     it 'assigns the params' do
       expect(model_instance.name).to eq 'Foobar'
-    end
-
-    it 'cannot assign provider_type to anything else than "nextcloud"' do
-      expect(model_instance.provider_type).to eq Storages::Storage::PROVIDER_TYPE_NEXTCLOUD
+      expect(model_instance.provider_type).to eq 'foo provider'
     end
   end
 
@@ -148,6 +145,50 @@ describe ::Storages::Storages::SetAttributesService, type: :model do
     it "returns the contract's errors" do
       expect(subject.errors)
         .to eql(contract_errors)
+    end
+  end
+
+  describe 'automatically managed project folders' do
+    let(:model_instance) { build_stubbed(:nextcloud_storage) }
+
+    context 'with password' do
+      let(:params) do
+        super().merge(
+          "automatically_managed" => true,
+          "password" => "secret"
+        )
+      end
+
+      it 'enables automatic folder management with password' do
+        expect(subject.result).to have_attributes(automatically_managed: true, username: 'OpenProject',
+                                                  password: 'secret')
+      end
+    end
+
+    context 'with automatically_managed false' do
+      let(:params) do
+        super().merge(
+          "automatically_managed" => false
+        )
+      end
+
+      it 'disables automatic folder management' do
+        expect(subject.result).to have_attributes(automatically_managed: false)
+        expect(subject.result.attributes.keys).not_to include(:username, :password)
+      end
+    end
+
+    context 'with automatically_managed nil' do
+      let(:params) do
+        super().merge(
+          "automatically_managed" => nil
+        )
+      end
+
+      it 'does not change the value' do
+        expect(subject.result).to have_attributes(automatically_managed: nil)
+        expect(subject.result.attributes.keys).not_to include(:username, :password)
+      end
     end
   end
 end

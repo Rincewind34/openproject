@@ -1,6 +1,6 @@
 #-- copyright
 #OpenProject is an open source project management software.
-#Copyright (C) 2012-2022 the OpenProject GmbH
+#Copyright (C) 2012-2023 the OpenProject GmbH
 #This program is free software; you can redistribute it and/or
 #modify it under the terms of the GNU General Public License version 3.
 #OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
@@ -21,6 +21,10 @@
 #++
 #English strings go here for Rails i18n
 ko:
+  plugin_openproject_meeting:
+    name: "OpenProject Meeting"
+    description: >-
+      This module adds functions to support project meetings to OpenProject. Meetings can be scheduled selecting invitees from the same project to take part in the meeting. An agenda can be created and sent to the invitees. After the meeting, attendees can be selected and minutes can be created based on the agenda. Finally, the minutes can be sent to all attendees and invitees.
   activerecord:
     attributes:
       meeting:
@@ -29,6 +33,7 @@ ko:
         participants: "참가자"
         participants_attended: "참석자"
         participants_invited: "초대된 사람"
+        project: "프로젝트"
         start_time: "시간"
         start_time_hour: "시작 시간"
     errors:
@@ -37,6 +42,9 @@ ko:
     models:
       meeting_agenda: "의제"
       meeting_minutes: "의사록"
+  activity:
+    filter:
+      meeting: "미팅"
   description_attended: "참석함"
   description_invite: "초대됨"
   events:
@@ -58,6 +66,13 @@ ko:
   label_meeting_agenda_close: "의사록을 시작하려면 의제 닫기"
   label_meeting_date_time: "날짜/시간"
   label_meeting_diff: "차이"
+  label_upcoming_meetings: "다가오는 이벤트"
+  label_past_meetings: "지난 미팅"
+  label_involvement: "참여"
+  label_upcoming_invitations: "다가오는 초대"
+  label_past_invitations: "과거 초대"
+  label_attendee: "참석자"
+  label_author: "만든이"
   label_notify: "검토를 위해 보내기"
   label_icalendar: "iCalendar 보내기"
   label_version: "버전"
@@ -82,7 +97,7 @@ ko:
   text_duration_in_hours: "기간(시간)"
   text_in_hours: " 시간"
   text_meeting_agenda_for_meeting: '미팅 "%{meeting}"에 대한 의제'
-  text_meeting_closing_are_you_sure: "이 미팅을 닫으시겠습니까?"
+  text_meeting_closing_are_you_sure: "미팅 어젠더를 닫으시겠습니까?"
   text_meeting_agenda_open_are_you_sure: "그러면 몇 분 내에 모든 변경 사항을 덮어씁니다. 계속하시겠습니까?"
   text_meeting_minutes_for_meeting: '미팅 "%{meeting}"에 대한 의사록'
   text_review_meeting_agenda: "%{author} 님이 검토를 위해 %{link}을(를) 넣었습니다."

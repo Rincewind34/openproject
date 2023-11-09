@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,7 +30,7 @@ require 'spec_helper'
 require_relative './../support//board_index_page'
 require_relative './../support/board_page'
 
-describe 'Status action board', type: :feature, js: true do
+RSpec.describe 'Status action board', js: true, with_ee: %i[board_view] do
   let(:user) do
     create(:user,
            member_in_project: project,
@@ -44,16 +44,16 @@ describe 'Status action board', type: :feature, js: true do
 
   let(:permissions) do
     %i[show_board_views manage_board_views add_work_packages
-       edit_work_packages view_work_packages manage_public_queries]
+       edit_work_packages move_work_packages view_work_packages manage_public_queries]
   end
 
-  let!(:priority) { create :default_priority }
-  let!(:open_status) { create :default_status, name: 'Open' }
-  let!(:other_status) { create :status, name: 'Whatever' }
-  let!(:closed_status) { create :status, is_closed: true, name: 'Closed' }
-  let!(:work_package) { create :work_package, project:, subject: 'Foo', status: other_status }
+  let!(:priority) { create(:default_priority) }
+  let!(:open_status) { create(:default_status, name: 'Open') }
+  let!(:whatever_status) { create(:status, name: 'Whatever') }
+  let!(:closed_status) { create(:status, is_closed: true, name: 'Closed') }
+  let!(:work_package) { create(:work_package, project:, subject: 'Foo', status: whatever_status) }
 
-  let(:filters) { ::Components::WorkPackages::Filters.new }
+  let(:filters) { Components::WorkPackages::Filters.new }
 
   let!(:workflow_type) do
     create(:workflow,
@@ -66,7 +66,7 @@ describe 'Status action board', type: :feature, js: true do
     create(:workflow,
            type:,
            role:,
-           old_status_id: other_status.id,
+           old_status_id: whatever_status.id,
            new_status_id: open_status.id)
   end
   let!(:workflow_type_back_open) do
@@ -76,9 +76,15 @@ describe 'Status action board', type: :feature, js: true do
            old_status_id: closed_status.id,
            new_status_id: open_status.id)
   end
+  let!(:workflow_type_open_to_whatever) do
+    create(:workflow,
+           type:,
+           role:,
+           old_status_id: open_status.id,
+           new_status_id: whatever_status.id)
+  end
 
   before do
-    with_enterprise_token :board_view
     project
     login_as(user)
   end
@@ -88,7 +94,7 @@ describe 'Status action board', type: :feature, js: true do
       board_index.visit!
 
       # Create new board
-      board_page = board_index.create_board action: :Status
+      board_page = board_index.create_board action: 'Status'
 
       # expect lists of default status
       board_page.expect_list 'Open'
@@ -97,11 +103,57 @@ describe 'Status action board', type: :feature, js: true do
       board_page.expect_list 'Closed'
     end
 
+    it 'does not change moving card project when filtering on projects (Bug #44895)' do
+      other_project = create(:project,
+                             types: [type],
+                             enabled_module_names: %i[work_package_tracking board_view],
+                             members: { user => role })
+      board_index.visit!
+
+      # Create new board
+      board_page = board_index.create_board action: 'Status'
+
+      board_page.add_list option: 'Whatever'
+      board_page.expect_list 'Whatever'
+
+      # Add item
+      board_page.add_card 'Open', 'New Task'
+
+      # Add projects filter
+      board_page.filters.open
+      # binding.pry
+      # board_page.filters.add_filter('Project')
+      # board_page.filters.add_filter_by('Project', 'is (OR)', [other_project.name, project.name])
+
+      board_page.filters.add_filter_by('Project', 'is not', other_project.name)
+      board_page.filters.expect_filter_count 1
+
+      # wait for the chain of debounces:
+      # - 250ms in frontend/src/app/features/work-packages/components/filters/filter-project/filter-project.component.ts
+      # - 500ms in frontend/src/app/features/work-packages/components/filters/query-filters/query-filters.component.ts
+      # - 250ms in frontend/src/app/features/boards/board/board-filter/board-filter.component.ts
+      sleep(1)
+      # wait for the loading indicators to disappear
+      loading_indicator_saveguard
+
+      # move card
+      board_page.move_card(0, from: 'Open', to: 'Whatever')
+      board_page.wait_for_lists_reload
+
+      board_page.expect_card('Whatever', 'New Task', present: true)
+
+      wp_task = WorkPackage.find_by(subject: 'New Task')
+
+      expect(wp_task.status).to eq(whatever_status), 'Moving the card should have updated the status'
+      expect(wp_task.project).to eq(project), 'Moving the card should not change the project'
+    end
+
     it 'allows management of boards' do
       board_index.visit!
 
       # Create new board
-      board_page = board_index.create_board action: :Status
+      board_page = board_index.create_board title: 'My Status Board',
+                                            action: 'Status'
 
       # expect lists of default status
       board_page.expect_list 'Open'
@@ -110,7 +162,7 @@ describe 'Status action board', type: :feature, js: true do
       board_page.expect_list 'Closed'
 
       board_page.board(reload: true) do |board|
-        expect(board.name).to eq 'Action board (status)'
+        expect(board.name).to eq 'My Status Board'
         queries = board.contained_queries
         expect(queries.count).to eq(2)
 
@@ -145,7 +197,7 @@ describe 'Status action board', type: :feature, js: true do
 
       # Expect work package to be saved in query first
       subjects = WorkPackage.where(id: first.ordered_work_packages.pluck(:work_package_id)).pluck(:subject, :status_id)
-      expect(subjects).to match_array [['Task 1', open_status.id]]
+      expect(subjects).to contain_exactly(['Task 1', open_status.id])
 
       # Move item to Closed
       board_page.move_card(0, from: 'Open', to: 'Closed')
@@ -160,7 +212,7 @@ describe 'Status action board', type: :feature, js: true do
       end
 
       subjects = WorkPackage.where(id: second.ordered_work_packages.pluck(:work_package_id)).pluck(:subject, :status_id)
-      expect(subjects).to match_array [['Task 1', closed_status.id]]
+      expect(subjects).to contain_exactly(['Task 1', closed_status.id])
 
       # Try to drag to whatever, which has no workflow
       board_page.move_card(0, from: 'Closed', to: 'Whatever')
@@ -220,7 +272,7 @@ describe 'Status action board', type: :feature, js: true do
       expect(queries.first.ordered_work_packages).to be_empty
 
       subjects = WorkPackage.where(id: second.ordered_work_packages.pluck(:work_package_id))
-      expect(subjects.pluck(:subject, :status_id)).to match_array [['Task 1', closed_status.id]]
+      expect(subjects.pluck(:subject, :status_id)).to contain_exactly(['Task 1', closed_status.id])
 
       # Open remaining in split view
       wp = second.ordered_work_packages.first.work_package
@@ -247,14 +299,15 @@ describe 'Status action board', type: :feature, js: true do
       board_index.visit!
 
       # Create new board
-      board_page = board_index.create_board action: :Status
+      board_page = board_index.create_board action: 'Status'
 
       # expect lists of default status
       board_page.expect_list 'Open'
       expect(board_page.list_count).to eq(1)
 
+      board_index.visit!
       # Create another status board
-      second_board_page = board_index.create_board action: :Status, via_toolbar: true
+      second_board_page = board_index.create_board action: 'Status', via_toolbar: false
 
       # Expect only one list with the default status
       second_board_page.expect_list 'Open'

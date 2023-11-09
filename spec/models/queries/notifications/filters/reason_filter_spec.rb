@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe Queries::Notifications::Filters::ReasonFilter do
+RSpec.describe Queries::Notifications::Filters::ReasonFilter do
   it_behaves_like 'basic query filter' do
     let(:class_key) { :reason }
     let(:type) { :list }
@@ -39,7 +39,7 @@ describe Queries::Notifications::Filters::ReasonFilter do
     it_behaves_like 'non ar filter'
 
     describe '#allowed_values' do
-      context 'with enterprise', with_ee: [:date_alerts] do
+      context 'with enterprise', with_ee: %i[date_alerts] do
         it 'contains all the REASONS' do
           expect(instance.allowed_values).to eq(described_class::REASONS.keys.map { |r| [r, r] })
         end

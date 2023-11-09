@@ -1,6 +1,6 @@
 // -- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2022 the OpenProject GmbH
+// Copyright (C) 2012-2023 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -38,20 +38,21 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
+import { Observable } from 'rxjs';
+import { filter, map, tap } from 'rxjs/operators';
+
+import { States } from 'core-app/core/states/states.service';
+import { I18nService } from 'core-app/core/i18n/i18n.service';
 import { HalResource } from 'core-app/features/hal/resources/hal-resource';
 import { HalResourceService } from 'core-app/features/hal/services/hal-resource.service';
-import { I18nService } from 'core-app/core/i18n/i18n.service';
-import { States } from 'core-app/core/states/states.service';
-import { filter, map, tap } from 'rxjs/operators';
 import { UntilDestroyedMixin } from 'core-app/shared/helpers/angular/until-destroyed.mixin';
 import { populateInputsFromDataset } from 'core-app/shared/components/dataset-inputs';
-import { UploadFile } from 'core-app/core/file-upload/op-file-upload.service';
 import { AttachmentsResourceService } from 'core-app/core/state/attachments/attachments.service';
 import { ToastService } from 'core-app/shared/components/toaster/toast.service';
+import { OpUploadService } from 'core-app/core/upload/upload.service';
 import { TimezoneService } from 'core-app/core/datetime/timezone.service';
-import isNewResource from 'core-app/features/hal/helpers/is-new-resource';
 import { IAttachment } from 'core-app/core/state/attachments/attachment.model';
-import { Observable } from 'rxjs';
+import isNewResource from 'core-app/features/hal/helpers/is-new-resource';
 
 function containsFiles(dataTransfer:DataTransfer):boolean {
   return dataTransfer.types.indexOf('Files') >= 0;
@@ -62,18 +63,15 @@ export const attachmentsSelector = 'op-attachments';
 @Component({
   selector: attachmentsSelector,
   templateUrl: './attachments.component.html',
-  styleUrls: ['./attachments.component.sass'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnInit, OnDestroy {
   @HostBinding('attr.data-qa-selector') public qaSelector = 'op-attachments';
 
-  @HostBinding('id.attachments_fields') public hostId = true;
+  @HostBinding('class.op-file-section') public className = true;
 
-  @HostBinding('class.op-attachments') public className = true;
-
-  @Input('resource') public resource:HalResource;
+  @Input() public resource:HalResource;
 
   @Input() public allowUploading = true;
 
@@ -83,7 +81,7 @@ export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnIni
 
   public draggingOverDropZone = false;
 
-  public dragging = false;
+  public dragging = 0;
 
   @ViewChild('hiddenFileInput') public filePicker:ElementRef<HTMLInputElement>;
 
@@ -91,7 +89,7 @@ export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnIni
     attachments: this.I18n.t('js.label_attachments'),
     uploadLabel: this.I18n.t('js.label_add_attachments'),
     dropFiles: this.I18n.t('js.label_drop_files'),
-    dropFilesHint: this.I18n.t('js.label_drop_files_hint'),
+    dropClickFiles: this.I18n.t('js.label_drop_or_click_files'),
     foldersWarning: this.I18n.t('js.label_drop_folders_hint'),
   };
 
@@ -100,17 +98,39 @@ export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnIni
     return attachments.href;
   }
 
-  private get collectionKey():string {
+  public get collectionKey():string {
     return isNewResource(this.resource) ? 'new' : this.attachmentsSelfLink;
   }
+
+  private onGlobalDragLeave:(_event:DragEvent) => void = (_event) => {
+    this.dragging = Math.max(this.dragging - 1, 0);
+    this.cdRef.detectChanges();
+  };
+
+  private onGlobalDragEnd:(_event:DragEvent) => void = (_event) => {
+    this.dragging = 0;
+    this.cdRef.detectChanges();
+  };
+
+  private onGlobalDragEnter:(_event:DragEvent) => void = (_event) => {
+    // When the global drag and drop is active and the dragging happens over the DOM
+    // elements, the dragenter and dragleave events are always fired in pairs.
+    // On dragenter the this.dragging is set to 2 and on dragleave we deduct it to 1,
+    // meaning the drag and drop remains active. When the drag and drop action is canceled
+    // i.e. by the "Escape" key, an extra dragleave event is fired.
+    // In this case this.dragging will be deducted to 0, disabling the active drop areas.
+    this.dragging = 2;
+    this.cdRef.detectChanges();
+  };
 
   constructor(
     public elementRef:ElementRef,
     protected readonly I18n:I18nService,
     protected readonly states:States,
+    protected readonly toastService:ToastService,
+    private readonly uploadService:OpUploadService,
     protected readonly halResourceService:HalResourceService,
     protected readonly attachmentsResourceService:AttachmentsResourceService,
-    protected readonly toastService:ToastService,
     protected readonly timezoneService:TimezoneService,
     protected readonly cdRef:ChangeDetectorRef,
   ) {
@@ -136,7 +156,7 @@ export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnIni
 
     // ensure collection is loaded to the store
     if (!isNewResource(this.resource)) {
-      this.attachmentsResourceService.requireCollection(this.attachmentsSelfLink);
+      this.attachmentsResourceService.requireCollection(this.attachmentsSelfLink).subscribe();
     }
 
     const compareCreatedAtTimestamps = (a:IAttachment, b:IAttachment):number => {
@@ -160,13 +180,17 @@ export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnIni
         }),
       );
 
-    document.body.addEventListener('dragover', this.onGlobalDragOver.bind(this));
-    document.body.addEventListener('dragleave', this.onGlobalDragLeave.bind(this));
+    document.body.addEventListener('dragenter', this.onGlobalDragEnter);
+    document.body.addEventListener('dragleave', this.onGlobalDragLeave);
+    document.body.addEventListener('dragend', this.onGlobalDragEnd);
+    document.body.addEventListener('drop', this.onGlobalDragEnd);
   }
 
   ngOnDestroy():void {
-    document.body.removeEventListener('dragover', this.onGlobalDragOver.bind(this));
-    document.body.removeEventListener('dragleave', this.onGlobalDragLeave.bind(this));
+    document.body.removeEventListener('dragenter', this.onGlobalDragEnter);
+    document.body.removeEventListener('dragleave', this.onGlobalDragLeave);
+    document.body.removeEventListener('dragend', this.onGlobalDragEnd);
+    document.body.removeEventListener('drop', this.onGlobalDragEnd);
   }
 
   public triggerFileInput():void {
@@ -177,8 +201,9 @@ export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnIni
     const fileList = this.filePicker.nativeElement.files;
     if (fileList === null) return;
 
-    const files:UploadFile[] = Array.from(fileList);
-    this.uploadFiles(files);
+    this.uploadFiles(Array.from(fileList));
+    // reset file input, so that selecting the same file again triggers a change
+    this.filePicker.nativeElement.value = '';
   }
 
   public onDropFiles(event:DragEvent):void {
@@ -186,20 +211,10 @@ export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnIni
 
     // eslint-disable-next-line no-param-reassign
     event.dataTransfer.dropEffect = 'copy';
-    event.preventDefault();
-    event.stopPropagation();
 
-    const dfFiles = event.dataTransfer.files;
-    const length:number = dfFiles ? dfFiles.length : 0;
-
-    const files:UploadFile[] = [];
-    for (let i = 0; i < length; i++) {
-      files.push(dfFiles[i]);
-    }
-
-    this.uploadFiles(files);
+    this.uploadFiles(Array.from(event.dataTransfer.files));
     this.draggingOverDropZone = false;
-    this.dragging = false;
+    this.dragging = 0;
   }
 
   public onDragOver(event:DragEvent):void {
@@ -214,24 +229,12 @@ export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnIni
     this.draggingOverDropZone = false;
   }
 
-  public onGlobalDragLeave():void {
-    this.dragging = false;
-
-    this.cdRef.detectChanges();
-  }
-
-  public onGlobalDragOver():void {
-    this.dragging = true;
-
-    this.cdRef.detectChanges();
-  }
-
-  protected uploadFiles(files:UploadFile[]):void {
-    let uploadFiles = files || [];
+  protected uploadFiles(files:File[]):void {
+    let filesWithoutFolders = files || [];
     const countBefore = files.length;
-    uploadFiles = this.filterFolders(uploadFiles);
+    filesWithoutFolders = this.filterFolders(filesWithoutFolders);
 
-    if (uploadFiles.length === 0) {
+    if (filesWithoutFolders.length === 0) {
       // If we filtered all files as directories, show a notice
       if (countBefore > 0) {
         this.toastService.addNotice(this.text.foldersWarning);
@@ -242,7 +245,7 @@ export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnIni
 
     this
       .attachmentsResourceService
-      .attachFiles(this.resource, uploadFiles)
+      .attachFiles(this.resource, filesWithoutFolders)
       .subscribe();
   }
 
@@ -251,7 +254,7 @@ export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnIni
    * or empty file sizes.
    * @param files
    */
-  protected filterFolders(files:UploadFile[]):UploadFile[] {
+  protected filterFolders(files:File[]):File[] {
     return files.filter((file) => {
       // Folders never have a mime type
       if (file.type !== '') {

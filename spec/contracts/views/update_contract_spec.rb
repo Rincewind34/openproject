@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,12 +29,11 @@
 require 'spec_helper'
 require_relative './shared_contract_examples'
 
-describe Views::UpdateContract do
+RSpec.describe Views::UpdateContract do
   # TODO: this is just a stub to ensure that the type is not altered
   it_behaves_like 'view contract' do
     let(:view) do
-      FactoryBot
-        .build_stubbed(:view_work_packages_table).tap do |view|
+      build_stubbed(:view_work_packages_table).tap do |view|
         view.type = view_type if defined?(view_type)
         view.query = view_query
       end

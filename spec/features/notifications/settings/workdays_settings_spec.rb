@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Workday notification settings", type: :feature, js: true do
+RSpec.describe "Workday notification settings", js: true, with_cuprite: true do
   shared_examples 'workday settings' do
     before do
       current_user.language = locale
@@ -97,6 +97,22 @@ describe "Workday notification settings", type: :feature, js: true do
         expect(pref.reload.workdays).to eq [1, 2, 5, 6]
       end
     end
+
+    context 'with Chinese Simplified locale and start of week setting defined',
+            with_settings: {
+              start_of_week: 1,
+              first_week_of_year: 1
+            } do
+      let(:locale) { 'zh-CN' }
+
+      it 'displays week days in Chinese (bug #49848)' do
+        settings_page.visit!
+
+        I18n.t('date.day_names', locale:).map(&:strip).each do |day_name|
+          expect(page).to have_field(day_name)
+        end
+      end
+    end
   end
 
   context 'with the my page' do
@@ -104,7 +120,7 @@ describe "Workday notification settings", type: :feature, js: true do
     let(:pref) { current_user.pref }
 
     current_user do
-      create :user
+      create(:user)
     end
 
     it_behaves_like 'workday settings'
@@ -113,11 +129,11 @@ describe "Workday notification settings", type: :feature, js: true do
   context 'with the user administration page' do
     let(:settings_page) { Pages::Reminders::Settings.new(other_user) }
 
-    let(:other_user) { create :user }
+    let(:other_user) { create(:user) }
     let(:pref) { other_user.pref }
 
     current_user do
-      create :admin
+      create(:admin)
     end
 
     it_behaves_like 'workday settings'

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-shared_examples_for 'acts_as_watchable included' do
+RSpec.shared_examples_for 'acts_as_watchable included' do
   before do
     unless defined?(model_instance) &&
            defined?(watch_permission) &&
@@ -101,7 +101,7 @@ MESSAGE
   shared_context 'anonymous role has the permission to watch' do
     let(:anonymous_role) do
       permissions = is_public_permission ? [] : [watch_permission]
-      build :anonymous_role, permissions:
+      build(:anonymous_role, permissions:)
     end
 
     before do
@@ -116,7 +116,7 @@ MESSAGE
       # in case the model_instance creates users, we do not want them
       # to mess with our expected users
       model_instance
-      User.destroy_all
+      User.not_builtin.update_all(status: User.statuses[:locked])
 
       Role.non_member
       Role.anonymous
@@ -200,7 +200,7 @@ MESSAGE
       # in case the model_instance creates users, we do not want them
       # to mess with our expected users
       model_instance
-      User.destroy_all
+      User.not_builtin.update_all(status: User.statuses[:locked])
 
       User.system.save!
 

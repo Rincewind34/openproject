@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,12 +28,25 @@
 
 require 'spec_helper'
 
-describe Member, type: :model do
+RSpec.describe Member do
   let(:user) { create(:user) }
   let(:role) { create(:role) }
   let(:project) { create(:project) }
   let(:member) { create(:member, user:, roles: [role]) }
   let(:new_member) { build(:member, user:, roles: [role], project:) }
+
+  describe 'Associations' do
+    it { expect(member).to belong_to(:principal) }
+    it { expect(member).to have_many(:member_roles) }
+    it { expect(member).to have_many(:roles) }
+
+    it do
+      expect(member).to have_many(:oauth_client_tokens)
+        .with_foreign_key(:user_id)
+        .with_primary_key(:user_id)
+        .dependent(nil)
+    end
+  end
 
   describe '#project' do
     context 'with a project' do
@@ -58,7 +71,7 @@ describe Member, type: :model do
 
       it 'is invalid' do
         expect(new_member)
-          .to be_invalid
+          .not_to be_valid
       end
     end
   end
@@ -72,11 +85,11 @@ describe Member, type: :model do
       member
       group = create(:group, members: [user])
       create(:member, project:, principal: group, roles: [role])
-      ::Groups::AddUsersService
+      Groups::CreateInheritedRolesService
         .new(group, current_user: User.system, contract_class: EmptyContract)
-        .call(ids: [user.id])
+        .call(user_ids: [user.id])
 
-      expect(user.reload.memberships.map { _1.deletable_role?(role) }).to match_array([true, false])
+      expect(user.reload.memberships.map { _1.deletable_role?(role) }).to contain_exactly(true, false)
     end
   end
 end

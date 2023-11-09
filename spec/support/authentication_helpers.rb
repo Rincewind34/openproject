@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -34,12 +34,19 @@ module AuthenticationHelpers
   end
 
   def login_as(user)
-    if is_a? RSpec::Rails::FeatureExampleGroup
+    if is_a?(RSpec::Rails::FeatureExampleGroup)
       # If we want to mock having finished the login process
       # we must set the user_id in rack.session accordingly
       # Otherwise e.g. calls to Warden will behave unexpectantly
       # as they will login AnonymousUser
-      page.set_rack_session(user_id: user.id, updated_at: Time.now)
+      if using_cuprite? && js_enabled?
+        page.driver.set_cookie(
+          OpenProject::Configuration['session_cookie_name'],
+          session_value_for(user).to_s
+        )
+      else
+        page.set_rack_session(session_value_for(user))
+      end
     end
 
     allow(User).to receive(:current).and_return(user)
@@ -57,16 +64,54 @@ module AuthenticationHelpers
   end
 
   def logout
-    visit signout_path
+    # There are a select number of specs that rely on some implementation detail
+    # of `visit signout_path` that a cookie clear just doesn't cut.
+    if !using_cuprite? || RSpec.current_example.metadata[:signout_via_visit]
+      visit signout_path
+    else
+      page.driver.cookies.clear
+    end
+  end
+
+  private
+
+  def js_enabled?
+    RSpec.current_example.metadata[:js]
+  end
+
+  def using_cuprite?
+    RSpec.current_example.metadata[:with_cuprite]
+  end
+
+  def session_value_for(user)
+    { user_id: user.id, updated_at: Time.current }
   end
 
   module ClassMethods
     # Sets the current user.
-    # Will make the return value available in the specs as current_user (using a let block)
-    # and treat that user as the one currently being logged in
+    #
+    # Will make the return value available in the specs as +current_user+ (using
+    # a let block) and treat that user as the one currently being logged in.
+    #
     # @block [Proc] The user to log in.
     def current_user(&)
       let(:current_user, &)
+
+      before { login_as current_user }
+    end
+
+    # Sets the current user.
+    #
+    # This is the shared_let version of +current_user+, meaning the user is
+    # created only once.
+    #
+    # Will make the return value available in the specs as +current_user+ (using
+    # a shared_let block) and treat that user as the one currently being logged
+    # in.
+    #
+    # @block [Proc] The user to log in.
+    def shared_current_user(&)
+      shared_let(:current_user, &)
 
       before { login_as current_user }
     end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,30 +29,31 @@
 require 'spec_helper'
 require 'features/page_objects/notification'
 
-describe 'Upload attachment to documents',
+RSpec.describe 'Upload attachment to documents',
          js: true,
          with_settings: {
            journal_aggregation_time_minutes: 0
          } do
   let!(:user) do
-    create :user,
+    create(:user,
            member_in_project: project,
            member_with_permissions: %i[view_documents
-                                       manage_documents]
+                                       manage_documents])
   end
   let!(:other_user) do
-    create :user,
+    create(:user,
            member_in_project: project,
            member_with_permissions: %i[view_documents],
-           notification_settings: [build(:notification_setting, all: true)]
+           notification_settings: [build(:notification_setting, all: true)])
   end
   let!(:category) do
     create(:document_category)
   end
   let(:project) { create(:project) }
-  let(:attachments) { ::Components::Attachments.new }
-  let(:image_fixture) { ::UploadedFile.load_from('spec/fixtures/files/image.png') }
-  let(:editor) { ::Components::WysiwygEditor.new }
+  let(:attachments) { Components::Attachments.new }
+  let(:image_fixture) { UploadedFile.load_from('spec/fixtures/files/image.png') }
+  let(:editor) { Components::WysiwygEditor.new }
+  let(:attachments_list) { Components::AttachmentsList.new }
 
   before do
     login_as(user)
@@ -70,12 +71,12 @@ describe 'Upload attachment to documents',
       # adding an image via the attachments-list
       find("[data-qa-selector='op-attachments--drop-box']").drop(image_fixture.path)
 
-      expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png', count: 1)
+      editor.attachments_list.expect_attached('image.png')
 
       # adding an image
       editor.drag_attachment image_fixture.path, 'Image uploaded on creation'
-      expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png', count: 2)
-      expect(page).not_to have_selector('op-toasters-upload-progress')
+      editor.attachments_list.expect_attached('image.png', count: 2)
+      editor.wait_until_upload_progress_toaster_cleared
 
       perform_enqueued_jobs do
         click_on 'Create'
@@ -86,7 +87,7 @@ describe 'Upload attachment to documents',
       expect(page).to have_selector('#content img', count: 1)
       expect(page).to have_content('Image uploaded on creation')
 
-      document = ::Document.last
+      document = Document.last
       expect(document.title).to eq 'New documentation'
 
       # Expect it to be present on the show page
@@ -104,26 +105,18 @@ describe 'Upload attachment to documents',
       # editor.click_and_type_slowly 'abc'
       SeleniumHubWaiter.wait
 
-      expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png', count: 2)
+      editor.attachments_list.expect_attached('image.png', count: 2)
 
       editor.drag_attachment image_fixture.path, 'Image uploaded the second time'
 
-      expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png', count: 3)
+      editor.attachments_list.expect_attached('image.png', count: 3)
 
-      scroll_to_element(page.find('[data-qa-selector="op-attachments"]'))
+      editor.attachments_list.drag_enter
+      editor.attachments_list.drop(image_fixture)
 
-      script = <<~JS
-        const event = new DragEvent('dragover');
-        document.body.dispatchEvent(event);
-      JS
-      page.execute_script(script)
+      editor.attachments_list.expect_attached('image.png', count: 4)
 
-      # adding an image via the attachments-list
-      find("[data-qa-selector='op-attachments--drop-box']").drop(image_fixture.path)
-
-      expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png', count: 4)
-
-      expect(page).not_to have_selector('op-toasters-upload-progress')
+      editor.wait_until_upload_progress_toaster_cleared
 
       perform_enqueued_jobs do
         click_on 'Save'
@@ -133,7 +126,7 @@ describe 'Upload attachment to documents',
       expect(page).to have_selector('#content img', count: 2)
       expect(page).to have_content('Image uploaded on creation')
       expect(page).to have_content('Image uploaded the second time')
-      expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png', count: 4)
+      attachments_list.expect_attached('image.png', count: 4)
 
       # Expect a mail to be sent to the user having subscribed to all notifications
       expect(ActionMailer::Base.deliveries.size)
@@ -155,7 +148,7 @@ describe 'Upload attachment to documents',
     it_behaves_like 'can upload an image'
   end
 
-  context 'internal upload', with_direct_uploads: false do
+  context 'for internal uploads', with_direct_uploads: false do
     it_behaves_like 'can upload an image'
   end
 end

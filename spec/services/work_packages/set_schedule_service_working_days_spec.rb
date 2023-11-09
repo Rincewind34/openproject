@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe WorkPackages::SetScheduleService, 'working days' do
+RSpec.describe WorkPackages::SetScheduleService, 'working days' do
   create_shared_association_defaults_for_work_package_factory
 
   shared_let(:week_days) { week_with_saturday_and_sunday_as_weekend }
@@ -970,13 +970,6 @@ describe WorkPackages::SetScheduleService, 'working days' do
           follower4    |                          X..X |
         CHART
       end
-    end
-
-    def set_non_working_week_days(*days)
-      non_working_days = days.map do |day|
-        %w[xxx monday tuesday wednesday thursday friday saturday sunday].index(day.downcase)
-      end
-      Setting.working_days -= non_working_days
     end
 
     context 'when moving forward due to days and predecessor due date now being non-working days' do

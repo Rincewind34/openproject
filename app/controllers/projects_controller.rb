@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -41,7 +41,7 @@ class ProjectsController < ApplicationController
   include ProjectsHelper
 
   current_menu_item :index do
-    :list_projects
+    :projects
   end
 
   def index
@@ -56,17 +56,13 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        render layout: 'no_menu'
+        render layout: 'global'
       end
 
       format.any(*supported_export_formats) do
         export_list(request.format.symbol)
       end
     end
-  end
-
-  current_menu_item :index do
-    :list_projects
   end
 
   def new
@@ -89,7 +85,7 @@ class ProjectsController < ApplicationController
       flash[:error] = I18n.t('projects.delete.schedule_failed', errors: service_call.errors.full_messages.join("\n"))
     end
 
-    redirect_to project_path_with_status
+    redirect_to projects_path
   end
 
   def destroy_info
@@ -109,20 +105,8 @@ class ProjectsController < ApplicationController
     render_404
   end
 
-  def redirect_work_packages_or_overview
-    return if redirect_to_project_menu_item(@project, :work_packages)
-
-    redirect_to project_overview_path(@project)
-  end
-
   def hide_project_in_layout
     @project = nil
-  end
-
-  def project_path_with_status
-    acceptable_params = params.permit(:status).to_h.compact.select { |_, v| v.present? }
-
-    projects_path(acceptable_params)
   end
 
   def load_query

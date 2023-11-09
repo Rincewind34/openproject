@@ -2,16 +2,17 @@
   <div class="op-ckeditor--wrapper op-ckeditor-element">
     <op-ckeditor [context]="ckEditorContext"
                  [content]="initialContent"
-                 (onContentChange)="onContentChange($event)"
-                 (onInitializationFailed)="initializationError = true"
-                 (onInitialized)="onCkeditorSetup($event)"
+                 (contentChanged)="onContentChange($event)"
+                 (initializationFailed)="initializationError = true"
+                 (initializeDone)="onCkeditorSetup($event)"
+                 (saveRequested)="handleUserSubmit()"
                  >
     </op-ckeditor>
   </div>
   <edit-field-controls *ngIf="!(handler.inEditMode || initializationError)"
                        [fieldController]="field"
                        (onSave)="handleUserSubmit()"
-                       (onCancel)="handler.handleUserCancel()"
+                       (onCancel)="handleUserCancel()"
                        [saveTitle]="text.save"
                        [cancelTitle]="text.cancel">
   </edit-field-controls>

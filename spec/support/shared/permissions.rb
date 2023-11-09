@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -74,14 +74,14 @@ module PermissionSpecHelpers
   end
 end
 
-shared_context 'a controller action with unrestricted access' do
+RSpec.shared_context 'a controller action with unrestricted access' do
   let(:valid_user) { create(:anonymous) }
 
   extend PermissionSpecHelpers
   spec_permissions(false)
 end
 
-shared_context 'a controller action with require_login' do
+RSpec.shared_context 'a controller action with require_login' do
   let(:valid_user)   { create(:user) }
   let(:invalid_user) { create(:anonymous) }
 
@@ -89,7 +89,7 @@ shared_context 'a controller action with require_login' do
   spec_permissions
 end
 
-shared_context 'a controller action with require_admin' do
+RSpec.shared_context 'a controller action with require_admin' do
   let(:valid_user)   { User.where(admin: true).first || create(:admin) }
   let(:invalid_user) { create(:user) }
 
@@ -97,7 +97,7 @@ shared_context 'a controller action with require_admin' do
   spec_permissions
 end
 
-shared_context 'a controller action which needs project permissions' do
+RSpec.shared_context 'a controller action which needs project permissions' do
   # Expecting the following environment
   #
   # let(:project) { create(:project) }

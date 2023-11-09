@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe MyController, type: :controller do
+RSpec.describe MyController do
   let(:user) { create(:user) }
 
   before do
@@ -121,7 +121,7 @@ describe MyController, type: :controller do
   end
 
   describe 'account' do
-    let(:custom_field) { create :text_user_custom_field }
+    let(:custom_field) { create(:user_custom_field, :text) }
 
     before do
       custom_field
@@ -155,18 +155,20 @@ describe MyController, type: :controller do
   end
 
   describe 'settings' do
-    context 'PATCH' do
+    describe 'PATCH' do
+      let(:language) { 'en' }
+
       before do
         as_logged_in_user user do
           user.pref.comments_sorting = 'desc'
           user.pref.auto_hide_popups = true
 
-          patch :update_settings, params: { user: { language: 'en' }, pref: { auto_hide_popups: 0 } }
+          patch :update_settings, params: { user: { language: }, pref: { auto_hide_popups: 0 } }
         end
       end
 
       it 'updates the settings appropriately', :aggregate_failures do
-        expect(assigns(:user).language).to eq 'en'
+        expect(assigns(:user).language).to eq language
         expect(assigns(:user).pref.comments_sorting).to eql 'desc'
         expect(assigns(:user).pref.auto_hide_popups?).to be_falsey
 
@@ -184,6 +186,15 @@ describe MyController, type: :controller do
         it 'shows a flash error' do
           expect(flash[:error]).to include 'Email is not a valid email address.'
           expect(request.path).to eq(my_settings_path)
+        end
+      end
+
+      context 'when changing language' do
+        let(:language) { 'de' }
+
+        it 'shows a flash message translated in the selected language' do
+          expect(assigns(:user).language).to eq(language)
+          expect(flash[:notice]).to eq(I18n.t(:notice_account_updated, locale: language))
         end
       end
     end
@@ -243,7 +254,7 @@ describe MyController, type: :controller do
       end
 
       context 'with existing key' do
-        let!(:key) { ::Token::RSS.create user: }
+        let!(:key) { Token::RSS.create user: }
 
         it 'replaces the key' do
           expect(user.rss_token).to eq(key)
@@ -278,7 +289,7 @@ describe MyController, type: :controller do
       end
 
       context 'with existing key' do
-        let!(:key) { ::Token::API.create user: }
+        let!(:key) { Token::API.create user: }
 
         it 'replaces the key' do
           expect(user.reload.api_token).to eq(key)
@@ -293,6 +304,69 @@ describe MyController, type: :controller do
 
           expect(response).to redirect_to action: :access_token
         end
+      end
+    end
+
+    describe 'ical' do
+      # unlike with the other tokens, creating new ical tokens is not done in this context
+      # ical tokens are generated whenever the user requests a new ical url
+      # a user can have N ical tokens
+      #
+      # in this context a specific ical token of a user should be reverted
+      # this invalidates the previously generated ical url
+      context 'with existing keys' do
+        let(:user) { create(:user) }
+        let(:project) { create(:project) }
+        let(:query) { create(:query, project:) }
+        let(:another_query) { create(:query, project:) }
+        let!(:ical_token_for_query) { create(:ical_token, user:, query:, name: "Some Token Name") }
+        let!(:another_ical_token_for_query) { create(:ical_token, user:, query:, name: "Some Other Token Name") }
+        let!(:ical_token_for_another_query) { create(:ical_token, user:, query: another_query, name: "Some Token Name") }
+
+        it 'revoke specific ical tokens' do
+          expect(user.ical_tokens).to contain_exactly(
+            ical_token_for_query, another_ical_token_for_query, ical_token_for_another_query
+          )
+
+          delete :revoke_ical_token, params: { id: another_ical_token_for_query.id }
+
+          expect(user.ical_tokens.reload).to contain_exactly(
+            ical_token_for_query, ical_token_for_another_query
+          )
+
+          expect(user.ical_tokens.reload).not_to contain_exactly(
+            ical_token_for_another_query
+          )
+
+          expect(flash[:info]).to be_present
+          expect(flash[:error]).not_to be_present
+
+          expect(response).to redirect_to action: :access_token
+        end
+      end
+    end
+
+    describe 'file storage' do
+      let(:client) { create(:oauth_client, integration: create(:nextcloud_storage)) }
+      let(:token) { create(:oauth_client_token, oauth_client: client, scope: nil, user:, expires_in: 3_600) }
+
+      render_views
+
+      before { token }
+
+      it 'list the tokens' do
+        get :access_token
+        expect(response.body).to have_selector("#storage-oauth-token-#{token.id}")
+      end
+
+      it 'can remove the token' do
+        expect do
+          delete :delete_storage_token, params: { id: token.id }
+        end.to change(OAuthClientToken, :count).by(-1)
+
+        expect(flash[:info]).to be_present
+        expect(flash[:error]).not_to be_present
+        expect(response).to redirect_to(action: :access_token)
       end
     end
   end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,32 +27,21 @@
 #++
 
 module Storages::Peripherals::StorageInteraction::Nextcloud
-  class DownloadLinkQuery < Storages::Peripherals::StorageInteraction::StorageQuery
+  class DownloadLinkQuery
     using Storages::Peripherals::ServiceResultRefinements
 
-    def initialize(base_uri:, token:, retry_proc:)
-      super()
-
-      @base_uri = base_uri
-      @uri = URI::join(base_uri, '/ocs/v2.php/apps/dav/api/v1/direct')
-      @token = token
-      @retry_proc = retry_proc
+    def initialize(storage)
+      @base_uri = URI(storage.host).normalize
+      @oauth_client = storage.oauth_client
     end
 
-    def query(file_link)
-      outbound_response(file_link)
-        .bind { |response_body| direct_download_token(body: response_body) }
-        .map { |download_token| download_link(download_token, file_link.origin_name) }
-    end
-
-    private
-
-    def outbound_response(file_link)
-      @retry_proc.call(@token) do |token|
-        begin
-          response = ServiceResult.success(
+    # rubocop:disable Metrics/AbcSize
+    def call(user:, file_link:)
+      result = Util.token(user:, oauth_client: @oauth_client) do |token|
+        service_result = begin
+          ServiceResult.success(
             result: RestClient.post(
-              @uri.to_s,
+              Util.join_uri_path(@base_uri, '/ocs/v2.php/apps/dav/api/v1/direct'),
               { fileId: file_link.origin_id },
               {
                 'Authorization' => "Bearer #{token.access_token}",
@@ -62,42 +51,42 @@ module Storages::Peripherals::StorageInteraction::Nextcloud
             )
           )
         rescue RestClient::Unauthorized => e
-          response = error(:not_authorized, 'Outbound request not authorized!', e.response)
+          Util.error(:not_authorized, 'Outbound request not authorized!', e.response)
         rescue RestClient::NotFound => e
-          response = error(:not_found, 'Outbound request destination not found!', e.response)
+          Util.error(:not_found, 'Outbound request destination not found!', e.response)
         rescue RestClient::ExceptionWithResponse => e
-          response = error(:error, 'Outbound request failed!', e.response)
+          Util.error(:error, 'Outbound request failed!', e.response)
         rescue StandardError
-          response = error(:error, 'Outbound request failed!')
+          Util.error(:error, 'Outbound request failed!')
         end
 
-        response
-          .bind do |r|
-            # The nextcloud API returns a successful response with empty body if the authorization is missing or expired
-            if r.body.blank?
-              error(:not_authorized, 'Outbound request not authorized!')
-            else
-              ServiceResult.success(result: r)
-            end
+        service_result.bind do |response|
+          # The nextcloud API returns a successful response with empty body if the authorization is missing or expired
+          if response.body.blank?
+            Util.error(:not_authorized, 'Outbound request not authorized!')
+          else
+            ServiceResult.success(result: response)
           end
+        end
       end
+
+      result
+        .bind { |response_body| direct_download_token(body: response_body) }
+        .map { |download_token| download_link(download_token, file_link.origin_name) }
     end
 
-    def error(code, log_message = nil, data = nil)
-      ServiceResult.failure(
-        result: code, # This is needed to work with the ConnectionManager token refresh mechanism.
-        errors: Storages::StorageError.new(code:, log_message:, data:)
-      )
-    end
+    # rubocop:enable Metrics/AbcSize
+
+    private
 
     def download_link(token, origin_name)
-      URI::join(@base_uri, "/index.php/apps/integration_openproject/direct/#{token}/#{CGI.escape(origin_name)}")
+      Util.join_uri_path(@base_uri, 'index.php/apps/integration_openproject/direct', token, CGI.escape(origin_name))
     end
 
     def direct_download_token(body:)
       token = parse_direct_download_token(body:)
       if token.blank?
-        return error(:error, "Received unexpected json response", body)
+        return Util.error(:error, "Received unexpected json response", body)
       end
 
       ServiceResult.success(result: token)

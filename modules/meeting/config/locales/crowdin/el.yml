@@ -1,6 +1,6 @@
 #-- copyright
 #OpenProject is an open source project management software.
-#Copyright (C) 2012-2022 the OpenProject GmbH
+#Copyright (C) 2012-2023 the OpenProject GmbH
 #This program is free software; you can redistribute it and/or
 #modify it under the terms of the GNU General Public License version 3.
 #OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
@@ -21,6 +21,10 @@
 #++
 #English strings go here for Rails i18n
 el:
+  plugin_openproject_meeting:
+    name: "OpenProject Meeting"
+    description: >-
+      This module adds functions to support project meetings to OpenProject. Meetings can be scheduled selecting invitees from the same project to take part in the meeting. An agenda can be created and sent to the invitees. After the meeting, attendees can be selected and minutes can be created based on the agenda. Finally, the minutes can be sent to all attendees and invitees.
   activerecord:
     attributes:
       meeting:
@@ -29,6 +33,7 @@ el:
         participants: "Συμμετέχοντες"
         participants_attended: "Παρευρισκόμενοι"
         participants_invited: "Προσκεκλημένοι"
+        project: "Project"
         start_time: "Ώρα"
         start_time_hour: "Ώρα έναρξης"
     errors:
@@ -37,6 +42,9 @@ el:
     models:
       meeting_agenda: "Ατζέντα"
       meeting_minutes: "Πρακτικά"
+  activity:
+    filter:
+      meeting: "Συναντήσεις"
   description_attended: "παρευρέθηκε"
   description_invite: "προσκεκλημένος"
   events:
@@ -58,13 +66,20 @@ el:
   label_meeting_agenda_close: "Κλείστε την ατζέντα για να ξεκινήσετε τα Πρακτικά"
   label_meeting_date_time: "Ημερομηνία/Ώρα"
   label_meeting_diff: "Διαφορά"
+  label_upcoming_meetings: "Upcoming meetings"
+  label_past_meetings: "Past meetings"
+  label_involvement: "Involvement"
+  label_upcoming_invitations: "Upcoming invitations"
+  label_past_invitations: "Past invitations"
+  label_attendee: "Attendee"
+  label_author: "Creator"
   label_notify: "Αποστολή για αναθεώρηση"
   label_icalendar: "Αποστολή στο iCalendar"
   label_version: "Έκδοση"
   label_time_zone: "Ζώνη Ώρας"
   label_start_date: "Ημερομηνία έναρξης"
   meeting:
-    copied: "Copied from Meeting #%{id}"
+    copied: "Αντιγράφηκε από τη Συνάντηση #%{id}"
   notice_successful_notification: "Η ειδοποίηση απεστάλη επιτυχώς"
   notice_timezone_missing: Δεν έχει οριστεί ζώνη ώρας και θεωρήθηκε η %{zone}. Για να επιλέξετε την ζώνη ώρας σας, παρακαλούμε κάντε κλικ εδώ.
   permission_create_meetings: "Δημιουργία συναντήσεων"
@@ -82,7 +97,7 @@ el:
   text_duration_in_hours: "Διάρκεια σε ώρες"
   text_in_hours: "σε ώρες"
   text_meeting_agenda_for_meeting: 'ατζέντα για τη συνάντηση "%{meeting}"'
-  text_meeting_closing_are_you_sure: "Είστε βέβαιοι ότι θέλετε να κλείσετε τη συνάντηση;"
+  text_meeting_closing_are_you_sure: "Are you sure you want to close the meeting agenda?"
   text_meeting_agenda_open_are_you_sure: "Αυτό θα αντικαταστήσει όλες τις αλλαγές στα πρακτικά συνάντησης!  Θέλετε να συνεχίσετε;"
   text_meeting_minutes_for_meeting: 'πρακτικά για τη συνάντηση "%{meeting}"'
   text_review_meeting_agenda: "Ο/Η %{author} έχει βάλει το %{link} για αναθεώρηση."

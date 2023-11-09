@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -36,7 +36,10 @@ OpenProject::Application.configure do
   # test suite. You never need to work with it otherwise. Remember that
   # your test database is "scratch space" for the test suite and is wiped
   # and recreated between test runs. Don't rely on the data there!
-  config.cache_classes = ENV['CI'].present?
+  #
+  # Spring requires to have the classes reloaded. On the CI or when Spring is
+  # disabled, it does not need to happen.
+  config.cache_classes = ENV['CI'].present? || ENV['DISABLE_SPRING'].present?
 
   # Use eager load to mirror the production environment
   # on travis
@@ -82,9 +85,9 @@ OpenProject::Application.configure do
   config.assets.debug = false
 
   # Raises error for missing translations
-  # config.action_view.raise_on_missing_translations = true
+  config.i18n.raise_on_missing_translations = true
 
-  config.cache_store = :file_store, Rails.root.join("tmp", "cache", "paralleltests#{ENV['TEST_ENV_NUMBER']}")
+  config.cache_store = :file_store, Rails.root.join("tmp", "cache", "paralleltests#{ENV.fetch('TEST_ENV_NUMBER', nil)}")
 
   if ENV['TEST_ENV_NUMBER']
     assets_cache_path = Rails.root.join("tmp/cache/assets/paralleltests#{ENV['TEST_ENV_NUMBER']}")

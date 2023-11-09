@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,15 +28,15 @@
 
 require File.expand_path('../../../../spec_helper', __dir__)
 
-describe OpenProject::GithubIntegration::Services::UpsertPartialPullRequest do
+RSpec.describe OpenProject::GithubIntegration::Services::UpsertPartialPullRequest do
   subject(:upsert) do
     described_class.new.call(OpenProject::GithubIntegration::NotificationHandler::Helper::Payload.new(payload),
                              work_packages:)
   end
 
   let!(:upsert_user_service) do
-    upsert_user_service = instance_double(::OpenProject::GithubIntegration::Services::UpsertGithubUser)
-    allow(::OpenProject::GithubIntegration::Services::UpsertGithubUser)
+    upsert_user_service = instance_double(OpenProject::GithubIntegration::Services::UpsertGithubUser)
+    allow(OpenProject::GithubIntegration::Services::UpsertGithubUser)
       .to receive(:new)
             .and_return(upsert_user_service)
 

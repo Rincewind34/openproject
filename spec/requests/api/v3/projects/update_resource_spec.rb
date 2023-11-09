@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,22 +29,18 @@
 require 'spec_helper'
 require 'rack/test'
 
-describe 'API v3 Project resource update', type: :request, content_type: :json do
+RSpec.describe 'API v3 Project resource update', content_type: :json do
   include Rack::Test::Methods
   include API::V3::Utilities::PathHelper
 
   let(:admin) { create(:admin) }
   let(:project) do
-    create(:project, public: false, status: project_status, active: project_active)
+    create(:project,
+           :with_status,
+           public: false,
+           active: project_active)
   end
   let(:project_active) { true }
-  let(:project_status) do
-    build(:project_status, project: nil)
-  end
-  let(:other_project) do
-    create(:project, public: false)
-  end
-  let(:role) { create(:role) }
   let(:custom_field) do
     create(:text_project_custom_field)
   end
@@ -98,7 +94,7 @@ describe 'API v3 Project resource update', type: :request, content_type: :json d
   context 'with a custom field' do
     let(:body) do
       {
-        "customField#{custom_field.id}": {
+        custom_field.attribute_name(:camel_case) => {
           raw: "CF text"
         }
       }
@@ -109,7 +105,7 @@ describe 'API v3 Project resource update', type: :request, content_type: :json d
     end
 
     it 'sets the cf value' do
-      expect(project.reload.send("custom_field_#{custom_field.id}"))
+      expect(project.reload.send(custom_field.attribute_getter))
         .to eql("CF text")
     end
   end
@@ -148,9 +144,9 @@ describe 'API v3 Project resource update', type: :request, content_type: :json d
         .to be_json_eql(nil.to_json)
               .at_path('_links/status/href')
 
-      status = project.status.reload
-      expect(status.code).to be_nil
-      expect(status.explanation).to eq 'Some explanation.'
+      project.reload
+      expect(project.status_code).to be_nil
+      expect(project.status_explanation).to eq 'Some explanation.'
 
       expect(last_response.body)
         .to be_json_eql(
@@ -195,12 +191,12 @@ describe 'API v3 Project resource update', type: :request, content_type: :json d
     end
 
     it 'persists the altered status' do
-      project_status.reload
+      project.reload
 
-      expect(project_status.code)
+      expect(project.status_code)
         .to eql('off_track')
 
-      expect(project_status.explanation)
+      expect(project.status_explanation)
         .to eql('Some explanation.')
     end
   end
@@ -250,9 +246,9 @@ describe 'API v3 Project resource update', type: :request, content_type: :json d
     end
 
     it 'does not change the project status' do
-      code_before = project_status.code
+      code_before = project.status_code
 
-      expect(project_status.reload.code)
+      expect(project.reload.status_code)
         .to eql(code_before)
     end
 
@@ -267,7 +263,13 @@ describe 'API v3 Project resource update', type: :request, content_type: :json d
     end
   end
 
-  context 'when deactivating (archiving) the project' do
+  context 'when archiving the project (change active from true to false)' do
+    let(:body) do
+      {
+        active: false
+      }
+    end
+
     context 'for an admin' do
       let(:current_user) do
         create(:admin)
@@ -281,15 +283,9 @@ describe 'API v3 Project resource update', type: :request, content_type: :json d
         create(:project)
       end
 
-      let(:body) do
-        {
-          active: false
-        }
-      end
-
       it 'responds with 200 OK' do
         expect(last_response.status)
-          .to be(200)
+          .to eq(200)
       end
 
       it 'archives the project' do
@@ -303,21 +299,175 @@ describe 'API v3 Project resource update', type: :request, content_type: :json d
       end
     end
 
-    context 'for a non admin' do
-      let(:body) do
-        {
-          active: false
-        }
-      end
+    context 'for a user with only edit_project permission' do
+      let(:permissions) { [:edit_project] }
 
       it 'responds with 403' do
         expect(last_response.status)
-          .to be(403)
+          .to eq(403)
       end
 
       it 'does not alter the project' do
         expect(project.reload.active)
           .to be_truthy
+      end
+    end
+
+    context 'for a user with only archive_project permission' do
+      let(:permissions) { [:archive_project] }
+
+      it 'responds with 200 OK' do
+        expect(last_response.status)
+          .to eq(200)
+      end
+
+      it 'archives the project' do
+        expect(project.reload.active)
+          .to be_falsey
+      end
+    end
+
+    context 'for a user missing archive_project permission on child project' do
+      let(:permissions) { [:archive_project] }
+      let(:project) do
+        create(:project).tap do |p|
+          p.children << child_project
+        end
+      end
+      let(:child_project) { create(:project) }
+
+      it 'responds with 422 (and not 403?)' do
+        expect(last_response.status)
+          .to eq(422)
+      end
+
+      it 'does not alter the project' do
+        expect(project.reload.active)
+          .to be_truthy
+      end
+    end
+  end
+
+  context 'when setting a custom field and archiving the project' do
+    let(:body) do
+      {
+        active: false,
+        custom_field.attribute_name(:camel_case) => {
+          raw: "CF text"
+        }
+      }
+    end
+
+    context 'for an admin' do
+      let(:current_user) do
+        create(:admin)
+      end
+      let(:project) do
+        create(:project).tap do |p|
+          p.children << child_project
+        end
+      end
+      let(:child_project) do
+        create(:project)
+      end
+
+      it 'responds with 200 OK' do
+        expect(last_response.status)
+          .to eq(200)
+      end
+
+      it 'sets the cf value' do
+        expect(project.reload.send(custom_field.attribute_getter))
+          .to eql("CF text")
+      end
+
+      it 'archives the project' do
+        expect(project.reload.active)
+          .to be_falsey
+      end
+
+      it 'archives the child project' do
+        expect(child_project.reload.active)
+          .to be_falsey
+      end
+    end
+
+    context 'for a user with only edit_project permission' do
+      let(:permissions) { [:edit_project] }
+
+      it 'responds with 403' do
+        expect(last_response.status)
+          .to eq(403)
+      end
+    end
+
+    context 'for a user with only archive_project permission' do
+      let(:permissions) { [:archive_project] }
+
+      it 'responds with 403' do
+        expect(last_response.status)
+          .to eq(403)
+      end
+    end
+
+    context 'for a user with both archive_project and edit_project permissions' do
+      let(:permissions) { %i[archive_project edit_project] }
+
+      it 'responds with 200 OK' do
+        expect(last_response.status)
+          .to eq(200)
+      end
+    end
+  end
+
+  context 'when unarchiving the project (change active from false to true)' do
+    let(:project_active) { false }
+    let(:body) do
+      {
+        active: true
+      }
+    end
+
+    context 'for an admin' do
+      let(:current_user) do
+        create(:admin)
+      end
+      let(:project) do
+        create(:project).tap do |p|
+          p.children << child_project
+        end
+      end
+      let(:child_project) do
+        create(:project)
+      end
+
+      it 'responds with 200 OK' do
+        expect(last_response.status)
+          .to eq(200)
+      end
+
+      it 'unarchives the project' do
+        expect(project.reload)
+          .to be_active
+      end
+
+      it 'unarchives the child project' do
+        expect(child_project.reload)
+          .to be_active
+      end
+    end
+
+    context 'for a non-admin user, even with both archive_project and edit_project permissions' do
+      let(:permissions) { %i[archive_project edit_project] }
+
+      it 'responds with 404' do
+        expect(last_response.status)
+          .to eq(404)
+      end
+
+      it 'does not alter the project' do
+        expect(project.reload)
+          .not_to be_active
       end
     end
   end

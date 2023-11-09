@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2020 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,7 +27,7 @@
 
 require 'spec_helper'
 
-describe Attachments::DeleteService, 'integration', with_settings: { journal_aggregation_time_minutes: 0 } do
+RSpec.describe Attachments::DeleteService, 'integration', with_settings: { journal_aggregation_time_minutes: 0 } do
   subject(:call) { described_class.new(model: attachment, user:).call }
 
   let(:user) do
@@ -71,7 +71,7 @@ describe Attachments::DeleteService, 'integration', with_settings: { journal_agg
         before do
           # Force to have a journal for the attachment
           attachment
-          container.add_journal(user)
+          container.add_journal(user:)
           container.save!
 
           call
@@ -86,7 +86,7 @@ describe Attachments::DeleteService, 'integration', with_settings: { journal_agg
         before do
           # Force to have a journal for the attachment
           attachment
-          container.add_journal(user, 'Some notes')
+          container.add_journal(user:, notes: 'Some notes')
           container.save!
 
           # have an invalid work package

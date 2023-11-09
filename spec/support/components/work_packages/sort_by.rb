@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -36,13 +36,15 @@ module Components
       def sort_via_header(name, selector: nil, descending: false)
         text = descending ? 'Sort descending' : 'Sort ascending'
 
-        SeleniumHubWaiter.wait
+        SeleniumHubWaiter.wait unless using_cuprite?
         open_table_column_context_menu(name, selector)
-        SeleniumHubWaiter.wait
+        SeleniumHubWaiter.wait unless using_cuprite?
 
         within_column_context_menu do
           click_button text
         end
+
+        wait_for_network_idle if using_cuprite?
       end
 
       def update_criteria(first, second = nil, third = nil)

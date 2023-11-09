@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,15 +29,15 @@
 require 'spec_helper'
 require_relative '../../../overviews/spec/support/pages/overview'
 
-describe 'Calendar drag&dop and resizing', type: :feature, js: true do
+RSpec.describe 'Calendar Widget', :js, :with_cuprite do
   let(:project) do
     create(:project, enabled_module_names: %w[work_package_tracking calendar_view])
   end
   let!(:work_package) do
-    create :work_package,
+    create(:work_package,
            project:,
            start_date: Time.zone.today.beginning_of_week.next_occurring(:tuesday),
-           due_date: Time.zone.today.beginning_of_week.next_occurring(:thursday)
+           due_date: Time.zone.today.beginning_of_week.next_occurring(:thursday))
   end
 
   let(:overview_page) do
@@ -46,11 +46,11 @@ describe 'Calendar drag&dop and resizing', type: :feature, js: true do
   let(:wp_full_view) { Pages::FullWorkPackage.new(work_package, project) }
 
   current_user do
-    create :user,
+    create(:user,
            member_in_project: project,
            member_with_permissions: %w[
              view_work_packages view_calendar manage_overview
-           ]
+           ])
   end
 
   before do
@@ -61,7 +61,6 @@ describe 'Calendar drag&dop and resizing', type: :feature, js: true do
     # within top-left area, add an additional widget
     overview_page.add_widget(1, 1, :row, 'Calendar')
 
-    sleep(1)
     overview_page.expect_and_dismiss_toaster message: I18n.t('js.notice_successful_update')
 
     # Clicking the calendar entry goes to work package full screen

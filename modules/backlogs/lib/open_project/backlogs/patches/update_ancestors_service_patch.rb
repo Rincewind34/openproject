@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -39,12 +39,13 @@ module OpenProject::Backlogs::Patches::UpdateAncestorsServicePatch
     def inherit_attributes(ancestor, loader, attributes)
       super
 
-      inherit_remaining_hours(ancestor, loader) if inherit?(attributes, :remaining_hours)
+      derive_remaining_hours(ancestor, loader) if inherit?(attributes, :remaining_hours)
     end
 
-    def inherit_remaining_hours(ancestor, loader)
-      ancestor.remaining_hours = all_remaining_hours(loader.leaves_of(ancestor)).sum.to_f
-      ancestor.remaining_hours = nil if ancestor.remaining_hours == 0.0
+    def derive_remaining_hours(work_package, loader)
+      descendants = loader.descendants_of(work_package)
+
+      work_package.derived_remaining_hours = not_zero(all_remaining_hours(descendants).sum.to_f)
     end
 
     def all_remaining_hours(work_packages)

@@ -16,11 +16,19 @@ module Components
       container.find 'input'
     end
 
+    def dropdown
+      container.find('.ng-dropdown-panel')
+    end
+
+    def click_input
+      input.hover
+      input.click
+    end
+
     def search(query, submit: false)
       SeleniumHubWaiter.wait
       input.set ''
-      input.hover
-      input.click
+      click_input
       input.set query
 
       if submit
@@ -76,7 +84,7 @@ module Components
 
     def expect_no_work_package_option(wp)
       expect(page)
-        .to have_no_selector('.global-search--option', text: wp.subject.to_s)
+        .not_to have_selector('.global-search--option', text: wp.subject.to_s)
     end
 
     def click_work_package(wp)

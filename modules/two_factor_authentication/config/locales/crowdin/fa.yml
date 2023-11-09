@@ -1,5 +1,9 @@
 #English strings go here for Rails i18n
 fa:
+  plugin_openproject_two_factor_authentication:
+    name: "تأیید هویت دو مرحله‌ای OpenProject "
+    description: >-
+      این افزونه OpenProject احراز هویت کاربران شما را با استفاده از احراز هویت دو مرحله ای با استفاده از رمز عبور یک بار مصرف از طریق استاندارد TOTP (Google Authenticator) یا ارسال به تلفن همراه کاربر از طریق پیام کوتاه یا تماس صوتی انجام می دهد.
   activerecord:
     attributes:
       two_factor_authentication/device:
@@ -27,7 +31,7 @@ fa:
     error_invalid_backup_code: 'Invalid 2FA backup code'
     channel_unavailable: "The delivery channel %{channel} is unavailable."
     no_valid_phone_number: "No valid phone number exists."
-    label_pwd_confirmation: "Password"
+    label_pwd_confirmation: "کلمه عبور"
     notice_pwd_confirmation: "You need to confirm your password upon making changes to these settings."
     label_device_type: "Device type"
     label_default_device: "Default 2FA device"
@@ -69,8 +73,8 @@ fa:
       delete_all_are_you_sure: 'Are you sure you want to delete all 2FA devices for this user?'
       button_delete_all_devices: 'Delete registered 2FA devices'
       button_register_mobile_phone_for_user: 'Register mobile phone'
-      text_2fa_enabled: 'Upon every login, this user will be requested to enter a OTP token from his default 2FA device.'
-      text_2fa_disabled: "The user did not set up a 2FA device through his 'My account page'"
+      text_2fa_enabled: 'Upon every login, this user will be requested to enter a OTP token from their default 2FA device.'
+      text_2fa_disabled: "The user did not set up a 2FA device through their 'My account page'"
     upsale:
       title: 'Two-factor authentication'
       description: 'Strenghten the security of your OpenProject instance by offering (or enforcing) two-factor authentification to all project members.'

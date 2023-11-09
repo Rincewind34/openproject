@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -31,7 +31,7 @@ require 'support/permission_specs'
 require_module_spec_helper
 
 # rubocop:disable RSpec/EmptyExampleGroup
-describe Storages::Admin::ProjectsStoragesController, 'manage_storage_in_project permission', type: :controller do
+RSpec.describe Storages::Admin::ProjectStoragesController, 'manage_storage_in_project permission', type: :controller do
   include PermissionSpecs
 
   controller_actions.each do |action|

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,8 +31,11 @@
 OpenProject::Application.routes.draw do
   namespace :admin do
     namespace :settings do
-      resources :storages, controller: '/storages/admin/storages' do
+      resources :storages, controller: '/storages/admin/storages', except: [:show] do
         resource :oauth_client, controller: '/storages/admin/oauth_clients', only: %i[new create]
+        resource :automatically_managed_project_folders, controller: '/storages/admin/automatically_managed_project_folders',
+                                                         only: %i[new edit update]
+
         member do
           delete '/replace_oauth_application' => '/storages/admin/storages#replace_oauth_application'
         end
@@ -40,8 +45,14 @@ OpenProject::Application.routes.draw do
 
   scope 'projects/:project_id', as: 'project' do
     namespace 'settings' do
-      resources :projects_storages, controller: '/storages/admin/projects_storages',
-                                    except: %i[show update]
+      resources :project_storages, controller: '/storages/admin/project_storages', except: %i[show] do
+        member do
+          # Destroy uses a get request to prompt the user before the actual DELETE request
+          get :destroy_info, as: 'confirm_destroy'
+        end
+
+        resources :members, controller: '/storages/project_settings/project_storage_members', only: %i[index]
+      end
     end
   end
 end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,8 +28,7 @@
 
 require 'spec_helper'
 
-# rubocop:disable RSpec:MultipleMemoizedHelpers
-describe Relations::CreateService do
+RSpec.describe Relations::CreateService do
   let(:work_package1_start_date) { nil }
   let(:work_package1_due_date) { Date.today }
   let(:work_package2_start_date) { nil }
@@ -143,7 +142,7 @@ describe Relations::CreateService do
 
     it 'has a dependent result for the from-work package' do
       expect(subject.dependent_results)
-        .to match_array [set_schedule_work_package2_result]
+        .to contain_exactly(set_schedule_work_package2_result)
     end
   end
 
@@ -210,6 +209,7 @@ describe Relations::CreateService do
 
     context 'on a circular_dependency error' do
       let(:symbols_for_base) { [:'typed_dag.circular_dependency'] }
+
       before do
         allow(relation)
           .to receive(:save) do
@@ -267,4 +267,3 @@ describe Relations::CreateService do
     end
   end
 end
-# rubocop:enable RSpec:MultipleMemoizedHelpers

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2020 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,9 +27,9 @@
 
 require 'spec_helper'
 require 'rack/test'
-require_relative './create_user_common_examples'
+require_relative 'create_user_common_examples'
 
-describe ::API::V3::Users::UsersAPI, type: :request do
+RSpec.describe API::V3::Users::UsersAPI do
   include API::V3::Utilities::PathHelper
 
   let(:path) { api_v3_paths.users }
@@ -59,8 +59,8 @@ describe ::API::V3::Users::UsersAPI, type: :request do
     it_behaves_like 'create user request flow'
 
     context 'with auth_source' do
-      let(:auth_source_id) { 'some_ldap' }
-      let(:auth_source) { create :auth_source, name: auth_source_id }
+      let(:ldap_auth_source_id) { 'some_ldap' }
+      let(:auth_source) { create(:ldap_auth_source, name: ldap_auth_source_id) }
 
       context 'ID' do
         before do
@@ -76,7 +76,7 @@ describe ::API::V3::Users::UsersAPI, type: :request do
 
           user = User.find_by(login: parameters[:login])
 
-          expect(user.auth_source).to eq auth_source
+          expect(user.ldap_auth_source).to eq auth_source
         end
 
         it_behaves_like 'represents the created user'
@@ -96,7 +96,7 @@ describe ::API::V3::Users::UsersAPI, type: :request do
 
           user = User.find_by(login: parameters[:login])
 
-          expect(user.auth_source).to eq auth_source
+          expect(user.ldap_auth_source).to eq auth_source
         end
 
         it_behaves_like 'represents the created user'
@@ -192,8 +192,8 @@ describe ::API::V3::Users::UsersAPI, type: :request do
     end
   end
 
-  describe 'user with global user CRU permission' do
-    shared_let(:current_user) { create :user, global_permission: :manage_user }
+  describe 'user with global user create permission' do
+    shared_let(:current_user) { create(:user, global_permission: :create_user) }
 
     it_behaves_like 'create user request flow'
 
@@ -220,8 +220,8 @@ describe ::API::V3::Users::UsersAPI, type: :request do
     end
 
     context 'with auth_source' do
-      let(:auth_source_id) { 'some_ldap' }
-      let(:auth_source) { create :auth_source, name: auth_source_id }
+      let(:ldap_auth_source_id) { 'some_ldap' }
+      let(:auth_source) { create(:ldap_auth_source, name: ldap_auth_source_id) }
 
       before do
         parameters[:_links] = {
@@ -236,7 +236,7 @@ describe ::API::V3::Users::UsersAPI, type: :request do
 
         user = User.find_by(login: parameters[:login])
 
-        expect(user.auth_source).to eq auth_source
+        expect(user.ldap_auth_source).to eq auth_source
       end
     end
   end

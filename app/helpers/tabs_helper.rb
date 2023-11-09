@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -43,9 +43,9 @@ module TabsHelper
 
   # Render tabs from the ui/extensible tabs manager
   def render_extensible_tabs(key, params = {})
-    tabs = ::OpenProject::Ui::ExtensibleTabs.enabled_tabs(key).map do |tab|
+    tabs = ::OpenProject::Ui::ExtensibleTabs.enabled_tabs(key, params.reverse_merge(current_user:)).map do |tab|
       path = tab[:path].respond_to?(:call) ? instance_exec(params, &tab[:path]) : tab[:path]
-      tab.dup.merge path: path
+      tab.dup.merge(path:)
     end
     render_tabs(tabs)
   end

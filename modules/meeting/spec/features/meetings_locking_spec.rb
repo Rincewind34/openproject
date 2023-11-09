@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,24 +28,30 @@
 
 require 'spec_helper'
 
-describe 'Meetings locking', type: :feature, js: true do
-  let(:project) { create :project, enabled_module_names: %w[meetings] }
-  let(:user) { create :admin }
-  let!(:meeting) { create :meeting }
-  let!(:agenda) { create :meeting_agenda, meeting: }
+RSpec.describe 'Meetings locking', js: true do
+  let(:project) { create(:project, enabled_module_names: %w[meetings]) }
+  let(:user) { create(:admin) }
+  let!(:meeting) { create(:meeting) }
+  let!(:agenda) { create(:meeting_agenda, meeting:) }
+  let(:agenda_field) do
+    TextEditorField.new(page,
+                        '',
+                        selector: '[data-qa-selector="op-meeting--meeting_agenda"]')
+  end
 
   before do
     login_as(user)
-
-    visit meeting_path(meeting)
   end
 
   it 'shows an error when trying to update a meeting update while editing' do
+    visit meeting_path(meeting)
+
     # Edit agenda
     within '#tab-content-agenda' do
       find('.button--edit-agenda').click
 
-      SeleniumHubWaiter.wait
+      agenda_field.set_value('Some new text')
+
       agenda.text = 'blabla'
       agenda.save!
 
@@ -53,6 +59,7 @@ describe 'Meetings locking', type: :feature, js: true do
     end
 
     expect(page).to have_text 'Information has been updated by at least one other user in the meantime.'
-    expect(page).to have_selector '#edit-meeting_agenda'
+
+    agenda_field.expect_value('Some new text')
   end
 end

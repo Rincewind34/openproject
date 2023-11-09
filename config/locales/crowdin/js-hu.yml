@@ -1,6 +1,6 @@
 #-- copyright
 #OpenProject is an open source project management software.
-#Copyright (C) 2012-2022 the OpenProject GmbH
+#Copyright (C) 2012-2023 the OpenProject GmbH
 #This program is free software; you can redistribute it and/or
 #modify it under the terms of the GNU General Public License version 3.
 #OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
@@ -65,6 +65,8 @@ hu:
     button_confirm: "Jóváhagy"
     button_continue: "Folytatás"
     button_copy: "Másol"
+    button_copy_to_clipboard: "Másolás a vágólapra"
+    button_copy_link_to_clipboard: "Copy link to clipboard"
     button_copy_to_other_project: "Másolás másik projektbe"
     button_custom-fields: "Választható mezők"
     button_delete: "Törlés"
@@ -105,7 +107,7 @@ hu:
       remove_from_list: 'Kártya eltávolítása a listából'
     caption_rate_history: "Díj előzmények"
     clipboard:
-      browser_error: "A böngésző nem támogatja a vágólapra másolást. Kérjük, másolja a kijelölt szöveget manuálisan."
+      browser_error: "Your browser doesn't support copying to clipboard. Please copy it manually: %{content}"
       copied_successful: "A vágólapra másolás sikeres!"
     chart:
       type: 'Diagram típus'
@@ -228,8 +230,8 @@ hu:
           quick_overview: "Get a quick overview of project management and team collaboration with OpenProject Enterprise edition."
         upsale:
           become_hero: "Legyél egy hős!"
-          enterprise_info_html: "%{feature_title} is an Enterprise <span class='spot-icon spot-icon_enterprise-addons'></span> add-on."
-          upgrade_info: "Please upgrade to a paid plan to activate and start using it in your team."
+          enterprise_info_html: "%{feature_title} is an Enterprise <span class='spot-icon spot-icon_inline spot-icon_enterprise-addons'></span> add-on."
+          upgrade_info: "Kérjük, válasszon egy fizetős csomagot az aktiváláshoz, hogy mihamarabb használhassa a csapatában."
           benefits:
             description: "What are the benefits of the Enterprise on-premises edition?"
             high_security: "Biztonsági szolgáltatások"
@@ -241,17 +243,31 @@ hu:
             professional_support: "Szakmai támogatás"
             professional_support_text: "Megbízható támogatást kaphat a vezető támogató mérnököktől, akik szakértő ismeretekkel rendelkeznek az OpenProject futtatásáról üzleti szempontból kritikus környezetben."
           button_start_trial: "Ingyenes próbaverzió kipróbálása"
-          button_upgrade: "Upgrade now"
-          button_contact_us: "Contact us for a demo"
+          button_upgrade: "Frissítés most"
+          button_contact_us: "Keressen fel minket a próbaverzióért"
           button_book_now: "Foglalás most"
           confidence: >
             A tesztelt és támogatott vállalati szintű projektmenedzsment szoftver bizalmát nyújtjuk - nyílt forráskóddal és nyitott szemmel.
           link_quote: "Árajánlat kérése"
-          more_info: "More information"
+          more_info: "További információ"
           text: >
             The OpenProject Enterprise edition builds on top of the Community edition. It includes Enterprise add-ons and professional support mainly aimed at organizations with more than 10 users that manage business critical projects with OpenProject.
           unlimited: "Korlátlan"
           you_contribute: "Developers need to pay their bills, too. By upgrading to the Enterprise edition, you will be supporting this open source community effort and contributing to its development, maintenance and continuous improvement."
+      working_days:
+        calendar:
+          empty_state_header: "Non-working days"
+          empty_state_description: 'No specific non-working days are defined for this year. Click on "+ Non-working day" below to add a date.'
+          new_date: '(new)'
+        add_non_working_day: "Non-working day"
+        already_added_error: "A non-working day for this date exists already. There can only be one non-working day created for each unique date."
+        change_button: "Save and reschedule"
+        change_title: "Change working days"
+        removed_title: "You will remove the following days from the non-working days list:"
+        change_description: "Changing which days of the week are considered working days or non-working days can affect the start and finish days of all work packages in all projects in this instance."
+        warning: >
+          The changes might take some time to take effect. You will be notified when all relevant work packages have been updated.
+          Are you sure you want to continue?
     custom_actions:
       date:
         specific: 'be'
@@ -280,8 +296,34 @@ hu:
           one: "Első rendezési feltétel"
           two: "Második rendezési feltétel"
           three: "Harmadik rendezési feltétel"
-      upsale_for_more: "Advanced filters allow you to also filter for file names and content of work package attachments. Please upgrade to a paid plan to use this add-on."
-      upsale_link: 'Enterprise edition.'
+    gantt_chart:
+      label: 'Gantt chart'
+      quarter_label: 'Q%{quarter_number}'
+      labels:
+        title: 'Label configuration'
+        bar: 'Bar labels'
+        left: 'Left'
+        right: 'Right'
+        farRight: 'Far right'
+        description: >
+          Select the attributes you want to be shown in the respective positions of the Gantt chart at all times. Note that when hovering over an element, its date labels will be shown instead of these attributes.
+      button_activate: 'Show Gantt chart'
+      button_deactivate: 'Hide Gantt chart'
+      filter:
+        noneSelection: "(none)"
+      selection_mode:
+        notification: 'Click on any highlighted work package to create the relation. Press escape to cancel.'
+      zoom:
+        in: "Zoom in"
+        out: "Zoom out"
+        auto: "Auto zoom"
+        days: "Days"
+        weeks: "Weeks"
+        months: "Months"
+        quarters: "Quarters"
+        years: "Years"
+        description: >
+          Select the initial zoom level that should be shown when autozoom is not available.
     general_text_no: "nem"
     general_text_yes: "igen"
     general_text_No: "Nem"
@@ -300,15 +342,22 @@ hu:
           learn_about: "Tudjon meg többet az új funkciókról"
           #Include the version to invalidate outdated translations in other locales.
           #Otherwise, e.g. chinese might still have the translations for 10.0 in the 12.0 release.
-          '12_4':
+          '13_0':
             standard:
-              learn_about_link: https://www.openproject.org/blog/openproject-12-4-release
+              learn_about_link: https://www.openproject.org/blog/openproject-13-0-release/
               new_features_html: >
-                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>Activate notification date alerts for upcoming dates and overdue tasks.</li> <li>We release two-factor authentication (2FA) for the Community edition.</li> <li>The work week display option is now also added to the team planner.</li> <li>List up to 3 people in a notification card when multiple people were involved in the changes.</li> </ul>
-            bim:
-              learn_about_link: https://www.openproject.org/blog/openproject-12-4-release
-              new_features_html: >
-                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>Activate notification date alerts for upcoming dates and overdue tasks.</li> <li>We release two-factor authentication (2FA) for the Community edition.</li> <li>The work week display option is now also added to the team planner.</li> <li>List up to 3 people in a notification card when multiple people were involved in the changes.</li> </ul>
+                The release contains various new features and improvements: <br> <ul class="%{list_styling_class}"> <li>Baseline comparison for easy tracking of changes.</li> <li>PDF export for reports on work plans.</li> <li>Subscribe to project calendars via URL (iCalendar).</li> <li>Project folders with document templates for the Nextcloud integration.</li> <li>Localized seeding of all seed data.</li> <li>Global modules are listed on new index pages.</li> </ul>
+    ical_sharing_modal:
+      title: "Subscribe to calendar"
+      inital_setup_error_message: "An error occured while fetching data."
+      description: "You can use the URL (iCalendar) to subscribe to this calendar in an external client and view up-to-date work package information from there."
+      warning: "Please don't share this URL with other users. Anyone with this link will be able to view work package details without an account or password."
+      token_name_label: "Where will you be using this?"
+      token_name_placeholder: "Type a name, e.g. \"Phone\""
+      token_name_description_text: "If you subscribe to this calendar from multiple devices, this name will help you distinguish between them in your <a href=\"my/access_token\", target=\"_blank\">access tokens</a> list."
+      copy_url_label: "Copy URL"
+      ical_generation_error_text: "An error occured while generating the calendar URL."
+      success_message: "The URL \"%{name}\" was successfully copied to your clipboard. Paste it in your calendar client to complete the subscription."
     label_activate: "Aktivál"
     label_assignee: 'Megbízott'
     label_add_column_after: "Oszlop hozzáadása utána"
@@ -320,7 +369,7 @@ hu:
     label_add_row_before: "Sor hozzáadása előtte"
     label_add_selected_columns: "A kiválasztott oszlopok hozzáadása"
     label_added_by: "Hozzáadta"
-    label_added_time_by: "Hozzáadta: <a href=%{authorLink}>%{author} </a>,%{age}"
+    label_added_time_by: "Added by <a href=\"%{authorLink}\">%{author}</a> at %{age}"
     label_ago: "nappal ezelőtt"
     label_all: "mind"
     label_all_work_packages: "minden feladatcsoport"
@@ -367,7 +416,7 @@ hu:
     label_filename: "File"
     label_filesize: "Méret"
     label_general: "Általános"
-    label_global_roles: "Globális szerepek"
+    label_global_roles: "Global roles"
     label_greater_or_equal: ">="
     label_group: 'Csoport'
     label_group_by: "Csoportosítás a következők szerint"
@@ -413,7 +462,7 @@ hu:
     label_previous: "Korábbi"
     label_per_page: "Oldalanként:"
     label_please_wait: "Kérem várjon"
-    label_project: "Project"
+    label_project: "Projekt"
     label_project_list: "Projects list"
     label_project_plural: "Projektek"
     label_visibility_settings: "Láthatósági beállítások"
@@ -427,7 +476,7 @@ hu:
     label_report: "Jelentés"
     label_repository_plural: "Csomagtárolók"
     label_save_as: "Mentés másként"
-    label_select_project: "Select a project"
+    label_select_project: "Válasszon projektet"
     label_select_watcher: "Megfigyelők választása..."
     label_selected_filter_list: "Szűrők választása"
     label_show_attributes: "Minden attribútum megjelenítése"
@@ -465,27 +514,27 @@ hu:
     label_watch_work_package: "Megfigyelő munkacsomag"
     label_watcher_added_successfully: "Megfigyelő sikeresen hozzáadva!"
     label_watcher_deleted_successfully: "Megfigyelő sikeresen törölve!"
-    label_work_package_details_you_are_here: "Te a %{tab} lapon %{type} %{subject}."
+    label_work_package_details_you_are_here: "You are on the %{tab} tab for %{type} %{subject}."
     label_unwatch: "Megfigyelés leállítása"
     label_unwatch_work_package: "Nem megfigyelt feladatcsoport"
     label_uploaded_by: "Által feltöltött"
-    label_default_queries: "Default"
+    label_default_queries: "alapértelmezett"
     label_starred_queries: "Favorite"
-    label_global_queries: "Public"
+    label_global_queries: "Nyilvános"
     label_custom_queries: "Private"
     label_columns: "Oszlopok"
     label_attachments: Csatolmány
-    label_drop_files: Húzza a fájlokat ide
-    label_drop_files_hint: vagy kattintson a fájlok hozzáadásához
+    label_drop_files: "Drop files here to attach files."
+    label_drop_or_click_files: "Drop files here or click to attach files."
     label_drop_folders_hint: Nem tölthet fel mappákat mellékletként. Válasszon egyetlen fájlt.
-    label_add_attachments: "Melléklet hozzáadása"
+    label_add_attachments: "Attach files"
     label_formattable_attachment_hint: "Fájl hozzárendelése mellékletként a fájl \"ideejtésével\" vagy vágólapról beillesztésével."
     label_remove_file: "%{fileName} törlése"
     label_remove_watcher: "Megfigyelő törlése: %{name}"
     label_remove_all_files: Összes fájl törlése
     label_add_description: "Adjon meg leírást a %{file} fájlhoz"
     label_upload_notification: "Fájl feltöltése folyamatban"
-    label_work_package_upload_notification: "Fájlok feltöltése a #%{id}: %{subject} feladatcsoporthoz" #%{id}: %{subject} feladatcsoporthoz"
+    label_work_package_upload_notification: "Fájlok feltöltése a #%{id}: %{subject} feladatcsoporthoz"
     label_wp_id_added_by: "%{id} hozzáadva %{author} által"
     label_files_to_upload: "Ezek a fájlok kerülnek feltöltésre:"
     label_rejected_files: "Ezeket a fájlokat nem lehet felölteni:"
@@ -542,7 +591,7 @@ hu:
       reasons:
         mentioned: 'megemlített'
         watched: 'watcher'
-        assigned: 'assignee'
+        assigned: 'felelős'
         responsible: 'felelős'
         created: 'created'
         scheduled: 'scheduled'
@@ -565,23 +614,23 @@ hu:
         unread: 'Olvasatlan'
         unread_title: 'Show unread'
         all: 'Mind'
-        all_title: 'Show all'
+        all_title: 'Minden megjelenítése'
       center:
-        label_actor_and: 'and'
+        label_actor_and: 'és'
         and_more_users:
           one: "és 1 másik\n"
           other: 'és %{count} egyéb'
         no_results:
-          at_all: 'New notifications will appear here when there is activity that concerns you, in the mean time you can also view and modify your notification settings to configure when to be notified.'
+          at_all: 'New notifications will appear here when there is activity that concerns you.'
           with_current_filter: 'Ebben a nézetben jelenleg nincsenek értesítések'
         mark_all_read: 'Mindegyik megjelölése olvasottként'
         mark_as_read: 'Megjelölés olvasottként'
         text_update_date: "%{date} szerint"
         total_count_warning: "A %{newest_count} legfrissebb értesítések megjelenítése. %{more_count} több nem jelenik meg.\n"
         empty_state:
-          no_notification: "Úgy tűnik, hogy teljesen naprakész."
-          no_notification_with_current_project_filter: "Looks like you're all caught up with the selected project."
-          no_notification_with_current_filter: "Looks like you're all caught up for %{filter} filter."
+          no_notification: "Looks like you are all caught up."
+          no_notification_with_current_project_filter: "Looks like you are all caught up with the selected project."
+          no_notification_with_current_filter: "Looks like you are all caught up for %{filter} filter."
           no_selection: "Click on a notification to view all activity details."
         new_notifications:
           message: 'Új értesítések érkeztek.'
@@ -591,11 +640,11 @@ hu:
         by_project: 'Olvasatlan projektenként'
         by_reason: 'Reason'
         inbox: 'Beérkezett üzenetek'
-        mentioned: 'Mentioned'
-        watched: 'Watcher'
+        mentioned: 'Megemlített'
+        watched: 'Megfigyelő'
         date_alert: 'Date alert'
       settings:
-        change_notification_settings: 'Az értesítési beállítások megtekintéséhez és megváltoztatásához <a target="_blank" href="%{url}">kattintson ide</a>'
+        change_notification_settings: 'You can modify your <a target="_blank" href="%{url}">notification settings</a> to ensure you never miss an important update.'
         title: "Értesítési beállítások"
         notify_me: "Értesítést kérek"
         reminders:
@@ -612,11 +661,11 @@ hu:
               P7D: every week
         reasons:
           mentioned:
-            title: 'Mentioned'
+            title: 'Megemlített'
             description: 'Értesítés fogadása minden alkalommal, amikor bárki bárhol megemlít'
-          assignee: 'Assignee'
-          responsible: 'Accountable'
-          watched: 'Watcher'
+          assignee: 'Megbízott'
+          responsible: 'Felelős'
+          watched: 'Megfigyelő'
           work_package_commented: 'Új megjegyzések'
           work_package_created: 'Új munkacsomagok'
           work_package_processed: 'Összes státusz változás'
@@ -657,9 +706,9 @@ hu:
     project:
       required_outside_context: >
         Kérjük, válasszon egy projektet a munkacsomag létrehozásához az összes attribútum megtekintéséhez. Csak olyan projekteket választhat ki, amelyek aktiválták a fenti típust.
+      details_activity: 'Project details activity'
       context: 'Projekt kontextus'
-      work_package_belongs_to: 'Ez a feladatcsoport a(z) %{projectname} nevű projekthez tartozik.'
-      click_to_switch_context: 'Munkacsomag megnyitása a projektben.'
+      click_to_switch_to_project: 'Project: %{projectname}'
       confirm_template_load: "Ha megváltoztatja a sablont, az oldal újratöltődik, és elveszíti az összes űrlapon lévő adatot. Folytatni?\n"
       use_template: "Sablon használata"
       no_template_selected: "(Nincs)"
@@ -718,6 +767,14 @@ hu:
     time_entry:
       work_package_required: 'Először ki kell választania egy munkacsomagot.'
       title: 'Eltöltött idő rögzítése'
+      tracking: 'Munkaidő követése'
+      stop: 'Stop'
+    timer:
+      start_new_timer: 'Start new timer'
+      timer_already_running: 'To start a new timer, you must first stop the current timer:'
+      timer_already_stopped: 'No active timer for this work package, have you stopped it in another window?'
+      tracking_time: 'Tracking time'
+      button_stop: 'Stop current timer'
     two_factor_authentication:
       label_two_factor_authentication: 'Kétlépcsős hitelesítés'
     watchers:
@@ -776,7 +833,8 @@ hu:
     autocompleter:
       placeholder: "Gépeljen a kereséshez"
       notFoundText: "Nem található elem"
-      typeToSearchText: "Gépeljen a kereséshez"
+      project:
+        placeholder: "Select project"
     repositories:
       select_tag: 'Címke kiválasztása'
       select_branch: 'Branch kiválasztása'
@@ -794,63 +852,6 @@ hu:
       activate_no: 'aktiválva a rendezés törlése'
     text_work_packages_destroy_confirmation: "Biztosan törli a kijelölt feladatcsoportot?"
     text_query_destroy_confirmation: "Biztosan törli a kijelölt megjelenítést?"
-    timelines:
-      quarter_label: 'Q%{quarter_number}'
-      gantt_chart: 'Gantt-diagram'
-      labels:
-        title: 'Címke konfiguráció'
-        bar: 'Oszlop címkék'
-        left: 'Bal'
-        right: 'Jobb'
-        farRight: 'Jobb szélen'
-        showNone: '--Nincs címke--'
-        description: >
-          Select the attributes you want to be shown in the respective positions of the Gantt chart at all times. Note that when hovering over an element, its date labels will be shown instead of these attributes.
-      button_activate: 'Gannt diagramm megtekintése'
-      button_deactivate: 'Gannt diagramm elrejtése'
-      cancel: Mégsem
-      change: "A tervezés módosítása"
-      due_date: "Befejezési dátum"
-      empty: "(üres)"
-      error: "Hiba történt."
-      errors:
-        not_implemented: "Az ütemterv nem jeleníthető meg, mert egy olyan tulajdonságot használ, amely még nincs beépítve."
-        report_comparison: "Az ütemterv nem nyújthatja a beállított összehasonlításokat. Kérjük, ellenőrizze a megfelelő részben a konfigurációt, az alaphelyzetbe állitása segíthet megoldani ezt a problémát."
-        report_epicfail: "Váratlan hiba miatt nem lehet betölteni az ütemtervet."
-        report_timeout: "Az ütemtervet nem lehetett betölteni az ésszerű idő alatt."
-      filter:
-        grouping_other: "Egyéb"
-        noneSelection: "(nincs)"
-      name: "Név"
-      outline: "A vázlat alaphelyzetbe állitása"
-      outlines:
-        aggregation: "Csak az összesítések megjelenítése"
-        level1: "Az 1-es szint kibontása"
-        level2: "A 2-es szint kibontása"
-        level3: "A 3-as szint kibontása"
-        level4: "A 4-es szint kibontása"
-        level5: "Az 5-ös szint kibontása"
-        all: "Minden megjelenítése"
-      project_status: "Projekt állapot"
-      really_close_dialog: "Igazán akar zárja be a párbeszédpanelt, és elveszíteni a bevitt adatokat?"
-      responsible: "Felelős"
-      save: Mentés
-      start_date: "Indulási dátum"
-      tooManyProjects: "Több mint %{count} projekt. Kérjük, használjon jobb szűrési beállításokat!"
-      selection_mode:
-        notification: 'Klikkeljen valamelyik feladatcsoportra a kapcsolat létrehozásához. Visszavonás az Esc megnyomásával.'
-      zoom:
-        in: "Nagyítás"
-        out: "Kicsinyítés"
-        auto: "Automatikus nagyítás"
-        days: "Nap"
-        weeks: "Hetek"
-        months: "Hónap"
-        quarters: "Negyedek"
-        years: "Évek"
-        slider: "Nagyítás/kicsinyítés"
-        description: >
-          Válassza ki a megjelenítendő kezdeti nagyítási szintet, ha az automatikus nagyítás nem áll rendelkezésre.
     tl_toolbar:
       zooms: "Nagyítási szint"
       outlines: "Hierarchia szint"
@@ -911,8 +912,15 @@ hu:
       message_work_package_read_only: "Ez Feladatcsomag ebben a státuszban zárolt. Nem lehet más attribútum segítségével megváltoztatni."
       message_work_package_status_blocked: "A munkacsomag állapota nem írható, mivel a zárt állapotot és a zárt verziót hozzárendelték."
       placeholder_filter_by_text: "Tárgy, leírás, kommentek"
+      baseline:
+        addition_label: 'Added to view within the comparison time period'
+        removal_label: 'Removed from view within the comparison time period'
+        modification_label: 'Modified within the comparison time period'
+        column_incompatible: 'This column does not show changes in Baseline mode.'
       filters:
-        title: 'Filter work packages'
+        title: 'A feladatcsoportok szűrése'
+        baseline_incompatible: 'This filter attribute is not taken into consideration in Baseline mode.'
+        baseline_warning: 'Baseline mode is on but some of your active filters are not included in the comparison.'
       inline_create:
         title: 'Ide kattintva adhatsz új munkacsomagot a listához'
       create:
@@ -949,7 +957,7 @@ hu:
         description: "Leírás"
         date: "dátum"
         dueDate: "Befejezési dátum"
-        duration: "Duration"
+        duration: "Időtartam"
         estimatedTime: "Becsült idő (óra)"
         spentTime: "Eltöltött idő"
         category: "Kategória"
@@ -992,7 +1000,7 @@ hu:
         move_column_left: "Oszlop mozgatása balra"
         move_column_right: "Oszlop mozgatása jobbra"
         hide_column: "Oszlop elrejtése"
-        insert_columns: "Oszlopok beszúrása..."
+        insert_columns: "Insert columns"
         filters: "Szürő"
         display_sums: "Megjelenitendő összegek"
         confirm_edit_cancel: "Biztosan meg kívánod szakítani a nézet nevének szerkesztését? Cím vissza lesz állítva a korábbi értékre."
@@ -1019,7 +1027,7 @@ hu:
         button: 'Ennek a feladatcsoportnak a beállítása'
         choose_display_mode: 'Feladatcsoportok megjelenése'
         modal_title: 'Feladatcsoport táblázat beállítás'
-        embedded_tab_disabled: "Ez a konfigurációs lap nem érhető el a szerkesztett beágyazott nézetben.\n"
+        embedded_tab_disabled: "This configuration tab is not available for the embedded view you are editing."
         default: "alapértelmezett"
         display_settings: 'Megjelenítési beállítások'
         default_mode: "Sima lista"
@@ -1055,26 +1063,26 @@ hu:
         relations: Kapcsolatok
         watchers: Megfigyelők
         files: Fájlok
-        files_tab_migration_help: 'Mostantól az új fülön lehet fájlokat csatolni a munkacsomagokhoz.'
       time_relative:
         days: "nap"
         weeks: "Hetek"
         months: "hónap"
     toolbar:
       settings:
-        configure_view: "Nézet beállítása"
-        columns: "Oszlopok..."
-        sort_by: "Rendezés..."
-        group_by: "Csoportosítás..."
+        configure_view: "Configure view"
+        columns: "Oszlopok"
+        sort_by: "Rendezés a következő szerint"
+        group_by: "Csoportosítás a következők szerint"
         display_sums: "Megjelenítendő összegek"
         display_hierarchy: "Hierarchia megjelenítése"
         hide_hierarchy: "Hierarchia elrejtése"
         hide_sums: "Összegek elrejtése"
         save: "Mentés"
-        save_as: "Mentés másként ..."
-        export: "Exportálás..."
-        visibility_settings: "Láthatóság beállítások ..."
-        page_settings: "Nézet átnevezése ..."
+        save_as: "Mentés másként"
+        export: "Exportálás"
+        visibility_settings: "Láthatósági beállítások"
+        share_calendar: "Subscribe to calendar"
+        page_settings: "Nézet átnevezése"
         delete: "Törlés"
       filter: "Szűrő"
       unselected_title: "Feladatcsoport"
@@ -1086,7 +1094,7 @@ hu:
       button_save: "Mentés"
       button_submit: "Küldés"
       button_cancel: "Mégsem"
-      button_delete: "Delete"
+      button_delete: "Törlés"
       form_submit:
         title: 'Megerősítés a folytatáshoz'
         text: 'Biztosan végre szeretné hajtani ezt a műveletet?'
@@ -1142,18 +1150,19 @@ hu:
         other: "%{count} ó"
         zero: "0 óra"
       day:
-        one: "1 day"
-        other: "%{count} days"
+        one: "%{count} nap"
+        other: "%{count} nap"
         zero: "0 days"
     zen_mode:
       button_activate: 'Zen mód aktiválása'
       button_deactivate: 'Zen mód kikapcsolása'
     global_search:
       all_projects: "Az összes projektben"
-      search: "Keresés"
       close_search: "Keresés bezárása"
-      current_project: "Ebben a projektben"
       current_project_and_all_descendants: "Ebben a projektben + alprojektekben"
+      current_project: "Ebben a projektben"
+      recently_viewed: "Recently viewed"
+      search: "Keresés"
       title:
         all_projects: "minden projekt"
         project_and_subprojects: "az összes alprojektben"
@@ -1217,7 +1226,7 @@ hu:
       message:
         label: 'Meghívó üzenet'
         description: 'We will send an email to the user, to which you can add a personal message here. An explanation for the invitation could be useful, or prehaps a bit of information regarding the project to help them get started.'
-        next_button: 'Next'
+        next_button: ' Következő'
       summary:
         next_button: 'Meghívó küldése'
       success:
@@ -1242,6 +1251,38 @@ hu:
         current_project: 'Ez a jelenlegi projekt, amiben vagyunk.'
         does_not_match_search: 'Project does not match the search criteria.'
       no_results: 'No project matches your search criteria.'
+    baseline:
+      toggle_title: 'Baseline'
+      clear: 'Törlés'
+      apply: 'Alkalmaz'
+      header_description: 'Highlight changes made to this list since any point in the past.'
+      enterprise_header_description: 'Highlight changes made to this list since any point in the past with Enterprise edition.'
+      show_changes_since: 'Show changes since'
+      baseline_comparison: 'Baseline comparison'
+      help_description: 'Reference time zone for the baseline.'
+      time_description: 'In your local time: %{datetime}'
+      time: 'Idő'
+      from: 'tól'
+      to: 'címzett'
+      drop_down:
+        none: '-'
+        yesterday: 'tegnap'
+        last_working_day: 'last working day'
+        last_week: 'múlt héten'
+        last_month: 'A múlt hónap'
+        a_specific_date: 'a specific date'
+        between_two_specific_dates: 'between two specific dates'
+      legends:
+        changes_since: 'Changes since'
+        changes_between: 'Changes between'
+        now_meets_filter_criteria: 'Now meets filter criteria'
+        no_longer_meets_filter_criteria: 'No longer meets filter criteria'
+        maintained_with_changes: 'Maintained with changes'
+        in_your_timezone: 'In your local timezone:'
+      icon_tooltip:
+        added: 'Added to view within the comparison time period'
+        removed: 'Removed from view within the comparison time period'
+        changed: 'Maintained with modifications'
     forms:
       submit_success_message: 'Jelentés sikeresen elküldve'
       load_error_message: 'Hiba történt az eredmény betöltésekor.'
@@ -1251,4 +1292,5 @@ hu:
       filter_chip:
         remove: 'Eltávolítás'
       drop_modal:
+        focus_grab: 'This is a focus anchor for modals. Press shift+tab to go back to the modal trigger element.'
         Close: 'Bezár'

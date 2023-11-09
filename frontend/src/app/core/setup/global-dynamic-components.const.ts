@@ -74,9 +74,9 @@ import {
   contentTabsSelector,
 } from 'core-app/shared/components/tabs/content-tabs/content-tabs.component';
 import {
-  CopyToClipboardDirective,
+  CopyToClipboardComponent,
   copyToClipboardSelector,
-} from 'core-app/shared/components/copy-to-clipboard/copy-to-clipboard.directive';
+} from 'core-app/shared/components/copy-to-clipboard/copy-to-clipboard.component';
 import {
   GlobalSearchInputComponent,
   globalSearchSelector,
@@ -163,6 +163,10 @@ import {
   enterprisePageSelector,
 } from 'core-app/shared/components/enterprise-page/enterprise-page.component';
 import {
+  OpNonWorkingDaysListComponent,
+  nonWorkingDaysListSelector,
+} from 'core-app/shared/components/op-non-working-days-list/op-non-working-days-list.component';
+import {
   EEActiveSavedTrialComponent,
   enterpriseActiveSavedTrialSelector,
 } from 'core-app/features/enterprise/enterprise-active-trial/ee-active-saved-trial.component';
@@ -203,11 +207,33 @@ import {
   CalendarSidemenuComponent,
   opCalendarSidemenuSelector,
 } from 'core-app/features/calendar/sidemenu/calendar-sidemenu.component';
-import { OpModalOverlayComponent, opModalOverlaySelector } from 'core-app/shared/components/modal/modal-overlay.component';
+import {
+  OpModalOverlayComponent,
+  opModalOverlaySelector,
+} from 'core-app/shared/components/modal/modal-overlay.component';
+import {
+  OpModalSingleDatePickerComponent,
+  opModalSingleDatePickerSelector,
+} from 'core-app/shared/components/datepicker/modal-single-date-picker/modal-single-date-picker.component';
+import {
+  OpBasicSingleDatePickerComponent,
+  opBasicSingleDatePickerSelector,
+} from 'core-app/shared/components/datepicker/basic-single-date-picker/basic-single-date-picker.component';
+import { SpotDropModalPortalComponent, spotDropModalPortalComponentSelector } from 'core-app/spot/components/drop-modal/drop-modal-portal.component';
+import { StaticAttributeHelpTextComponent, staticAttributeHelpTextSelector } from 'core-app/shared/components/attribute-help-texts/static-attribute-help-text.component';
+import {
+  StorageLoginButtonComponent,
+  opStorageLoginButtonSelector,
+} from 'core-app/shared/components/storages/storage-login-button/storage-login-button.component';
+import {
+  TimerAccountMenuComponent,
+  timerAccountSelector,
+} from 'core-app/shared/components/time_entries/timer/timer-account-menu.component';
 
 export const globalDynamicComponents:OptionalBootstrapDefinition[] = [
   { selector: appBaseSelector, cls: ApplicationBaseComponent },
   { selector: attributeHelpTextSelector, cls: AttributeHelpTextComponent },
+  { selector: staticAttributeHelpTextSelector, cls: StaticAttributeHelpTextComponent },
   { selector: wpEmbeddedTableMacroSelector, cls: EmbeddedTablesMacroComponent, embeddable: true },
   { selector: colorsAutocompleterSelector, cls: ColorsAutocompleterComponent },
   { selector: zenModeComponentSelector, cls: ZenModeButtonComponent },
@@ -232,12 +258,13 @@ export const globalDynamicComponents:OptionalBootstrapDefinition[] = [
   { selector: autocompleteSelectDecorationSelector, cls: AutocompleteSelectDecorationComponent },
   { selector: contentTabsSelector, cls: ContentTabsComponent },
   { selector: globalSearchTitleSelector, cls: GlobalSearchTitleComponent },
-  { selector: copyToClipboardSelector, cls: CopyToClipboardDirective },
+  { selector: copyToClipboardSelector, cls: CopyToClipboardComponent },
   { selector: mainMenuResizerSelector, cls: MainMenuResizerComponent },
   { selector: mainMenuToggleSelector, cls: MainMenuToggleComponent },
   { selector: globalSearchSelector, cls: GlobalSearchInputComponent },
   { selector: collapsibleSectionAugmentSelector, cls: CollapsibleSectionComponent },
   { selector: enterpriseBannerSelector, cls: EnterpriseBannerComponent },
+  { selector: nonWorkingDaysListSelector, cls: OpNonWorkingDaysListComponent },
   { selector: enterprisePageSelector, cls: EnterprisePageComponent },
   { selector: noResultsSelector, cls: NoResultsComponent },
   { selector: enterpriseBaseSelector, cls: EnterpriseBaseComponent },
@@ -245,7 +272,6 @@ export const globalDynamicComponents:OptionalBootstrapDefinition[] = [
   { selector: enterpriseActiveSavedTrialSelector, cls: EEActiveSavedTrialComponent },
   { selector: headerProjectSelectSelector, cls: OpHeaderProjectSelectComponent },
   { selector: projectsAutocompleterSelector, cls: ProjectAutocompleterComponent },
-  { selector: remoteFieldUpdaterSelector, cls: RemoteFieldUpdaterComponent },
   { selector: wpOverviewGraphSelector, cls: WorkPackageOverviewGraphComponent },
   { selector: opViewSelectSelector, cls: ViewSelectComponent },
   { selector: opTeamPlannerSidemenuSelector, cls: TeamPlannerSidemenuComponent },
@@ -256,9 +282,21 @@ export const globalDynamicComponents:OptionalBootstrapDefinition[] = [
   { selector: attributeLabelMacro, cls: AttributeLabelMacroComponent, embeddable: true },
   { selector: quickInfoMacroSelector, cls: WorkPackageQuickinfoMacroComponent, embeddable: true },
   { selector: editableQueryPropsSelector, cls: EditableQueryPropsComponent },
-  { selector: spotSwitchSelector, cls: SpotSwitchComponent },
   { selector: backupSelector, cls: BackupComponent },
   { selector: opInAppNotificationBellSelector, cls: InAppNotificationBellComponent },
   { selector: ianMenuSelector, cls: IanMenuComponent },
+
   { selector: opModalOverlaySelector, cls: OpModalOverlayComponent },
+  { selector: spotDropModalPortalComponentSelector, cls: SpotDropModalPortalComponent },
+  { selector: spotSwitchSelector, cls: SpotSwitchComponent },
+  { selector: opStorageLoginButtonSelector, cls: StorageLoginButtonComponent },
+
+  { selector: opModalSingleDatePickerSelector, cls: OpModalSingleDatePickerComponent, embeddable: true },
+  { selector: opBasicSingleDatePickerSelector, cls: OpBasicSingleDatePickerComponent, embeddable: true },
+
+  // It is important to initialize the remoteFieldUpdaterSelector after the datepickers,
+  // because we need to access the input field of the datepickers inside the remoteFieldUpdaterSelector
+  { selector: remoteFieldUpdaterSelector, cls: RemoteFieldUpdaterComponent },
+
+  { selector: timerAccountSelector, cls: TimerAccountMenuComponent },
 ];

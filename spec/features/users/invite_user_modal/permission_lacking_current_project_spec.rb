@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,21 +28,23 @@
 
 require 'spec_helper'
 
-describe 'Inviting user in project the current user is lacking permission in', type: :feature, js: true do
+RSpec.describe 'Inviting user in project the current user is lacking permission in',
+               js: true,
+               with_cuprite: true do
   let(:modal) do
-    ::Components::Users::InviteUserModal.new project: invite_project,
-                                             principal: other_user,
-                                             role: view_role
+    Components::Users::InviteUserModal.new project: invite_project,
+                                           principal: other_user,
+                                           role: view_role
   end
-  let(:quick_add) { ::Components::QuickAddMenu.new }
+  let(:quick_add) { Components::QuickAddMenu.new }
 
   let(:view_role) do
-    create :role,
-           permissions: []
+    create(:role,
+           permissions: [])
   end
   let(:invite_role) do
-    create :role,
-           permissions: %i[manage_members]
+    create(:role,
+           permissions: %i[manage_members])
   end
 
   let!(:other_user) { create(:user) }
@@ -50,10 +52,10 @@ describe 'Inviting user in project the current user is lacking permission in', t
   let!(:invite_project) { create(:project, members: { current_user => invite_role }) }
 
   current_user do
-    create :user
+    create(:user)
   end
 
-  it 'user cannot invite in current project but for different one' do
+  specify 'user cannot invite in current project but for different one' do
     visit project_path(view_project)
 
     quick_add.expect_visible
@@ -61,6 +63,8 @@ describe 'Inviting user in project the current user is lacking permission in', t
     quick_add.toggle
 
     quick_add.click_link 'Invite user'
+
+    wait_for_network_idle
 
     modal.expect_help_displayed I18n.t('js.invite_user_modal.project.lacking_permission_info')
 

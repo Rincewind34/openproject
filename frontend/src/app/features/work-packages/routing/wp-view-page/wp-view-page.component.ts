@@ -1,6 +1,6 @@
 // -- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2022 the OpenProject GmbH
+// Copyright (C) 2012-2023 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -47,6 +47,7 @@ import { WorkPackageSettingsButtonComponent } from 'core-app/features/work-packa
 import { of } from 'rxjs';
 import { WorkPackageFoldToggleButtonComponent } from 'core-app/features/work-packages/components/wp-buttons/wp-fold-toggle-button/wp-fold-toggle-button.component';
 import { OpProjectIncludeComponent } from 'core-app/shared/components/project-include/project-include.component';
+import { OpBaselineModalComponent } from 'core-app/features/work-packages/components/wp-baseline/baseline-modal/baseline-modal.component';
 
 @Component({
   selector: 'wp-view-page',
@@ -77,11 +78,15 @@ export class WorkPackageViewPageComponent extends PartitionedQuerySpacePageCompo
       show: () => !!(this.currentQuery && this.currentQuery.groupBy),
     },
     {
+      component: OpBaselineModalComponent,
+      containerClasses: 'hidden-for-tablet',
+    },
+    {
       component: WorkPackageFilterButtonComponent,
     },
     {
       component: WorkPackageViewToggleButtonComponent,
-      containerClasses: 'hidden-for-mobile',
+      containerClasses: 'hidden-for-tablet',
     },
     {
       component: WorkPackageFoldToggleButtonComponent,
@@ -89,15 +94,15 @@ export class WorkPackageViewPageComponent extends PartitionedQuerySpacePageCompo
     },
     {
       component: WorkPackageDetailsViewButtonComponent,
-      containerClasses: 'hidden-for-mobile',
+      containerClasses: 'hidden-for-tablet',
     },
     {
       component: WorkPackageTimelineButtonComponent,
-      containerClasses: 'hidden-for-mobile -no-spacing',
+      containerClasses: 'hidden-for-tablet -no-spacing',
     },
     {
       component: ZenModeButtonComponent,
-      containerClasses: 'hidden-for-mobile',
+      containerClasses: 'hidden-for-tablet',
     },
     {
       component: WorkPackageSettingsButtonComponent,

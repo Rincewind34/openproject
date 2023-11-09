@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -58,7 +58,7 @@ module Components
         modal_open? or open_modal
 
         column_autocompleter.click
-        expect(page).to have_no_selector('.ng-option', text: name, visible: :all)
+        expect(page).not_to have_selector('.ng-option', text: name, visible: :all)
         close_autocompleter
       end
 
@@ -71,7 +71,7 @@ module Components
       end
 
       def add(name, save_changes: true, finicky: false)
-        modal_open? or open_modal
+        open_modal unless modal_open?
 
         select_autocomplete column_autocompleter,
                             results_selector: '.ng-dropdown-panel-items',
@@ -82,7 +82,6 @@ module Components
           within ".work-package-table" do
             # for some reason these columns (e.g. 'Overall costs') don't have a proper link
             if finicky
-              SeleniumHubWaiter.wait
               expect(page).to have_selector("a", text: /#{name}/i, visible: :all)
             else
               expect(page).to have_link(name)
@@ -110,19 +109,16 @@ module Components
 
       def expect_unchecked(name)
         within_modal do
-          expect(page).to have_no_selector('.op-draggable-autocomplete--item', text: name)
+          expect(page).not_to have_selector('.op-draggable-autocomplete--item', text: name)
         end
       end
 
       def uncheck_all(save_changes: true)
-        modal_open? or open_modal
+        open_modal unless modal_open?
 
         within_modal do
           expect(page).to have_selector('.op-draggable-autocomplete--item', minimum: 1)
-          page.all('.op-draggable-autocomplete--remove-item').each do |el|
-            el.click
-            sleep 0.2
-          end
+          page.all('.op-draggable-autocomplete--remove-item').each(&:click)
         end
 
         apply if save_changes
@@ -131,7 +127,6 @@ module Components
       def apply
         @opened = false
 
-        # SeleniumHubWaiter.wait
         click_button('Apply')
       end
 

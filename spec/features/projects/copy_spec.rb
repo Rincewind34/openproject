@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,10 +28,7 @@
 
 require 'spec_helper'
 
-# rubocop:disable RSpec:MultipleMemoizedHelpers
-describe 'Projects copy',
-         type: :feature,
-         js: true do
+RSpec.describe 'Projects copy', :with_cuprite, js: true do
   describe 'with a full copy example' do
     let!(:project) do
       create(:project,
@@ -66,7 +63,7 @@ describe 'Projects copy',
       create(:text_wp_custom_field)
     end
     let(:active_types) do
-      [create(:type), create(:type)]
+      create_list(:type, 2)
     end
     let!(:inactive_type) do
       create(:type)
@@ -77,7 +74,15 @@ describe 'Projects copy',
              permissions:)
     end
     let(:permissions) do
-      %i(copy_projects edit_project add_subprojects manage_types view_work_packages select_custom_fields work_package_assigned)
+      %i(copy_projects
+         edit_project
+         add_subprojects
+         manage_types
+         view_work_packages
+         select_custom_fields
+         manage_storages_in_project
+         manage_file_links
+         work_package_assigned)
     end
     let(:wp_user) do
       user = create(:user)
@@ -111,13 +116,13 @@ describe 'Projects copy',
 
     let!(:wiki) { project.wiki }
     let!(:wiki_page) do
-      create :wiki_page_with_content,
+      create(:wiki_page,
              title: 'Attached',
              wiki:,
-             attachments: [build(:attachment, container: nil, filename: 'wiki_page_attachment.pdf')]
+             attachments: [build(:attachment, container: nil, filename: 'wiki_page_attachment.pdf')])
     end
 
-    let(:parent_field) { ::FormFields::SelectFormField.new :parent }
+    let(:parent_field) { FormFields::SelectFormField.new :parent }
 
     let(:storage) { create(:storage) }
     let(:project_storage) { create(:project_storage, project:, storage:) }
@@ -143,18 +148,14 @@ describe 'Projects copy',
 
       expect(page).to have_text "Copy project \"#{project.name}\""
 
-      fill_in 'Name', with: 'Copied project', wait: 10
+      fill_in 'Name', with: 'Copied project'
 
       # Expand advanced settings
       click_on 'Advanced settings'
 
       # the value of the custom field should be preselected
-      editor = ::Components::WysiwygEditor.new "[data-qa-field-name='customField#{project_custom_field.id}']"
+      editor = Components::WysiwygEditor.new "[data-qa-field-name='customField#{project_custom_field.id}']"
       editor.expect_value 'some text cf'
-
-      # Deactivate sending of mails during copying
-      click_on 'Copy options'
-      uncheck 'Send email notifications during the project copy'
 
       click_button 'Save'
 
@@ -166,8 +167,7 @@ describe 'Projects copy',
 
       copied_project = Project.find_by(name: 'Copied project')
 
-      expect(copied_project)
-        .to be_present
+      expect(copied_project).to be_present
 
       # Will redirect to the new project automatically once the copy process is done
       expect(page).to have_current_path(Regexp.new("#{project_path(copied_project)}/?"))
@@ -180,7 +180,7 @@ describe 'Projects copy',
 
       # copies over the value of the custom field
       # has the parent of the original project
-      editor = ::Components::WysiwygEditor.new "[data-qa-field-name='customField#{project_custom_field.id}']"
+      editor = Components::WysiwygEditor.new "[data-qa-field-name='customField#{project_custom_field.id}']"
       editor.expect_value 'some text cf'
 
       # has wp custom fields of original project active
@@ -206,71 +206,57 @@ describe 'Projects copy',
         .to eq ['wiki_page_attachment.pdf']
 
       # Expect ProjectStores and their FileLinks were copied
-      expect(copied_project.projects_storages.count).to eq(project.projects_storages.count)
+      expect(copied_project.project_storages.count).to eq(project.project_storages.count)
       expect(copied_project.work_packages[0].file_links.count).to eq(project.work_packages[0].file_links.count)
 
       # custom field is copied over where the author is the current user
       # Using the db directly due to performance and clarity
       copied_work_packages = copied_project.work_packages
 
-      expect(copied_work_packages.length)
-        .to eql 1
+      expect(copied_work_packages.length).to eql 1
 
       copied_work_package = copied_work_packages[0]
 
-      expect(copied_work_package.subject)
-        .to eql work_package.subject
-      expect(copied_work_package.author)
-        .to eql user
-      expect(copied_work_package.assigned_to)
-        .to eql work_package.assigned_to
-      expect(copied_work_package.responsible)
-        .to eql work_package.responsible
-      expect(copied_work_package.status)
-        .to eql work_package.status
-      expect(copied_work_package.done_ratio)
-        .to eql work_package.done_ratio
-      expect(copied_work_package.description)
-        .to eql work_package.description
-      expect(copied_work_package.category)
-        .to eql copied_project.categories.find_by(name: category.name)
-      expect(copied_work_package.version)
-        .to eql copied_project.versions.find_by(name: version.name)
-      expect(copied_work_package.custom_value_attributes)
-        .to eql(wp_custom_field.id => 'Some wp cf text')
-      expect(copied_work_package.attachments.map(&:filename))
-        .to eq ['work_package_attachment.pdf']
+      expect(copied_work_package.subject).to eql work_package.subject
+      expect(copied_work_package.author).to eql user
+      expect(copied_work_package.assigned_to).to eql work_package.assigned_to
+      expect(copied_work_package.responsible).to eql work_package.responsible
+      expect(copied_work_package.status).to eql work_package.status
+      expect(copied_work_package.done_ratio).to eql work_package.done_ratio
+      expect(copied_work_package.description).to eql work_package.description
+      expect(copied_work_package.category).to eql copied_project.categories.find_by(name: category.name)
+      expect(copied_work_package.version).to eql copied_project.versions.find_by(name: version.name)
+      expect(copied_work_package.custom_value_attributes).to eql(wp_custom_field.id => 'Some wp cf text')
+      expect(copied_work_package.attachments.map(&:filename)).to eq ['work_package_attachment.pdf']
 
-      expect(ActionMailer::Base.deliveries.count)
-        .to eql(1)
-
-      expect(ActionMailer::Base.deliveries.last.subject)
-        .to eql("Created project Copied project")
-
-      expect(ActionMailer::Base.deliveries.last.to)
-        .to match_array([user.mail])
+      expect(ActionMailer::Base.deliveries.count).to eql(1)
+      expect(ActionMailer::Base.deliveries.last.subject).to eql("Created project Copied project")
+      expect(ActionMailer::Base.deliveries.last.to).to contain_exactly(user.mail)
     end
   end
 
   describe 'copying a set of ordered work packages' do
-    let(:user) { create :admin }
-    let(:project) { create :project, types: [type] }
-    let(:type) { create :type }
-    let(:status) { create :status }
-    let(:priority) { create :priority }
+    let(:user) { create(:admin) }
+    let(:wp_table) { Pages::WorkPackagesTable.new project }
+    let(:copied_project) { Project.find_by(name: 'Copied project') }
+    let(:copy_wp_table) { Pages::WorkPackagesTable.new copied_project }
+    let(:project) { create(:project, types: [type]) }
+    let(:type) { create(:type) }
+    let(:status) { create(:status) }
+    let(:priority) { create(:priority) }
 
     let(:default_params) do
       { type:, status:, project:, priority: }
     end
 
-    let(:parent1) { create :work_package, default_params.merge(subject: 'Initial phase') }
-    let(:child1_1) { create :work_package, default_params.merge(parent: parent1, subject: 'Confirmation phase') }
-    let(:child1_2) { create :work_package, default_params.merge(parent: parent1, subject: 'Initiation') }
-    let(:parent2) { create :work_package, default_params.merge(subject: 'Execution') }
-    let(:child2_1) { create :work_package, default_params.merge(parent: parent2, subject: 'Define goal') }
-    let(:child2_2) { create :work_package, default_params.merge(parent: parent2, subject: 'Specify metrics') }
-    let(:child2_3) { create :work_package, default_params.merge(parent: parent2, subject: 'Prepare launch') }
-    let(:child2_4) { create :work_package, default_params.merge(parent: parent2, subject: 'Launch') }
+    let(:parent1) { create(:work_package, default_params.merge(subject: 'Initial phase')) }
+    let(:child1_1) { create(:work_package, default_params.merge(parent: parent1, subject: 'Confirmation phase')) }
+    let(:child1_2) { create(:work_package, default_params.merge(parent: parent1, subject: 'Initiation')) }
+    let(:parent2) { create(:work_package, default_params.merge(subject: 'Execution')) }
+    let(:child2_1) { create(:work_package, default_params.merge(parent: parent2, subject: 'Define goal')) }
+    let(:child2_2) { create(:work_package, default_params.merge(parent: parent2, subject: 'Specify metrics')) }
+    let(:child2_3) { create(:work_package, default_params.merge(parent: parent2, subject: 'Prepare launch')) }
+    let(:child2_4) { create(:work_package, default_params.merge(parent: parent2, subject: 'Launch')) }
 
     let(:order) do
       [parent1, child1_1, child1_2, parent2, child2_1, child2_2, child2_3, child2_4]
@@ -287,11 +273,6 @@ describe 'Projects copy',
 
       login_as user
     end
-
-    let(:wp_table) { ::Pages::WorkPackagesTable.new project }
-
-    let(:copied_project) { Project.find_by(name: 'Copied project') }
-    let(:copy_wp_table) { ::Pages::WorkPackagesTable.new copied_project }
 
     it 'copies them in the same order' do
       wp_table.visit!
@@ -320,4 +301,3 @@ describe 'Projects copy',
     end
   end
 end
-# rubocop:enable RSpec:MultipleMemoizedHelpers

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -40,7 +40,7 @@ module OpenProject::Documents
            { controller: '/documents', action: 'index' },
            caption: :label_document_plural,
            before: :members,
-           icon: 'icon2 icon-notes'
+           icon: 'notes'
 
       project_module :documents do |_map|
         permission :view_documents, documents: %i[index show download]
@@ -74,7 +74,5 @@ module OpenProject::Documents
 
     # Add documents to allowed search params
     additional_permitted_attributes search: %i(documents)
-
-    patch_with_namespace :OpenProject, :TextFormatting, :Formats, :Markdown, :TextileConverter
   end
 end

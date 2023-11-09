@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,8 +28,8 @@
 
 require 'spec_helper'
 
-describe ::API::V3::Capabilities::CapabilitySqlRepresenter, 'rendering' do
-  include ::API::V3::Utilities::PathHelper
+RSpec.describe API::V3::Capabilities::CapabilitySqlRepresenter, 'rendering' do
+  include API::V3::Utilities::PathHelper
 
   let(:scope) do
     Capability
@@ -57,7 +57,7 @@ describe ::API::V3::Capabilities::CapabilitySqlRepresenter, 'rendering' do
   end
 
   subject(:json) do
-    ::API::V3::Utilities::SqlRepresenterWalker
+    API::V3::Utilities::SqlRepresenterWalker
       .new(
         scope,
         current_user:,
@@ -71,7 +71,7 @@ describe ::API::V3::Capabilities::CapabilitySqlRepresenter, 'rendering' do
     it 'renders as expected' do
       expect(json)
         .to be_json_eql({
-          id: "memberships/read/p#{context.id}-#{principal.id}",
+          id: "activities/read/p#{context.id}-#{principal.id}",
           _type: "Capability",
           _links: {
             context: {
@@ -83,10 +83,10 @@ describe ::API::V3::Capabilities::CapabilitySqlRepresenter, 'rendering' do
               title: principal.name
             },
             action: {
-              href: api_v3_paths.action("memberships/read")
+              href: api_v3_paths.action("activities/read")
             },
             self: {
-              href: api_v3_paths.capability("memberships/read/p#{context.id}-#{principal.id}")
+              href: api_v3_paths.capability("activities/read/p#{context.id}-#{principal.id}")
             }
           }
         }.to_json)
@@ -115,10 +115,10 @@ describe ::API::V3::Capabilities::CapabilitySqlRepresenter, 'rendering' do
               title: principal.name
             },
             action: {
-              href: api_v3_paths.action("memberships/read")
+              href: api_v3_paths.action("activities/read")
             },
             self: {
-              href: api_v3_paths.capability("memberships/read/p#{context.id}-#{principal.id}")
+              href: api_v3_paths.capability("activities/read/p#{context.id}-#{principal.id}")
             }
           }
         }.to_json)
@@ -128,7 +128,7 @@ describe ::API::V3::Capabilities::CapabilitySqlRepresenter, 'rendering' do
   context 'with a global permission' do
     let(:principal) do
       create(:user,
-             global_permission: %i[manage_user],
+             global_permission: %i[create_user],
              member_in_project: project,
              member_with_permissions: [])
     end

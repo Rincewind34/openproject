@@ -1,33 +1,35 @@
 require 'spec_helper'
 
-describe "Split screen in the notification center", type: :feature, js: true do
-  let(:global_html_title) { ::Components::HtmlTitle.new }
-  let(:center) { ::Pages::Notifications::Center.new }
-  let(:split_screen) { ::Pages::Notifications::SplitScreen.new work_package }
+RSpec.describe "Split screen in the notification center",
+               js: true,
+               with_cuprite: true do
+  let(:global_html_title) { Components::HtmlTitle.new }
+  let(:center) { Pages::Notifications::Center.new }
+  let(:split_screen) { Pages::Notifications::SplitScreen.new work_package }
 
-  shared_let(:project) { create :project }
-  shared_let(:work_package) { create :work_package, project: }
-  shared_let(:second_work_package) { create :work_package, project: }
+  shared_let(:project) { create(:project) }
+  shared_let(:work_package) { create(:work_package, project:) }
+  shared_let(:second_work_package) { create(:work_package, project:) }
 
   shared_let(:recipient) do
-    create :user,
+    create(:user,
            member_in_project: project,
-           member_with_permissions: %i[view_work_packages]
+           member_with_permissions: %i[view_work_packages])
   end
   shared_let(:notification) do
-    create :notification,
+    create(:notification,
            recipient:,
            project:,
            resource: work_package,
-           journal: work_package.journals.last
+           journal: work_package.journals.last)
   end
 
   shared_let(:second_notification) do
-    create :notification,
+    create(:notification,
            recipient:,
            project:,
            resource: second_work_package,
-           journal: second_work_package.journals.last
+           journal: second_work_package.journals.last)
   end
 
   describe 'basic use case' do
@@ -35,6 +37,7 @@ describe "Split screen in the notification center", type: :feature, js: true do
 
     before do
       visit home_path
+      wait_for_reload
       center.open
     end
 
@@ -49,7 +52,7 @@ describe "Split screen in the notification center", type: :feature, js: true do
 
       # Clicking on a another notification changes the split screen content
       center.click_item second_notification
-      split_screen = ::Pages::SplitWorkPackage.new(second_work_package, project)
+      split_screen = Pages::SplitWorkPackage.new(second_work_package, project)
       split_screen.expect_open
       center.expect_work_package_item second_notification
     end
@@ -62,13 +65,13 @@ describe "Split screen in the notification center", type: :feature, js: true do
 
       # Activity is selected as default
       split_screen.expect_tab :activity
-      activity_tab = ::Components::WorkPackages::Activities.new(work_package)
+      activity_tab = Components::WorkPackages::Activities.new(work_package)
       activity_tab.expect_wp_has_been_created_activity work_package
 
       # Navigate to the relations tab
       split_screen.switch_to_tab tab: 'relations'
       split_screen.expect_tab :relations
-      relations_tab = ::Components::WorkPackages::Relations.new(work_package)
+      relations_tab = Components::WorkPackages::Relations.new(work_package)
       relations_tab.expect_no_relation work_package
 
       # Navigate to full view and back
@@ -97,6 +100,7 @@ describe "Split screen in the notification center", type: :feature, js: true do
       # Html title should be updated with next WP data after making the current one as read
       second_title = "#{second_work_package.type.name}: #{second_work_package.subject} (##{second_work_package.id})"
       center.click_item notification
+      sleep 0.25 # Wait after the item has been clicked to not be interpreted as a double click
       center.mark_notification_as_read notification
       global_html_title.expect_first_segment second_title
 
@@ -112,6 +116,7 @@ describe "Split screen in the notification center", type: :feature, js: true do
     before do
       Notification.where(recipient:).update_all(read_ian: true)
       visit home_path
+      wait_for_reload
       center.open
     end
 

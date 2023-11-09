@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -45,7 +45,7 @@ namespace :ldap do
     ldap = LdapAuthSource.find_by!(name: args.fetch(:name))
 
     logins = args.fetch(:logins, '').split(/\s*,\s*/)
-    ::Ldap::SynchronizeUsersService
+    Ldap::SynchronizeUsersService
       .new(ldap, logins)
       .call
   end
@@ -60,7 +60,7 @@ namespace :ldap do
     # Parse filter string if available
     filter = Net::LDAP::Filter.from_rfc2254 args.fetch(:filter, 'objectClass = *')
 
-    ::Ldap::ImportUsersFromFilterService
+    Ldap::ImportUsersFromFilterService
       .new(ldap, filter)
       .call
   end
@@ -75,7 +75,7 @@ namespace :ldap do
     puts "--> Reading username file #{file}"
     users = File.read(file).lines(chomp: true)
 
-    ::Ldap::ImportUsersFromListService
+    Ldap::ImportUsersFromListService
       .new(ldap, users)
       .call
   end
@@ -118,36 +118,5 @@ namespace :ldap do
     else
       raise "Failed to save auth source: #{source.errors.full_messages.join("\n")}"
     end
-  end
-
-  desc 'Creates a dummy LDAP auth source for logging in any user using the password "dummy".'
-  task create_dummy: :environment do
-    source_name = 'DerpLAP'
-    otf_reg = ARGV.include?('onthefly_register')
-
-    source = DummyAuthSource.create name: source_name, onthefly_register: otf_reg
-
-    puts
-    if source.valid?
-      puts "Created dummy auth source called \"#{source_name}\""
-      puts 'On-the-fly registration support: ' + otf_reg.to_s
-      unless otf_reg
-        puts "use `rake ldap:create_dummy[onthefly_register]` to enable on-the-fly registration"
-      end
-    else
-      puts "Dummy auth source already exists. It's called \"#{source_name}\"."
-    end
-
-    puts
-    puts 'Note: Dummy auth sources cannot be edited, so clicking on them'
-    puts "      in the 'LDAP Authentication' view will result in an error. Bummer!"
-  end
-
-  desc 'Delete all Dummy auth sources'
-  task delete_dummies: :environment do
-    DummyAuthSource.destroy_all
-
-    puts
-    puts 'Deleted all dummy auth sources. Users who used it are out of luck! :o'
   end
 end

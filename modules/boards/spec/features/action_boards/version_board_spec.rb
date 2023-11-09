@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,11 +27,10 @@
 #++
 
 require 'spec_helper'
-require_relative './../support//board_index_page'
-require_relative './../support/board_page'
+require_relative '../support//board_index_page'
+require_relative '../support/board_page'
 
-# rubocop:disable RSpec:MultipleMemoizedHelpers
-describe 'Version action board', type: :feature, js: true do
+RSpec.describe 'Version action board', js: true, with_ee: %i[board_view] do
   let(:user) do
     create(:user,
            member_in_projects: [project, second_project],
@@ -44,8 +43,8 @@ describe 'Version action board', type: :feature, js: true do
            member_through_role: role_board_manager)
   end
   let(:type) { create(:type_standard) }
-  let!(:priority) { create :default_priority }
-  let!(:status) { create :default_status }
+  let!(:priority) { create(:default_priority) }
+  let!(:status) { create(:default_status) }
   let(:role) { create(:role, permissions:) }
   let(:role_board_manager) { create(:role, permissions: permissions_board_manager) }
 
@@ -61,21 +60,22 @@ describe 'Version action board', type: :feature, js: true do
     %i[show_board_views manage_board_views view_work_packages manage_public_queries]
   end
 
-  let!(:open_version) { create :version, project:, name: 'Open version' }
-  let!(:other_version) { create :version, project:, name: 'A second version' }
-  let!(:different_project_version_) { create :version, project: second_project, name: 'Version of another project' }
-  let!(:shared_version) { create :version, project: second_project, name: 'Shared version', sharing: 'system' }
-  let!(:closed_version) { create :version, project:, status: 'closed', name: 'Closed version' }
+  let!(:open_version) { create(:version, project:, name: 'Open version') }
+  let!(:other_version) { create(:version, project:, name: 'A second version') }
+  let!(:different_project_version_) { create(:version, project: second_project, name: 'Version of another project') }
+  let!(:shared_version) { create(:version, project: second_project, name: 'Shared version', sharing: 'system') }
+  let!(:closed_version) { create(:version, project:, status: 'closed', name: 'Closed version') }
 
-  let!(:work_package) { create :work_package, project:, subject: 'Foo', version: open_version }
-  let!(:closed_version_wp) { create :work_package, project:, subject: 'Closed', version: closed_version }
-  let(:filters) { ::Components::WorkPackages::Filters.new }
+  let!(:work_package) { create(:work_package, project:, subject: 'Foo', version: open_version) }
+  let!(:closed_version_wp) { create(:work_package, project:, subject: 'Closed', version: closed_version) }
+  let(:filters) { Components::WorkPackages::Filters.new }
 
   def create_new_version_board
     board_index.visit!
 
     # Create new board
-    board_page = board_index.create_board action: :Version
+    board_page = board_index.create_board title: 'My Version Board',
+                                          action: 'Version'
 
     # expect lists of open versions
     board_page.expect_list 'Open version'
@@ -88,7 +88,6 @@ describe 'Version action board', type: :feature, js: true do
   end
 
   before do
-    with_enterprise_token :board_view
     project
   end
 
@@ -106,7 +105,7 @@ describe 'Version action board', type: :feature, js: true do
       board_page.expect_list_option 'Closed version'
 
       board_page.board(reload: true) do |board|
-        expect(board.name).to eq 'Action board (version)'
+        expect(board.name).to eq 'My Version Board'
         queries = board.contained_queries
         expect(queries.count).to eq(2)
 
@@ -140,7 +139,7 @@ describe 'Version action board', type: :feature, js: true do
       # Expect work package to be saved in query first
       subjects = WorkPackage.where(id: first.ordered_work_packages.pluck(:work_package_id)).pluck(:subject, :version_id)
       # Only the explicitly added item is now contained in sort order
-      expect(subjects).to match_array [['Task 1', open_version.id]]
+      expect(subjects).to contain_exactly(['Task 1', open_version.id])
 
       # Move item to Closed
       board_page.move_card(0, from: 'Open version', to: 'A second version')
@@ -155,7 +154,7 @@ describe 'Version action board', type: :feature, js: true do
       end
 
       subjects = WorkPackage.where(id: second.ordered_work_packages.pluck(:work_package_id)).pluck(:subject, :version_id)
-      expect(subjects).to match_array [['Task 1', other_version.id]]
+      expect(subjects).to contain_exactly(['Task 1', other_version.id])
 
       # Add filter
       # Filter for Task
@@ -206,7 +205,7 @@ describe 'Version action board', type: :feature, js: true do
       board_page.expect_card('A second version', 'Task 1', present: true)
 
       subjects = WorkPackage.where(id: second.ordered_work_packages.pluck(:work_package_id)).pluck(:subject, :version_id)
-      expect(subjects).to match_array [['Task 1', other_version.id]]
+      expect(subjects).to contain_exactly(['Task 1', other_version.id])
 
       # Open remaining in split view
       work_package = second.ordered_work_packages.first.work_package
@@ -254,7 +253,7 @@ describe 'Version action board', type: :feature, js: true do
 
       # Can open that version
       board_page.click_list_dropdown 'Closed version', 'Open version'
-      expect(page).to have_no_selector('[data-qa-selector="op-version-board-header"].-closed')
+      expect(page).not_to have_selector('[data-qa-selector="op-version-board-header"].-closed')
 
       closed_version.reload
       expect(closed_version.status).to eq 'open'
@@ -285,7 +284,7 @@ describe 'Version action board', type: :feature, js: true do
       end
 
       ids = open.ordered_work_packages.pluck(:work_package_id)
-      expect(ids).to match_array [work_package.id, closed_version_wp.id]
+      expect(ids).to contain_exactly(work_package.id, closed_version_wp.id)
 
       closed_version_wp.reload
       expect(closed_version_wp.version_id).to eq(open_version.id)
@@ -305,7 +304,7 @@ describe 'Version action board', type: :feature, js: true do
     end
   end
 
-  context 'a user with edit_work_packages, but missing assign_versions permissions' do
+  context 'when user has edit_work_packages, but missing assign_versions permissions' do
     let(:no_version_edit_user) do
       create(:user,
              member_in_projects: [project],
@@ -330,7 +329,7 @@ describe 'Version action board', type: :feature, js: true do
       board_page.expect_editable_board(true)
       board_page.expect_editable_list(false)
 
-      expect(page).to have_no_selector('[data-qa-selector="op-wp-single-card"].-draggable')
+      expect(page).not_to have_selector('[data-qa-selector="op-wp-single-card"].-draggable')
     end
   end
 
@@ -348,4 +347,3 @@ describe 'Version action board', type: :feature, js: true do
     end
   end
 end
-# rubocop:enable RSpec:MultipleMemoizedHelpers

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,10 +28,10 @@
 
 require 'spec_helper'
 
-describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
+RSpec.describe Queries::Projects::Filters::CustomFieldFilter do
   let(:query) { Queries::Projects::ProjectQuery.new }
-  let(:bool_project_custom_field) { build_stubbed(:bool_project_custom_field) }
-  let(:int_project_custom_field) { build_stubbed(:int_project_custom_field) }
+  let(:bool_project_custom_field) { build_stubbed(:boolean_project_custom_field) }
+  let(:int_project_custom_field) { build_stubbed(:integer_project_custom_field) }
   let(:float_project_custom_field) { build_stubbed(:float_project_custom_field) }
   let(:text_project_custom_field) { build_stubbed(:text_project_custom_field) }
   let(:user_project_custom_field) { build_stubbed(:user_project_custom_field) }
@@ -50,7 +50,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
      date_project_custom_field,
      string_project_custom_field]
   end
-  let(:cf_accessor) { "cf_#{custom_field.id}" }
+  let(:cf_accessor) { custom_field.column_name }
   let(:instance) do
     described_class.create!(name: cf_accessor, operator: '=', context: query)
   end
@@ -69,7 +69,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     let(:all_custom_fields) { [] }
 
     it 'raises exception' do
-      expect { instance }.to raise_error(::Queries::Filters::InvalidError)
+      expect { instance }.to raise_error(Queries::Filters::InvalidError)
     end
   end
 
@@ -78,12 +78,9 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
 
     before do
       instance.values = ['bogus']
-    end
-
-    before do
       allow(ProjectCustomField)
-        .to receive_message_chain(:visible, :exists?)
-        .and_return(true)
+              .to receive_message_chain(:visible, :exists?) # rubocop:disable RSpec/MessageChain
+              .and_return(true)
     end
 
     shared_examples_for 'custom field type dependent validity' do
@@ -128,7 +125,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
       all_custom_fields.each do |cf|
         name = "cf_#{cf.id}"
         filter = described_class.create!(name:)
-        expect(filter.name).to eql(:"cf_#{cf.id}")
+        expect(filter.name).to eql(cf.column_name.to_sym)
         expect(filter.order).to be(20)
       end
     end
@@ -136,7 +133,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
 
   describe '#type' do
     context 'integer' do
-      let(:cf_accessor) { "cf_#{int_project_custom_field.id}" }
+      let(:cf_accessor) { int_project_custom_field.column_name }
 
       it 'is integer for an integer' do
         expect(instance.type)
@@ -145,7 +142,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'float' do
-      let(:cf_accessor) { "cf_#{float_project_custom_field.id}" }
+      let(:cf_accessor) { float_project_custom_field.column_name }
 
       it 'is integer for a float' do
         expect(instance.type)
@@ -154,7 +151,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'text' do
-      let(:cf_accessor) { "cf_#{text_project_custom_field.id}" }
+      let(:cf_accessor) { text_project_custom_field.column_name }
 
       it 'is text for a text' do
         expect(instance.type)
@@ -163,7 +160,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'list optional' do
-      let(:cf_accessor) { "cf_#{list_project_custom_field.id}" }
+      let(:cf_accessor) { list_project_custom_field.column_name }
 
       it 'is list_optional for a list' do
         expect(instance.type)
@@ -172,7 +169,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'user' do
-      let(:cf_accessor) { "cf_#{user_project_custom_field.id}" }
+      let(:cf_accessor) { user_project_custom_field.column_name }
 
       it 'is list_optional for a user' do
         expect(instance.type)
@@ -181,7 +178,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'version' do
-      let(:cf_accessor) { "cf_#{version_project_custom_field.id}" }
+      let(:cf_accessor) { version_project_custom_field.column_name }
 
       it 'is list_optional for a version' do
         expect(instance.type)
@@ -190,7 +187,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'version' do
-      let(:cf_accessor) { "cf_#{date_project_custom_field.id}" }
+      let(:cf_accessor) { date_project_custom_field.column_name }
 
       it 'is date for a date' do
         expect(instance.type)
@@ -199,7 +196,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'bool' do
-      let(:cf_accessor) { "cf_#{bool_project_custom_field.id}" }
+      let(:cf_accessor) { bool_project_custom_field.column_name }
 
       it 'is list for a bool' do
         expect(instance.type)
@@ -208,7 +205,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'string' do
-      let(:cf_accessor) { "cf_#{string_project_custom_field.id}" }
+      let(:cf_accessor) { string_project_custom_field.column_name }
 
       it 'is string for a string' do
         expect(instance.type)
@@ -226,7 +223,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
 
   describe '#allowed_values' do
     context 'integer' do
-      let(:cf_accessor) { "cf_#{int_project_custom_field.id}" }
+      let(:cf_accessor) { int_project_custom_field.column_name }
 
       it 'is nil for an integer' do
         expect(instance.allowed_values)
@@ -235,7 +232,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'float' do
-      let(:cf_accessor) { "cf_#{float_project_custom_field.id}" }
+      let(:cf_accessor) { float_project_custom_field.column_name }
 
       it 'is integer for a float' do
         expect(instance.allowed_values)
@@ -244,7 +241,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'text' do
-      let(:cf_accessor) { "cf_#{text_project_custom_field.id}" }
+      let(:cf_accessor) { text_project_custom_field.column_name }
 
       it 'is text for a text' do
         expect(instance.allowed_values)
@@ -253,7 +250,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'list' do
-      let(:cf_accessor) { "cf_#{list_project_custom_field.id}" }
+      let(:cf_accessor) { list_project_custom_field.column_name }
 
       it 'is list_optional for a list' do
         expect(instance.allowed_values)
@@ -262,7 +259,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'user' do
-      let(:cf_accessor) { "cf_#{user_project_custom_field.id}" }
+      let(:cf_accessor) { user_project_custom_field.column_name }
 
       it 'is list_optional for a user' do
         bogus_return_value = ['user1', 'user2']
@@ -276,7 +273,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'version' do
-      let(:cf_accessor) { "cf_#{version_project_custom_field.id}" }
+      let(:cf_accessor) { version_project_custom_field.column_name }
 
       it 'is list_optional for a version' do
         bogus_return_value = ['version1', 'version2']
@@ -290,7 +287,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'date' do
-      let(:cf_accessor) { "cf_#{date_project_custom_field.id}" }
+      let(:cf_accessor) { date_project_custom_field.column_name }
 
       it 'is nil for a date' do
         expect(instance.allowed_values)
@@ -299,17 +296,17 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
     end
 
     context 'bool' do
-      let(:cf_accessor) { "cf_#{bool_project_custom_field.id}" }
+      let(:cf_accessor) { bool_project_custom_field.column_name }
 
       it 'is list for a bool' do
         expect(instance.allowed_values)
-          .to match_array [[I18n.t(:general_text_yes), OpenProject::Database::DB_VALUE_TRUE],
-                           [I18n.t(:general_text_no), OpenProject::Database::DB_VALUE_FALSE]]
+          .to contain_exactly([I18n.t(:general_text_yes), OpenProject::Database::DB_VALUE_TRUE],
+                              [I18n.t(:general_text_no), OpenProject::Database::DB_VALUE_FALSE])
       end
     end
 
     context 'string' do
-      let(:cf_accessor) { "cf_#{string_project_custom_field.id}" }
+      let(:cf_accessor) { string_project_custom_field.column_name }
 
       it 'is nil for a string' do
         expect(instance.allowed_values)
@@ -341,12 +338,12 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
        text_project_custom_field,
        date_project_custom_field,
        string_project_custom_field].each do |cf|
-        expect(filters.detect { |filter| filter.name == :"cf_#{cf.id}" }).not_to be_nil
+        expect(filters.detect { |filter| filter.name == cf.column_name.to_sym }).not_to be_nil
       end
 
-      expect(filters.detect { |filter| filter.name == :"cf_#{version_project_custom_field.id}" })
+      expect(filters.detect { |filter| filter.name == version_project_custom_field.column_name.to_sym })
         .to be_nil
-      expect(filters.detect { |filter| filter.name == :"cf_#{user_project_custom_field.id}" })
+      expect(filters.detect { |filter| filter.name == user_project_custom_field.column_name.to_sym })
         .to be_nil
     end
   end
@@ -370,8 +367,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
 
         it 'returns an array with custom classes' do
           expect(instance.value_objects)
-            .to match_array([custom_field.custom_options.last,
-                             custom_field.custom_options.first])
+            .to contain_exactly(custom_field.custom_options.last, custom_field.custom_options.first)
         end
 
         it 'ignores invalid values' do
@@ -379,7 +375,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
                              custom_field.custom_options.last.id]
 
           expect(instance.value_objects)
-            .to match_array([custom_field.custom_options.last])
+            .to contain_exactly(custom_field.custom_options.last)
         end
       end
     end
@@ -432,7 +428,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
 
         it 'returns an array with users' do
           expect(instance.value_objects)
-            .to match_array([user1, user2])
+            .to contain_exactly(user1, user2)
         end
       end
     end
@@ -462,7 +458,7 @@ describe Queries::Projects::Filters::CustomFieldFilter, type: :model do
 
         it 'returns an array with users' do
           expect(instance.value_objects)
-            .to match_array([version1, version2])
+            .to contain_exactly(version1, version2)
         end
       end
     end

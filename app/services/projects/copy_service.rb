@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -42,6 +42,7 @@ module Projects
         ::Projects::Copy::BoardsDependentService,
         ::Projects::Copy::OverviewDependentService,
         ::Projects::Copy::StoragesDependentService,
+        ::Projects::Copy::StorageProjectFoldersDependentService,
         ::Projects::Copy::FileLinksDependentService
       ]
     end
@@ -61,9 +62,6 @@ module Projects
         enabled_module_names: source_enabled_modules,
         types: source_types,
         work_package_custom_fields: source_custom_fields,
-
-        # Copy status object
-        status: source_status
       )
 
       only_allowed_parent_id(attributes)

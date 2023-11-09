@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe 'Work package table log unit costs', js: true do
+RSpec.describe 'Work package table log unit costs', js: true do
   let(:user) { create(:admin) }
   let(:work_package) { create(:work_package) }
 
-  let(:wp_table) { ::Pages::WorkPackagesTable.new }
-  let(:menu) { ::Components::WorkPackages::ContextMenu.new }
+  let(:wp_table) { Pages::WorkPackagesTable.new }
+  let(:menu) { Components::WorkPackages::ContextMenu.new }
 
   def goto_context_menu
     # Go to table

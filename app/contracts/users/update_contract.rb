@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,17 +30,31 @@ module Users
   class UpdateContract < BaseContract
     validate :user_allowed_to_update
 
-    private
-
     ##
     # Users can only be updated when
     # - the user is editing herself
-    # - the user has the global manage_user CRU permission
     # - the user is an admin
+    # - the user has the global manage_user permission and is not editing an admin
+    def allowed_to_update?
+      editing_themself? || can_manage_user?
+    end
+
+    private
+
     def user_allowed_to_update
-      unless user == model || user.allowed_to_globally?(:manage_user)
+      unless allowed_to_update?
         errors.add :base, :error_unauthorized
       end
+    end
+
+    def editing_themself?
+      user == model
+    end
+
+    # Only admins can edit other admins
+    # Only users with manage_user permission can edit other users
+    def can_manage_user?
+      user.allowed_to_globally?(:manage_user) && (user.admin? || !model.admin?)
     end
   end
 end

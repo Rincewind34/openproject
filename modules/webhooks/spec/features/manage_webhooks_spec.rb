@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe 'Manage webhooks through UI', type: :feature, js: true do
+RSpec.describe 'Manage webhooks through UI', js: true do
   before do
     login_as user
   end
 
   context 'as regular user' do
-    let(:user) { create :user }
+    let(:user) { create(:user) }
 
     it 'forbids accessing the webhooks management view' do
       visit admin_outgoing_webhooks_path
@@ -15,8 +15,8 @@ describe 'Manage webhooks through UI', type: :feature, js: true do
   end
 
   context 'as admin' do
-    let(:user) { create :admin }
-    let!(:project) { create :project }
+    let(:user) { create(:admin) }
+    let!(:project) { create(:project) }
 
     it 'allows the management flow' do
       visit admin_outgoing_webhooks_path
@@ -40,9 +40,9 @@ describe 'Manage webhooks through UI', type: :feature, js: true do
       # 1st webhook created
       #
 
-      expect(page).to have_selector('.flash.notice', text: I18n.t(:notice_successful_create))
+      expect(page).to have_selector('.op-toast.-success', text: I18n.t(:notice_successful_create))
       expect(page).to have_selector('.webhooks--outgoing-webhook-row .name', text: 'My webhook')
-      webhook = ::Webhooks::Webhook.last
+      webhook = Webhooks::Webhook.last
       expect(webhook.event_names).to eq %w(work_package:created)
       expect(webhook.all_projects).to be_truthy
 
@@ -65,9 +65,9 @@ describe 'Manage webhooks through UI', type: :feature, js: true do
       find(".webhooks--selected-project-ids[value='#{project.id}']").set true
 
       click_on 'Save'
-      expect(page).to have_selector('.flash.notice', text: I18n.t(:notice_successful_update))
+      expect(page).to have_selector('.op-toast.-success', text: I18n.t(:notice_successful_update))
       expect(page).to have_selector('.webhooks--outgoing-webhook-row .name', text: 'My webhook')
-      webhook = ::Webhooks::Webhook.last
+      webhook = Webhooks::Webhook.last
       expect(webhook.event_names).to eq %w(work_package:updated)
       expect(webhook.projects.all).to eq [project]
       expect(webhook.all_projects).to be_falsey
@@ -77,13 +77,13 @@ describe 'Manage webhooks through UI', type: :feature, js: true do
       find(".webhooks--outgoing-webhook-row-#{webhook.id} .icon-delete").click
       page.driver.browser.switch_to.alert.accept
 
-      expect(page).to have_selector('.flash.notice', text: I18n.t(:notice_successful_delete))
+      expect(page).to have_selector('.op-toast.-success', text: I18n.t(:notice_successful_delete))
       expect(page).to have_selector('.generic-table--empty-row')
     end
 
     context 'with existing webhook' do
-      let!(:webhook) { create :webhook, name: 'testing' }
-      let!(:log) { create :webhook_log, response_headers: { test: :foo }, webhook: }
+      let!(:webhook) { create(:webhook, name: 'testing') }
+      let!(:log) { create(:webhook_log, response_headers: { test: :foo }, webhook:) }
 
       it 'shows the delivery' do
         visit admin_outgoing_webhooks_path
@@ -101,6 +101,32 @@ describe 'Manage webhooks through UI', type: :feature, js: true do
         page.within('.spot-modal') do
           expect(page).to have_selector('.webhooks--response-headers strong', text: 'test')
           expect(page).to have_selector('.webhooks--response-body', text: log.response_body)
+        end
+      end
+
+      context 'with multiple logs' do
+        let!(:log2) { create(:webhook_log, response_body: 'This is the second log', webhook:) }
+        let!(:log3) { create(:webhook_log, response_body: 'This is the third log', webhook:) }
+
+        it 'shows the response of the log being clicked' do
+          visit admin_outgoing_webhook_path(webhook)
+
+          # Open modal
+          SeleniumHubWaiter.wait
+
+          all('tbody tr').each do |row_element|
+            matching_log = nil
+            within(row_element) do
+              id = find('td.id').text.to_i
+              matching_log = [log, log2, log3].find { |l| l.id == id }
+              find('td.response_body a', text: 'Show').click
+            end
+
+            page.within('.spot-modal') do
+              expect(page).to have_selector('.webhooks--response-body', text: matching_log.response_body)
+              click_button('Close')
+            end
+          end
         end
       end
     end

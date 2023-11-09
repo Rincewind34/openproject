@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2020 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -25,7 +25,7 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 
-shared_examples 'represents the notification' do
+RSpec.shared_examples 'represents the notification' do
   it 'represents the notification', :aggregate_failures do
     expect(last_response.status)
       .to eq(200)
@@ -38,11 +38,11 @@ shared_examples 'represents the notification' do
             .at_path('readIAN')
 
     expect(last_response.body)
-      .to be_json_eql(::API::V3::Utilities::DateTimeFormatter.format_datetime(notification.created_at).to_json)
+      .to be_json_eql(API::V3::Utilities::DateTimeFormatter.format_datetime(notification.created_at).to_json)
             .at_path('createdAt')
 
     expect(last_response.body)
-      .to be_json_eql(::API::V3::Utilities::DateTimeFormatter.format_datetime(notification.updated_at).to_json)
+      .to be_json_eql(API::V3::Utilities::DateTimeFormatter.format_datetime(notification.updated_at).to_json)
             .at_path('updatedAt')
 
     expect(last_response.body)

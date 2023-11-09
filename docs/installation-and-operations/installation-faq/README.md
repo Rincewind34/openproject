@@ -10,7 +10,7 @@ keywords: installation FAQ, upgrades, updates, operation faq
 
 ## Installation and configuration
 
-### Which options are there to install Openproject?
+### Which options are there to install OpenProject?
 
 There's the package based installation (recommended), installation via Docker, using a provider (like Univention, Bitnami, IONOS) and the manual installation.
 
@@ -52,7 +52,13 @@ Your Mac will have to be reachable from the Internet if you want to collaborate 
 
 ### Does the OpenProject docker container run on ARM technology like Apple M1 or Raspberry PI? 
 
-At the moment, OpenProject is supported only on x86-x64 technology (Intel). The Development of OpenProject started 2010, when ARM was out of scope for being supported. With strong ARM processors this might change in the future, but at the moment the only possible solution is to build OpenProject from source on your ARM hardware. OpenProject does not support ARM at the moment.
+Starting with OpenProject 12.5.6 we publish our containers for three architectures.
+
+1. AMD64 (x86)
+2. ARM64
+3. PPC64
+
+However, the OpenProject **BIM Edition** is only supported on AMD64.
 
 ### Can I install OpenProject offline?
 
@@ -86,7 +92,7 @@ Please follow these steps:
 
 The Community edition and [Enterprise on-premises edition](https://www.openproject.org/enterprise-edition/) are on-premises solutions and thus need installation from your side while the [Enterprise cloud edition](https://www.openproject.org/hosting/) is hosted by us. 
 The Community edition is for free and we ask you to do the installation yourself. Of course we support you with a clear and easy [installation guide](https://www.openproject.org/download-and-installation/). 
-If you would like us to install the **Enterprise on-premises edition** for you, we are charging a fee of €150 (excluding VAT) for this once-off service. You can add the installation support during your [Enterprise on-premises edition booking process](../../enterprise-guide/enterprise-on-premises-guide/activate-enterprise-on-premises/#order-the-enterprise-on-premises-edition).
+If you would like us to install the **Enterprise on-premises edition** for you, we are charging a fee of €300 (excluding VAT) for this once-off service. You can add the installation support during your [Enterprise on-premises edition booking process](../../enterprise-guide/enterprise-on-premises-guide/activate-enterprise-on-premises/#order-the-enterprise-on-premises-edition).
 
 ### How do I get SSL certificates (in case of installation support by OpenProject employee)? Do we have to purchase them?
 

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe 'admin routes', type: :routing do
+RSpec.describe 'admin routes' do
   it 'connects GET /admin to admin#index' do
     expect(get('/admin'))
       .to route_to('admin#index')
@@ -47,11 +47,6 @@ describe 'admin routes', type: :routing do
   it 'connects GET /admin/info to admin#info' do
     expect(get('/admin/info'))
       .to route_to('admin#info')
-  end
-
-  it 'connects POST /admin/force_user_language to admin#force_user_language' do
-    expect(post('/admin/force_user_language'))
-      .to route_to('admin#force_user_language')
   end
 
   it 'connects POST /admin/test_email to admin#test_email' do

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -133,7 +133,7 @@ module Pages
       if present
         expect(page).to have_selector('.fc-event', text: work_package.subject, wait: 10)
       else
-        expect(page).to have_no_selector('.fc-event', text: work_package.subject)
+        expect(page).not_to have_selector('.fc-event', text: work_package.subject)
       end
     end
 
@@ -143,6 +143,85 @@ module Pages
       else
         expect(page).to have_selector('.fc-event:not(.fc-event-resizable)', text: work_package.subject, wait: 10)
       end
+    end
+
+    def expect_no_views_rendered
+      expect(page).to have_text 'There is currently nothing to display.'
+    end
+
+    def expect_views_rendered(*queries)
+      rendered_query_names = all('td.name').map(&:text)
+
+      expect(rendered_query_names).to match_array(queries.map(&:name))
+    end
+
+    def expect_delete_buttons_for(*queries)
+      queries.each do |query|
+        expect(page).to have_selector "[data-qa-selector='team-planner-remove-#{query.id}']"
+      end
+    end
+
+    def expect_no_delete_buttons_for(*queries)
+      queries.each do |query|
+        expect(page).not_to have_selector "[data-qa-selector='team-planner-remove-#{query.id}']"
+      end
+    end
+
+    def expect_view_not_rendered(query)
+      expect(page).not_to have_selector 'td', text: query.name
+    end
+
+    def expect_create_button
+      within '.toolbar-items' do
+        expect(page).to have_link text: 'Team planner'
+      end
+    end
+
+    def expect_no_create_button
+      within '.toolbar-items' do
+        expect(page).not_to have_link text: 'Team planner'
+      end
+    end
+
+    def expect_views_listed_in_order(*queries)
+      within '.generic-table tbody' do
+        listed_view_names = all('tr td.name').map(&:text)
+
+        expect(listed_view_names).to eq(queries.map(&:name))
+      end
+    end
+
+    def click_on_create_button
+      within '.toolbar-items' do
+        click_link 'Team planner'
+      end
+    end
+
+    def click_on_cancel_button
+      click_on 'Cancel'
+    end
+
+    def set_title(title)
+      fill_in 'Title', with: title
+    end
+
+    def set_project(project)
+      select_autocomplete(find('[data-qa-selector="project_id"]'),
+                          query: project,
+                          results_selector: 'body',
+                          wait_for_fetched_options: false)
+    end
+
+    def set_public
+      check 'Public'
+    end
+
+    def set_favoured
+      check 'Favoured'
+    end
+
+    def click_on_submit
+      click_on 'Create'
     end
 
     def add_assignee(name)

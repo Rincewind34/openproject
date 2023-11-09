@@ -1,6 +1,6 @@
 // -- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2022 the OpenProject GmbH
+// Copyright (C) 2012-2023 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -49,11 +49,15 @@ export class OpTypesContextMenuDirective extends OpContextMenuTrigger {
 
   @Input('dropdownActive') active:boolean;
 
-  constructor(readonly elementRef:ElementRef,
+  public isOpen = false;
+
+  constructor(
+    readonly elementRef:ElementRef,
     readonly opContextMenu:OPContextMenuService,
     readonly browserDetector:BrowserDetector,
     readonly wpCreate:WorkPackageCreateService,
-    readonly $state:StateService) {
+    readonly $state:StateService,
+  ) {
     super(elementRef, opContextMenu);
   }
 
@@ -71,20 +75,27 @@ export class OpTypesContextMenuDirective extends OpContextMenuTrigger {
   }
 
   protected open(evt:JQuery.TriggeredEvent) {
-    this
-      .wpCreate
-      .getEmptyForm(this.projectIdentifier)
-      .then((form) => {
-        if (!evt.altKey)
-          this.buildItemsAndFilterPreferedTypes(form.schema.type.allowedValues);
-        else
-          this.buildItems(form.schema.type.allowedValues)
-        
-        if (this.items.length === 1)
-          this.openOnlyItemNow(evt)
-        else
-          this.opContextMenu.show(this, evt);
-      });
+    this.isOpen = !this.isOpen;
+    if (this.isOpen) {
+      void this
+        .wpCreate
+        .getEmptyForm(this.projectIdentifier)
+        .then((form) => {
+          if (!evt.altKey)
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            this.buildItemsAndFilterPreferedTypes(form.schema.type.allowedValues as TypeResource[]);
+          else
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            this.buildItems(form.schema.type.allowedValues as TypeResource[]);
+          
+          if (this.items.length === 1)
+            this.openOnlyItemNow(evt)
+          else
+            this.opContextMenu.show(this, evt);
+        });
+    } else {
+      this.opContextMenu.close();
+    }
   }
 
   private openOnlyItemNow(evt:JQuery.TriggeredEvent):void
@@ -113,6 +124,7 @@ export class OpTypesContextMenuDirective extends OpContextMenuTrigger {
       ariaLabel: type.name,
       class: Highlighting.inlineClass('type', type.id!),
       onClick: ($event:JQuery.TriggeredEvent) => {
+        this.isOpen = false;
         if (isClickedWithModifier($event)) {
           return false;
         }

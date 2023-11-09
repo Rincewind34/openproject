@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -87,8 +87,7 @@ module API
             end
 
             get do
-              @query = Query.new_default(name: 'default',
-                                         user: current_user)
+              @query = Query.new_default(user: current_user)
 
               authorize_by_policy(:show)
 
@@ -158,6 +157,8 @@ module API
                             })
                        .mount
             end
+
+            mount API::V3::Queries::ICalUrl::QueryIcalUrlAPI
 
             mount API::V3::Queries::Order::QueryOrderAPI
           end

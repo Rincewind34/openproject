@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe Project, 'customizable', type: :model do
+RSpec.describe Project, 'customizable' do
   let(:project) do
     build_stubbed(:project,
                   custom_values:)
@@ -46,7 +46,7 @@ describe Project, 'customizable', type: :model do
       .and_return(available_custom_fields)
   end
   let(:custom_values) { [] }
-  let(:bool_custom_field) { build_stubbed(:bool_project_custom_field) }
+  let(:bool_custom_field) { build_stubbed(:boolean_project_custom_field) }
   let(:text_custom_field) { build_stubbed(:text_project_custom_field) }
   let(:list_custom_field) { build_stubbed(:list_project_custom_field) }
 

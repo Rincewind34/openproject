@@ -1,5 +1,8 @@
 #English strings go here for Rails i18n
 zh-TW:
+  plugin_openproject_bim:
+    name: "OpenProject BIM and BCF functionality"
+    description: "This OpenProject plugin introduces BIM and BCF functionality."
   bim:
     label_bim: 'BIM'
   bcf:
@@ -125,10 +128,9 @@ zh-TW:
       upload_successful: 'Upload succeeded. It will now get processed and will be ready to use in a couple of minutes.'
     conversion:
       missing_commands: "The following IFC converter commands are missing on this system: %{names}"
-  project_module_ifc_models: "IFC models"
+  project_module_ifc_models: "IFC 模型"
   permission_view_ifc_models: "View IFC models"
   permission_manage_ifc_models: "Import and manage IFC models"
   extraction:
     available:
       ifc_convert: "IFC conversion pipeline available"
-

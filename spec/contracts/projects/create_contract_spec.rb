@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,7 +29,7 @@
 require 'spec_helper'
 require_relative './shared_contract_examples'
 
-describe Projects::CreateContract do
+RSpec.describe Projects::CreateContract do
   it_behaves_like 'project contract' do
     let(:project) do
       Project.new(name: project_name,
@@ -38,7 +38,8 @@ describe Projects::CreateContract do
                   active: project_active,
                   public: project_public,
                   parent: project_parent,
-                  status: project_status)
+                  status_code: project_status_code,
+                  status_explanation: project_status_explanation)
     end
     let(:permissions) { [:add_project] }
     let!(:allowed_to) do

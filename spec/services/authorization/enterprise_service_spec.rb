@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe Authorization::EnterpriseService do
+RSpec.describe Authorization::EnterpriseService do
   let(:token_object) do
     token = OpenProject::Token.new
     token.subscriber = 'Foobar'
@@ -58,7 +58,7 @@ describe Authorization::EnterpriseService do
       let(:expired) { true }
 
       it 'returns a false result' do
-        expect(result).to be_kind_of ServiceResult
+        expect(result).to be_a ServiceResult
         expect(result.result).to be_falsey
         expect(result.success?).to be_falsey
       end
@@ -73,17 +73,28 @@ describe Authorization::EnterpriseService do
         end
       end
 
-      %i(define_custom_style
-         multiselect_custom_fields
+      %i(attribute_help_texts
+         baseline_comparison
+         board_view
+         conditional_highlighting
+         custom_actions
+         custom_fields_in_projects_list
+         date_alerts
+         define_custom_style
          edit_attribute_groups
-         work_package_query_relation_columns
-         attribute_help_texts
-         grid_widget_wp_graph).each do |guarded_action|
+         grid_widget_wp_graph
+         ldap_groups
+         openid_providers
+         placeholder_users
+         readonly_work_packages
+         team_planner_view
+         two_factor_authentication
+         work_package_query_relation_columns).each do |guarded_action|
         context "guarded action #{guarded_action}" do
           let(:action) { guarded_action }
 
           it 'returns a true result' do
-            expect(result).to be_kind_of ServiceResult
+            expect(result).to be_a ServiceResult
             expect(result.result).to be_truthy
             expect(result.success?).to be_truthy
           end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,8 +28,8 @@
 
 require 'spec_helper'
 
-describe ::API::V3::WorkPackageCollectionFromQueryParamsService,
-         type: :model do
+RSpec.describe API::V3::WorkPackageCollectionFromQueryParamsService,
+               type: :model do
   include API::V3::Utilities::PathHelper
 
   let(:mock_wp_collection_from_query_service) do
@@ -37,7 +37,6 @@ describe ::API::V3::WorkPackageCollectionFromQueryParamsService,
 
     allow(mock)
       .to receive(:call)
-      .with(params)
       .and_return(mock_wp_collection_service_response)
 
     mock
@@ -63,7 +62,7 @@ describe ::API::V3::WorkPackageCollectionFromQueryParamsService,
     stub_const('::API::V3::WorkPackageCollectionFromQueryService',
                mock_wp_collection_from_query_service)
 
-    allow(::API::V3::WorkPackageCollectionFromQueryService)
+    allow(API::V3::WorkPackageCollectionFromQueryService)
       .to receive(:new)
       .with(query, user, scope: nil)
       .and_return(mock_wp_collection_from_query_service)
@@ -77,7 +76,7 @@ describe ::API::V3::WorkPackageCollectionFromQueryParamsService,
     before do
       allow(Query)
         .to receive(:new_default)
-        .with(name: '_', project:)
+        .with(project:)
         .and_return(query)
     end
 

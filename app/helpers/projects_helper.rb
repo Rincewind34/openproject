@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,8 +29,8 @@
 module ProjectsHelper
   include WorkPackagesFilterHelper
 
-  def filter_set?
-    params[:filters].present?
+  def show_filters_section?
+    params[:filters].present? && !params.key?(:hide_filters_section)
   end
 
   def allowed_filters(query)
@@ -46,6 +46,7 @@ module ProjectsHelper
       Queries::Projects::Filters::TemplatedFilter,
       Queries::Projects::Filters::PublicFilter,
       Queries::Projects::Filters::ProjectStatusFilter,
+      Queries::Projects::Filters::MemberOfFilter,
       Queries::Projects::Filters::CreatedAtFilter,
       Queries::Projects::Filters::LatestActivityAtFilter,
       Queries::Projects::Filters::NameAndIdentifierFilter,
@@ -64,9 +65,83 @@ module ProjectsHelper
     end
   end
 
+  def global_menu_items
+    [
+      global_menu_all_projects_item,
+      global_menu_my_projects_item,
+      global_menu_public_projects_item,
+      global_menu_archived_projects_item
+    ]
+  end
+
+  def global_menu_all_projects_item
+    path = projects_path
+
+    [
+      t(:label_all_projects),
+      path,
+      { class: global_menu_item_css_class(path),
+        title: t(:label_all_projects) }
+    ]
+  end
+
+  def global_menu_my_projects_item
+    path = projects_path_with_filters(
+      [{ member_of: { operator: '=', values: ['t'] } }]
+    )
+
+    [
+      t(:label_my_projects),
+      path,
+      { class: global_menu_item_css_class(path),
+        title: t(:label_my_projects) }
+    ]
+  end
+
+  def global_menu_public_projects_item
+    path = projects_path_with_filters(
+      [{ public: { operator: '=', values: ['t'] } }]
+    )
+
+    [
+      t(:label_public_projects),
+      path,
+      { class: global_menu_item_css_class(path),
+        title: t(:label_public_projects) }
+    ]
+  end
+
+  def global_menu_archived_projects_item
+    path = projects_path_with_filters(
+      [{ active: { operator: '=', values: ['f'] } }]
+    )
+
+    [
+      t(:label_archived_projects),
+      path,
+      { class: global_menu_item_css_class(path),
+        title: t(:label_archived_projects) }
+    ]
+  end
+
+  def projects_path_with_filters(filters)
+    return projects_path if filters.empty?
+
+    projects_path(filters: filters.to_json, hide_filters_section: true)
+  end
+
+  def global_menu_item_css_class(path)
+    "op-sidemenu--item-action #{global_menu_item_selected(path) ? 'selected' : ''}"
+  end
+
+  def global_menu_item_selected(menu_item_path)
+    menu_item_path == request.fullpath
+  end
+
   def project_more_menu_items(project)
     [project_more_menu_subproject_item(project),
      project_more_menu_settings_item(project),
+     project_more_menu_activity_item(project),
      project_more_menu_archive_item(project),
      project_more_menu_unarchive_item(project),
      project_more_menu_copy_item(project),
@@ -91,8 +166,19 @@ module ProjectsHelper
     end
   end
 
+  def project_more_menu_activity_item(project)
+    if User.current.allowed_to?(:view_project_activity, project)
+      [
+        t(:label_project_activity),
+        project_activity_index_path(project, event_types: ['project_attributes']),
+        { class: 'icon-context icon-checkmark',
+          title: t(:label_project_activity) }
+      ]
+    end
+  end
+
   def project_more_menu_archive_item(project)
-    if User.current.admin? && project.active?
+    if User.current.allowed_to?(:archive_project, project) && project.active?
       [t(:button_archive),
        project_archive_path(project, status: params[:status]),
        { data: { confirm: t('project.archive.are_you_sure', name: project.name) },
@@ -103,7 +189,7 @@ module ProjectsHelper
   end
 
   def project_more_menu_unarchive_item(project)
-    if User.current.admin? && !project.active? && (project.parent.nil? || project.parent.active?)
+    if User.current.admin? && project.archived? && (project.parent.nil? || project.parent.active?)
       [t(:button_unarchive),
        project_archive_path(project, status: params[:status]),
        { method: :delete,
@@ -141,7 +227,7 @@ module ProjectsHelper
       .new(project, current_user)
       .assignable_status_codes
       .map do |code|
-      [I18n.t("activerecord.attributes.projects/status.codes.#{code}"), code]
+      [I18n.t("activerecord.attributes.project.status_codes.#{code}"), code]
     end
   end
 

@@ -1,9 +1,9 @@
 require 'spec_helper'
 require 'services/base_services/behaves_like_create_service'
 
-describe Bim::IfcModels::CreateService do
+RSpec.describe Bim::IfcModels::CreateService do
   it_behaves_like 'BaseServices create service' do
-    let(:model_class) { ::Bim::IfcModels::IfcModel }
+    let(:model_class) { Bim::IfcModels::IfcModel }
     let(:factory) { :ifc_model }
     let(:conversion_job) do
       double('ifc_conversion_job').tap do |job|

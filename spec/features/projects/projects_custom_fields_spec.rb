@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,10 +28,12 @@
 
 require 'spec_helper'
 
-describe 'Projects custom fields', type: :feature, js: true do
+RSpec.describe 'Projects custom fields',
+               js: true,
+               with_cuprite: true do
   shared_let(:current_user) { create(:admin) }
   shared_let(:project) { create(:project, name: 'Foo project', identifier: 'foo-project') }
-  let(:name_field) { ::FormFields::InputFormField.new :name }
+  let(:name_field) { FormFields::InputFormField.new :name }
   let(:identifier) { "[data-qa-field-name='customField#{custom_field.id}'] input[type=checkbox]" }
 
   before do
@@ -42,7 +44,7 @@ describe 'Projects custom fields', type: :feature, js: true do
     let!(:custom_field) do
       create(:version_project_custom_field)
     end
-    let(:cf_field) { ::FormFields::SelectFormField.new custom_field }
+    let(:cf_field) { FormFields::SelectFormField.new custom_field }
 
     it 'allows creating a new project (regression #29099)' do
       visit new_project_path
@@ -61,7 +63,7 @@ describe 'Projects custom fields', type: :feature, js: true do
 
   describe 'with default values' do
     let!(:default_int_custom_field) do
-      create(:int_project_custom_field, default_value: 123)
+      create(:integer_project_custom_field, default_value: 123)
     end
     let!(:default_string_custom_field) do
       create(:string_project_custom_field, default_value: 'lorem')
@@ -70,10 +72,10 @@ describe 'Projects custom fields', type: :feature, js: true do
       create(:string_project_custom_field)
     end
 
-    let(:name_field) { ::FormFields::InputFormField.new :name }
-    let(:default_int_field) { ::FormFields::InputFormField.new default_int_custom_field }
-    let(:default_string_field) { ::FormFields::InputFormField.new default_string_custom_field }
-    let(:no_default_string_field) { ::FormFields::InputFormField.new no_default_string_custom_field }
+    let(:name_field) { FormFields::InputFormField.new :name }
+    let(:default_int_field) { FormFields::InputFormField.new default_int_custom_field }
+    let(:default_string_field) { FormFields::InputFormField.new default_string_custom_field }
+    let(:no_default_string_field) { FormFields::InputFormField.new no_default_string_custom_field }
 
     it 'sets the default values on custom fields and allows overwriting them' do
       visit new_project_path
@@ -104,7 +106,7 @@ describe 'Projects custom fields', type: :feature, js: true do
     let!(:custom_field) do
       create(:text_project_custom_field)
     end
-    let(:editor) { ::Components::WysiwygEditor.new "[data-qa-field-name='customField#{custom_field.id}']" }
+    let(:editor) { Components::WysiwygEditor.new "[data-qa-field-name='customField#{custom_field.id}']" }
 
     it 'allows settings the project boolean CF (regression #26313)' do
       visit project_settings_general_path(project.id)
@@ -134,10 +136,10 @@ describe 'Projects custom fields', type: :feature, js: true do
     let!(:float_cf) do
       create(:float_project_custom_field, name: 'MyFloat')
     end
-    let(:float_field) { ::FormFields::InputFormField.new float_cf }
+    let(:float_field) { FormFields::InputFormField.new float_cf }
 
     context 'with english locale' do
-      let(:current_user) { create :admin, language: 'en' }
+      let(:current_user) { create(:admin, language: 'en') }
 
       it 'displays the float with english locale' do
         visit new_project_path
@@ -161,8 +163,9 @@ describe 'Projects custom fields', type: :feature, js: true do
     end
 
     context 'with german locale',
-            driver: :firefox_de do
-      let(:current_user) { create :admin, language: 'de' }
+            driver: :firefox_de,
+            with_cuprite: false do
+      let(:current_user) { create(:admin, language: 'de') }
 
       it 'displays the float with german locale' do
         I18n.locale = :de
@@ -192,7 +195,7 @@ describe 'Projects custom fields', type: :feature, js: true do
 
   describe 'with boolean CF' do
     let!(:custom_field) do
-      create(:bool_project_custom_field)
+      create(:boolean_project_custom_field)
     end
 
     it 'allows settings the project boolean CF (regression #26313)' do
@@ -214,22 +217,22 @@ describe 'Projects custom fields', type: :feature, js: true do
     let!(:custom_field) do
       create(:user_project_custom_field)
     end
-    let(:cf_field) { ::FormFields::SelectFormField.new custom_field }
+    let(:cf_field) { FormFields::SelectFormField.new custom_field }
 
     # Create a second project for visible options
-    let!(:existing_project) { create :project }
+    let!(:existing_project) { create(:project) }
 
     # Assume one user is visible
-    let!(:invisible_user) { create :user, firstname: 'Invisible', lastname: 'User' }
-    let!(:visible_user) { create :user, firstname: 'Visible', lastname: 'User', member_in_project: existing_project }
+    let!(:invisible_user) { create(:user, firstname: 'Invisible', lastname: 'User') }
+    let!(:visible_user) { create(:user, firstname: 'Visible', lastname: 'User', member_in_project: existing_project) }
 
-    let(:role) { create :role }
+    let(:role) { create(:role) }
 
     let(:modal) do
-      ::Components::Users::InviteUserModal.new project:,
-                                               principal: invisible_user,
-                                               role:,
-                                               invite_message: 'you are invited'
+      Components::Users::InviteUserModal.new project:,
+                                             principal: invisible_user,
+                                             role:,
+                                             invite_message: 'you are invited'
     end
 
     it 'allows setting a visible user CF (regression #26313)' do
@@ -274,6 +277,18 @@ describe 'Projects custom fields', type: :feature, js: true do
       project.reload
       cv = project.custom_values.find_by(custom_field_id: custom_field.id).typed_value
       expect(cv).to eq invisible_user
+    end
+
+    it 'does not show invite user button when there is no project selected' do
+      visit new_project_path
+
+      name_field.set_value 'My project name'
+
+      find('.op-fieldset--toggle', text: 'ADVANCED SETTINGS').click
+
+      cf_field.expect_visible
+      cf_field.expect_no_option invisible_user
+      expect(page).not_to have_selector('.ng-dropdown-footer button', text: 'Invite')
     end
   end
 end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -81,14 +81,12 @@ class Project < ApplicationRecord
   # Custom field for the project's work_packages
   has_and_belongs_to_many :work_package_custom_fields,
                           -> { order("#{CustomField.table_name}.position") },
-                          class_name: 'WorkPackageCustomField',
-                          join_table: "#{table_name_prefix}custom_fields_projects#{table_name_suffix}",
+                          join_table: :custom_fields_projects,
                           association_foreign_key: 'custom_field_id'
-  has_one :status, class_name: 'Projects::Status', dependent: :destroy
   has_many :budgets, dependent: :destroy
   has_many :notification_settings, dependent: :destroy
-  has_many :projects_storages, dependent: :destroy, class_name: 'Storages::ProjectStorage'
-  has_many :storages, through: :projects_storages
+  has_many :project_storages, dependent: :destroy, class_name: 'Storages::ProjectStorage'
+  has_many :storages, through: :project_storages
 
   acts_as_customizable
   acts_as_searchable columns: %W(#{table_name}.name #{table_name}.identifier #{table_name}.description),
@@ -96,13 +94,24 @@ class Project < ApplicationRecord
                      project_key: 'id',
                      permission: nil
 
-  include Projects::Journalized
+  acts_as_journalized
 
   # Necessary for acts_as_searchable which depends on the event_datetime method for sorting
   acts_as_event title: Proc.new { |o| "#{Project.model_name.human}: #{o.name}" },
                 url: Proc.new { |o| { controller: 'overviews/overviews', action: 'show', project_id: o } },
                 author: nil,
                 datetime: :created_at
+
+  register_journal_formatted_fields(:active_status, 'active')
+  register_journal_formatted_fields(:template, 'templated')
+  register_journal_formatted_fields(:plaintext, 'identifier')
+  register_journal_formatted_fields(:plaintext, 'name')
+  register_journal_formatted_fields(:diff, 'status_explanation')
+  register_journal_formatted_fields(:diff, 'description')
+  register_journal_formatted_fields(:project_status_code, 'status_code')
+  register_journal_formatted_fields(:visibility, 'public')
+  register_journal_formatted_fields(:subproject_named_association, 'parent_id')
+  register_journal_formatted_fields(:custom_field, /custom_fields_\d+/)
 
   has_paper_trail
 
@@ -141,7 +150,8 @@ class Project < ApplicationRecord
 
   friendly_id :identifier, use: :finders
 
-  delegate :explanation, to: :status, allow_nil: true, prefix: true
+  include ::Scopes::Scoped
+  scopes :allowed_to
 
   scope :has_module, ->(mod) {
     where(["#{Project.table_name}.id IN (SELECT em.project_id FROM #{EnabledModule.table_name} em WHERE em.name=?)", mod.to_s])
@@ -150,9 +160,21 @@ class Project < ApplicationRecord
   scope :visible, ->(user = User.current) { where(id: Project.visible_by(user)) }
   scope :newest, -> { order(created_at: :desc) }
   scope :active, -> { where(active: true) }
+  scope :archived, -> { where(active: false) }
+  scope :with_member, ->(user = User.current) { where(id: user.memberships.select(:project_id)) }
+  scope :without_member, ->(user = User.current) { where.not(id: user.memberships.select(:project_id)) }
 
   scopes :activated_time_activity,
          :visible_with_activated_time_activity
+
+  enum status_code: {
+    on_track: 0,
+    at_risk: 1,
+    off_track: 2,
+    not_started: 3,
+    finished: 4,
+    discontinued: 5
+  }
 
   def visible?(user = User.current)
     active? and (public? or user.admin? or user.member_of?(self))
@@ -160,6 +182,10 @@ class Project < ApplicationRecord
 
   def archived?
     !active?
+  end
+
+  def being_archived?
+    (active == false) && (active_was == true)
   end
 
   def copy_allowed?
@@ -185,18 +211,6 @@ class Project < ApplicationRecord
     allowed_to(user, :view_project)
   end
 
-  # Returns a ActiveRecord::Relation to find all projects for which
-  # +user+ has the given +permission+
-  def self.allowed_to(user, permission)
-    Authorization.projects(permission, user)
-  end
-
-  def reload(*args)
-    @all_work_package_custom_fields = nil
-
-    super
-  end
-
   # Returns a :conditions SQL string that can be used to find the issues associated with this project.
   #
   # Examples:
@@ -206,8 +220,14 @@ class Project < ApplicationRecord
     projects_table = Project.arel_table
 
     stmt = projects_table[:id].eq(id)
-    stmt = stmt.or(projects_table[:lft].gt(lft).and(projects_table[:rgt].lt(rgt))) if with_subprojects
+    if with_subprojects && has_subprojects?
+      stmt = stmt.or(projects_table[:lft].gt(lft).and(projects_table[:rgt].lt(rgt)))
+    end
     stmt
+  end
+
+  def has_subprojects?
+    !leaf?
   end
 
   def types_used_by_work_packages
@@ -298,7 +318,7 @@ class Project < ApplicationRecord
   end
 
   def enabled_module_names=(module_names)
-    if module_names&.is_a?(Array)
+    if module_names.is_a?(Array)
       module_names = module_names.map(&:to_s).compact_blank
       self.enabled_modules = module_names.map do |name|
         enabled_modules.detect do |mod|
@@ -322,6 +342,11 @@ class Project < ApplicationRecord
     parents = project.self_and_ancestors || []
     descendants = project.descendants || []
     parents | descendants # Set union
+  end
+
+  # Returns an array of active subprojects.
+  def active_subprojects
+    project.descendants.where(active: true)
   end
 
   class << self
@@ -403,9 +428,9 @@ class Project < ApplicationRecord
   end
 
   def allowed_actions
-    @actions_allowed ||= allowed_permissions
-                           .map { |permission| OpenProject::AccessControl.allowed_actions(permission) }
-                           .flatten
+    @allowed_actions ||= allowed_permissions.flat_map do |permission|
+      OpenProject::AccessControl.allowed_actions(permission)
+    end
   end
 
   def remove_white_spaces_from_project_name

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 require 'spec_helper'
 
-describe Journals::CompletedJob, type: :model do
+RSpec.describe Journals::CompletedJob, type: :model do
   let(:send_mail) { true }
 
   let(:journal) do
@@ -69,7 +69,7 @@ describe Journals::CompletedJob, type: :model do
     end
 
     context 'with a wiki page' do
-      let(:journable) { build_stubbed(:wiki_content) }
+      let(:journable) { build_stubbed(:wiki_page) }
 
       it_behaves_like 'enqueues a JournalCompletedJob'
     end
@@ -116,7 +116,7 @@ describe Journals::CompletedJob, type: :model do
     end
 
     context 'with wiki page content' do
-      let(:journable) { build_stubbed(:wiki_content) }
+      let(:journable) { build_stubbed(:wiki_page) }
 
       it_behaves_like 'sends a notification',
                       OpenProject::Events::AGGREGATED_WIKI_JOURNAL_READY

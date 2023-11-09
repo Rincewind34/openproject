@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,22 +33,28 @@ module OpenProject::Backlogs::Patches::WorkPackagePatch
     prepend InstanceMethods
     extend ClassMethods
 
-    before_validation :backlogs_before_validation, if: lambda { backlogs_enabled? }
+    before_validation :backlogs_before_validation, if: -> { backlogs_enabled? }
 
-    register_on_journal_formatter(:fraction, 'remaining_hours')
-    register_on_journal_formatter(:decimal, 'story_points')
-    register_on_journal_formatter(:decimal, 'position')
+    register_journal_formatted_fields(:fraction, 'remaining_hours')
+    register_journal_formatted_fields(:fraction, 'derived_remaining_hours')
+    register_journal_formatted_fields(:decimal, 'story_points')
+    register_journal_formatted_fields(:decimal, 'position')
 
     validates_numericality_of :story_points, only_integer: true,
                                              allow_nil: true,
                                              greater_than_or_equal_to: 0,
                                              less_than: 10_000,
-                                             if: lambda { backlogs_enabled? }
+                                             if: -> { backlogs_enabled? }
 
     validates_numericality_of :remaining_hours, only_integer: false,
                                                 allow_nil: true,
                                                 greater_than_or_equal_to: 0,
-                                                if: lambda { backlogs_enabled? }
+                                                if: -> { backlogs_enabled? }
+
+    validates_numericality_of :derived_remaining_hours, only_integer: false,
+                                                        allow_nil: true,
+                                                        greater_than_or_equal_to: 0,
+                                                        if: -> { backlogs_enabled? }
 
     include OpenProject::Backlogs::List
   end
@@ -106,13 +112,7 @@ module OpenProject::Backlogs::Patches::WorkPackagePatch
       if is_story?
         Story.find(id)
       elsif is_task?
-        # Make sure to get the closest ancestor that is a Story
-        ancestors_relations
-          .includes(:from)
-          .where(from: { type_id: Story.types })
-          .order(hierarchy: :asc)
-          .first
-          .from
+        ancestors.where(type_id: Story.types).first
       end
     end
 

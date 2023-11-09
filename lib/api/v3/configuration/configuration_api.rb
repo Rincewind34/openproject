@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,6 +33,12 @@ module API
     module Configuration
       class ConfigurationAPI < ::API::OpenProjectAPI
         resources :configuration do
+          helpers do
+            def allowed_unauthenticated_route?
+              true
+            end
+          end
+
           get do
             ConfigurationRepresenter.new(Setting, current_user:, embed_links: true)
           end

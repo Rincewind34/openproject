@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,8 +28,8 @@
 
 require 'spec_helper'
 
-describe 'Read-only statuses affect work package editing',
-         js: true, with_ee: %i[readonly_work_packages] do
+RSpec.describe 'Read-only statuses affect work package editing',
+               js: true, with_ee: %i[readonly_work_packages] do
   let(:locked_status) { create(:status, name: 'Locked', is_readonly: true) }
   let(:unlocked_status) { create(:status, name: 'Unlocked', is_readonly: false) }
   let(:cf_all) do
@@ -102,7 +102,7 @@ describe 'Read-only statuses affect work package editing',
     assignee_field.label_element.click
     assignee_field.expect_inactive!
 
-    custom_field = wp_page.edit_field cf_all.accessor_name.camelcase(:lower)
+    custom_field = wp_page.edit_field cf_all.attribute_name.camelcase(:lower)
     custom_field.label_element.click
     custom_field.expect_inactive!
   end

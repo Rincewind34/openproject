@@ -1,6 +1,6 @@
 //-- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2022 the OpenProject GmbH
+// Copyright (C) 2012-2023 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -65,9 +65,13 @@
         max-width: 90%
         display: inline-block
         vertical-align: middle
-        line-height: 32px
+        // Inherit from Parent, e.g. strikethrough for baseline comparison
+        text-decoration: inherit
         &:first-of-type
           padding-right: 5px
+
+      .badge
+        height: 1rem
 
   &.split-time-field
     white-space: nowrap
@@ -103,8 +107,14 @@
 .wp-table--cell-container .dueDate .icon-pin
   display: none
 
+.wp-table--cell-container
+  &.duration,
+  &.startDate,
+  &.dueDate
+    overflow: visible
+
 .wp-table--cell-container.startDate
-  padding-left: 24px
+  padding-left: $work-package--start-date-display-field-padding-left
 
   .icon-context
     position: relative
@@ -128,7 +138,8 @@
   border-style: solid
   border-radius: 2px
   border-width: 1px
-  line-height: normal
+  overflow-wrap: anywhere
+  word-break: normal
 
   &:hover,
   &:focus

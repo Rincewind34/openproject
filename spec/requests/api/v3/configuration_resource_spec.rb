@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,9 +29,9 @@
 require 'spec_helper'
 require 'rack/test'
 
-describe 'API v3 Configuration resource', type: :request do
+RSpec.describe 'API v3 Configuration resource' do
   include Rack::Test::Methods
-  include ::API::V3::Utilities::PathHelper
+  include API::V3::Utilities::PathHelper
 
   let(:user) { create(:user) }
   let(:configuration_path) { api_v3_paths.configuration }
@@ -70,13 +70,14 @@ describe 'API v3 Configuration resource', type: :request do
         .not_to have_json_path('_embedded/user_preferences')
     end
 
-    context 'with feature flags', :settings_reset do
+    context 'with feature flags',
+            :settings_reset,
+            with_env: {
+              'OPENPROJECT_FEATURE_AN_EXAMPLE_ACTIVE' => 'true',
+              'OPENPROJECT_FEATURE_ANOTHER_EXAMPLE_ACTIVE' => 'true',
+              'OPENPROJECT_FEATURE_INACTIVE_EXAMPLE_ACTIVE' => 'false'
+            } do
       before do
-        stub_const('ENV',
-                   'OPENPROJECT_FEATURE_AN_EXAMPLE_ACTIVE' => 'true',
-                   'OPENPROJECT_FEATURE_ANOTHER_EXAMPLE_ACTIVE' => 'true',
-                   'OPENPROJECT_FEATURE_INACTIVE_EXAMPLE_ACTIVE' => 'false')
-
         OpenProject::FeatureDecisions.add :an_example
         OpenProject::FeatureDecisions.add :another_example
         OpenProject::FeatureDecisions.add :deactivated_example
@@ -91,6 +92,17 @@ describe 'API v3 Configuration resource', type: :request do
     end
 
     context 'for a non logged in user' do
+      current_user { User.anonymous }
+
+      it 'returns 200 OK' do
+        expect(subject.status).to eq(200)
+      end
+    end
+
+    context 'for a non logged in user with login_required',
+            with_settings: { login_required?: true } do
+      current_user { User.anonymous }
+
       it 'returns 200 OK' do
         expect(subject.status).to eq(200)
       end

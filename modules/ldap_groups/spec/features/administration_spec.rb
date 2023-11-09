@@ -1,7 +1,7 @@
 require_relative '../spec_helper'
 
-describe 'LDAP group sync administration spec', type: :feature, js: true do
-  let(:admin) { create :admin }
+RSpec.describe 'LDAP group sync administration spec', js: true do
+  let(:admin) { create(:admin) }
 
   before do
     login_as admin
@@ -15,25 +15,25 @@ describe 'LDAP group sync administration spec', type: :feature, js: true do
   end
 
   context 'with EE', with_ee: %i[ldap_groups] do
-    let!(:group) { create :group, lastname: 'foo' }
-    let!(:auth_source) { create :ldap_auth_source, name: 'ldap' }
+    let!(:group) { create(:group, lastname: 'foo') }
+    let!(:auth_source) { create(:ldap_auth_source, name: 'ldap') }
 
     it 'allows synced group administration flow' do
-      expect(page).to have_no_selector('.upsale-notification')
+      expect(page).not_to have_selector('.upsale-notification')
 
       # Create group
       find('.button', text: I18n.t('ldap_groups.synchronized_groups.singular')).click
       SeleniumHubWaiter.wait
 
-      select 'ldap', from: 'synchronized_group_auth_source_id'
+      select 'ldap', from: 'synchronized_group_ldap_auth_source_id'
       select 'foo', from: 'synchronized_group_group_id'
       fill_in 'synchronized_group_dn', with: 'cn=foo,ou=groups,dc=example,dc=com'
       check 'synchronized_group_sync_users'
 
       click_on 'Create'
-      expect(page).to have_selector('.flash.notice', text: I18n.t(:notice_successful_create))
+      expect(page).to have_selector('.op-toast.-success', text: I18n.t(:notice_successful_create))
       expect(page).to have_selector('td.dn', text: 'cn=foo,ou=groups,dc=example,dc=com')
-      expect(page).to have_selector('td.auth_source', text: 'ldap')
+      expect(page).to have_selector('td.ldap_auth_source', text: 'ldap')
       expect(page).to have_selector('td.group', text: 'foo')
       expect(page).to have_selector('td.users', text: '0')
 
@@ -43,9 +43,9 @@ describe 'LDAP group sync administration spec', type: :feature, js: true do
       expect(page).to have_selector '.generic-table--empty-row'
 
       # Check created group
-      sync = ::LdapGroups::SynchronizedGroup.last
+      sync = LdapGroups::SynchronizedGroup.last
       expect(sync.group_id).to eq(group.id)
-      expect(sync.auth_source_id).to eq(auth_source.id)
+      expect(sync.ldap_auth_source_id).to eq(auth_source.id)
       expect(sync.dn).to eq 'cn=foo,ou=groups,dc=example,dc=com'
 
       # Assume we have a membership
@@ -65,10 +65,10 @@ describe 'LDAP group sync administration spec', type: :feature, js: true do
       SeleniumHubWaiter.wait
       click_on 'Delete'
 
-      expect(page).to have_selector('.flash.notice', text: I18n.t(:notice_successful_delete))
+      expect(page).to have_selector('.op-toast.-success', text: I18n.t(:notice_successful_delete))
       expect(page).to have_selector '.generic-table--empty-row'
 
-      expect(::LdapGroups::Membership.where(id: memberships)).to be_empty
+      expect(LdapGroups::Membership.where(id: memberships)).to be_empty
     end
   end
 end

@@ -1,6 +1,6 @@
 //-- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2022 the OpenProject GmbH
+// Copyright (C) 2012-2023 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -26,6 +26,8 @@
 // See COPYRIGHT and LICENSE files for more details.
 //++
 
+@import "src/app/spot/styles/tokens/dist/tokens"
+
 @mixin details-pane--form-field
   @include grid-visible-overflow
   padding: 0
@@ -40,8 +42,9 @@
 
     .inline-edit--display-field
       white-space: normal
-      overflow-wrap: break-word
-      hyphens: auto
+      overflow-wrap: anywhere
+      word-break: normal
+      line-height: normal
 
 // Subject field
 .wp-new--subject-wrapper
@@ -99,11 +102,11 @@ i
 // -------------------- Attribute groups --------------------
 // Special styling for project context area
 .attributes-group.-project-context
-  background: rgba(227, 245, 255, 0.3)
-  border-radius: 5px
-  padding: 10px 10px 0 10px
+  background: $spot-color-feedback-info-light
+  border-radius: 2px
+  padding: 10px
   margin: 10px 0 0 0
-  border: 1px solid rgb(227, 245, 255)
+  border: 1px solid $spot-color-feedback-info-dark
 
 // Avoid top border and spacing for special projects/select attribute group
 .attributes-group.-special-fields
@@ -114,21 +117,6 @@ i
     border: 0
     padding: 0
     margin: 0
-
-// Increase label width
-.router--work-packages-full-view .attributes-group,
-.router--work-packages-full-create .attributes-group
-  // We have to find a middle way between
-  // (a) avoiding label wrap and
-  // (b) ugly content wrap (e.g. in the label)
-  // These values are what matches best at the moment. So be careful when changing them.
-  .attributes-key-value--key
-    flex: 1 0 45%
-    max-width: 45%
-  .attributes-key-value--value-container
-    position: relative
-    flex: 1 0 55%
-    max-width: 55%
 
 // -------------------- Info row --------------------
 .work-packages--info-row

@@ -1,6 +1,6 @@
 // -- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2022 the OpenProject GmbH
+// Copyright (C) 2012-2023 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -59,7 +59,7 @@ export class StaticQueriesService {
     updated_at: this.I18n.t('js.work_packages.properties.updatedAt'),
     status: this.I18n.t('js.work_packages.properties.status'),
     work_packages: this.I18n.t('js.label_work_package_plural'),
-    gantt: this.I18n.t('js.timelines.gantt_chart'),
+    gantt: this.I18n.t('js.gantt_chart.label'),
     latest_activity: this.I18n.t('js.work_packages.default_queries.latest_activity'),
     created_by_me: this.I18n.t('js.work_packages.default_queries.created_by_me'),
     assigned_to_me: this.I18n.t('js.work_packages.default_queries.assigned_to_me'),

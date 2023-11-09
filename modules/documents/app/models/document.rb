@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -67,16 +67,5 @@ class Document < ApplicationRecord
 
   def set_default_category
     self.category ||= DocumentCategory.default if new_record?
-  end
-
-  # TODO: This should not be necessary as the Attachments::CreateService in combination
-  # with acts_as_journalized should touch the document after an attachment has been added.
-  def updated_at
-    @updated_at ||= [attachments.maximum(:updated_at), read_attribute(:updated_at)].compact.max
-  end
-
-  def reload(options = nil)
-    @updated_at = nil
-    super
   end
 end

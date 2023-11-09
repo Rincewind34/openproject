@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,13 +28,14 @@
 
 module Users
   class LoginService
-    attr_accessor :controller, :request
+    attr_accessor :controller, :request, :browser
 
     delegate :session, to: :controller
 
     def initialize(controller:, request:)
       self.controller = controller
       self.request = request
+      self.browser = controller.send(:browser)
     end
 
     def call(user)
@@ -53,6 +54,7 @@ module Users
       ::Sessions::InitializeSessionService.call(user, session)
 
       session.merge!(retained_values) if retained_values
+      session.merge!(session_identification)
 
       user.log_successful_login
 
@@ -62,6 +64,14 @@ module Users
     end
 
     private
+
+    def session_identification
+      {
+        platform: browser.platform&.name,
+        browser: browser.name,
+        browser_version: browser.version
+      }
+    end
 
     def after_login_hook(user)
       context = { user:, request:, session: }

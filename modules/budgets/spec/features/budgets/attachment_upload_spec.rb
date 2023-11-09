@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) 2012-2023 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,17 +29,15 @@
 require 'spec_helper'
 require 'features/page_objects/notification'
 
-describe 'Upload attachment to budget', js: true do
+RSpec.describe 'Upload attachment to budget', js: true do
   let(:user) do
-    create :user,
-           member_in_project: project,
-           member_with_permissions: %i[view_budgets
-                                       edit_budgets]
+    create(:user, member_in_project: project, member_with_permissions: %i[view_budgets edit_budgets])
   end
   let(:project) { create(:project) }
-  let(:attachments) { ::Components::Attachments.new }
-  let(:image_fixture) { ::UploadedFile.load_from('spec/fixtures/files/image.png') }
-  let(:editor) { ::Components::WysiwygEditor.new }
+  let(:attachments) { Components::Attachments.new }
+  let(:image_fixture) { UploadedFile.load_from('spec/fixtures/files/image.png') }
+  let(:editor) { Components::WysiwygEditor.new }
+  let(:attachments_list) { Components::AttachmentsList.new }
 
   before do
     login_as(user)
@@ -57,13 +55,13 @@ describe 'Upload attachment to budget', js: true do
     # adding an image
     editor.drag_attachment image_fixture.path, 'Image uploaded on creation'
 
-    expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png')
+    editor.attachments_list.expect_attached('image.png')
 
     click_on 'Create'
 
     expect(page).to have_selector('#content img', count: 1)
     expect(page).to have_content('Image uploaded on creation')
-    expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png')
+    attachments_list.expect_attached('image.png')
 
     within '.toolbar-items' do
       click_on "Update"
@@ -71,14 +69,14 @@ describe 'Upload attachment to budget', js: true do
 
     editor.drag_attachment image_fixture.path, 'Image uploaded the second time'
 
-    expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png', count: 2)
+    editor.attachments_list.expect_attached('image.png', count: 2)
 
     click_on 'Submit'
 
     expect(page).to have_selector('#content img', count: 2)
     expect(page).to have_content('Image uploaded on creation')
     expect(page).to have_content('Image uploaded the second time')
-    expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png', count: 2)
+    attachments_list.expect_attached('image.png', count: 2)
   end
 
   it 'can upload an image to new and existing budgets via drag & drop on attachment list' do
@@ -92,31 +90,26 @@ describe 'Upload attachment to budget', js: true do
     editor.set_markdown "Some content because it's required"
 
     # adding an image
-    find("[data-qa-selector='op-attachments--drop-box']").drop(image_fixture.path)
+    editor.attachments_list.drop(image_fixture)
 
-    expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png')
+    editor.attachments_list.expect_attached('image.png')
 
     click_on 'Create'
 
-    expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png')
+    attachments_list.expect_attached('image.png')
 
     within '.toolbar-items' do
       click_on "Update"
     end
 
-    script = <<~JS
-      const event = new DragEvent('dragover');
-      document.body.dispatchEvent(event);
-    JS
-    page.execute_script(script)
-
     # adding an image
-    find("[data-qa-selector='op-attachments--drop-box']").drop(image_fixture.path)
+    editor.attachments_list.drag_enter
+    editor.attachments_list.drop(image_fixture)
 
-    expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png', count: 2)
+    editor.attachments_list.expect_attached('image.png', count: 2)
 
     click_on 'Submit'
 
-    expect(page).to have_selector('[data-qa-selector="op-attachment-list-item"]', text: 'image.png', count: 2)
+    attachments_list.expect_attached('image.png', count: 2)
   end
 end
