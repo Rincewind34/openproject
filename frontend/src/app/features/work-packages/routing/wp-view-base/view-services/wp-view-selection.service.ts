@@ -145,14 +145,23 @@ export class WorkPackageViewSelectionService extends WorkPackageViewBaseService<
     } else {
       const start = Math.min(position, state.activeRowIndex);
       const end = Math.max(position, state.activeRowIndex);
+      const targetSelectState = state.selected[wpId];
 
       rows.forEach((row, i) => {
-        if (row.workPackageId) {
-          state.selected[row.workPackageId] = i >= start && i <= end;
+        if (row.workPackageId && i >= start && i <= end) {
+          state.selected[row.workPackageId] = targetSelectState;
         }
       });
     }
 
+    this.update(state);
+  }
+
+  public performCtrlClick(wpId:string, position:number) {
+    this.toggleRow(wpId);
+
+    const state = this.current || this._emptyState;
+    state.activeRowIndex = position;
     this.update(state);
   }
 

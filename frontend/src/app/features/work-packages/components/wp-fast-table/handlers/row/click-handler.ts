@@ -77,7 +77,7 @@ export class RowClickHandler implements TableEventHandler {
 
     // Single selection expansion if ctrl / cmd(mac)
     if (evt.ctrlKey || evt.metaKey) {
-      this.wpTableSelection.toggleRow(wpId);
+      this.wpTableSelection.performCtrlClick(wpId, index);
     }
 
     view.selectionChanged.emit(this.wpTableSelection.getSelectedWorkPackageIds());
