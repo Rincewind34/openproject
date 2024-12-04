@@ -2,7 +2,7 @@
 
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -55,22 +55,22 @@ module Acts::Journalized
       end
 
       def all_file_link_ids(previous, current)
-        current.pluck('file_link_id') | previous.pluck('file_link_id')
+        current.pluck("file_link_id") | previous.pluck("file_link_id")
       end
 
       def cleanup_changes(changes) = changes.reject { |_, (first, last)| first == last }
 
       def pair_changes(ids, previous, current)
         ids.index_with do |id|
-          [select_journals(previous.select { |attributes| attributes['file_link_id'] == id }),
-           select_journals(current.select { |attributes| attributes['file_link_id'] == id })]
+          [select_journals(previous.select { |attributes| attributes["file_link_id"] == id }),
+           select_journals(current.select { |attributes| attributes["file_link_id"] == id })]
         end
       end
 
       def select_journals(journals)
         return if journals.empty?
 
-        journals.sort.map { |hash| hash.slice('link_name', 'storage_name') }.last
+        journals.sort.map { |hash| hash.slice("link_name", "storage_name") }.last
       end
     end
   end

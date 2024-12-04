@@ -2,7 +2,7 @@
 
 # -- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,13 +29,15 @@
 # ++
 #
 
-require 'spec_helper'
-require_relative '../support/pages/meetings/index'
+require "spec_helper"
+require_relative "../support/pages/meetings/index"
 
-RSpec.describe 'Meetings global menu item',
+RSpec.describe "Meetings global menu item",
+               :js,
                :with_cuprite do
   shared_let(:user_without_permissions) { create(:user) }
   shared_let(:admin) { create(:admin) }
+  shared_let(:project) { create(:project) }
   shared_let(:meetings_label) { I18n.t(:label_meeting_plural) }
 
   let(:meetings_page) { Pages::Meetings::Index.new(project: nil) }
@@ -44,34 +46,34 @@ RSpec.describe 'Meetings global menu item',
     login_as current_user
   end
 
-  context 'as a user with permissions' do
+  context "as a user with permissions" do
     let(:current_user) { admin }
 
     before do
       meetings_page.navigate_by_global_menu
     end
 
-    it 'navigates to the global meetings index page' do
-      expect(page).to have_current_path('/meetings')
+    it "navigates to the global meetings index page" do
+      expect(page).to have_current_path("/meetings")
     end
 
-    specify '"Upcoming meetings" is the default filter set' do
-      within '#main-menu' do
-        expect(page).to have_selector('.selected', text: I18n.t(:label_upcoming_meetings))
+    specify '"Upcoming invitations" is the default filter set' do
+      within "#main-menu" do
+        expect(page).to have_css(".selected", text: I18n.t(:label_upcoming_invitations))
       end
     end
   end
 
-  context 'as a user without permissions' do
+  context "as a user without permissions" do
     let(:current_user) { user_without_permissions }
 
     before do
       visit root_path
     end
 
-    it 'does not render' do
-      within '#main-menu' do
-        expect(page).not_to have_link(meetings_label)
+    it "does not render" do
+      within "#main-menu" do
+        expect(page).to have_no_link(meetings_label)
       end
     end
   end

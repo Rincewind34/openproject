@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -44,22 +46,24 @@ module Storages::ProjectStorages::Members
     end
 
     def name
-      icon = helpers.avatar principal, size: :mini
-
-      icon + principal_link
+      helpers.avatar principal, hide_name: false, size: :mini
     end
 
     def status
       connection_result = storage_connection_status
 
       if connection_result == :not_connected
-        helpers.op_icon('icon-warning -warning') +
-          content_tag(:span,
-                      I18n.t("storages.member_connection_status.not_connected",
-                             files_label: content_tag(:span,
-                                                      I18n.t('storages.label_files'),
-                                                      class: 'text-bold')).html_safe,
-                      class: 'pl-2')
+        ensure_connection_url = oauth_clients_ensure_connection_url(
+          oauth_client_id: storage.oauth_client.client_id,
+          storage_id: storage.id
+        )
+        helpers.op_icon("icon-warning -warning") +
+          content_tag(
+            :span,
+            I18n.t("storages.member_connection_status.not_connected",
+                   link: link_to(I18n.t("link"), ensure_connection_url),
+                   class: "pl-2").html_safe
+          )
       else
         I18n.t("storages.member_connection_status.#{connection_result}")
       end
@@ -68,10 +72,6 @@ module Storages::ProjectStorages::Members
     private
 
     delegate :storage, to: :table
-
-    def principal_link
-      link_to principal.name, principal_show_path
-    end
 
     def principal_class_name
       principal.model_name.singular
@@ -100,7 +100,7 @@ module Storages::ProjectStorages::Members
 
     def oauth_client_connected?
       storage.oauth_client.present? &&
-        member.oauth_client_tokens.any? { |token| token.oauth_client_id == storage.oauth_client.id }
+        member.principal.remote_identities.exists?(oauth_client: storage.oauth_client)
     end
 
     def can_read_files?

@@ -6,11 +6,11 @@ ca:
     attributes:
       ldap_groups/synchronized_group:
         dn: 'DN'
-        ldap_auth_source: 'LDAP connection'
+        ldap_auth_source: 'Connexió LDAP'
         sync_users: 'Usuaris sincronitzats'
       ldap_groups/synchronized_filter:
         filter_string: 'Filtre LDAP'
-        ldap_auth_source: 'LDAP connection'
+        ldap_auth_source: 'Connexió LDAP'
         group_name_attribute: "Atribut de nom de grup"
         sync_users: 'Usuaris sincronitzats'
         base_dn: "Base de cerca DN"
@@ -50,7 +50,7 @@ ca:
       add_new: 'Afegeix grup de sincronització LDAP'
       destroy:
         title: 'Elimina el grup de sincronització %{name}'
-        confirmation: "Si continues, el grup de sincronització %{name} i tots els %{groups_count} usuaris sincronitzats seran eliminats."
+        confirmation: "Si continues, el grup de sincronització %{name} i tots els %{users_count} usuaris sincronitzats seran eliminats."
         info: "Nota: El grup d'OpenProject i els membres afegits fora d'aquesta sincronització de LDAP no seran eliminats."
         verification: "Introdueix el nom del grup %{name} per verificar l'eliminació."
       help_text_html: |

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,7 +30,7 @@ class Queries::WorkPackages::Filter::RelatableFilter < Queries::WorkPackages::Fi
   include Queries::WorkPackages::Filter::FilterForWpMixin
 
   def available?
-    User.current.allowed_to_globally?(:manage_work_package_relations)
+    User.current.allowed_in_any_work_package?(:manage_work_package_relations)
   end
 
   def type
@@ -46,15 +46,15 @@ class Queries::WorkPackages::Filter::RelatableFilter < Queries::WorkPackages::Fi
     "(1 = 1)"
   end
 
-  def scope
-    WorkPackage.relatable(WorkPackage.find_by(id: values.first), scope_operator)
+  def apply_to(query_scope)
+    query_scope.relatable(WorkPackage.find_by(id: values.first), scope_operator)
   end
 
   private
 
   # 'children' used to be supported by the API although 'child' would be more fitting.
   def scope_operator
-    if operator == 'children'
+    if operator == "children"
       Relation::TYPE_CHILD
     else
       operator

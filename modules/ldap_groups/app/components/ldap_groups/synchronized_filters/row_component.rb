@@ -2,7 +2,7 @@
 
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -65,7 +65,7 @@ module LdapGroups
 
         link_to I18n.t(:button_edit),
                 { controller: table.target_controller, ldap_filter_id: model.id, action: :edit },
-                class: 'icon icon-edit',
+                class: "icon icon-edit",
                 title: t(:button_edit)
       end
 
@@ -74,7 +74,7 @@ module LdapGroups
 
         link_to I18n.t(:button_delete),
                 { controller: table.target_controller, ldap_filter_id: model.id, action: :destroy_info },
-                class: 'icon icon-delete',
+                class: "icon icon-delete",
                 title: t(:button_delete)
       end
     end

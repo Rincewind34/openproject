@@ -1,6 +1,6 @@
-// -- copyright
+//-- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2023 the OpenProject GmbH
+// Copyright (C) the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -32,13 +32,13 @@ import { BcfRestApi } from 'core-app/features/bim/bcf/bcf-constants.const';
 import { I18nService } from 'core-app/core/i18n/i18n.service';
 import { imagePath } from 'core-app/shared/helpers/images/path-helper';
 
-export const homescreenNewFeaturesBlockSelector = 'homescreen-new-features-block';
-
 // The key used in the I18n files to distinguish between versions.
-const OpVersionI18n = '13_0';
+const OpVersionI18n = '15_0';
+
+const OpReleaseURL = 'https://www.openproject.org/docs/release-notes/15-0-0/';
 
 /** Update the teaser image to the next version */
-const featureTeaserImage = '13_0_features.svg';
+const featureTeaserImage = `${OpVersionI18n}_features.svg`;
 
 @Component({
   template: `
@@ -50,13 +50,14 @@ const featureTeaserImage = '13_0_features.svg';
         <p [innerHtml]="currentNewFeatureHtml"></p>
         <img
           class="widget-box--teaser-image op-new-features--teaser-image"
+          role="presentation"
           [src]="new_features_image"/>
       </div>
 
       <a [href]="teaserWebsiteUrl" target="_blank">{{ text.learnAbout }}</a>
     </div>
   `,
-  selector: homescreenNewFeaturesBlockSelector,
+  selector: 'opce-homescreen-new-features-block',
   styleUrls: ['./new-features.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -89,8 +90,7 @@ export class HomescreenNewFeaturesBlockComponent {
   }
 
   public get teaserWebsiteUrl() {
-    const url = this.translated('learn_about_link');
-    return this.domSanitizer.bypassSecurityTrustResourceUrl(url);
+    return this.domSanitizer.bypassSecurityTrustResourceUrl(OpReleaseURL);
   }
 
   public get currentNewFeatureHtml():string {

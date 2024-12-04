@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -49,7 +49,7 @@ module Queries::WorkPackages::Filter::FilterOnUndirectedRelationsMixin
     if operator_class <= Queries::Operators::Equals
       %w[IN OR]
     else
-      ['NOT IN', 'AND']
+      ["NOT IN", "AND"]
     end
   end
 

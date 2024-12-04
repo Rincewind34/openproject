@@ -1,10 +1,12 @@
 require:
+  - rubocop-openproject
   - rubocop-rails
   - rubocop-rspec
-  - ./lib_static/rubocop/cop/open_project/no_do_end_block_with_rspec_capybara_matcher_in_expect.rb
-  - ./lib_static/rubocop/cop/open_project/use_service_result_factory_methods.rb
+  - rubocop-rspec_rails
   - rubocop-capybara
   - rubocop-factory_bot
+  - rubocop-performance
+  - ./config/initializers/inflections.rb
 
 <% if File.exist?('.rubocop-local.yml') %>
 inherit_from:
@@ -17,7 +19,7 @@ inherit_mode:
     - Exclude
 
 AllCops:
-  TargetRubyVersion: 3.2
+  TargetRubyVersion: 3.3
   # Enable any new cops in new versions by default
   NewCops: enable
   Exclude:
@@ -141,7 +143,7 @@ Naming/VariableNumber:
   AllowedPatterns:
     - '\w_20\d\d' # allow dates like christmas_2022 or date_2034_04_12
     - '\w\d++(_\d++)+' # allow hierarchical data like child1_2_5 (second + in regex is possessive qualifier)
-
+    - 'custom_field_\d+' # allow custom field method names to be called with send :custom_field_1001
 # There are valid cases in which to use methods like:
 # * update_all
 # * touch_all
@@ -159,6 +161,10 @@ Rails/I18nLocaleAssignment:
   Enabled: true
   Exclude:
     - 'spec/**/*.rb'
+
+# Do not bother if `let` statements use an index in their name
+RSpec/IndexedLet:
+  Enabled: false
 
 # The http verbs in Rack::Test do not accept named parameters (params: params)
 Rails/HttpPositionalArguments:
@@ -191,6 +197,10 @@ RSpec/DescribeClass:
     - 'spec/features/**/*.rb'
     - 'modules/*/spec/features/**/*.rb'
 
+# Allow number HTTP status codes in specs
+RSpecRails/HttpStatus:
+  Enabled: false
+
 # dynamic finders cop clashes with capybara ID cop
 Rails/DynamicFindBy:
   Enabled: true
@@ -198,6 +208,22 @@ Rails/DynamicFindBy:
     - 'spec/features/**/*.rb'
     - 'spec/support/**/*.rb'
     - 'modules/*/spec/features/**/*.rb'
+  Whitelist:
+    - find_by_login
+
+# Allow reorder to prevent find each cop triggering
+Rails/FindEach:
+  AllowedMethods:
+    - order
+    - reorder
+    - limit
+    - select
+    - lock
+
+# We have config.active_record.belongs_to_required_by_default = false ,
+# which means, we do have to declare presence validators on belongs_to relations.
+Rails/RedundantPresenceValidationOnBelongsTo:
+  Enabled: false
 
 # See RSpec/ExampleLength for why feature specs are excluded
 RSpec/MultipleExpectations:
@@ -221,6 +247,9 @@ RSpec/DescribeMethod:
 # Don't force the second argument of describe
 # to match the exact file name
 RSpec/SpecFilePathFormat:
+  CustomTransform:
+    OpenIDConnect: openid_connect
+    OAuthClients: oauth_clients
   IgnoreMethods: true
 
 # Prevent  "fit" or similar to be committed
@@ -244,8 +273,10 @@ RSpec/ContextWording:
     - as
     - even
     - for
+    - given
     - having
     - if
+    - in
     - 'on'
     - to
     - unless
@@ -402,10 +433,9 @@ Style/SpecialGlobalVars:
 #   For the record: using single quotes does NOT have any performance advantages.
 #   Even if it did, this would be a silly argument.
 #
-# Ideally we would just use double quotes everywhere but since that would result
-# in innumerable rubocop offenses we will just disable this. Quote away.
+# Quote away.
 Style/StringLiterals:
-  Enabled: false
+  EnforcedStyle: double_quotes
 
 Style/TrivialAccessors:
   Enabled: false
@@ -440,3 +470,13 @@ Style/HashTransformKeys:
 
 Style/HashTransformValues:
   Enabled: true
+
+Performance/Casecmp:
+  Enabled: false
+
+OpenProject/AddPreviewForViewComponent:
+  Include:
+    - app/components/op_turbo/**.rb
+    - app/components/op_primer/**.rb
+    - app/components/open_project/**.rb
+    - app/components/concerns/**.rb

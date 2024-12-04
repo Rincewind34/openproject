@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,14 +26,14 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe "POST /api/v3/queries",
                with_ee: %i[baseline_comparison] do
   shared_let(:user) { create(:admin) }
   shared_let(:status) { create(:status) }
   shared_let(:project) { create(:project) }
-  let(:timestamps) { [1.week.ago.iso8601, 'lastWorkingDay@12:00+00:00', "P0D"] }
+  let(:timestamps) { [1.week.ago.iso8601, "lastWorkingDay@12:00+00:00", "P0D"] }
 
   let(:default_params) do
     {
@@ -109,16 +109,16 @@ RSpec.describe "POST /api/v3/queries",
       post "/api/v3/queries", params.to_json
     end
 
-    it 'returns 201 (created)' do
-      expect(last_response.status).to eq(201)
+    it "returns 201 (created)" do
+      expect(last_response).to have_http_status(:created)
     end
 
-    it 'renders the created query' do
+    it "renders the created query" do
       expect(json["_type"]).to eq "Query"
       expect(json["name"]).to eq "Dummy Query"
     end
 
-    it 'creates the query correctly' do
+    it "creates the query correctly" do
       query = Query.find_by(name: params[:name])
 
       expect(query).to be_present
@@ -137,20 +137,20 @@ RSpec.describe "POST /api/v3/queries",
       expect(filter.values).to eq [status.id.to_s]
     end
 
-    context 'without EE', with_ee: false do
-      it 'yields a 422 error given a timestamp older than 1 day' do
-        expect(last_response.status).to eq 422
+    context "without EE", with_ee: false do
+      it "yields a 422 error given a timestamp older than 1 day" do
+        expect(last_response).to have_http_status :unprocessable_entity
         expect(json["message"]).to eq "Timestamps contain forbidden values: #{timestamps.first}"
       end
 
-      context 'when timestamps are within 1 day' do
+      context "when timestamps are within 1 day" do
         let(:timestamps) { ["oneDayAgo@12:00+00:00"] }
 
-        it 'returns 201 (created)' do
-          expect(last_response.status).to eq(201)
+        it "returns 201 (created)" do
+          expect(last_response).to have_http_status(:created)
         end
 
-        it 'updates the query timestamps' do
+        it "updates the query timestamps" do
           expect(Query.first.timestamps).to eq(timestamps.map { |t| Timestamp.new(t) })
         end
       end
@@ -168,7 +168,7 @@ RSpec.describe "POST /api/v3/queries",
 
       post!
 
-      expect(last_response.status).to eq 422
+      expect(last_response).to have_http_status :unprocessable_entity
       expect(json["message"]).to eq "Project not found"
     end
 
@@ -177,7 +177,7 @@ RSpec.describe "POST /api/v3/queries",
 
       post!
 
-      expect(last_response.status).to eq 422
+      expect(last_response).to have_http_status :unprocessable_entity
       expect(json["message"]).to eq "Status Operator is not set to one of the allowed values."
     end
 
@@ -186,7 +186,7 @@ RSpec.describe "POST /api/v3/queries",
 
       post!
 
-      expect(last_response.status).to eq 422
+      expect(last_response).to have_http_status :unprocessable_entity
       expect(json["message"]).to eq "Statuz filter does not exist."
     end
   end

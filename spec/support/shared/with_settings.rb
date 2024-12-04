@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -38,12 +38,14 @@ def aggregate_mocked_settings(example, settings)
   settings
 end
 
-RSpec.shared_context 'with settings reset' do
+RSpec.shared_context "with settings reset" do
   shared_let(:definitions_before) { Settings::Definition.all.dup }
 
-  def reset(setting)
+  def reset(setting, **definitions)
+    setting = setting.to_sym
+    definitions = Settings::Definition::DEFINITIONS[setting] if definitions.empty?
     Settings::Definition.all.delete(setting)
-    Settings::Definition.add(setting, **Settings::Definition::DEFINITIONS[setting])
+    Settings::Definition.add(setting, **definitions)
   end
 
   def stub_configuration_yml
@@ -51,14 +53,14 @@ RSpec.shared_context 'with settings reset' do
     allow(Rails.env).to receive(:test?).and_return(false)
     allow(File)
       .to receive(:file?)
-            .with(Rails.root.join('config/configuration.yml'))
+            .with(Rails.root.join("config/configuration.yml"))
             .and_return(true)
 
     # It is added to avoid warning about other File.read calls.
     allow(File).to receive(:read).and_call_original
     allow(File)
       .to receive(:read)
-            .with(Rails.root.join('config/configuration.yml'))
+            .with(Rails.root.join("config/configuration.yml"))
             .and_return(configuration_yml)
   end
 
@@ -79,7 +81,7 @@ module WithSettingsMixin
     allow(Setting).to receive(:[]).and_call_original
 
     settings.each do |k, v|
-      name = k.to_s.sub(/\?\Z/, '') # remove trailing question mark if present to get setting name
+      name = k.to_s.sub(/\?\Z/, "") # remove trailing question mark if present to get setting name
 
       raise "#{k} is not a valid setting" unless Setting.respond_to?(name)
 
@@ -112,7 +114,7 @@ RSpec.configure do |config|
   end
 end
 
-RSpec.shared_context 'with settings' do
+RSpec.shared_context "with settings" do
   before do
     with_settings(settings)
   end

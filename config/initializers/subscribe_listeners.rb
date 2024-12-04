@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -73,6 +73,14 @@ Rails.application.config.after_initialize do
       .perform_later(current_user: User.current,
                      member: payload[:member],
                      message: payload[:message])
+  end
+
+  OpenProject::Notifications.subscribe(OpenProject::Events::WORK_PACKAGE_SHARED) do |payload|
+    next unless payload[:send_notifications]
+
+    Mails::WorkPackageSharedJob
+      .perform_later(current_user: User.current,
+                     work_package_member: payload[:work_package_member])
   end
 
   OpenProject::Notifications.subscribe(OpenProject::Events::NEWS_COMMENT_CREATED) do |payload|

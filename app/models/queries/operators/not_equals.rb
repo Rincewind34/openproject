@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,8 +28,8 @@
 
 module Queries::Operators
   class NotEquals < Base
-    label 'not_equals'
-    set_symbol '!'
+    label "not_equals"
+    set_symbol "!"
 
     def self.sql_for_field(values, db_table, db_field)
       # code expects strings (e.g. for quoting), but ints would work as well: unify them here
@@ -37,10 +37,10 @@ module Queries::Operators
 
       if values.present?
         "(#{db_table}.#{db_field} IS NULL OR #{db_table}.#{db_field} NOT IN (" +
-          values.map { |val| "'#{connection.quote_string(val)}'" }.join(',') + '))'
+          values.map { |val| "'#{connection.quote_string(val)}'" }.join(",") + "))"
       else
         # empty set of forbidden values allows all results
-        '1=1'
+        "1=1"
       end
     end
   end

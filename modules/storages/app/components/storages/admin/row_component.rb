@@ -2,7 +2,7 @@
 
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -48,10 +48,10 @@ module Storages::Admin
       if configured?
         storage.name
       else
-        render(Primer::Beta::Octicon.new(:'alert-fill', size: :small, color: :severe)) +
+        render(Primer::Beta::Octicon.new(:"alert-fill", size: :small, color: :severe)) +
           content_tag(:span,
                       storage.name,
-                      class: 'pl-2')
+                      class: "pl-2")
       end
     end
 
@@ -65,18 +65,18 @@ module Storages::Admin
     end
 
     def delete_link
-      link_to '',
+      link_to "",
               admin_settings_storage_path(storage),
-              class: 'icon icon-delete',
-              data: { confirm: I18n.t('storages.delete_warning.storage') },
+              class: "icon icon-delete",
+              data: { confirm: I18n.t("storages.delete_warning.storage") },
               title: I18n.t(:button_delete),
               method: :delete
     end
 
     def edit_link
-      link_to '',
+      link_to "",
               edit_admin_settings_storage_path(storage),
-              class: 'icon icon-edit',
+              class: "icon icon-edit",
               accesskey: helpers.accesskey(:edit),
               title: I18n.t(:button_edit)
     end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,7 +29,7 @@
 module OnboardingSteps
   def step_through_onboarding_team_planner_tour
     next_button.click
-    expect(page).to have_text sanitize_string(I18n.t('js.onboarding.steps.team_planner.overview')), normalize_ws: true
+    expect(page).to have_text sanitize_string(I18n.t("js.onboarding.steps.team_planner.overview")), normalize_ws: true
 
     next_button.click
     # The team planner (and in fact every PartitionedQuerySpacePageComponent page) suffers from not being shown upon
@@ -43,22 +43,22 @@ module OnboardingSteps
     retry_block do
       page.execute_script("document.querySelector('#content').dispatchEvent(new MouseEvent('mouseover'));")
 
-      page.find('.enjoy_hint_label',
-                text: sanitize_string(I18n.t('js.onboarding.steps.team_planner.calendar')),
+      page.find(".enjoy_hint_label",
+                text: sanitize_string(I18n.t("js.onboarding.steps.team_planner.calendar")),
                 normalize_ws: true)
     end
 
     next_button.click
     expect(page)
-      .to have_text sanitize_string(I18n.t('js.onboarding.steps.team_planner.add_assignee')), normalize_ws: true
+      .to have_text sanitize_string(I18n.t("js.onboarding.steps.team_planner.add_assignee")), normalize_ws: true
 
     next_button.click
     expect(page)
-      .to have_text sanitize_string(I18n.t('js.onboarding.steps.team_planner.add_existing')), normalize_ws: true
+      .to have_text sanitize_string(I18n.t("js.onboarding.steps.team_planner.add_existing")), normalize_ws: true
 
     next_button.click
     expect(page)
-      .to have_text sanitize_string(I18n.t('js.onboarding.steps.team_planner.card')), normalize_ws: true
+      .to have_text sanitize_string(I18n.t("js.onboarding.steps.team_planner.card")), normalize_ws: true
   end
 end
 

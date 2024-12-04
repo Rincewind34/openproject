@@ -7,23 +7,26 @@ export class OpApplicationController extends ApplicationController {
   private loaded = new Set<string>();
 
   dynamicTargetConnected(target:HTMLElement) {
-    const controller = target.dataset.controller as string;
-    const path = this.derivePath(controller);
+    const controllers = (target.dataset.controller as string).split(' ');
 
-    if (!this.loaded.has(controller)) {
-      this.loaded.add(controller);
-      void import(/* webpackChunkName: "[request]" */`./dynamic/${path}.controller`)
-        .then((imported:{ default:ControllerConstructor }) => this.application.register(controller, imported.default))
-        .catch((err:unknown) => {
-          console.error('Failed to load dyanmic controller chunk %O: %O', controller, err);
-        });
-    }
+    controllers.forEach((controller) => {
+      const path = this.derivePath(controller);
+
+      if (!this.loaded.has(controller)) {
+        this.loaded.add(controller);
+        void import(/* webpackChunkName: "[request]" */`./dynamic/${path}.controller`)
+          .then((imported:{ default:ControllerConstructor }) => this.application.register(controller, imported.default))
+          .catch((err:unknown) => {
+            console.error('Failed to load dynamic controller chunk %O: %O', controller, err);
+          });
+      }
+    });
   }
 
   /**
    * Derive dynamic path from controller name.
    *
-   * Stimlus conventions allow subdirectories to be used by double dashes.
+   * Stimulus conventions allow subdirectories to be used by double dashes.
    * We convert these to slashes for the dynamic import.
    *
    * https://stimulus.hotwired.dev/handbook/installing#controller-filenames-map-to-identifiers
@@ -31,6 +34,6 @@ export class OpApplicationController extends ApplicationController {
    * @private
    */
   private derivePath(controller:string):string {
-    return controller.replace('--', '/');
+    return controller.replace(/--/g, '/');
   }
 }

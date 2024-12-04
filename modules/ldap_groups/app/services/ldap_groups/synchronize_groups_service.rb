@@ -45,7 +45,7 @@ module LdapGroups
     def map_to_users(sync_group, entries)
       create_missing!(entries) if sync_group.sync_users
 
-      User.where('LOWER(login) IN (?)', entries.keys.map(&:downcase))
+      User.where("LOWER(login) IN (?)", entries.keys.map(&:downcase))
     end
 
     ##
@@ -101,12 +101,16 @@ module LdapGroups
       users = {}
       # Override the default search attributes from the ldap
       # if we have sync_users enabled, to also get user attributes
-      search_attributes = ldap.search_attributes(group.sync_users)
+      search_attributes = ldap.search_attributes
       ldap_con.search(base: base_dn,
                       filter: memberof_filter(group),
                       attributes: search_attributes) do |entry|
         data = ldap.get_user_attributes_from_ldap_entry(entry)
-        users[data[:login]] = data.except(:dn)
+        if data[:login].present?
+          users[data[:login]] = data.except(:dn)
+        else
+          Rails.logger.warn { "Tried to add user but mapped login is empty for #{entry.dn}. Ignoring this user."}
+        end
       end
 
       users
@@ -129,7 +133,7 @@ module LdapGroups
     # Get the memberof filter to use for querying members
     def memberof_filter(group)
       # memberOf filter to identify member entries of the group
-      filter = Net::LDAP::Filter.eq('memberOf', group.dn)
+      filter = Net::LDAP::Filter.eq("memberOf", group.dn)
 
       # Add the LDAP auth source own filter if present
       if ldap.filter_string.present?

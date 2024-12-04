@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,12 +27,12 @@
 #++
 
 FactoryBot.define do
-  factory :ldap_auth_source, class: 'LdapAuthSource' do
-    name { 'Test LDAP LdapAuthSource' }
-    host { '127.0.0.1' }
-    port { 225 }  # a reserved port, should not be in use
-    attr_login { 'uid' }
-    tls_mode { 'plain_ldap' }
-    base_dn { 'dc=example,dc=com' }
+  factory :ldap_auth_source, class: "LdapAuthSource" do
+    name { "Test LDAP LdapAuthSource" }
+    host { "127.0.0.1" }
+    port { 225 } # a reserved port, should not be in use
+    attr_login { "uid" }
+    tls_mode { "plain_ldap" }
+    base_dn { "dc=example,dc=com" }
   end
 end

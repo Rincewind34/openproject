@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,32 +26,54 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-module Storages::Peripherals::StorageInteraction::Nextcloud::Internal
-  class DeleteEntityCommand
-    UTIL = ::Storages::Peripherals::StorageInteraction::Nextcloud::Util
+module Storages
+  module Peripherals
+    module StorageInteraction
+      module Nextcloud
+        module Internal
+          class DeleteEntityCommand
+            def self.call(storage:, auth_strategy:, location:)
+              new(storage).call(auth_strategy:, location:)
+            end
 
-    def initialize(storage)
-      @uri = URI(storage.host).normalize
-      @base_path = UTIL.join_uri_path(@uri.path, "remote.php/dav/files", CGI.escapeURIComponent(storage.username))
-      @username = storage.username
-      @password = storage.password
-    end
+            def initialize(storage)
+              @storage = storage
+            end
 
-    def call(location:)
-      response = UTIL.http(@uri).delete(
-        UTIL.join_uri_path(@base_path, UTIL.escape_path(location)),
-        UTIL.basic_auth_header(@username, @password)
-      )
+            def call(auth_strategy:, location:)
+              origin_user_id = Util.origin_user_id(caller: self.class, storage: @storage, auth_strategy:)
+                                   .on_failure { |error| return error }
+                                   .result
 
-      case response
-      when Net::HTTPSuccess
-        ServiceResult.success
-      when Net::HTTPNotFound
-        UTIL.error(:not_found)
-      when Net::HTTPUnauthorized
-        UTIL.error(:not_authorized)
-      else
-        UTIL.error(:error)
+              Authentication[auth_strategy].call(storage: @storage) do |http|
+                handle_response http.delete(
+                  UrlBuilder.url(@storage.uri, "remote.php/dav/files", origin_user_id, location)
+                )
+              end
+            end
+
+            private
+
+            def handle_response(response)
+              case response
+              in { status: 200..299 }
+                ServiceResult.success
+              in { status: 404 }
+                Util.failure(code: :not_found,
+                             data: Util.error_data_from_response(caller: self.class, response:),
+                             log_message: "Outbound request destination not found!")
+              in { status: 401 }
+                Util.failure(code: :unauthorized,
+                             data: Util.error_data_from_response(caller: self.class, response:),
+                             log_message: "Outbound request not authorized!")
+              else
+                Util.failure(code: :error,
+                             data: Util.error_data_from_response(caller: self.class, response:),
+                             log_message: "Outbound request failed with unknown error!")
+              end
+            end
+          end
+        end
       end
     end
   end

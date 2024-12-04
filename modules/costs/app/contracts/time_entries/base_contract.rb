@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -77,10 +77,9 @@ module TimeEntries
       end
     end
 
-    # Necessary for custom fields
-    # of type version.
-    def assignable_versions
-      work_package.try(:assignable_versions) || project.try(:assignable_versions) || []
+    # Necessary for custom fields of type version.
+    def assignable_versions(only_open: true)
+      work_package.try(:assignable_versions, only_open:) || project.try(:assignable_versions, only_open:) || []
     end
 
     private

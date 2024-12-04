@@ -7,7 +7,7 @@ module Components
 
     attr_reader :context_selector
 
-    def initialize(context = '#content')
+    def initialize(context = "#content")
       @context_selector = context
     end
 
@@ -27,11 +27,11 @@ module Components
     end
 
     def expect_empty
-      expect(page).not_to have_selector("#{context_selector} [data-qa-selector='op-attachment-list-item']")
+      expect(page).to have_no_css("#{context_selector} [data-test-selector='op-attachment-list-item']")
     end
 
     def expect_attached(name, count: 1)
-      expect(page).to have_selector("#{context_selector} [data-qa-selector='op-attachment-list-item']", text: name, count:)
+      expect(page).to have_css("#{context_selector} [data-test-selector='op-attachment-list-item']", text: name, count:)
     end
 
     def wait_until_visible
@@ -39,11 +39,11 @@ module Components
     end
 
     def element
-      page.find("#{context_selector} [data-qa-selector='op-attachments']")
+      page.find("#{context_selector} [data-test-selector='op-attachments']")
     end
 
     def drop_box_element
-      find("#{context_selector} [data-qa-selector='op-attachments--drop-box']")
+      find("#{context_selector} [data-test-selector='op-attachments--drop-box']")
     end
   end
 end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,12 +26,12 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.describe 'Types', js: true, with_cuprite: true do
+RSpec.describe "Types", :js, :with_cuprite do
   shared_let(:admin) { create(:admin) }
 
-  shared_let(:existing_role) { create(:role) }
+  shared_let(:existing_role) { create(:project_role) }
   shared_let(:existing_type) { create(:type) }
   shared_let(:existing_workflow) { create(:workflow_with_default_status, role: existing_role, type: existing_type) }
 
@@ -41,28 +41,27 @@ RSpec.describe 'Types', js: true, with_cuprite: true do
     login_as(admin)
   end
 
-  it 'crud' do
+  it "crud" do
     index_page.visit!
 
     index_page.click_new
 
     # Error messages if something was wrong
-    fill_in 'Name', with: existing_type.name
-    select existing_type.name, from: 'Copy workflow from'
+    fill_in "Name", with: existing_type.name
+    select existing_type.name, from: "Copy workflow from"
 
-    click_button 'Create'
+    click_button "Create"
 
-    expect(page)
-      .to have_selector('.errorExplanation', text: "Name has already been taken.")
+    expect_flash(type: :error, message: "Name has already been taken.")
 
     # Values are retained
     expect(page)
-      .to have_field('Name', with: existing_type.name)
+      .to have_field("Name", with: existing_type.name)
 
     # Successful creation
-    fill_in 'Name', with: 'A new type'
+    fill_in "Name", with: "A new type"
 
-    click_button 'Create'
+    click_button "Create"
 
     expect(page)
       .to have_content I18n.t(:notice_successful_create)
@@ -71,9 +70,9 @@ RSpec.describe 'Types', js: true, with_cuprite: true do
     # Workflow routes are not resource-oriented.
     visit(url_for(controller: :workflows, action: :edit, only_path: true))
 
-    select existing_role.name, from: 'Role'
-    select 'A new type', from: 'Type'
-    click_button 'Edit'
+    select existing_role.name, from: "Role"
+    select "A new type", from: "Type"
+    click_button "Edit"
 
     from_id = existing_workflow.old_status_id
     to_id = existing_workflow.new_status_id
@@ -85,27 +84,27 @@ RSpec.describe 'Types', js: true, with_cuprite: true do
 
     index_page.visit!
 
-    index_page.expect_listed(existing_type, 'A new type')
+    index_page.expect_listed(existing_type, "A new type")
 
-    index_page.click_edit('A new type')
+    index_page.click_edit("A new type")
 
-    fill_in 'Name', with: 'Renamed type'
+    fill_in "Name", with: "Renamed type"
 
-    click_button 'Save'
+    click_button "Save"
 
     expect(page)
       .to have_content I18n.t(:notice_successful_update)
 
     index_page.visit!
 
-    index_page.expect_listed(existing_type, 'Renamed type')
+    index_page.expect_listed(existing_type, "Renamed type")
 
-    index_page.delete 'Renamed type'
+    index_page.delete "Renamed type"
 
     index_page.expect_listed(existing_type)
   end
 
-  context 'when a work package of a given type is part of an archived project' do
+  context "when a work package of a given type is part of an archived project" do
     shared_let(:project) do
       create(:project, :archived).tap do |p|
         p.types << existing_type
@@ -115,17 +114,15 @@ RSpec.describe 'Types', js: true, with_cuprite: true do
 
     shared_let(:work_package) { create(:work_package, type: existing_type, project:) }
 
-    context 'and I attempt to delete the type' do
+    context "and I attempt to delete the type" do
       before do
         index_page.visit!
         index_page.delete existing_type.name
         wait_for_network_idle
       end
 
-      it 'renders an error message with links to the archived project in the projects list' do
-        within '.op-toast.-error' do
-          expect(page).to have_link(project.name)
-        end
+      it "renders an error message with links to the archived project in the projects list" do
+        expect_flash type: :error, message: project.name
       end
     end
   end

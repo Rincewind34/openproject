@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -41,41 +41,39 @@ module Storages::ProjectStorages
     end
 
     def provider_type
-      project_storage.storage.short_provider_type
+      I18n.t(:"storages.provider_types.#{project_storage.storage.short_provider_type}.name")
     end
 
     def creator
-      icon = helpers.avatar project_storage.creator, size: :mini
-      icon + project_storage.creator.name
+      helpers.avatar project_storage.creator, hide_name: false, size: :mini
     end
 
     def button_links
-      [edit_link, delete_link].tap do |links|
-        if project_storage.project_folder_automatic?
-          links.unshift members_connection_status_link
-        end
-      end
+      links = [edit_link, delete_link]
+      links.prepend(members_connection_status_link) if project_storage.project_folder_automatic?
+
+      links
     end
 
     def members_connection_status_link
-      link_to '',
+      link_to "",
               project_settings_project_storage_members_path(project_id: project_storage.project,
                                                             project_storage_id: project_storage),
-              class: 'icon icon-group',
-              title: I18n.t(:'storages.page_titles.project_settings.members_connection_status')
+              class: "icon icon-group",
+              title: I18n.t(:"storages.page_titles.project_settings.members_connection_status")
     end
 
     def edit_link
-      link_to '',
+      link_to "",
               edit_project_settings_project_storage_path(project_id: project_storage.project, id: project_storage),
-              class: 'icon icon-edit',
+              class: "icon icon-edit",
               title: I18n.t(:button_edit)
     end
 
     def delete_link
-      link_to '',
+      link_to "",
               confirm_destroy_project_settings_project_storage_path(project_id: project_storage.project, id: project_storage),
-              class: 'icon icon-delete',
+              class: "icon icon-delete",
               title: I18n.t(:button_delete),
               method: :get
     end

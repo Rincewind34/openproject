@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -31,14 +31,14 @@ class RenameFixedVersion < ActiveRecord::Migration[6.0]
     rename_column :work_packages, :fixed_version_id, :version_id
     rename_column :work_package_journals, :fixed_version_id, :version_id
 
-    rename_query_attributes('fixed_version', 'version')
+    rename_query_attributes("fixed_version", "version")
   end
 
   def down
     rename_column :work_packages, :version_id, :fixed_version_id
     rename_column :work_package_journals, :version_id, :fixed_version_id
 
-    rename_query_attributes('version', 'fixed_version')
+    rename_query_attributes("version", "fixed_version")
   end
 
   def rename_query_attributes(from, to)

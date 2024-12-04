@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -38,7 +38,7 @@ module WorkPackage::PDFExport::Style
     end
 
     def page_size
-      @styles[:page_size] || 'EXECUTIVE'
+      @styles[:page_size] || "A4"
     end
 
     def page_header_offset
@@ -98,7 +98,7 @@ module WorkPackage::PDFExport::Style
     end
 
     def link_color
-      @styles.dig(:page, :link_color) || '000000'
+      @styles.dig(:page, :link_color) || "000000"
     end
 
     def overview_group_header
@@ -147,7 +147,7 @@ module WorkPackage::PDFExport::Style
 
     def toc_item(level)
       resolve_font(@styles.dig(:toc, :item)).merge(
-        resolve_font(@styles.dig(:toc, "item_level_#{level}".to_sym))
+        resolve_font(@styles.dig(:toc, :"item_level_#{level}"))
       )
     end
 
@@ -157,7 +157,7 @@ module WorkPackage::PDFExport::Style
 
     def toc_item_margins(level)
       resolve_margin(@styles.dig(:toc, :item)).merge(
-        resolve_margin(@styles.dig(:toc, "item_level_#{level}".to_sym))
+        resolve_margin(@styles.dig(:toc, :"item_level_#{level}"))
       )
     end
 
@@ -167,7 +167,7 @@ module WorkPackage::PDFExport::Style
 
     def wp_subject(level)
       resolve_font(@styles.dig(:work_package, :subject)).merge(
-        resolve_font(@styles.dig(:work_package, "subject_level_#{level}".to_sym))
+        resolve_font(@styles.dig(:work_package, :"subject_level_#{level}"))
       )
     end
 
@@ -302,8 +302,8 @@ module WorkPackage::PDFExport::Style
   private
 
   def load_style
-    yml = YAML::load_file(File.join(styles_asset_path, 'standard.yml'))
-    schema = JSON::load_file(File.join(styles_asset_path, 'schema.json'))
+    yml = YAML::load_file(File.join(styles_asset_path, "standard.yml"))
+    schema = JSON::load_file(File.join(styles_asset_path, "schema.json"))
     validate_schema!(yml, schema)
   end
 

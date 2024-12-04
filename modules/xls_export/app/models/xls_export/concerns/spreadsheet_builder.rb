@@ -18,7 +18,7 @@ module XlsExport
           .new format: :xls,
                content:,
                title: xls_export_filename,
-               mime_type: 'application/vnd.ms-excel'
+               mime_type: "application/vnd.ms-excel"
       end
 
       def spreadsheet
@@ -79,7 +79,7 @@ module XlsExport
       def xls_export_filename
         sane_filename(
           "#{Setting.app_title} #{spreadsheet_title} \
-          #{format_time_as_date(Time.zone.now, '%Y-%m-%d')}.xls"
+          #{format_time_as_date(Time.zone.now, format: '%Y-%m-%d')}.xls"
         )
       end
     end

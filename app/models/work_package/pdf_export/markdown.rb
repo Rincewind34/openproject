@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,24 +26,24 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'md_to_pdf/core'
+require "md_to_pdf/core"
 
 module WorkPackage::PDFExport::Markdown
   class MD2PDF
     include MarkdownToPDF::Core
+    include MarkdownToPDF::Parser
 
-    def initialize(styling_yml)
+    def initialize(styling_yml, pdf)
       @styles = MarkdownToPDF::Styles.new(styling_yml)
       init_options({ auto_generate_header_ids: false })
+      pdf_init_md2pdf_fonts(pdf)
       # @hyphens = Hyphen.new('en', false)
     end
 
     def draw_markdown(markdown, pdf, image_loader)
       @pdf = pdf
       @image_loader = image_loader
-      cm_extentions = %i[autolink strikethrough table tagfilter tasklist]
-      cm_parse_option = %i[FOOTNOTES SMART LIBERAL_HTML_TAG STRIKETHROUGH_DOUBLE_TILDE UNSAFE VALIDATE_UTF8]
-      root = CommonMarker.render_doc(markdown, cm_parse_option, cm_extentions)
+      root = parse_markdown(markdown)
       begin
         draw_node(root, pdf_root_options(@styles.page), true)
       rescue Prawn::Errors::CannotFit => e
@@ -65,7 +65,7 @@ module WorkPackage::PDFExport::Markdown
       if tag.text.blank?
         # <mention class="mention" data-id="46012" data-type="work_package" data-text="#46012"></mention>
         # <mention class="mention" data-id="3" data-type="user" data-text="@Some User">
-        text = tag.attr('data-text')
+        text = tag.attr("data-text")
         if text.present? && !node.next.respond_to?(:string_content) && node.next.string_content != text
           return [text_hash(text, opts)]
         end
@@ -75,7 +75,7 @@ module WorkPackage::PDFExport::Markdown
     end
 
     def handle_unknown_inline_html_tag(tag, node, opts)
-      result = if tag.name == 'mention'
+      result = if tag.name == "mention"
                  handle_mention_html_tag(tag, node, opts)
                else
                  # unknown/unsupported html tags eg. <foo>hi</foo> are ignored
@@ -92,12 +92,12 @@ module WorkPackage::PDFExport::Markdown
     end
 
     def warn(text, element, node)
-      Rails.logger.warn "PDF-Export: #{text}\nGot #{element} at #{node.sourcepos.inspect}\n\n"
+      Rails.logger.warn "PDF-Export: #{text}\nGot #{element} at #{node.source_position.inspect}\n\n"
     end
   end
 
   def write_markdown!(work_package, markdown)
-    md2pdf = MD2PDF.new(styles.wp_markdown_styling_yml)
+    md2pdf = MD2PDF.new(styles.wp_markdown_styling_yml, pdf)
     md2pdf.draw_markdown(markdown, pdf, ->(src) {
       with_images? ? attachment_image_filepath(work_package, src) : nil
     })
@@ -105,12 +105,22 @@ module WorkPackage::PDFExport::Markdown
 
   private
 
+  def attachment_image_local_file(attachment)
+    attachment.file.local_file
+  rescue StandardError => e
+    Rails.logger.error "Failed to access attachment #{attachment.id} file: #{e}"
+    nil # return nil as if the id was wrong and the attachment obj has not been found
+  end
+
   def attachment_image_filepath(work_package, src)
     # images are embedded into markup with the api-path as img.src
     attachment = attachment_by_api_content_src(work_package, src)
-    return nil if attachment.nil? || attachment.file.local_file.nil? || !pdf_embeddable?(attachment.content_type)
+    return nil if attachment.nil? || !pdf_embeddable?(attachment.content_type)
 
-    resize_image(attachment.file.local_file.path)
+    local_file = attachment_image_local_file(attachment)
+    return nil if local_file.nil?
+
+    resize_image(local_file.path)
   end
 
   def attachment_by_api_content_src(work_package, src)

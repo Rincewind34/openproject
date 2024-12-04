@@ -41,7 +41,19 @@ zh-CN:
           name: 技术规范
         item_2:
           name: 其他
-      roles:
+      project_query_roles:
+        item_0:
+          name: 项目查询查看器
+        item_1:
+          name: 项目查询查看器
+      work_package_roles:
+        item_0:
+          name: 工作包编辑者
+        item_1:
+          name: 工作包评论者
+        item_2:
+          name: 工作包查看者
+      project_roles:
         item_0:
           name: 非成员
         item_1:
@@ -49,11 +61,14 @@ zh-CN:
         item_2:
           name: 成员
         item_3:
-          name: 只读
+          name: 阅读者
         item_4:
           name: 项目管理员
-        item_5:
+      global_roles:
+        item_0:
           name: 员工和项目经理
+        item_1:
+          name: 默认全局角色
     standard:
       priorities:
         item_0:
@@ -64,76 +79,6 @@ zh-CN:
           name: 高
         item_3:
           name: 立即
-      statuses:
-        item_0:
-          name: 新增
-        item_1:
-          name: 正在确定技术规范
-        item_2:
-          name: 已指定
-        item_3:
-          name: 已确认
-        item_4:
-          name: 待计划
-        item_5:
-          name: 已计划
-        item_6:
-          name: 正在处理
-        item_7:
-          name: 已开发
-        item_8:
-          name: 正在测试
-        item_9:
-          name: 已测试
-        item_10:
-          name: 测试失败
-        item_11:
-          name: 已关闭
-        item_12:
-          name: 暂停
-        item_13:
-          name: 已拒绝
-      time_entry_activities:
-        item_0:
-          name: 管理
-        item_1:
-          name: 技术规范
-        item_2:
-          name: 开发
-        item_3:
-          name: 测试
-        item_4:
-          name: 支持
-        item_5:
-          name: 其他
-      types:
-        item_0:
-          name: 任务
-        item_1:
-          name: 里程碑
-        item_2:
-          name: 阶段
-        item_3:
-          name: 功能
-        item_4:
-          name: 史诗
-        item_5:
-          name: 用户故事
-        item_6:
-          name: 缺陷
-      welcome:
-        title: 欢迎使用 OpenProject！
-        text: |
-          选择一个演示项目以开始使用我们为您准备的演示数据。
-
-          * [演示项目]({{opSetting:base_url}}/projects/demo-project): 获取关于典型项目管理的概览。
-          * [Scrum 项目]({{opSetting:base_url}}/projects/your-scrum-project): 了解 Agile 和 Scrum 项目的管理。
-
-          您也可以创建一个空白的[新项目]({{opSetting:base_url}}/projects/new)。
-
-          永不停止协作，秉承开源和开放的心态。
-
-          您可以在[这里]({{opSetting:base_url}}/admin/settings/general)更改此欢迎文本。
       projects:
         demo-project:
           name: 演示项目
@@ -238,6 +183,21 @@ zh-CN:
                     * [ ] 甚至更多啤酒
             item_4:
               subject: 项目结束
+          wiki: |
+            _在这个wiki中，您可以协作创建和编辑页面及子页面，以创建项目wiki._
+
+            **您可以：**
+
+            * 插入文本和图片，也可以从其他文档中复制和粘贴
+            * 创建带父页面的页面层次结构
+            * 在项目菜单中包含wiki页面
+            * 使用宏来包含，例如：目录、工作包列表或甘特图
+            * 在其他文本字段中包含wiki页面，例如：项目概览页面
+            * 包含指向其他文档的链接
+            * 查看更改历史
+            * 以 Markdown 格式查看
+
+            更多信息：[https://www.openproject.org/docs/user-guide/wiki/](https://www.openproject.org/docs/user-guide/wiki/)
         scrum-project:
           name: Scrum 项目
           status_explanation: 所有任务都按计划进行。相关人员均知晓各自任务。系统已完全建立。
@@ -339,22 +299,19 @@ zh-CN:
                 options:
                   name: 入门指南
                   text: |
-                    欢迎您的加入！让我们通过以下几个步骤来开始使用 OpenProject 吧。
+                    我们很高兴您加入！建议您尝试以下几个步骤来开始使用OpenProject。
 
-                    通过 [导览]({{opSetting:base_url}}/projects/your-scrum-project/backlogs?start_scrum_onboarding_tour=true) 来探索最重要的功能。
+                    请按照以下步骤进行操作：
 
-                    _请尝试以下步骤_：
+                    1. *邀请新成员加入项目*：&rightarrow; 在项目导航中前往[成员]({{opSetting:base_url}}/projects/your-scrum-project/members)。
+                    2. *查看产品待办和迭代待办*：&rightarrow; 在项目导航中前往[待办]({{opSetting:base_url}}/projects/your-scrum-project/backlogs)。
+                    3. *查看任务看板*：&rightarrow; 在项目导航中前往[待办]({{opSetting:base_url}}/projects/your-scrum-project/backlogs) &rightarrow; 点击迭代右侧的箭头 &rightarrow; 选择[任务看板](##sprint:scrum_project__version__sprint_1)。
+                    4. *创建新的工作包*：&rightarrow; 在工作包 &rightarrow; [创建]({{opSetting:base_url}}/projects/your-scrum-project/work_packages/new)中进行操作。
+                    5. *创建和更新项目计划*：&rightarrow; 在项目导航中前往[项目计划](##query:scrum_project__query__project_plan)。
+                    6. *创建迭代Wiki*：&rightarrow; 在[待办]({{opSetting:base_url}}/projects/your-scrum-project/backlogs)中打开迭代右侧下拉菜单中的Wiki。您可以根据需要编辑[Wiki模板]({{opSetting:base_url}}/projects/your-scrum-project/wiki/)。
+                    7. *激活其他模块*：&rightarrow; 在项目设置 &rightarrow; [模块]({{opSetting:base_url}}/projects/your-scrum-project/settings/modules)中进行操作。
 
-                    1. *邀请新成员加入项目*： &rightarrow; 转到项目导航中的 [成员]({{opSetting:base_url}}/projects/your-scrum-project/members) 。
-                    2. *查看产品待办清单和 Sprint 待办清单*： &rightarrow; 转到项目导航中 [待办清单]({{opSetting:base_url}}/projects/your-scrum-project/backlogs) 。
-                    3. *查看任务板*： &rightarrow; 转到 [待办清单]({{opSetting:base_url}}/projects/your-scrum-project/backlogs) &rightarrow; 点击 Sprint &rightarrow; 选择 [任务板](##sprint:scrum_project__version__sprint_1) 。
-                    4. *创建一个新的工作包*： &rightarrow; 转到项目导航中的 工作包 &rightarrow; [创建]({{opSetting:base_url}}/projects/your-scrum-project/work_packages/new) 。
-                    5. *创建和更新项目计划*： &rightarrow; 转到项目导航中的 [项目计划](##query:scrum_project__query__project_plan) 。
-                    6. *创建一个 Sprint 维基*： &rightarrow; 转到 [待办清单]({{opSetting:base_url}}/projects/your-scrum-project/backlogs) ，然后从右侧下拉菜单打开 Sprint 维基，您可以根据需要编辑 [维基]({{opSetting:base_url}}/projects/your-scrum-project/wiki/) 模板。
-                    7. *激活更多模块*： &rightarrow; 转到项目设置 &rightarrow;  [模块]({{opSetting:base_url}}/projects/your-scrum-project/settings/modules)。
-
-                    可以在这里找到我们的 [用户指南](https://www.openproject.org/docs/user-guide/) 。
-                    遇到任何问题或需要支持，请联系我们：[support@openproject.com](mailto:support@openproject.com)。
+                    您可以在我们的[用户指南](https://www.openproject.org/docs/user-guide/)中找到更多信息。如果您有任何问题或需要支持，请随时与我们联系：[support[at]openproject.com](mailto:support@openproject.com)。
               item_5:
                 options:
                   name: 工作包
@@ -458,3 +415,78 @@ zh-CN:
             * 时间盒(3 h)。
             * 冲刺评论后，将由敏捷教练主持。
             * 团队讨论：情况良好。 为了提高下一次冲刺的生产力，需要改进的是什么，甚至有更多的趣味。
+      statuses:
+        item_0:
+          name: 新增
+        item_1:
+          name: 正在确定技术规范
+        item_2:
+          name: 已指定
+        item_3:
+          name: 已确认
+        item_4:
+          name: 待计划
+        item_5:
+          name: 已计划
+        item_6:
+          name: 正在处理
+        item_7:
+          name: 已开发
+        item_8:
+          name: 正在测试
+        item_9:
+          name: 已测试
+        item_10:
+          name: 测试失败
+        item_11:
+          name: 已关闭
+        item_12:
+          name: 暂停
+        item_13:
+          name: 已拒绝
+      time_entry_activities:
+        item_0:
+          name: 管理
+        item_1:
+          name: 技术规范
+        item_2:
+          name: 开发
+        item_3:
+          name: 测试
+        item_4:
+          name: 支持
+        item_5:
+          name: 其他
+      types:
+        item_0:
+          name: 任务
+        item_1:
+          name: 里程碑
+        item_2:
+          name: 阶段
+        item_3:
+          name: 功能
+        item_4:
+          name: 史诗
+        item_5:
+          name: 用户故事
+        item_6:
+          name: 缺陷
+      welcome:
+        title: 欢迎使用 OpenProject！
+        text: |
+          OpenProject是领先的开源项目管理软件。它支持经典、敏捷和混合型项目管理，并由您完全掌握自己的数据。
+
+          核心功能和用例：
+
+          * [项目组合管理](https://www.openproject.org/collaboration-software-features/project-portfolio-management/)
+          * [项目规划和调度](https://www.openproject.org/collaboration-software-features/project-planning-scheduling/)
+          * [任务管理和问题跟踪](https://www.openproject.org/collaboration-software-features/task-management/)
+          * [敏捷看板（Scrum和Kanban）](https://www.openproject.org/collaboration-software-features/agile-project-management/)
+          * [需求管理和发布计划](https://www.openproject.org/collaboration-software-features/product-development/)
+          * [时间和成本跟踪/预算](https://www.openproject.org/collaboration-software-features/time-tracking/)
+          * [团队协作和文档](https://www.openproject.org/collaboration-software-features/team-collaboration/)
+
+          欢迎来到项目管理的未来。
+
+          对于管理员：您可以[在此]({{opSetting:base_url}}/admin/settings/general)更改此欢迎文本。

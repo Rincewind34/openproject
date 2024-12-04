@@ -1,6 +1,6 @@
-// -- copyright
+//-- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2023 the OpenProject GmbH
+// Copyright (C) the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -35,14 +35,19 @@ import {
   Component,
   ElementRef,
   Injector,
-  Input, NgZone,
+  Input,
+  NgZone,
   OnInit,
 } from '@angular/core';
 import { I18nService } from 'core-app/core/i18n/i18n.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ApiV3Service } from 'core-app/core/apiv3/api-v3.service';
-import { WorkPackageCommentFieldHandler } from 'core-app/features/work-packages/components/work-package-comment/work-package-comment-field-handler';
-import { WorkPackagesActivityService } from 'core-app/features/work-packages/components/wp-single-view-tabs/activity-panel/wp-activity.service';
+import {
+  WorkPackageCommentFieldHandler,
+} from 'core-app/features/work-packages/components/work-package-comment/work-package-comment-field-handler';
+import {
+  WorkPackagesActivityService,
+} from 'core-app/features/work-packages/components/wp-single-view-tabs/activity-panel/wp-activity.service';
 import { CommentService } from 'core-app/features/work-packages/components/wp-activity/comment-service';
 import { WorkPackageResource } from 'core-app/features/hal/resources/work-package-resource';
 import { UserResource } from 'core-app/features/hal/resources/user-resource';
@@ -51,6 +56,7 @@ import idFromLink from 'core-app/features/hal/helpers/id-from-link';
 import { DeviceService } from 'core-app/core/browser/device.service';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'user-activity',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './user-activity.component.html',
@@ -73,7 +79,7 @@ export class UserActivityComponent extends WorkPackageCommentFieldHandler implem
 
   public userCanQuote = false;
 
-  public userId:string | number;
+  public userId:string|number;
 
   public user:UserResource;
 
@@ -100,19 +106,21 @@ export class UserActivityComponent extends WorkPackageCommentFieldHandler implem
 
   private $element:JQuery;
 
-  constructor(readonly elementRef:ElementRef,
+  constructor(
+    readonly elementRef:ElementRef,
     readonly injector:Injector,
     readonly sanitization:DomSanitizer,
     readonly PathHelper:PathHelperService,
     readonly wpLinkedActivities:WorkPackagesActivityService,
     readonly commentService:CommentService,
-    readonly ConfigurationService:ConfigurationService,
+    readonly configurationService:ConfigurationService,
     readonly apiV3Service:ApiV3Service,
     readonly cdRef:ChangeDetectorRef,
     readonly I18n:I18nService,
     readonly ngZone:NgZone,
     readonly deviceService:DeviceService,
-    protected appRef:ApplicationRef) {
+    protected appRef:ApplicationRef,
+  ) {
     super(elementRef, injector);
   }
 
@@ -157,7 +165,7 @@ export class UserActivityComponent extends WorkPackageCommentFieldHandler implem
             return;
           }
           const activityElement = document.querySelectorAll(`[data-qa-activity-number='${this.activityNo}']`)[0] as HTMLElement;
-          const scrollContainer = document.querySelectorAll("[data-notification-selector='notification-scroll-container']")[0];
+          const scrollContainer = document.querySelectorAll('[data-notification-selector=\'notification-scroll-container\']')[0];
           const scrollOffset = activityElement.offsetTop - (scrollContainer as HTMLElement).offsetTop - this.additionalScrollMargin;
           scrollContainer.scrollTop = scrollOffset;
         });
@@ -193,11 +201,13 @@ export class UserActivityComponent extends WorkPackageCommentFieldHandler implem
     return null;
   }
 
-  public async updateComment() {
+  public async updateComment():Promise<unknown> {
     this.inFlight = true;
 
     await this.onSubmit();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return
     return this.commentService.updateComment(this.activity, this.rawComment || '')
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       .then((newActivity:HalResource) => {
         this.activity = newActivity;
         this.updateCommentText();
@@ -208,8 +218,10 @@ export class UserActivityComponent extends WorkPackageCommentFieldHandler implem
           .cache
           .updateWorkPackage(this.workPackage);
       })
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       .finally(() => {
-        this.deactivate(true); this.inFlight = false;
+        this.deactivate(true);
+        this.inFlight = false;
       });
   }
 
@@ -232,7 +244,7 @@ export class UserActivityComponent extends WorkPackageCommentFieldHandler implem
     return this.focused;
   }
 
-  setErrors(newErrors:string[]):void {
+  setErrors(_newErrors:string[]):void {
     // interface
   }
 
@@ -240,7 +252,8 @@ export class UserActivityComponent extends WorkPackageCommentFieldHandler implem
     const quoted = rawComment.split('\n')
       .map((line:string) => `\n> ${line}`)
       .join('');
-    return `${this.userName} wrote:\n${quoted}`;
+    const userWrote = this.I18n.instance_locale_translate('js.text_user_wrote', { value: this.userName });
+    return `${userWrote}\n${quoted}`;
   }
 
   deactivate(focus:boolean):void {
@@ -252,6 +265,7 @@ export class UserActivityComponent extends WorkPackageCommentFieldHandler implem
   }
 
   private updateCommentText() {
-    this.postedComment = this.activity.comment.html;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
+    this.postedComment = this.sanitization.bypassSecurityTrustHtml(this.activity.comment.html);
   }
 }

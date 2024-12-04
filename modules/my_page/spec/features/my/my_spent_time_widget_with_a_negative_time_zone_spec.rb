@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,11 +26,11 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
-require_relative '../../support/pages/my/page'
+require_relative "../../support/pages/my/page"
 
-RSpec.describe 'My spent time widget with a negative time zone', :js,
+RSpec.describe "My spent time widget with a negative time zone", :js,
                with_settings: { start_of_week: 1 } do
   let(:beginning_of_week) { monday }
   let(:end_of_week) { sunday }
@@ -38,11 +38,11 @@ RSpec.describe 'My spent time widget with a negative time zone', :js,
   let(:tuesday) { beginning_of_week + 1.day }
   let(:thursday) { beginning_of_week + 3.days }
   let(:sunday) { beginning_of_week + 6.days }
-  let(:time_zone) { 'America/Phoenix' }
+  let(:time_zone) { "America/New_York" }
 
   let!(:type) { create(:type) }
   let!(:project) { create(:project, types: [type]) }
-  let!(:activity) { create(:time_entry_activity, name: 'Development') }
+  let!(:activity) { create(:time_entry_activity, name: "Development") }
   let!(:work_package) do
     create(:work_package,
            project:,
@@ -60,44 +60,45 @@ RSpec.describe 'My spent time widget with a negative time zone', :js,
   let(:user) do
     create(:user,
            preferences: { time_zone: },
-           member_in_project: project,
-           member_with_permissions: %i[view_time_entries edit_time_entries view_work_packages log_own_time])
+           member_with_permissions: { project => %i[view_time_entries edit_time_entries view_work_packages log_own_time] })
   end
   let(:my_page) { Pages::My::Page.new }
   let(:time_logging_modal) { Components::TimeLoggingModal.new }
   let!(:week_days) { week_with_saturday_and_sunday_as_weekend }
   let!(:non_working_day) { create(:non_working_day, date: tuesday) }
 
-  # Configure the time zone of the browser
-  # @param [String] time_zone The time zone to set, for instance 'Europe/Paris'
-  def set_browser_time_zone(time_zone)
-    page.driver.browser.execute_cdp('Emulation.setTimezoneOverride', timezoneId: time_zone)
+  let!(:my_page_grid) do
+    create(:my_page, :empty, user:)
   end
 
   before do
     login_as user
-    set_browser_time_zone(time_zone)
     my_page.visit!
   end
 
-  it 'correctly displays non-working days and prefills day when logging time [fix #49779]' do
-    my_page.add_widget(1, 1, :within, 'My spent time')
+  it "correctly displays non-working days and prefills day when logging time [fix #49779]",
+     driver: :chrome_new_york_time_zone do
+    my_page.add_widget(1, 1, :within, "My spent time")
 
     my_page.expect_and_dismiss_toaster message: I18n.t(:notice_successful_update)
 
+    expect(page)
+      .to have_content time_entry.spent_on.strftime("%-m/%-d")
+
     aggregate_failures("non-working days are displayed properly") do
-      expect(page).not_to have_css('.fc-day-mon.fc-non-working-day', wait: 0)
-      expect(page).to have_css('.fc-day-tue.fc-non-working-day', wait: 0)
-      expect(page).not_to have_css('.fc-day-wed.fc-non-working-day', wait: 0)
-      expect(page).not_to have_css('.fc-day-thu.fc-non-working-day', wait: 0)
-      expect(page).not_to have_css('.fc-day-fri.fc-non-working-day', wait: 0)
-      expect(page).to have_css('.fc-day-sat.fc-non-working-day', wait: 0)
-      expect(page).to have_css('.fc-day-sun.fc-non-working-day', wait: 0)
+      expect(page).to have_button("Today", disabled: true)
+      expect(page).to have_no_css(".fc-day-mon.fc-non-working-day")
+      expect(page).to have_css(".fc-day-tue.fc-non-working-day")
+      expect(page).to have_no_css(".fc-day-wed.fc-non-working-day")
+      expect(page).to have_no_css(".fc-day-thu.fc-non-working-day")
+      expect(page).to have_no_css(".fc-day-fri.fc-non-working-day")
+      expect(page).to have_css(".fc-day-sat.fc-non-working-day")
+      expect(page).to have_css(".fc-day-sun.fc-non-working-day")
     end
 
     aggregate_failures("when clicking a day, time entry day is set to the day clicked (Thursday)") do
       find(".fc-day-thu .te-calendar--add-entry", visible: false).click
-      time_logging_modal.has_field_with_value 'spentOn', thursday.iso8601
+      time_logging_modal.has_field_with_value "spentOn", thursday.iso8601
     end
   end
 end

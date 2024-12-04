@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,12 +26,12 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe Story do
   let(:user) { @user ||= create(:user) }
-  let(:role) { @role ||= create(:role) }
-  let(:status1) { @status1 ||= create(:status, name: 'status 1', is_default: true) }
+  let(:role) { @role ||= create(:project_role) }
+  let(:status1) { @status1 ||= create(:status, name: "status 1", is_default: true) }
   let(:type_feature) { @type_feature ||= create(:type_feature) }
   let(:version) { @version ||= create(:version, project:) }
   let(:version2) { create(:version, project:) }
@@ -74,28 +74,28 @@ RSpec.describe Story do
   before do
     ActionController::Base.perform_caching = false
 
-    allow(Setting).to receive(:plugin_openproject_backlogs).and_return({ 'points_burn_direction' => 'down',
-                                                                         'wiki_template' => '',
-                                                                         'story_types' => [type_feature.id.to_s],
-                                                                         'task_type' => task_type.id.to_s })
+    allow(Setting).to receive(:plugin_openproject_backlogs).and_return({ "points_burn_direction" => "down",
+                                                                         "wiki_template" => "",
+                                                                         "story_types" => [type_feature.id.to_s],
+                                                                         "task_type" => task_type.id.to_s })
     project.types << task_type
   end
 
-  describe 'Class methods' do
-    describe '#backlogs' do
-      describe "WITH one sprint
-                WITH the sprint having 1 story" do
+  describe "Class methods" do
+    describe "#backlogs" do
+      describe "WITH one sprint " \
+               "WITH the sprint having 1 story" do
         before do
           story1
         end
 
-        it { expect(Story.backlogs(project, [version.id])[version.id]).to match_array([story1]) }
+        it { expect(Story.backlogs(project, [version.id])[version.id]).to contain_exactly(story1) }
       end
 
-      describe "WITH two sprints
-                WITH two stories
-                WITH one story per sprint
-                WITH querying for the two sprints" do
+      describe "WITH two sprints " \
+               "WITH two stories " \
+               "WITH one story per sprint " \
+               "WITH querying for the two sprints" do
         before do
           version2
           story1
@@ -103,14 +103,14 @@ RSpec.describe Story do
           story2.save!
         end
 
-        it { expect(Story.backlogs(project, [version.id, version2.id])[version.id]).to match_array([story1]) }
-        it { expect(Story.backlogs(project, [version.id, version2.id])[version2.id]).to match_array([story2]) }
+        it { expect(Story.backlogs(project, [version.id, version2.id])[version.id]).to contain_exactly(story1) }
+        it { expect(Story.backlogs(project, [version.id, version2.id])[version2.id]).to contain_exactly(story2) }
       end
 
-      describe "WITH two sprints
-                WITH two stories
-                WITH one story per sprint
-                WITH querying one sprints" do
+      describe "WITH two sprints " \
+               "WITH two stories " \
+               "WITH one story per sprint " \
+               "WITH querying one sprints" do
         before do
           version2
           story1
@@ -119,15 +119,15 @@ RSpec.describe Story do
           story2.save!
         end
 
-        it { expect(Story.backlogs(project, [version.id])[version.id]).to match_array([story1]) }
+        it { expect(Story.backlogs(project, [version.id])[version.id]).to contain_exactly(story1) }
         it { expect(Story.backlogs(project, [version.id])[version2.id]).to be_empty }
       end
 
-      describe "WITH two sprints
-                WITH two stories
-                WITH one story per sprint
-                WITH querying for the two sprints
-                WITH one sprint being in another project" do
+      describe "WITH two sprints " \
+               "WITH two stories " \
+               "WITH one story per sprint " \
+               "WITH querying for the two sprints " \
+               "WITH one sprint being in another project" do
         before do
           story1
 
@@ -137,18 +137,18 @@ RSpec.describe Story do
           story2.version_id = version2.id
           story2.project = other_project
           # reset memoized versions to reflect changes above
-          story2.instance_variable_set('@assignable_versions', nil)
+          story2.instance_variable_set(:@assignable_versions, nil)
           story2.save!
         end
 
-        it { expect(Story.backlogs(project, [version.id, version2.id])[version.id]).to match_array([story1]) }
+        it { expect(Story.backlogs(project, [version.id, version2.id])[version.id]).to contain_exactly(story1) }
         it { expect(Story.backlogs(project, [version.id, version2.id])[version2.id]).to be_empty }
       end
 
-      describe "WITH one sprint
-                WITH the sprint having one story in this project and one story in another project" do
+      describe "WITH one sprint " \
+               "WITH the sprint having one story in this project and one story in another project" do
         before do
-          version.sharing = 'system'
+          version.sharing = "system"
           version.save!
 
           another_project = create(:project)
@@ -158,42 +158,42 @@ RSpec.describe Story do
           story2.save!
         end
 
-        it { expect(Story.backlogs(project, [version.id])[version.id]).to match_array([story1]) }
+        it { expect(Story.backlogs(project, [version.id])[version.id]).to contain_exactly(story1) }
       end
 
-      describe "WITH one sprint
-                WITH the sprint having two storys
-                WITH one being the child of the other" do
+      describe "WITH one sprint " \
+               "WITH the sprint having two storys " \
+               "WITH one being the child of the other" do
         before do
           story1.parent_id = story2.id
 
           story1.save
         end
 
-        it { expect(Story.backlogs(project, [version.id])[version.id]).to match_array([story1, story2]) }
+        it { expect(Story.backlogs(project, [version.id])[version.id]).to contain_exactly(story1, story2) }
       end
 
-      describe "WITH one sprint
-                WITH the sprint having one story
-                WITH the story having a child task" do
+      describe "WITH one sprint " \
+               "WITH the sprint having one story " \
+               "WITH the story having a child task" do
         before do
           task.parent_id = story1.id
 
           task.save
         end
 
-        it { expect(Story.backlogs(project, [version.id])[version.id]).to match_array([story1]) }
+        it { expect(Story.backlogs(project, [version.id])[version.id]).to contain_exactly(story1) }
       end
 
-      describe "WITH one sprint
-                WITH the sprint having one story and one task
-                WITH the two having no connection" do
+      describe "WITH one sprint " \
+               "WITH the sprint having one story and one task " \
+               "WITH the two having no connection" do
         before do
           task
           story1
         end
 
-        it { expect(Story.backlogs(project, [version.id])[version.id]).to match_array([story1]) }
+        it { expect(Story.backlogs(project, [version.id])[version.id]).to contain_exactly(story1) }
       end
     end
   end

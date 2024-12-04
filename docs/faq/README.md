@@ -19,7 +19,6 @@ Welcome to the central overview of frequently asked questions for OpenProject.
 | [Other](#other)                                                                 | Additional questions, e.g. about contribution, training, support                                  |
 | [Topic-specific FAQ](#topic-specific-faq)                                       | Links to other FAQ sections                                                                       |
 
-
 ## Learn more about OpenProject
 
 ### How do I get access to the OpenProject Enterprise add-ons?
@@ -33,6 +32,7 @@ If you want to run OpenProject on your own server, the OpenProject Enterprise on
 Have you already installed the [OpenProject Community edition](https://www.openproject.org/download-and-installation/)? If yes, you can request a trial license for the OpenProject Enterprise on-premises edition by clicking on the button "Free trial license" [here](https://www.openproject.org/de/enterprise-edition/) and test the Enterprise on-premises edition for 14 days for free.
 
 ### Can I have some users with Enterprise add-ons and some without?
+
 As the Enterprise Enterprise add-ons affect the whole instance (e.g. with Agile Boards and project custom fields) it's not possible to upgrade only some users.
 
 ### What are the system requirements?
@@ -46,10 +46,10 @@ Apart from using OpenProject in the cloud (OpenProject Enterprise cloud) OpenPro
 Here are resources to get to know OpenProject:
 
 - The [overview of our features](https://www.openproject.org/collaboration-software-features)
-- Our [English demo video](https://www.youtube.com/watch?v=un6zCm8_FT4) or [German demo video](https://www.youtube.com/watch?v=doVtVArSSvk) to get an overview of Openproject. There are additional videos explaining certain features to be found on our [YouTube channel](https://www.youtube.com/c/OpenProjectCommunity/videos), too.
+- Our [English demo video](https://www.youtube.com/watch?v=un6zCm8_FT4) or [German demo video](https://www.youtube.com/watch?v=doVtVArSSvk) to get an overview of OpenProject. There are additional videos explaining certain features to be found on our [YouTube channel](https://www.youtube.com/c/OpenProjectCommunity/videos), too.
 - The [Getting started guide](../getting-started) and the [User guide](../user-guide)
 - Our free trial: Click the green button [here](https://www.openproject.org/enterprise-edition) for Enterprise on-premises or go to [start.openproject.com](https://start.openproject.com) for the Enterprise cloud.
-- Our [development roadmap](https://community.openproject.com/projects/openproject/roadmap) (to get to know future features)
+- Our [development roadmap](https://community.openproject.org/projects/openproject/roadmap) (to get to know future features)
 - Our [training and consulting offers](https://www.openproject.org/training-and-consulting)
 
 ### Can I run OpenProject as a single user?
@@ -84,7 +84,7 @@ However, if you're still using an old OpenProject subscription there may be limi
 
 ### What is the difference between Enterprise on-premises and Community edition regarding LDAP?
 
-In the Community edition and in the Enterprise on-premises edition you can use the standard LDAP authentication. However, the Enterprise on-premises edition also includes LDAP group synchronization. This allows you to synchronize group members from LDAP with groups in OpenProject. The respective documentation can be found [here](../system-admin-guide/authentication/ldap-authentication/ldap-group-synchronization/#synchronize-ldap-and-openproject-groups-enterprise-add-on).
+In the Community edition and in the Enterprise on-premises edition you can use the standard LDAP authentication. However, the Enterprise on-premises edition also includes LDAP group synchronization. This allows you to synchronize group members from LDAP with groups in OpenProject. The respective documentation can be found [here](../system-admin-guide/authentication/ldap-connections/ldap-group-synchronization/#synchronize-ldap-and-openproject-groups-enterprise-add-on).
 
 ## How to ... in OpenProject
 
@@ -135,7 +135,7 @@ On a work package level you could use "Assignee" for "Responsible", "Accountable
 
 To create and print/export reports you can...
 
-- use the [global work packages list](../user-guide/projects/#global-work-package-tables): Filter for e.g. phases and milestones (which would make sense to use in your projects in this case). Then use the [export feature](../user-guide/work-packages/exporting/). This will give you an overview over all projects' work packages (or all projects' milestones and phases, respectively).
+- use the [global work packages list](../user-guide/projects/project-lists/#global-work-package-tables): Filter for e.g. phases and milestones (which would make sense to use in your projects in this case). Then use the [export feature](../user-guide/work-packages/exporting/). This will give you an overview over all projects' work packages (or all projects' milestones and phases, respectively).
 - use the [Wiki module](../user-guide/wiki) to document your project reports. The Wiki pages is optimized for being printed using your browser's print feature. You could even insert a work packages list there. If you want to use the Wiki we suggest setting it up in a (global) parent project.
 
 The projects overview is not optimized for export via PDF, yet. Nevertheless, you can try to use your browser's print feature.
@@ -146,12 +146,12 @@ Please go to [openproject.org/newsletter/](https://www.openproject.org/newslette
 
 ## FAQ regarding features
 
-Please find information on the features of OpenProject [here](https://www.openproject.org/collaboration-software-features/) and a comparison between Enterprise on-premises, Enterprise cloud and Community edition [here](https://www.openproject.org/pricing/#features). The community platform to see and [issue](../development/submit-feature-idea/) feature ideas can be found [here](https://community.openproject.com).
+Please find information on the features of OpenProject [here](https://www.openproject.org/collaboration-software-features/) and a comparison between Enterprise on-premises, Enterprise cloud and Community edition [here](https://www.openproject.org/pricing/#features). The community platform to see and [issue](../development/submit-feature-idea/) feature ideas can be found [here](https://community.openproject.org).
 
 ### Is it possible to use multiple languages in OpenProject?
 
-Yes, it is possible to use OpenProject in multiple languages. We support English, German, French and a number of additional languages. Each user can select their own preferred language by signing into OpenProject, clicking on the user avatar on the upper right side and selecting "My account" from the dropdown menu.
-You can then select "Settings" from the side menu on the left side and [change the language](../getting-started/my-account/#change-your-language).
+Yes, it is possible to use OpenProject in multiple languages. We support English, German, French and a number of additional languages. Each user can select their own preferred language by signing into OpenProject, clicking on the user avatar on the upper right side and selecting "Account settings" from the dropdown menu.
+You can then select "Settings" from the side menu on the left side and [change the language](../user-guide/account-settings/#change-your-language).
 
 ### Is there an OpenProject app?
 
@@ -185,16 +185,15 @@ Yes, you can. Starting with OpenProject 12.4 we implemented date alerts and emai
 
 ### Does OpenProject offer resource management?
 
-You can [set up budgets](../user-guide/budgets), [set an Estimated time](../user-guide/work-packages/edit-work-package/) for a work package and use the [Assignee board](../user-guide/agile-boards/#choose-between-board-types) to find out how many work packages are assigned to a person at the moment.
-Additional resource management features will be added within the next years. You can find the road-map for future releases [here](https://community.openproject.com/projects/openproject/work_packages?query_id=1993).
-More infomation regarding resource management in OpenProject can be found in the [Use Cases](../use-cases/resource-management) section.
+You can [set up budgets](../user-guide/budgets), [set the estimated time in  the **Work** field](../user-guide/work-packages/edit-work-package/) of a work package and use the [Assignee board](../user-guide/agile-boards/#choose-between-board-types) to find out how many work packages are assigned to a person at the moment.
+Additional resource management features will be added within the next years. You can find the roadmap for future releases [here](https://community.openproject.org/projects/openproject/work_packages?query_id=1993).
+More information regarding resource management in OpenProject can be found in the [Use Cases](../use-cases/resource-management) section.
 
 ### Does OpenProject offer portfolio management?
 
 For portfolio management or custom reporting, you can use either the project list, or the global work package table. Both views can be used to create optimal reports via filtering, sorting and other configuration options.
 
 For more information on portfolio management options in OpenProject please refer to this [Use Case](../use-cases/portfolio-management).
-
 
 ### Is there an organizational chart in OpenProject?
 
@@ -204,7 +203,7 @@ In many companies it makes sense to structure your project tree according to you
 
 ### Is there an architecture diagram for OpenProject?
 
-A (very rough) diagram can be found on [https://www.openproject.org/hosting/](https://www.openproject.org/hosting/).
+A (very rough) diagram can be found on [https://www.openproject.org/enterprise-edition/#hosting-options](https://www.openproject.org/enterprise-edition/#hosting-options).
 
 ### Can I set up an entity-relationship diagram in OpenProject?
 
@@ -248,7 +247,6 @@ Yes. Take a photo with your camera and save it on your phone. Then open the corr
 
 Yes, of course. Within the BCF module you can upload multiple IFC models and create and manage BCF issues.
 
-
 ## Migration
 
 ### How can I migrate from Bitnami to OpenProject?
@@ -269,6 +267,8 @@ At the moment there are these ways to migrate:
 - our [API](../api/)
 - our [Excel sync](../system-admin-guide/integrations/excel-synchronization)
 - Using a [Markdown export app](https://marketplace.atlassian.com/apps/1221351/markdown-exporter-for-confluence) you can export pages from Confluence and paste them (via copy & paste) into OpenProject in e.g. the wiki. This should preserve at least most of the layout. Attachments would then have to be added manually.
+
+Our partners at [ALMToolbox](https://www.almtoolbox.com/)  are happy to support you with Jira or Confluence migration. 
 
 For more information please contact us.
 
@@ -309,10 +309,6 @@ We offer our Professional Support for Enterprise on-premises users and Enterpris
 If you use the Community edition please feel free to use our [forums](https://community.openproject.org/projects/openproject/forums) for exchange with other users.
 
 To learn more about OpenProject and how its features work please have a look at [this FAQ](#how-can-i-learn-more-about-openproject).
-
-### Do you support Univention users?
-
-If you're an Enterprise on-premises user you're eligible for Professional Support. However, we can't support you in all Univention-related topics (e.g. server not reachable, authentication setup, ...).
 
 ### Do you have a cyber insurance?
 

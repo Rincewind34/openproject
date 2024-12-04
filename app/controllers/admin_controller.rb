@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -25,10 +25,10 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 #++
-require 'open3'
+require "open3"
 
 class AdminController < ApplicationController
-  layout 'admin'
+  layout "admin"
 
   before_action :require_admin, except: %i[index]
   before_action :authorize_global, only: %i[index]
@@ -53,11 +53,11 @@ class AdminController < ApplicationController
   end
 
   def projects
-    redirect_to controller: 'projects', action: 'index'
+    redirect_to controller: "projects", action: "index"
   end
 
   def plugins
-    @plugins = Redmine::Plugin.all.sort
+    @plugins = Redmine::Plugin.not_bundled.sort
   end
 
   def test_email
@@ -85,38 +85,32 @@ class AdminController < ApplicationController
     @checklist += plaintext_extraction_checks
     @checklist += admin_information_hook_checks
     @checklist += image_conversion_checks
+    @checklist += jemalloc_active_checks
 
     @storage_information = OpenProject::Storage.mount_information
   end
 
-  def default_breadcrumb
-    case params[:action]
-    when 'plugins'
-      t(:label_plugins)
-    when 'info'
-      t(:label_information)
-    end
-  end
+  def default_breadcrumb; end
 
   def show_local_breadcrumb
-    true
+    false
   end
 
   private
 
   def hidden_admin_menu_items
-    (OpenProject::Configuration.hidden_menu_items[:admin_menu.to_s] || [])
+    OpenProject::Configuration.hidden_menu_items[:admin_menu.to_s] || []
   end
 
   def plaintext_extraction_checks
     if OpenProject::Database.allows_tsv?
       [
-        [:'extraction.available.pdftotext', Plaintext::PdfHandler.available?],
-        [:'extraction.available.unrtf', Plaintext::RtfHandler.available?],
-        [:'extraction.available.catdoc', Plaintext::DocHandler.available?],
-        [:'extraction.available.xls2csv', Plaintext::XlsHandler.available?],
-        [:'extraction.available.catppt', Plaintext::PptHandler.available?],
-        [:'extraction.available.tesseract', Plaintext::ImageHandler.available?]
+        [:"extraction.available.pdftotext", Plaintext::PdfHandler.available?],
+        [:"extraction.available.unrtf", Plaintext::RtfHandler.available?],
+        [:"extraction.available.catdoc", Plaintext::DocHandler.available?],
+        [:"extraction.available.xls2csv", Plaintext::XlsHandler.available?],
+        [:"extraction.available.catppt", Plaintext::PptHandler.available?],
+        [:"extraction.available.tesseract", Plaintext::ImageHandler.available?]
       ]
     else
       []
@@ -124,11 +118,21 @@ class AdminController < ApplicationController
   end
 
   def image_conversion_checks
-    [[:'image_conversion.imagemagick', image_conversion_libs_available?]]
+    [[:"image_conversion.imagemagick", image_conversion_libs_available?]]
+  end
+
+  def jemalloc_active_checks
+    [[:"admin.jemalloc_allocator", jemalloc_libs_active?]]
+  end
+
+  def jemalloc_libs_active?
+    Open3.capture2e({ "MALLOC_CONF" => "true" }, "ruby", "-e", "exit").first.include?("jemalloc")
+  rescue StandardError
+    false
   end
 
   def image_conversion_libs_available?
-    Open3.capture2e('convert', '-version').first.include?('ImageMagick')
+    Open3.capture2e("convert", "-version").first.include?("ImageMagick")
   rescue StandardError
     false
   end

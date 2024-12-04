@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,11 +26,9 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.describe 'CRUD LDAP connections',
-               js: true,
-               with_cuprite: true do
+RSpec.describe "CRUD LDAP connections", :js, :with_cuprite do
   shared_let(:admin) { create(:admin) }
   let(:ldap_page) { Pages::Admin::LdapAuthSources::Index.new }
 
@@ -38,84 +36,82 @@ RSpec.describe 'CRUD LDAP connections',
     login_as(admin)
   end
 
-  it 'can create, modify, and delete LDAP connections' do
+  it "can create, modify, and delete LDAP connections" do
     ldap_page.visit!
 
-    expect(page).to have_text 'LDAP connections'
-    expect(page).to have_text 'There is currently nothing to display.'
+    expect(page).to have_text "LDAP connections"
+    expect(page).to have_text "There is currently nothing to display."
 
-    page.within('.toolbar') do
-      click_link 'LDAP connection'
-    end
+    page.find_test_selector("op-admin-ldap-connection--button-new", text: "LDAP connection").click
 
     expect(page).to have_current_path new_ldap_auth_source_path
 
-    fill_in 'ldap_auth_source_name', with: 'My LDAP connection'
-    fill_in 'ldap_auth_source_host', with: 'localhost'
-    fill_in 'ldap_auth_source_attr_login', with: 'uid'
+    fill_in "ldap_auth_source_name", with: "My LDAP connection"
+    fill_in "ldap_auth_source_host", with: "localhost"
+    fill_in "ldap_auth_source_attr_login", with: "uid"
 
-    click_on 'Create'
+    click_on "Create"
 
-    ldap_page.expect_and_dismiss_toaster message: 'Successful creation.'
-    expect(page).to have_selector('td.name', text: 'My LDAP connection')
-    expect(page).to have_selector('td.host', text: 'localhost')
+    expect_and_dismiss_flash message: "Successful creation."
+    expect(page).to have_css("td.name", text: "My LDAP connection")
+    expect(page).to have_css("td.host", text: "localhost")
 
     created_connection = LdapAuthSource.last
     connection = created_connection.dup
-    connection.name = 'Admin connection'
+    connection.name = "Admin connection"
     connection.save!
     admin.update_column(:ldap_auth_source_id, connection.id)
 
     ldap_page.visit!
-    expect(page).to have_text 'My LDAP connection'
-    expect(page).to have_text 'Admin connection'
+    expect(page).to have_text "My LDAP connection"
+    expect(page).to have_text "Admin connection"
 
     page.within("#ldap-auth-source-#{created_connection.id}") do
-      expect(page).to have_link 'Delete'
-      accept_prompt { click_on 'Delete' }
+      expect(page).to have_link "Delete"
+      accept_prompt { click_on "Delete" }
     end
 
-    ldap_page.expect_and_dismiss_toaster message: 'Successful deletion.'
+    expect_and_dismiss_flash message: "Successful deletion."
 
-    expect(page).not_to have_text 'My LDAP connection'
-    expect(page).to have_text 'Admin connection'
+    expect(page).to have_no_text "My LDAP connection"
+    expect(page).to have_text "Admin connection"
 
     page.within("#ldap-auth-source-#{connection.id}") do
-      expect(page).not_to have_link 'Delete'
+      expect(page).to have_no_link "Delete"
     end
 
     page.within("#ldap-auth-source-#{connection.id}") do
-      click_on 'Admin connection'
+      click_on "Admin connection"
     end
 
     expect(page).to have_current_path edit_ldap_auth_source_path(connection)
-    fill_in 'ldap_auth_source_name', with: 'Updated Admin connection'
-    click_on 'Save'
+    fill_in "ldap_auth_source_name", with: "Updated Admin connection"
+    click_on "Save"
 
-    ldap_page.expect_and_dismiss_toaster message: 'Successful update.'
-    expect(page).to have_selector('td.name', text: 'Updated Admin connection')
+    expect_flash(message: "Successful update.")
+    expect(page).to have_css("td.name", text: "Updated Admin connection")
   end
 
-  context 'when providing seed variables',
+  context "when providing seed variables",
           :settings_reset,
           with_env: {
             OPENPROJECT_SEED_LDAP_FOOBAR_HOST: "localhost"
           } do
-    let!(:ldap_auth_source) { create(:ldap_auth_source, name: 'foobar') }
+    let!(:ldap_auth_source) { create(:ldap_auth_source, name: "foobar") }
 
-    it 'blocks editing of that connection by name' do
+    it "blocks editing of that connection by name" do
       reset(:seed_ldap)
 
       ldap_page.visit!
-      expect(page).to have_text 'foobar'
+      expect(page).to have_text "foobar"
 
       page.within("#ldap-auth-source-#{ldap_auth_source.id}") do
-        click_on 'foobar'
+        click_on "foobar"
       end
 
       expect(page).to have_text(I18n.t(:label_seeded_from_env_warning))
-      expect(page).to have_field('ldap_auth_source_name', with: 'foobar', disabled: true)
-      expect(page).not_to have_button 'Save'
+      expect(page).to have_field("ldap_auth_source_name", with: "foobar", disabled: true)
+      expect(page).to have_no_button "Save"
     end
   end
 end

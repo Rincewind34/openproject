@@ -1,7 +1,7 @@
 /*
  * -- copyright
  * OpenProject is an open source project management software.
- * Copyright (C) 2023 the OpenProject GmbH
+ * Copyright (C) the OpenProject GmbH
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License version 3.
@@ -37,11 +37,9 @@ export default class MembersFormController extends Controller {
     'statusSelect',
     'addMemberForm',
     'search',
-    'memberUserIds',
     'addMemberButton',
     'membershipEditForm',
     'errorExplanation',
-    'limitWarning',
   ];
 
   declare readonly filterContainerTarget:HTMLElement;
@@ -52,8 +50,6 @@ export default class MembersFormController extends Controller {
 
   declare readonly addMemberFormTarget:HTMLElement;
 
-  declare readonly memberUserIdsTarget:HTMLInputElement;
-
   declare readonly addMemberButtonTarget:HTMLButtonElement;
 
   declare readonly membershipEditFormTargets:HTMLElement[];
@@ -62,9 +58,7 @@ export default class MembersFormController extends Controller {
 
   declare readonly hasErrorExplanationTarget:HTMLElement;
 
-  declare readonly limitWarningTarget:HTMLElement;
-
-  declare readonly hasLimitWarningTarget:HTMLElement;
+  private autocompleter:HTMLElement;
 
   connect() {
     // Show/Hide content when page is loaded
@@ -75,6 +69,8 @@ export default class MembersFormController extends Controller {
       // In case showFilter is not set yet
       window.OpenProject.guardedLocalStorage('showFilter', 'false');
     }
+
+    this.autocompleter = this.addMemberFormTarget.querySelector('opce-members-autocompleter') as HTMLElement;
 
     if (this.hasErrorExplanationTarget && this.errorExplanationTarget.textContent !== '') {
       this.showAddMemberForm();
@@ -106,20 +102,7 @@ export default class MembersFormController extends Controller {
     window.OpenProject.guardedLocalStorage('showFilter', 'false');
     this.addMemberButtonTarget.setAttribute('disabled', 'true');
 
-    const select = this.addMemberFormTarget.querySelector<HTMLInputElement>('.ng-input input');
-    select?.focus();
-  }
-
-  triggerLimitWarningIfReached() {
-    if (this.hasLimitWarningTarget) {
-      const values = this.memberUserIdsTarget.value;
-
-      if (values.indexOf('@') !== -1) {
-        this.limitWarningTarget.style.display = 'block';
-      } else {
-        this.limitWarningTarget.style.display = 'none';
-      }
-    }
+    this.focusAutocompleter();
   }
 
   toggleMemberFilter() {
@@ -137,14 +120,15 @@ export default class MembersFormController extends Controller {
   }
 
   toggleMembershipEdit({ params: { togglingClass } }:{ params:{ togglingClass:string } }) {
-    const targetedForm = this.membershipEditFormTargets.find((form:HTMLElement) => form.className === togglingClass);
-
-    if (targetedForm !== undefined) {
-      if (targetedForm.style.display === 'none') {
-        targetedForm.style.display = '';
-      } else {
-        targetedForm.style.display = 'none';
+    this.membershipEditFormTargets.forEach((form:HTMLElement) => {
+      if (form.className === togglingClass) {
+        form.style.display = form.style.display === 'none' ? '' : 'none';
       }
-    }
+    });
+  }
+
+  focusAutocompleter():void {
+    const input = this.autocompleter.querySelector<HTMLInputElement>('.ng-input input');
+    input?.focus();
   }
 }

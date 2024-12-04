@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -36,9 +36,10 @@ module Activities
     end
 
     def initialize(user, options = {})
-      options.assert_valid_keys(:project, :with_subprojects, :author, :scope)
+      options.assert_valid_keys(:project, :with_subprojects, :author, :scope, :meeting)
       @user = user
       @project = options[:project]
+      @meeting = options[:meeting]
       @options = options
 
       self.scope = options[:scope] || :all
@@ -49,10 +50,10 @@ module Activities
       @event_types ||=
         if @project
           OpenProject::Activity.available_event_types.select do |o|
-            permissions = constantized_providers(o).map do |activity_provider|
+            permissions = constantized_providers(o).filter_map do |activity_provider|
               activity_provider.activity_provider_options[:permission]
-            end.compact
-            permissions.all? { |p| @user.allowed_to?(p, @project) }
+            end
+            permissions.all? { |p| @user.allowed_in_project?(p, @project) }
           end
         else
           OpenProject::Activity.available_event_types.to_a
@@ -129,10 +130,10 @@ module Activities
       journal_ids = events.map(&:event_id)
 
       Journal
-        .includes(:data, :customizable_journals, :attachable_journals, :bcf_comment)
-        .find(journal_ids)
-        .then { |journals| ::API::V3::Activities::ActivityEagerLoadingWrapper.wrap(journals) }
-        .index_by(&:id)
+      .includes(:data, :customizable_journals, :attachable_journals, :bcf_comment)
+      .find(journal_ids)
+      .then { |journals| ::API::V3::Activities::ActivityEagerLoadingWrapper.wrap(journals) }
+      .index_by(&:id)
     end
 
     def sort_by_most_recent_first(events)

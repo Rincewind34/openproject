@@ -8,6 +8,7 @@ ca:
         text: "Alguns widgets com la gràfica de paquet de treball només estan disponibles en l'edició Enterprise."
         link: 'Edició Enterprise.'
       widgets:
+        missing_permission: "You don't have the necessary permissions to view this widget."
         custom_text:
           title: 'Text personalitzat'
         documents:
@@ -26,9 +27,6 @@ ca:
         project_description:
           title: 'Descripció del projecte'
           no_results: "No s'ha escrit cap descripció encara. Aquesta pot ser afegida en la configuració del projecte."
-        project_details:
-          title: 'Detalls del projecte'
-          no_results: 'No s''ha definit cap camp personalitzat per projectes.'
         project_status:
           title: 'Estat del projecte'
           not_started: 'No començat'
@@ -41,6 +39,9 @@ ca:
         subprojects:
           title: 'Subprojectes'
           no_results: 'Sense subprojectes.'
+        project_favorites:
+          title: 'Projectes preferits'
+          no_results: 'You currently have no favorite projects. Click on the star icon in the project dashboard to add one to your favorites.'
         time_entries_current_user:
           title: 'El meu temps invertit'
           displayed_days: 'Dies mostrats en el widget'

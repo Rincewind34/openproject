@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-class ::Query::Results
+class Query::Results
   include ::Query::Results::GroupBy
   include ::Query::Results::Sums
   include Redmine::I18n
@@ -50,8 +50,8 @@ class ::Query::Results
 
   def sorted_work_packages_matching_the_filters_today
     sorted_work_packages
-      .visible
       .merge(filtered_work_packages.merge(filter_merges))
+      .visible
   end
 
   # For filtering on historic data, this returns the work packages
@@ -87,7 +87,7 @@ class ::Query::Results
   end
 
   def order_option
-    order_option = [group_by_sort].compact_blank.join(', ')
+    order_option = [group_by_sort].compact_blank.join(", ")
 
     if order_option.blank?
       nil
@@ -135,8 +135,7 @@ class ::Query::Results
   def sort_criteria_joins
     query
       .sort_criteria_columns
-      .map { |column, _direction| column.sortable_join_statement(query) }
-      .compact
+      .filter_map { |column, _direction| column.sortable_join_statement(query) }
   end
 
   def sort_criteria_array
@@ -264,8 +263,7 @@ class ::Query::Results
 
   def filter_merges
     query.filters.inject(::WorkPackage.unscoped) do |scope, filter|
-      scope = scope.merge(filter.scope)
-      scope
+      filter.apply_to(scope)
     end
   end
 

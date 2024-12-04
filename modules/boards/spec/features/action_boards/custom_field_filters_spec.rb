@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,19 +26,18 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
-require_relative './../support//board_index_page'
-require_relative './../support/board_page'
+require "spec_helper"
+require_relative "../support//board_index_page"
+require_relative "../support/board_page"
 
-RSpec.describe 'Custom field filter in boards', js: true, with_ee: %i[board_view] do
+RSpec.describe "Custom field filter in boards", :js, with_ee: %i[board_view] do
   let(:user) do
     create(:user,
-           member_in_project: project,
-           member_through_role: role)
+           member_with_roles: { project => role })
   end
   let(:type) { create(:type_standard) }
   let(:project) { create(:project, types: [type], enabled_module_names: %i[work_package_tracking board_view]) }
-  let(:role) { create(:role, permissions:) }
+  let(:role) { create(:project_role, permissions:) }
 
   let(:board_index) { Pages::BoardIndex.new(project) }
 
@@ -48,14 +47,14 @@ RSpec.describe 'Custom field filter in boards', js: true, with_ee: %i[board_view
   end
 
   let!(:priority) { create(:default_priority) }
-  let!(:open_status) { create(:default_status, name: 'Open') }
-  let!(:closed_status) { create(:status, is_closed: true, name: 'Closed') }
+  let!(:open_status) { create(:default_status, name: "Open") }
+  let!(:closed_status) { create(:status, is_closed: true, name: "Closed") }
 
   let!(:work_package) do
     wp = build(:work_package,
                project:,
                type:,
-               subject: 'Foo',
+               subject: "Foo",
                status: open_status)
 
     wp.custom_field_values = {
@@ -88,21 +87,21 @@ RSpec.describe 'Custom field filter in boards', js: true, with_ee: %i[board_view
     login_as(user)
   end
 
-  it 'can add a case-insensitive list (Regression #35744)' do
+  it "can add a case-insensitive list (Regression #35744)" do
     board_index.visit!
 
     # Create new board
-    board_page = board_index.create_board action: 'Status'
+    board_page = board_index.create_board action: "Status"
 
     # expect lists of default status
-    board_page.expect_list 'Open'
+    board_page.expect_list "Open"
 
     # Add a filter for CF value A and B
     filters.expect_filter_count 0
     filters.open
 
     filters.add_filter_by(custom_field.name,
-                          'is (OR)',
+                          "is (OR)",
                           %w[A B],
                           custom_field.attribute_name(:camel_case))
 
@@ -111,21 +110,21 @@ RSpec.describe 'Custom field filter in boards', js: true, with_ee: %i[board_view
     # Save that filter
     board_page.save
 
-    board_page.add_list option: 'Closed', query: 'closed'
-    board_page.expect_list 'Closed'
+    board_page.add_list option: "Closed", query: "closed"
+    board_page.expect_list "Closed"
 
     # Expect card to be present
-    board_page.expect_card('Open', 'Foo', present: true)
+    board_page.expect_card("Open", "Foo", present: true)
 
     # Move card to list closed
-    board_page.move_card(0, from: 'Open', to: 'Closed')
+    board_page.move_card(0, from: "Open", to: "Closed")
 
-    board_page.expect_card('Closed', 'Foo', present: true)
-    board_page.expect_card('Open', 'Foo', present: false)
+    board_page.expect_card("Closed", "Foo", present: true)
+    board_page.expect_card("Open", "Foo", present: false)
 
     # Expect custom field to be unchanged
     work_package.reload
     cv = work_package.custom_value_for(custom_field).typed_value
-    expect(cv).to eq 'B'
+    expect(cv).to eq "B"
   end
 end

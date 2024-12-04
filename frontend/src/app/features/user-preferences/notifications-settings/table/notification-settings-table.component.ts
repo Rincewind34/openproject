@@ -1,18 +1,14 @@
 // noinspection ES6UnusedImports
 
-import {
-  Component,
-  ChangeDetectionStrategy,
-  Input,
-  OnInit,
-} from '@angular/core';
-import { UntypedFormArray, UntypedFormGroup, UntypedFormControl } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { UntypedFormArray, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { PathHelperService } from 'core-app/core/path-helper/path-helper.service';
 import { I18nService } from 'core-app/core/i18n/i18n.service';
 import idFromLink from 'core-app/features/hal/helpers/id-from-link';
 import { HalSourceLink } from 'core-app/features/hal/resources/hal-resource';
 import { BannersService } from 'core-app/core/enterprise/banners.service';
-import { OVERDUE_REMINDER_AVAILABLE_TIMEFRAMES, REMINDER_AVAILABLE_TIMEFRAMES } from '../overdue-reminder-available-times';
+import { overDueReminderTimes, reminderAvailableTimeframes } from '../overdue-reminder-available-times';
+import { ConfigurationService } from 'core-app/core/config/configuration.service';
 
 @Component({
   selector: 'op-notification-settings-table',
@@ -32,7 +28,7 @@ export class NotificationSettingsTableComponent implements OnInit {
       value: null,
       title: this.I18n.t('js.notifications.settings.reminders.no_notification'),
     },
-    ...REMINDER_AVAILABLE_TIMEFRAMES,
+    ...reminderAvailableTimeframes(),
   ];
 
   public availableTimesOverdue = [
@@ -40,7 +36,7 @@ export class NotificationSettingsTableComponent implements OnInit {
       value: null,
       title: this.I18n.t('js.notifications.settings.reminders.no_notification'),
     },
-    ...OVERDUE_REMINDER_AVAILABLE_TIMEFRAMES,
+    ...overDueReminderTimes(),
   ];
 
   text = {
@@ -64,6 +60,7 @@ export class NotificationSettingsTableComponent implements OnInit {
     },
     assignee: this.I18n.t('js.notifications.settings.reasons.assignee'),
     responsible: this.I18n.t('js.notifications.settings.reasons.responsible'),
+    shared: this.I18n.t('js.notifications.settings.reasons.shared'),
     watched_header: this.I18n.t('js.notifications.settings.reasons.watched'),
     work_package_commented_header: this.I18n.t('js.notifications.settings.reasons.work_package_commented'),
     work_package_created_header: this.I18n.t('js.notifications.settings.reasons.work_package_created'),
@@ -80,6 +77,7 @@ export class NotificationSettingsTableComponent implements OnInit {
     private I18n:I18nService,
     private pathHelper:PathHelperService,
     readonly bannersService:BannersService,
+    readonly configurationService:ConfigurationService,
   ) {}
 
   ngOnInit():void {
@@ -95,6 +93,7 @@ export class NotificationSettingsTableComponent implements OnInit {
       project: new UntypedFormControl(project),
       assignee: new UntypedFormControl(false),
       responsible: new UntypedFormControl(false),
+      shared: new UntypedFormControl(false),
       workPackageCreated: new UntypedFormControl(false),
       workPackageProcessed: new UntypedFormControl(false),
       workPackageScheduled: new UntypedFormControl(false),

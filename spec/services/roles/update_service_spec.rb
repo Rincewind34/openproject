@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,18 +26,21 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
-require 'services/base_services/behaves_like_update_service'
+require "spec_helper"
+require "services/base_services/behaves_like_update_service"
 
 RSpec.describe Roles::UpdateService, type: :model do
-  it_behaves_like 'BaseServices update service'
+  it_behaves_like "BaseServices update service" do
+    let(:factory) { :project_role }
+  end
 
-  it 'sends an update notification' do
+  it "sends an update notification" do
     allow(OpenProject::Notifications).to receive(:send)
 
-    existing_permissions = %i[view_files view_work_packages view_calender]
+    existing_permissions = %i[view_files view_work_packages
+                              view_calender] + OpenProject::AccessControl.public_permissions.map(&:name)
     added_permissions = %i[write_files view_wiki_pages]
-    role = create(:role, permissions: existing_permissions)
+    role = create(:project_role, permissions: existing_permissions)
 
     params = { permissions: existing_permissions + added_permissions }
 

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,11 +30,11 @@ class WorkPackages::UpdateService < BaseServices::Update
   include ::WorkPackages::Shared::UpdateAncestors
   include Attachments::ReplaceAttachments
 
-  attr_accessor :cause_of_update
+  attr_accessor :cause_of_rescheduling
 
-  def initialize(user:, model:, contract_class: nil, contract_options: {}, cause_of_update: nil)
+  def initialize(user:, model:, contract_class: nil, contract_options: {}, cause_of_rescheduling: nil)
     super(user:, model:, contract_class:, contract_options:)
-    self.cause_of_update = cause_of_update || model
+    self.cause_of_rescheduling = cause_of_rescheduling || model
   end
 
   private
@@ -88,6 +88,7 @@ class WorkPackages::UpdateService < BaseServices::Update
       moved_work_packages = [work_package] + work_package.descendants
       delete_relations(moved_work_packages)
       move_time_entries(moved_work_packages, work_package.project_id)
+      move_work_package_memberships(moved_work_packages, work_package.project_id)
     end
     if work_package.saved_change_to_type_id?
       reset_custom_values(work_package)
@@ -105,6 +106,12 @@ class WorkPackages::UpdateService < BaseServices::Update
   def move_time_entries(work_packages, project_id)
     TimeEntry
       .on_work_packages(work_packages)
+      .update_all(project_id:)
+  end
+
+  def move_work_package_memberships(work_packages, project_id)
+    Member
+      .where(entity: work_packages)
       .update_all(project_id:)
   end
 
@@ -128,7 +135,7 @@ class WorkPackages::UpdateService < BaseServices::Update
 
   def reschedule(work_package, work_packages)
     WorkPackages::SetScheduleService
-      .new(user:, work_package: work_packages, initiated_by: cause_of_update)
+      .new(user:, work_package: work_packages, initiated_by: cause_of_rescheduling)
       .call(work_package.saved_changes.keys.map(&:to_sym))
   end
 

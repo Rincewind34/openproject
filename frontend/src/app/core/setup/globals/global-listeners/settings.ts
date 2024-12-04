@@ -31,9 +31,10 @@ export function listenToSettingChanges() {
     const self = jQuery(select);
     const id:string = self.attr('id') || '';
     const settingName = id.replace('lang-for-', '');
-    const newLang = self.val();
+    const newLang = self.val() as string;
     const textArea = jQuery(`#settings-${settingName}`);
-    const editor = textArea.siblings('ckeditor-augmented-textarea').data('editor');
+    /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
+    const editor = textArea.siblings('opce-ckeditor-augmented-textarea').data('editor');
 
     return {
       id, settingName, newLang, textArea, editor,
@@ -61,17 +62,6 @@ export function listenToSettingChanges() {
       data.textArea.attr('name', `settings[${data.settingName}][${data.newLang}]`);
     });
   /* end Javascript for Settings::TextSettingComponent */
-
-  jQuery('.admin-settings--form').submit(() => {
-    /* Update consent time if consent required */
-    if (jQuery('#settings_consent_required').is(':checked') && jQuery('#toggle_consent_time').is(':checked')) {
-      jQuery('#settings_consent_time')
-        .val(new Date().toISOString())
-        .prop('disabled', false);
-    }
-
-    return true;
-  });
 
   /** Toggle notification settings fields */
   jQuery('#email_delivery_method_switch').on('change', function () {

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,24 +26,24 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.describe 'Role updating', js: true, with_cuprite: true do
+RSpec.describe "Role updating", :js, :with_cuprite do
   let!(:admin) { create(:admin) }
 
   before do
     login_as admin
   end
 
-  context 'with a global role' do
+  context "with a global role" do
     let!(:role) { create(:global_role, permissions: %i[manage_user add_project]) }
 
-    it 'allows removing permissions' do
+    it "allows removing permissions" do
       expect do
         visit edit_role_path(role)
-        uncheck 'Create project'
+        uncheck "Create project"
 
-        click_button 'Save'
+        click_button "Save"
 
         role.reload
       end.to change(role, :permissions).from(%i[manage_user add_project]).to([:manage_user])

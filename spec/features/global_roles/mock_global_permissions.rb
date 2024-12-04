@@ -6,7 +6,7 @@
 # It also takes care of mocking a translation for each provided
 # permission only if it wasn't already an existing key, preventing
 # a mock of an already present translation.
-RSpec.shared_context 'with mocked global permissions' do |permissions|
+RSpec.shared_context "with mocked global permissions" do |permissions|
   before do
     mock_global_permissions(permissions)
   end
@@ -24,11 +24,11 @@ end
 
 def mock_global_permissions(permissions)
   mapped = permissions.map do |name, options|
-    mock_permissions(name, options.merge(global: true))
+    mock_permissions(name, options.reverse_merge(permissible_on: :global))
   end
 
   mapped_modules = permissions.map do |_, options|
-    options[:project_module] || 'Foo'
+    options[:project_module] || "Foo"
   end.uniq
 
   allow(OpenProject::AccessControl).to receive(:modules).and_wrap_original do |m, *args|
@@ -46,9 +46,9 @@ def mock_permissions(name, options = {})
   OpenProject::AccessControl::Permission.new(
     name,
     { does_not: :matter },
-    project_module: 'Foo',
+    permissible_on: :project,
+    project_module: "Foo",
     public: false,
-    global: false,
     **options
   )
 end
@@ -82,7 +82,7 @@ class PermissionTranslationMocker
 
   def translation_registry
     @translation_registry ||= @permissions.to_h do |name, _options|
-      [name, I18n.exists?("permissions_#{name}")]
+      [name, I18n.exists?("permissions_#{name}", :en)]
     end
   end
 end

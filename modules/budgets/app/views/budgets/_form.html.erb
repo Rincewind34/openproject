@@ -1,6 +1,6 @@
 <%#-- copyright
 OpenProject is an open source project management software.
-Copyright (C) 2012-2023 the OpenProject GmbH
+Copyright (C) the OpenProject GmbH
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@ See COPYRIGHT and LICENSE files for more details.
 ++#%>
 
 <% resource = budget_attachment_representer(f.object) %>
-<%= error_messages_for_contract @budget, @errors %>
+<%= error_messages_for @budget %>
 
 <div class="form--field -required">
   <%= f.text_field :subject, required: true, autofocus: true, container_class: '-wide' %>

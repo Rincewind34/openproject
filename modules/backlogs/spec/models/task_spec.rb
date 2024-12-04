@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe Task do
   let(:task_type) { create(:type) }
@@ -42,28 +42,30 @@ RSpec.describe Task do
   before do
     allow(Setting)
       .to receive(:plugin_openproject_backlogs)
-            .and_return({ 'task_type' => task_type.id.to_s })
+            .and_return({ "task_type" => task_type.id.to_s })
   end
 
-  describe 'having custom journables', with_settings: { journal_aggregation_time_minutes: 0 } do
+  describe "having custom journables", with_settings: { journal_aggregation_time_minutes: 0 } do
     let(:user) { create(:user) }
-    let(:role) { create(:role, permissions: %i[add_work_packages manage_subtasks manage_work_packages view_work_packages]) }
+    let(:role) do
+      create(:project_role, permissions: %i[add_work_packages manage_subtasks manage_work_packages view_work_packages])
+    end
     let(:member) { create(:member, principal: user, project:, roles: [role]) }
 
     before do
       project.members << member
     end
 
-    describe 'with unchanged custom field' do
-      let(:custom_field) { create(:work_package_custom_field, name: 'TestingCustomField', field_format: 'text') }
+    describe "with unchanged custom field" do
+      let(:custom_field) { create(:work_package_custom_field, name: "TestingCustomField", field_format: "text") }
 
       before do
         project.work_package_custom_fields << custom_field
         task_type.custom_fields << custom_field
       end
 
-      it 'must have the same journal when resaved' do
-        task.custom_field_values = { custom_field.id => 'Example CF text' }
+      it "must have the same journal when resaved" do
+        task.custom_field_values = { custom_field.id => "Example CF text" }
         task.save!
 
         expect(task.journals.last.customizable_journals.count).to eq 1
@@ -79,10 +81,10 @@ RSpec.describe Task do
       end
     end
 
-    describe 'with attachment' do
+    describe "with attachment" do
       let(:attachment) { build(:attachment) }
 
-      it 'must have the same journal when resaved' do
+      it "must have the same journal when resaved" do
         task.attachments << attachment
         task.save!
 
@@ -96,51 +98,6 @@ RSpec.describe Task do
         task.reload
 
         expect(task.journals.last.attachable_journals.first).to eq attachable_journal
-      end
-    end
-  end
-
-  describe 'copying remaining_hours to estimated_hours and vice versa' do
-    context 'providing only remaining_hours' do
-      before do
-        task.remaining_hours = 3
-
-        task.save!
-      end
-
-      it 'copies to estimated_hours' do
-        expect(task.estimated_hours)
-          .to eql task.remaining_hours
-      end
-    end
-
-    context 'providing only estimated_hours' do
-      before do
-        task.estimated_hours = 3
-
-        task.save!
-      end
-
-      it 'copies to estimated_hours' do
-        expect(task.remaining_hours)
-          .to eql task.estimated_hours
-      end
-    end
-
-    context 'providing estimated_hours and remaining_hours' do
-      before do
-        task.estimated_hours = 3
-        task.remaining_hours = 5
-
-        task.save!
-      end
-
-      it 'leaves the values unchanged' do
-        expect(task.remaining_hours)
-          .to be 5.0
-
-        expect(task.estimated_hours)
-          .to be 3.0
       end
     end
   end

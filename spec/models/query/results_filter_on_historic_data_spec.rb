@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,10 +26,10 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe Query::Results,
-               'Filter on historic data',
+               "Filter on historic data",
                with_ee: %i[baseline_comparison] do
   let(:historic_time) { "2022-08-01".to_datetime }
   let(:pre_historic_time) { historic_time - 1.day }
@@ -59,10 +59,9 @@ RSpec.describe Query::Results,
 
   let(:user1) do
     create(:user,
-           firstname: 'user',
-           lastname: '1',
-           member_in_project: project_with_member,
-           member_with_permissions: %i[view_work_packages view_file_links])
+           firstname: "user",
+           lastname: "1",
+           member_with_permissions: { project_with_member => %i[view_work_packages view_file_links] })
   end
 
   def move_work_package_to_project(work_package, project, time)
@@ -87,7 +86,7 @@ RSpec.describe Query::Results,
       login_as(user1)
       build(:query, user: user1, project: nil).tap do |query|
         query.filters.clear
-        query.add_filter 'description', '~', search_term
+        query.add_filter "description", "~", search_term
       end
     end
     let(:results) { query.results }
@@ -95,7 +94,7 @@ RSpec.describe Query::Results,
     subject { results.work_packages }
 
     describe "filter for description containing 'current'" do
-      let(:search_term) { 'current' }
+      let(:search_term) { "current" }
 
       it "includes the work package matching today" do
         expect(subject).to eq [work_package]
@@ -103,7 +102,7 @@ RSpec.describe Query::Results,
     end
 
     describe "filter for description containing 'original'" do
-      let(:search_term) { 'original' }
+      let(:search_term) { "original" }
 
       it "does not include the work package matching only in the past" do
         expect(subject).not_to eq [work_package]
@@ -114,7 +113,7 @@ RSpec.describe Query::Results,
       before { query.timestamps = [historic_time, Time.zone.now] }
 
       describe "filter for description containing 'current'" do
-        let(:search_term) { 'current' }
+        let(:search_term) { "current" }
 
         it "includes the work package matching today" do
           expect(subject).to eq [work_package]
@@ -122,7 +121,7 @@ RSpec.describe Query::Results,
       end
 
       describe "filter for description containing 'original'" do
-        let(:search_term) { 'original' }
+        let(:search_term) { "original" }
 
         it "includes the work package matching in the past" do
           expect(subject).to eq [work_package]
@@ -133,7 +132,7 @@ RSpec.describe Query::Results,
     describe "when the search matches several work packages" do
       before { query.timestamps = [historic_time, Time.zone.now] }
 
-      let(:search_term) { 're' }
+      let(:search_term) { "re" }
 
       it "includes all matching work packages" do
         expect(subject).to include work_package, work_package2
@@ -144,7 +143,7 @@ RSpec.describe Query::Results,
       before { query.timestamps = [historic_time] }
 
       describe "filter for description containing 'current'" do
-        let(:search_term) { 'current' }
+        let(:search_term) { "current" }
 
         it "does not include the work package matching only in the past" do
           expect(subject).not_to include work_package
@@ -152,7 +151,7 @@ RSpec.describe Query::Results,
       end
 
       describe "filter for description containing 'original'" do
-        let(:search_term) { 'original' }
+        let(:search_term) { "original" }
 
         it "includes the work package matching in the past" do
           expect(subject).to include work_package
@@ -196,7 +195,7 @@ RSpec.describe Query::Results,
       before { query.timestamps = [pre_historic_time] }
 
       describe "filter for description containing 'current'" do
-        let(:search_term) { 'current' }
+        let(:search_term) { "current" }
 
         it "does not include the work package matching only in the past" do
           expect(subject).not_to include work_package
@@ -204,7 +203,7 @@ RSpec.describe Query::Results,
       end
 
       describe "filter for description containing 'original'" do
-        let(:search_term) { 'original' }
+        let(:search_term) { "original" }
 
         it "does not include the work package because it does not exist yet at that time" do
           expect(subject).not_to include work_package
@@ -215,12 +214,12 @@ RSpec.describe Query::Results,
     describe "when filtering for file links" do
       # https://github.com/opf/openproject/pull/11678#issuecomment-1326171087
 
-      let(:storage1) { create(:storage, creator: user1) }
+      let(:storage1) { create(:nextcloud_storage, creator: user1) }
       let(:query) do
         login_as(user1)
         build(:query, user: user1, project: nil).tap do |query|
           query.filters.clear
-          query.add_filter 'file_link_origin_id', '=', [file_link1.origin_id.to_s]
+          query.add_filter "file_link_origin_id", "=", [file_link1.origin_id.to_s]
         end
       end
       let(:file_link1) { create(:file_link, creator: user1, container: work_package, storage: storage1) }
@@ -240,7 +239,7 @@ RSpec.describe Query::Results,
       end
 
       describe "when having second reference to the same external file" do
-        let(:storage2) { create(:storage, creator: user1) }
+        let(:storage2) { create(:nextcloud_storage, creator: user1) }
         let(:project_storage2) { create(:project_storage, project: project_without_member, storage: storage2) }
         let(:file_link2) do
           create(:file_link, creator: user1, container: work_package, storage: storage2, origin_id: file_link1.origin_id)
@@ -261,7 +260,7 @@ RSpec.describe Query::Results,
       end
     end
 
-    context 'when the work package is moved to a project the user has no permissions in' do
+    context "when the work package is moved to a project the user has no permissions in" do
       current_user { user1 }
 
       let(:query) do
@@ -280,8 +279,8 @@ RSpec.describe Query::Results,
       end
     end
 
-    context 'when the work package is moved to a project the user has no permissions in ' \
-            'and also has no permission in the old project' do
+    context "when the work package is moved to a project the user has no permissions in " \
+            "and also has no permission in the old project" do
       current_user { user1 }
 
       let(:query) do
@@ -301,8 +300,8 @@ RSpec.describe Query::Results,
       end
     end
 
-    context 'when the work package is moved to a project the user has permissions in ' \
-            'and looses permission in the former project' do
+    context "when the work package is moved to a project the user has permissions in " \
+            "and looses permission in the former project" do
       current_user { user1 }
 
       let(:query) do
@@ -317,7 +316,7 @@ RSpec.describe Query::Results,
         create(:member,
                principal: user1,
                project: project_without_member,
-               roles: create_list(:role, 1, permissions: %w[view_work_packages]))
+               roles: create_list(:project_role, 1, permissions: %w[view_work_packages]))
         project_with_member.members.destroy_all
       end
 
@@ -326,8 +325,8 @@ RSpec.describe Query::Results,
       end
     end
 
-    context 'when the work package is moved to a project the user has no permissions in' \
-            'and the comparison time is after the move' do
+    context "when the work package is moved to a project the user has no permissions in" \
+            "and the comparison time is after the move" do
       current_user { user1 }
 
       let(:query) do

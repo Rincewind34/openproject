@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -37,7 +37,7 @@ module Users
     def set_attributes(params)
       self.pref = params.delete(:pref)
 
-      super(params)
+      super
     end
 
     def validate_and_result
@@ -80,7 +80,7 @@ module Users
     # are longer than 30 characters they will be trimmed to 27 characters and an
     # ellipsis will be appended.
     def placeholder_name(email)
-      first, last = email.split('@').map { |name| trim_name(name) }
+      first, last = email.split("@").map { |name| trim_name(name) }
 
       [first, "@#{last}"]
     end

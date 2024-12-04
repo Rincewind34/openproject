@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -50,7 +50,7 @@ class BaseContract < Disposable::Twin
     end
 
     def writable_conditions
-      @writable_conditions ||= []
+      @writable_conditions ||= {}
     end
 
     def attribute_permissions
@@ -101,17 +101,14 @@ class BaseContract < Disposable::Twin
     private
 
     def add_writable(attribute, writable)
-      attribute_name = attribute.to_s.gsub /_id\z/, ''
+      attribute_name = attribute.to_s.delete_suffix("_id")
+      writable_conditions[attribute_name] = writable
 
-      unless writable == false
-        writable_attributes << attribute_name
-        # allow the _id variant as well
-        writable_attributes << "#{attribute_name}_id"
-      end
+      return if writable == false
 
-      if writable.respond_to?(:call)
-        writable_conditions << [attribute_name, writable]
-      end
+      writable_attributes << attribute_name
+      # allow the _id variant as well
+      writable_attributes << "#{attribute_name}_id"
     end
   end
 
@@ -125,15 +122,6 @@ class BaseContract < Disposable::Twin
     @options = options
   end
 
-  # we want to add a validation error whenever someone sets a property that we don't know.
-  # However AR will cleverly try to resolve the value for erroneous properties. Thus we need
-  # to hook into this method and return nil for unknown properties to avoid NoMethod errors...
-  def read_attribute_for_validation(attribute)
-    if respond_to? attribute
-      send attribute
-    end
-  end
-
   def writable_attributes
     @writable_attributes ||= reduce_writable_attributes(collect_writable_attributes)
   end
@@ -142,19 +130,13 @@ class BaseContract < Disposable::Twin
     writable_attributes.include?(attribute.to_s)
   end
 
-  def valid?(*_args)
-    super()
-
-    errors.empty?
-  end
-
   # Provide same interface with valid? and validate
   # as with AM::Validations
   #
   # Do not use alias_method as this will not work when
   # valid? is overridden in subclasses
-  def validate(*args)
-    valid?(*args)
+  def validate(*)
+    valid?(*)
   end
 
   # Methods required to get ActiveModel error messages working
@@ -162,6 +144,14 @@ class BaseContract < Disposable::Twin
 
   def self.model_name
     ActiveModel::Name.new(model, nil)
+  end
+
+  def errors
+    if model.respond_to?(:errors)
+      model.errors
+    else
+      super
+    end
   end
 
   def self.model
@@ -187,9 +177,10 @@ class BaseContract < Disposable::Twin
 
   # Traverse ancestor hierarchy to collect contract information.
   # This allows to define attributes on a common base class of two or more contracts.
+  # Reverse merge is important to use the more specific overrides from subclasses.
   def collect_ancestor_attributes(attribute_to_collect)
     combination_method, cleanup_method = if self.class.send(attribute_to_collect).is_a?(Hash)
-                                           %i[merge with_indifferent_access]
+                                           %i[reverse_merge! with_indifferent_access]
                                          else
                                            %i[concat uniq]
                                          end
@@ -205,9 +196,10 @@ class BaseContract < Disposable::Twin
     # similar object from the superclass, every call would alter the memoized object as an unwanted side effect.
     # Not only would that lead to the subclass now having all the attributes of the superclass,
     # but those attributes would also be duplicated so that performance suffers significantly.
+    # `dup` also enables usage of combination methods working in place, e.g. `reverse_merge!`
     attributes = klass.send(attribute_to_collect).dup
 
-    while klass.superclass != ModelContract
+    while klass.superclass != ::BaseContract
       # Collect all the attribute_to_collect from ancestors
       klass = klass.superclass
 
@@ -227,10 +219,14 @@ class BaseContract < Disposable::Twin
     end
 
     if model.respond_to?(:available_custom_fields)
-      writable += model.available_custom_fields.map(&:attribute_name)
+      writable += collect_available_custom_field_attributes
     end
 
     writable
+  end
+
+  def collect_available_custom_field_attributes
+    model.available_custom_fields.map(&:attribute_name)
   end
 
   def reduce_writable_attributes(attributes)
@@ -240,7 +236,8 @@ class BaseContract < Disposable::Twin
 
   def reduce_by_writable_conditions(attributes)
     collect_ancestor_attributes(:writable_conditions).each do |attribute, condition|
-      attributes -= [attribute, "#{attribute}_id"] unless instance_exec(&condition)
+      condition = !!instance_exec(&condition) if condition.respond_to?(:call)
+      attributes -= [attribute, "#{attribute}_id"] if condition == false
     end
 
     attributes
@@ -250,19 +247,47 @@ class BaseContract < Disposable::Twin
     attribute_permissions = collect_ancestor_attributes(:attribute_permissions)
 
     attributes.reject do |attribute|
-      canonical_attribute = attribute.gsub(/_id\z/, '')
+      canonical_attribute = attribute.delete_suffix("_id")
 
       permissions = attribute_permissions[canonical_attribute] ||
-                    attribute_permissions["#{canonical_attribute}_id"] ||
-                    attribute_permissions[:default_permission]
+        attribute_permissions["#{canonical_attribute}_id"] ||
+        attribute_permissions[:default_permission]
 
       next unless permissions
 
-      # This will break once a model that does not respond to project is used.
-      # This is intended to be worked on then with the additional knowledge.
-      next if permissions.any? { |p| user.allowed_to?(p, model.project, global: model.project.nil?) }
+      next if permissions.any? do |perm|
+        user.allowed_based_on_permission_context?(
+          perm,
+          project: project_for_permission_check,
+          entity: entity_for_permission_check
+        )
+      end
 
       true
     end
+  end
+
+  def project_for_permission_check
+    if model.is_a?(Project)
+      model
+    else
+      model.respond_to?(:project) ? model.project : nil
+    end
+  end
+
+  def entity_for_permission_check
+    if model.is_a?(Project)
+      nil
+    else
+      model
+    end
+  end
+
+  def with_merged_former_errors
+    former_errors = errors.dup
+
+    yield
+
+    errors.merge!(former_errors)
   end
 end

@@ -1,12 +1,12 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
 #
 # OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
-# Copyright (C) 2006-2017 Jean-Philippe Lang
+# Copyright (C) 2006-2013 Jean-Philippe Lang
 # Copyright (C) 2010-2013 the ChiliProject Team
 #
 # This program is free software; you can redistribute it and/or
@@ -28,8 +28,9 @@
 
 class PlaceholderUsersController < ApplicationController
   include EnterpriseTrialHelper
-  layout 'admin'
+  layout "admin"
   before_action :authorize_global, except: %i[show]
+  no_authorization_required! :show
 
   before_action :find_placeholder_user, only: %i[show
                                                  edit
@@ -60,7 +61,7 @@ class PlaceholderUsersController < ApplicationController
                      .where(id: Member.visible(current_user))
 
     respond_to do |format|
-      format.html { render layout: 'no_menu' }
+      format.html { render layout: "no_menu" }
     end
   end
 
@@ -91,7 +92,6 @@ class PlaceholderUsersController < ApplicationController
         end
       end
     else
-      @errors = service_result.errors
       respond_to do |format|
         format.html do
           render action: :new
@@ -154,20 +154,11 @@ class PlaceholderUsersController < ApplicationController
 
   def authorize_deletion
     unless helpers.can_delete_placeholder_user?(@placeholder_user, current_user)
-      render_403 message: I18n.t('placeholder_users.right_to_manage_members_missing')
-    end
-  end
-
-  def default_breadcrumb
-    if action_name == 'index'
-      t('label_placeholder_user_plural')
-    else
-      ActionController::Base.helpers.link_to(t('label_placeholder_user_plural'),
-                                             placeholder_users_path)
+      render_403 message: I18n.t("placeholder_users.right_to_manage_members_missing")
     end
   end
 
   def show_local_breadcrumb
-    action_name != 'show'
+    false
   end
 end

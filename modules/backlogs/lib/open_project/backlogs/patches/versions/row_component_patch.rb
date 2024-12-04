@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -36,9 +36,9 @@ module OpenProject::Backlogs::Patches::Versions::RowComponentPatch
   def backlogs_edit_link
     return if version.project == table.project || !table.project.module_enabled?("backlogs")
 
-    helpers.link_to_if_authorized '',
-                                  { controller: '/versions', action: 'edit', id: version, project_id: table.project.id },
-                                  class: 'icon icon-edit',
+    helpers.link_to_if_authorized "",
+                                  { controller: "/versions", action: "edit", id: version, project_id: table.project.id },
+                                  class: "icon icon-edit",
                                   title: t(:button_edit)
   end
 end

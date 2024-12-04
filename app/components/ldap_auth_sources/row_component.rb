@@ -2,7 +2,7 @@
 
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,7 +33,7 @@ module LdapAuthSources
     def name
       content = link_to model.name, edit_ldap_auth_source_path(model)
       if model.seeded_from_env?
-        content += helpers.op_icon('icon icon-info2', title: I18n.t(:label_seeded_from_env_warning))
+        content += helpers.op_icon("icon icon-info2", title: I18n.t(:label_seeded_from_env_warning))
       end
 
       content
@@ -54,17 +54,17 @@ module LdapAuthSources
     end
 
     def test_link
-      link_to t(:button_test), { controller: 'ldap_auth_sources', action: 'test_connection', id: model }
+      link_to t(:button_test), { controller: "ldap_auth_sources", action: "test_connection", id: model }
     end
 
     def delete_link
       return if users > 0
 
       link_to I18n.t(:button_delete),
-              { controller: 'ldap_auth_sources', id: model.id, action: :destroy },
+              { controller: "ldap_auth_sources", id: model.id, action: :destroy },
               method: :delete,
               data: { confirm: I18n.t(:text_are_you_sure) },
-              class: 'icon icon-delete',
+              class: "icon icon-delete",
               title: I18n.t(:button_delete)
     end
   end

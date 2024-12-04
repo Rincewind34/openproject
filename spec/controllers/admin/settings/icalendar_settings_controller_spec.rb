@@ -2,7 +2,7 @@
 
 # -- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,27 +29,27 @@
 # ++
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe Admin::Settings::IcalendarSettingsController do
   shared_let(:user) { create(:admin) }
 
   current_user { user }
 
-  require_admin_and_render_template('icalendar_settings')
+  include_examples "GET #show requires admin permission and renders template", path: "icalendar_settings"
 
-  describe 'PATCH #update' do
-    subject { patch 'update', params: }
+  describe "PATCH #update" do
+    subject { patch "update", params: }
 
     let(:base_settings) do
       { ical_enabled: true }
     end
     let(:params) { { settings: } }
 
-    context 'with valid params' do
+    context "with valid params" do
       let(:settings) { base_settings }
 
-      it 'succeeds' do
+      it "succeeds" do
         subject
 
         expect(response).to redirect_to action: :show

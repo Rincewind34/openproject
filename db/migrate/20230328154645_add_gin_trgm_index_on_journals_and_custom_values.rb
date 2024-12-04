@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,9 +30,9 @@ class AddGinTrgmIndexOnJournalsAndCustomValues < ActiveRecord::Migration[7.0]
   def up
     safe_enable_pg_trgm_extension
 
-    if extensions.include?('pg_trgm')
-      add_index(:journals, :notes, using: 'gin', opclass: :gin_trgm_ops)
-      add_index(:custom_values, :value, using: 'gin', opclass: :gin_trgm_ops)
+    if extensions.include?("pg_trgm")
+      add_index(:journals, :notes, using: "gin", opclass: :gin_trgm_ops)
+      add_index(:custom_values, :value, using: "gin", opclass: :gin_trgm_ops)
     end
   end
 
@@ -47,10 +47,10 @@ class AddGinTrgmIndexOnJournalsAndCustomValues < ActiveRecord::Migration[7.0]
   def safe_enable_pg_trgm_extension
     ActiveRecord::Base.connection.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA pg_catalog;")
   rescue StandardError => e
-    raise unless e.message =~ /pg_trgm/
+    raise unless e.message.include?("pg_trgm")
 
     # Rollback the transaction in order to recover from the error.
-    ActiveRecord::Base.connection.execute 'ROLLBACK'
+    ActiveRecord::Base.connection.execute "ROLLBACK"
 
     warn <<~MESSAGE
 

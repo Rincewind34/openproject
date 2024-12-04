@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,17 +27,35 @@
 #++
 
 class CustomStylesController < ApplicationController
-  layout 'admin'
+  layout "admin"
   menu_item :custom_style
 
-  before_action :require_admin, except: %i[logo_download export_logo_download favicon_download touch_icon_download]
-  before_action :require_ee_token, except: %i[upsale logo_download export_logo_download favicon_download touch_icon_download]
-  skip_before_action :check_if_login_required, only: %i[logo_download export_logo_download favicon_download touch_icon_download]
+  UNGUARDED_ACTIONS = %i[logo_download
+                         export_logo_download
+                         export_cover_download
+                         favicon_download
+                         touch_icon_download].freeze
+
+  before_action :require_admin,
+                except: UNGUARDED_ACTIONS
+  before_action :require_ee_token,
+                except: UNGUARDED_ACTIONS + %i[upsale]
+  skip_before_action :check_if_login_required,
+                     only: UNGUARDED_ACTIONS
+  no_authorization_required! *UNGUARDED_ACTIONS
+
+  def default_url_options
+    super.merge(tab: params[:tab])
+  end
 
   def show
     @custom_style = CustomStyle.current || CustomStyle.new
     @current_theme = @custom_style.theme
     @theme_options = options_for_theme_select
+
+    if params[:tab].blank?
+      redirect_to tab: "interface"
+    end
   end
 
   def upsale; end
@@ -48,7 +66,7 @@ class CustomStylesController < ApplicationController
       redirect_to custom_style_path
     else
       flash[:error] = @custom_style.errors.full_messages
-      render action: :show
+      render action: :show, status: :unprocessable_entity
     end
   end
 
@@ -58,8 +76,20 @@ class CustomStylesController < ApplicationController
       redirect_to custom_style_path
     else
       flash[:error] = @custom_style.errors.full_messages
-      render action: :show
+      render action: :show, status: :unprocessable_entity
     end
+  end
+
+  def update_export_cover_text_color
+    @custom_style = get_or_create_custom_style
+    color = params[:export_cover_text_color]
+    color_hexcode_regex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
+    color = nil if color.blank?
+    if color.nil? || color.match(color_hexcode_regex)
+      @custom_style.export_cover_text_color = color
+      @custom_style.save
+    end
+    redirect_to custom_style_path
   end
 
   def logo_download
@@ -68,6 +98,10 @@ class CustomStylesController < ApplicationController
 
   def export_logo_download
     file_download(:export_logo_path)
+  end
+
+  def export_cover_download
+    file_download(:export_cover_path)
   end
 
   def favicon_download
@@ -84,6 +118,10 @@ class CustomStylesController < ApplicationController
 
   def export_logo_delete
     file_delete(:remove_export_logo)
+  end
+
+  def export_cover_delete
+    file_delete(:remove_export_cover)
   end
 
   def favicon_delete
@@ -105,11 +143,9 @@ class CustomStylesController < ApplicationController
   end
 
   def update_themes
-    theme = OpenProject::CustomStyles::ColorThemes.themes.find { |t| t[:theme] == params[:theme] }
-
     call = ::Design::UpdateDesignService
-      .new(theme)
-      .call
+       .new(theme_from_params)
+       .call
 
     call.on_success do
       flash[:notice] = I18n.t(:notice_successful_update)
@@ -119,19 +155,19 @@ class CustomStylesController < ApplicationController
       flash[:error] = call.message
     end
 
-    redirect_to action: :show
-  end
-
-  def show_local_breadcrumb
-    true
+    redirect_to custom_style_path
   end
 
   private
 
+  def theme_from_params
+    OpenProject::CustomStyles::ColorThemes.themes.find { |t| t[:theme] == params[:theme] }
+  end
+
   def options_for_theme_select
     options = OpenProject::CustomStyles::ColorThemes.themes.pluck(:theme)
     unless @current_theme.present?
-      options << [t('admin.custom_styles.color_theme_custom'), '',
+      options << [t("admin.custom_styles.color_theme_custom"), "",
                   { selected: true, disabled: true }]
     end
 
@@ -151,6 +187,8 @@ class CustomStylesController < ApplicationController
   def custom_style_params
     params.require(:custom_style).permit(:logo, :remove_logo,
                                          :export_logo, :remove_export_logo,
+                                         :export_cover, :remove_export_cover,
+                                         :export_cover_text_color,
                                          :favicon, :remove_favicon,
                                          :touch_icon, :remove_touch_icon)
   end
@@ -172,7 +210,6 @@ class CustomStylesController < ApplicationController
     end
 
     @custom_style.send(remove_method)
-    @custom_style.save
     redirect_to custom_style_path
   end
 end

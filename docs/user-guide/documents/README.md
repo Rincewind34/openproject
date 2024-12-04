@@ -10,6 +10,9 @@ keywords: documents
 
 This module allows uploading documents directly to the project under project menu item *Documents* and categorizing documents.
 
+> Please note that this module only allows to manually upload documents directly into projects. For more advanced
+> functionalities, please take a look at the [file storages integrations](../file-management).
+
 ## Add a new document to the project
 
 To upload a document select Documents from the project menu and click *New Document*. You can select the document category from the ones that you have  created under project administration settings. See in the Admin Guide  how to create a new document category.
@@ -26,7 +29,7 @@ The uploaded documents are visible to all project members who have the necessary
 
 You can edit or delete documents anytime. To do that, navigate to the Documents overview and select the document you want to edit. By  selecting *Edit* or *Delete* respectively you can either  adjust the document file and related information or remove the file  permanently. You can add the file again at a later point.
 
-![edit or delete document](image-20200130111121885.png)      
+![edit or delete document](image-20200130111121885.png)
 
 ## Frequently asked questions (FAQ)
 

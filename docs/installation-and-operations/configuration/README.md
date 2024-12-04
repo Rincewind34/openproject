@@ -6,17 +6,13 @@ sidebar_navigation:
 
 # OpenProject advanced configuration
 
-
-
 OpenProject can be configured via environment variables. These are often helpful for automatically deploying production systems.
 
 > **NOTE:** This documentation is for OpenProject on-premises Installations only, if you would like to setup similar in your OpenProject cloud instance, please contact us at support@openproject.com
 
-> **NOTE:** Using the configuration file `config/configuration.yml` is depracted and is **NOT** recommended anymore
+> **NOTE:** Using the configuration file `config/configuration.yml` is deprecated and is **NOT** recommended anymore
 
-
-
-# Packaged installation
+## Packaged installation
 
 The file `/opt/openproject/.env.example` contains some information to learn more. Files stored within `/etc/openproject/conf.d/` are used for parsing the variables and your custom values to your configuration. Whenever you call `openproject config:set VARIABLE=value`, it will end up in this folder.
 
@@ -36,10 +32,11 @@ After the file `/etc/openproject/conf.d/other`  is changed the command `sudo ope
 
 Configuring OpenProject through environment variables is described in detail [in the environment variables guide](environment/).
 
-# Docker
+## Docker
 
-## one container per process installation
+### one container per process installation
 
+Create a file `docker-compose.override.yml` next to `docker-compose.yml` file. Docker Compose will automatically merge those files, for more information, see https://docs.docker.com/compose/multiple-compose-files/merge/.
 Add your custom configuration to `docker-compose.override.yml`.
 
 In the compose folder you will also find the file `docker-compose.yml` which shall **NOT** be edited.
@@ -62,7 +59,7 @@ volumes:
 x-op-restart-policy: &restart_policy
   restart: unless-stopped
 x-op-image: &image
-  image: openproject/community:${TAG:-12}
+  image: openproject/openproject:${TAG:-15}
 x-op-app: &app
   <<: [*image, *restart_policy]
   environment:
@@ -80,10 +77,8 @@ x-op-app: &app
     - "${OPDATA:-opdata}:/var/openproject/assets"
 
 # configuration cut off at this point.
-# Please use the file at https://github.com/opf/openproject-deploy/blob/stable/13/compose/docker-compose.yml
+# Please use the file at https://github.com/opf/openproject-deploy/blob/stable/15/compose/docker-compose.yml
 ```
-
-
 
 Alternatively, you can also use an env file for docker-compose like so:
 
@@ -109,7 +104,7 @@ volumes:
 x-op-restart-policy: &restart_policy
   restart: unless-stopped
 x-op-image: &image
-  image: openproject/community:${TAG:-12}
+  image: openproject/openproject:${TAG:-15}
 x-op-app: &app
   <<: [*image, *restart_policy]
   environment:
@@ -117,10 +112,8 @@ x-op-app: &app
     # ... more environment variables
 
 # configuration cut off at this point.
-# Please use the file at https://github.com/opf/openproject-deploy/blob/stable/13/compose/docker-compose.yml
+# Please use the file at https://github.com/opf/openproject-deploy/blob/stable/15/compose/docker-compose.yml
 ```
-
-
 
 Let's say you have a `.env.prod`  file with some production-specific configuration. Then, start the services with that special env file specified.
 
@@ -128,7 +121,7 @@ Let's say you have a `.env.prod`  file with some production-specific configurati
 docker-compose --env-file .env.prod up
 ```
 
-### Disabling services in the docker-compose file
+#### Disabling services in the docker-compose file
 
 If you have a `docker-compose.override.yml` file created, it is also easy to disable certain services, such as the database container if you have an external one running anyway.
 
@@ -143,9 +136,7 @@ services:
 
 Configuring OpenProject through environment variables is described in detail [in the environment variables guide](environment/).
 
-
-
-## Docker all-in-one container installation
+### Docker all-in-one container installation
 
 Environment variables can be either passed directly on the command-line to the
 Docker Engine, or via an environment file:
@@ -158,9 +149,7 @@ docker run -d --env-file path/to/file ...
 
 Configuring OpenProject through environment variables is described in detail [in the environment variables guide](environment/).
 
-
-
-# Seeding through environment
+## Seeding through environment
 
 OpenProject allows some resources to be seeded/created initially through configuration variables.
 
@@ -169,17 +158,13 @@ OpenProject allows some resources to be seeded/created initially through configu
 | [Initial admin user creation](#initial-admin-user-creation) | Changing attributes or passwords of the initially created administrator |
 | [Seeding LDAP connections](#seeding-ldap-connections)       | How to create an LDAP connection through configuration       |
 
-
-
-## Initial admin user creation
+### Initial admin user creation
 
 **Note:** These variables are only applicable during the first initial setup of your OpenProject setup. Changing or setting them later will have no effect, as the admin user will already have been created.
 
 By default, an admin user will be created with the login and password set to `admin`. You will be required to change this password on first login.
 
 In case of automated deployments, you might find it useful to seed an admin user with password and attributes of your choosing. For that, you can use the following set of variables:
-
-
 
 ```shell
 OPENPROJECT_SEED_ADMIN_USER_PASSWORD="admin" # Password to set for the admin user
@@ -188,15 +173,13 @@ OPENPROJECT_SEED_ADMIN_USER_NAME="OpenProject Admin" # Name to assign to that us
 OPENPROJECT_SEED_ADMIN_USER_MAIL="admin@example.net" # Email attribute to assign to that user. Note that in packaged installations, a wizard step will assign this variable as well.
 ```
 
-
-
-## Seeding LDAP connections
+### Seeding LDAP connections
 
 OpenProject allows you to create and maintain an LDAP connection with optional synchronized group filters. This is relevant for e.g., automated deployments, where you want to trigger the synchronization right at the start.
 
 **Note:** These variables are applied whenever `db:seed` rake task is being executed. This happens on every packaged `configure` call or when the seeder container job is being run, so be aware that these changes might happen repeatedly.
 
-The connection can be set with the following options. Please note that "EXAMPLE" stands for an arbitrary name (expressable in ENV keys)  which will become the name of the connection. In this case, "example" and "examplefilter" for the synchronized filter.
+The connection can be set with the following options. Please note that "EXAMPLE" stands for an arbitrary name (expressible in ENV keys)  which will become the name of the connection. In this case, "example" and "examplefilter" for the synchronized filter.
 
 The name of the LDAP connection is derived from the ENV key behind `SEED_LDAP_`, so you need to take care to use only valid characters. If you need to place an underscore, use a double underscore to encode it e.g., `my__ldap`.
 
@@ -256,14 +239,11 @@ OPENPROJECT_SEED_LDAP_EXAMPLE_GROUPFILTER_EXAMPLEFILTER_GROUP__ATTRIBUTE="cn"
 
 When a filter is defined, synchronization happens directly during seeding for enterprise editions. Be aware of that when you create the connection that e.g., the LDAP connection needs to be reachable.
 
-
-
-# Examples for common use cases
+## Examples for common use cases
 
 * `attachments_storage_path`
 * `autologin_cookie_name` (default: 'autologin'),
 * `autologin_cookie_path` (default: '/')
-* `autologin_cookie_secure` (default: false)
 * `database_cipher_key`     (default: nil)
 * `scm_git_command` (default: 'git')
 * `scm_subversion_command` (default: 'svn')
@@ -284,12 +264,22 @@ When a filter is defined, synchronization happens directly during seeding for en
 * [`global_basic_auth`](#global-basic-auth)
 * [`apiv3_enable_basic_auth`](#apiv3-enable-basic-auth)
 * [`enterprise_fail_fast`](#enterprise-fail-fast)
-* [`backup_enabled`](#backup-enabled)
-* [`show_community_links`](#show-community-links)
-* [`web`](#web) (nested configuration)
+* [`backup_enabled`](#enable-backups)
+* [`show_community_links`](#show-or-hide-community-links)
+* [`web`](#web-worker-configuration) (nested configuration)
 * [`statsd`](#statsd) (nested configuration)
 
+### Allowing public access
 
+By default, any request to the OpenProject application needs to be authenticated. If you want to enable public unauthenticated access like we do for https://community.openproject.org, you can set the `login_required` to `false`. If not provided through environment variables, this setting is also accessible in the administrative UI. Please see the [authentication settings guide](../../system-admin-guide/authentication/authentication-settings/#general-authentication-settings) for more details.
+
+*default: true*
+
+To disable, set the configuration option:
+
+```yaml
+OPENPROJECT_LOGIN__REQUIRED="false"
+```
 
 ### Setting session options
 
@@ -334,8 +324,6 @@ OPENPROJECT_FOG_CREDENTIALS_REGION="eu-west-1"
 OPENPROJECT_FOG_DIRECTORY="uploads"
 ```
 
-
-
 ### Auth source sso
 
 Can be used to automatically login a user defined through a custom header sent by a load balancer or reverse proxy in front of OpenProject, for instance in a Kerberos Single Sign-On (SSO) setup via apache.
@@ -360,11 +348,9 @@ auth_source_sso:
   # optional: true
 ```
 
-
-
 ### Backups
 
-#### backup enabled
+#### Enable backups
 
 If enabled, admins (or users with the necessary permission) can download backups of the OpenProject installation
 via OpenProject's web interface or via the API.
@@ -375,7 +361,7 @@ via OpenProject's web interface or via the API.
 OPENPROJECT_BACKUP__ENABLED="false"
 ```
 
-#### backup attachment size max sum mb
+#### Backup attachment size max sum mb
 
 Per default the maximum overall size of all attachments must not exceed 1GB for them to be included in the backup. If they are larger only the database dump will be included.
 
@@ -385,15 +371,13 @@ Per default the maximum overall size of all attachments must not exceed 1GB for 
 OPENPROJECT_BACKUP__ATTACHMENT__SIZE__MAX__SUM__MB="8192"
 ```
 
-#### additional configurations for backup
+#### Additional configurations for backup
 
 ```yaml
 OPENPROJECT_BACKUP__DAILY__LIMIT="3"
 OPENPROJECT_BACKUP__INCLUDE__ATTACHMENTS="true"
 OPENPROJECT_BACKUP__INITIAL__WAITING__PERIOD="86400"
 ```
-
-
 
 ### BCrypt configuration
 
@@ -403,15 +387,13 @@ For more information, see the [Cost Factor guide of the bcrypt-ruby gem](https:/
 
 *default: 12*
 
-```bash
+```shell
 OPENPROJECT_OVERRIDE__BCRYPT__COST__FACTOR="16"
 ```
 
-
-
 ### Database configuration and SSL
 
-Please see [this separate guide](./database/) on how to set a custom database connection string and optionally, require SSL/TTLS verification. 
+Please see [this separate guide](./database/) on how to set a custom database connection string and optionally, require SSL/TTLS verification.
 
 ### disable password login
 
@@ -426,8 +408,6 @@ presented to the users.
 ```yaml
 OPENPROJECT_DISABLE__PASSWORD__LOGIN="true"
 ```
-
-
 
 ### omniauth direct login provider
 
@@ -460,7 +440,6 @@ to create a new account.
 ```yaml
 OPENPROJECT_OAUTH__ALLOW__REMAPPING__OF__EXISTING__USERS="false"
 ```
-
 
 ### Gravatar images
 
@@ -514,7 +493,7 @@ OPENPROJECT_REMOTE__STORAGE__UPLOAD__HOST=mybucket.s3.amazonaws.com
 OPENPROJECT_REMOTE__STORAGE__DOWNLOAD__HOST=mybucket.s3.eu-west.amazonaws.com"
 ```
 
-### fog download url expires in
+#### fog download url expires in
 
 When using remote storage for attachments via fog - usually S3 (see [`attachments_storage`](#attachments-storage) option) - each attachment download will generate a temporary URL. This option determines how long these links will be valid.
 
@@ -526,28 +505,28 @@ The default is 21600 seconds, that is 6 hours, which is the maximum expiry time 
 OPENPROJECT_FOG__DOWNLOAD__URL__EXPIRES__IN="60"
 ```
 
-### force help link
+### Force help link
 
 You can override the default help menu of OpenProject by specifying a `force_help_link` option to
 the configuration. This value is used for the href of the help link, and the default dropdown is removed.
 
-*deafult: nil*
+*default: nil*
 
 ```yaml
 OPENPROJECT_FORCE__HELP__LINK="https://it-support.example.com"
 ```
 
-### impressum link
+### Impressum link
 
 You can set a impressum link (legal notice) for your OpenProject instance by setting `impressum_link` to an absolute URL.
 
-*deafult: nil*
+*default: nil*
 
 ```yaml
 OPENPROJECT_IMPRESSUM__LINK="https://impressum.example.com"
 ```
 
-### hidden menu items admin menu
+### Hidden menu items admin menu
 
 You can disable specific menu items in the menu sidebar for each main menu (such as Administration and Projects). The configuration can be done through environment variables. You have to define one variable for each menu that shall be hidden.
 
@@ -565,7 +544,19 @@ The following example disables all menu items except 'Users', 'Groups' and 'Cust
 OPENPROJECT_HIDDEN__MENU__ITEMS_ADMIN__MENU="roles types statuses workflows enumerations settings ldap_authentication colors project_types plugins info"
 ```
 
-### blacklisted routes
+### Rate limiting and blocklisting
+
+#### Rate limiting
+
+OpenProject provides some rate limiting protections. The default configuration protects against repeated access to authentication credential resets (e.g., lost password functionality).
+
+You can optionally enable additional rules on API rate limiting as follows:
+
+`OPENPROJECT_RATE_LIMITING_API__V3=true`
+
+Additional application-level rate limiting rules will be added in the future. Additionally to these application level rules, use your load balancer / proxying web server to apply individual rate limiting rules using modules such as `ngx_http_limit_req_module` or `mod_security`.
+
+#### Blacklisted routes
 
 You can blacklist specific routes
 
@@ -598,7 +589,7 @@ Remote git repositories will be checked out here.
 note: to be verified, maybe option was removed, not in environement variables list
 ```
 
-### apiv3 enable basic auth
+### APIv3 enable basic auth
 
 You can control basic auth access to the APIv3 with the following configuration option:
 
@@ -628,7 +619,7 @@ default:
       password: adminpw
 ```
 
-### security badge displayed
+### Security Upgrade Badge
 
 OpenProject provides a release indicator (security badge) that will inform administrators of an OpenProject installation on whether new releases or security updates are available for your platform. If enabled, this option will display a badge with your installation status at Administration &gt; Information right next to the release version, and on the home screen. It is only displayed to administrators.
 
@@ -644,8 +635,13 @@ OPENPROJECT_SECURITY__BADGE__DISPLAYED="false"
 
 ### Cache configuration options
 
-* `rails_cache_store`: `memcache` for [memcached](https://www.memcached.org/) or `memory_store` (default: `file_store`)
-* `cache_memcache_server`: The memcache server host and IP (default: `nil`)
+* `rails_cache_store`: `memcache` for [memcached](https://www.memcached.org/), `redis` for [Redis cache](https://redis.io/), or `memory_store` (default: `file_store`)
+* When using `memcached`, the following configuration option is relevant:
+  * `cache_memcache_server`: The memcache server host and IP (default: `nil`)
+
+* When using `redis`, the following configuration option is relevant:
+  * `cache_redis_url`: The URL of the Redis host (e.g., `redis://host:6379`)
+
 * `cache_expires_in`: Expiration time for memcache entries (default: `nil`, no expiry)
 * `cache_namespace`: Namespace for cache keys, useful when multiple applications use a single memcache server (default: `nil`)
 
@@ -686,7 +682,7 @@ enterprise:
   fail_fast: true
 ```
 
-### show community links
+### Show or hide community links
 
 If you would like to hide the homescreen links to the OpenProject community, you can do this with the following configuration:
 
@@ -696,7 +692,7 @@ If you would like to hide the homescreen links to the OpenProject community, you
 OPENPROJECT_SHOW__COMMUNITY__LINKS=false
 ```
 
-### web
+### Web worker configuration
 
 Configuration of the main ruby web server (currently puma). Sensible *defaults* are provided.
 
@@ -727,7 +723,7 @@ OPENPROJECT_2FA_ENFORCED="true"
 
 **Setting available strategies**
 
-By default, the TOTP strategy for phone authenticator apps is active.
+By default, the TOTP and WebAuthn strategies are active.
 
 If you have a [MessageBird account](https://www.messagebird.com/), you can setup a SMS 2FA by activating that strategy like so:
 
@@ -752,7 +748,7 @@ OPENPROJECT_2FA_DISABLED="true"
 OPENPROJECT_2FA_ACTIVE__STRATEGIES="[]"
 ```
 
-### statsd
+#### statsd
 
 *default: { host: nil, port: 8125 }*
 
@@ -765,7 +761,7 @@ OPENPROJECT_STATSD_HOST="127.0.0.1"
 OPENPRJOECT_STATSD_PORT="8125"
 ```
 
-## Other configuration topics
+### Other configuration topics
 
 | Topic                                                        | Content                                                      |
 | ------------------------------------------------------------ | :----------------------------------------------------------- |

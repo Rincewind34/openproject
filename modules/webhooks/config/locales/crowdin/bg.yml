@@ -1,14 +1,14 @@
 bg:
   plugin_openproject_webhooks:
-    name: "OpenProject Webhooks"
-    description: "Provides a plug-in API to support OpenProject webhooks for better 3rd party integration."
+    name: "OpenProject уеб-куки"
+    description: "Осигурява приставка API, за поддръжка на OpenProject веб-куки, за по-добра интеграция на трети страни."
   activerecord:
     attributes:
       webhooks/webhook:
         url: 'Payload URL'
         secret: 'Signature secret'
         events: 'Events'
-        projects: 'Enabled projects'
+        projects: 'Активирани проекти'
       webhooks/log:
         event_name: 'Event name'
         url: 'Payload URL'
@@ -55,7 +55,7 @@ bg:
         events:
           title: 'Enabled events'
         project_ids:
-          title: 'Enabled projects'
+          title: 'Активирани проекти'
           description: 'Select for which projects this webhook should be executed for.'
           all: 'All projects'
           selected: 'Само избрани проекти'

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,7 +27,7 @@
 #++
 
 module WorkPackage::PDFExport::SumsTable
-  def write_work_packages_sums!(work_packages)
+  def write_work_packages_sums!(_work_packages)
     return unless has_summable_column?
 
     write_optional_page_break
@@ -45,7 +45,7 @@ module WorkPackage::PDFExport::SumsTable
 
   def write_sums_title
     with_margin(styles.page_heading_margins) do
-      pdf.formatted_text([styles.page_heading.merge({ text: I18n.t('js.work_packages.tabs.overview') })])
+      pdf.formatted_text([styles.page_heading.merge({ text: I18n.t("js.work_packages.tabs.overview") })])
     end
   end
 
@@ -82,13 +82,13 @@ module WorkPackage::PDFExport::SumsTable
     row = sums_columns_objects.map do |col|
       pdf.make_cell(sums_column_name(col), header_style)
     end
-    content = query.grouped? ? sums_column_name(query.group_by_column) : ''
+    content = query.grouped? ? sums_column_name(query.group_by_column) : ""
     row.unshift pdf.make_cell(content, header_style)
     row
   end
 
   def sums_column_name(col)
-    (col.caption || '').upcase
+    (col.caption || "").upcase
   end
 
   def build_sums_group_row(group)
@@ -96,7 +96,7 @@ module WorkPackage::PDFExport::SumsTable
   end
 
   def build_sums_total_row
-    build_sums_row(get_total_sums || {}, I18n.t('js.label_sum'), styles.overview_table_sums_cell)
+    build_sums_row(get_total_sums || {}, I18n.t("js.label_sum"), styles.overview_table_sums_cell)
   end
 
   def build_sums_row(sums, label, sums_style)

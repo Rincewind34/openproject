@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,26 +27,22 @@
 #++
 
 FactoryBot.define do
-  factory :user, parent: :principal, class: 'User' do
-    firstname { 'Bob' }
-    lastname { 'Bobbit' }
+  factory :user, parent: :principal, class: "User" do
+    firstname { "Bob" }
+    lastname { "Bobbit" }
     sequence(:login) { |n| "bob#{n}" }
     sequence(:mail) { |n| "bobmail#{n}.bobbit@bob.com" }
-    password { 'adminADMIN!' }
-    password_confirmation { 'adminADMIN!' }
+    password { "adminADMIN!" }
+    password_confirmation { "adminADMIN!" }
 
     transient do
       preferences { {} }
     end
 
-    language { 'en' }
+    language { "en" }
     status { User.statuses[:active] }
     admin { false }
-    first_login { false if User.table_exists? and User.columns.map(&:name).include? 'first_login' }
-
-    transient do
-      global_permissions { [] }
-    end
+    first_login { false if User.table_exists? and User.columns.map(&:name).include? "first_login" }
 
     callback(:after_build) do |user, evaluator|
       evaluator.preferences&.each do |key, val|
@@ -62,37 +58,36 @@ FactoryBot.define do
           create(:notification_setting, user:)
         ]
       end
-
-      if factory.global_permissions.present?
-        global_role = create(:global_role, permissions: factory.global_permissions)
-        create(:global_member, principal: user, roles: [global_role])
-      end
     end
 
     callback(:after_stub) do |user, evaluator|
       if evaluator.preferences.present?
-        user.preference = build_stubbed(:user_preference, user:, settings: evaluator.preferences)
+        # The assign_attributes workaround is required, because assigning user.preference will trigger
+        # creating a new database record, which raises an error in the build_stubbed context
+        user.pref.assign_attributes(
+          build_stubbed(:user_preference, user:, settings: evaluator.preferences).attributes
+        )
       end
     end
 
     factory :admin do
-      firstname { 'OpenProject' }
+      firstname { "OpenProject" }
       sequence(:lastname) { |n| "Admin#{n}" }
       sequence(:login) { |n| "admin#{n}" }
       sequence(:mail) { |n| "admin#{n}@example.com" }
       admin { true }
-      first_login { false if User.table_exists? and User.columns.map(&:name).include? 'first_login' }
+      first_login { false if User.table_exists? and User.columns.map(&:name).include? "first_login" }
     end
 
-    factory :deleted_user, class: 'DeletedUser'
+    factory :deleted_user, class: "DeletedUser"
 
     factory :locked_user do
-      firstname { 'Locked' }
-      lastname { 'User' }
+      firstname { "Locked" }
+      lastname { "User" }
       sequence(:login) { |n| "locked#{n}" }
       sequence(:mail) { |n| "locked#{n}@bob.com" }
-      password { 'adminADMIN!' }
-      password_confirmation { 'adminADMIN!' }
+      password { "adminADMIN!" }
+      password_confirmation { "adminADMIN!" }
       status { User.statuses[:locked] }
     end
 
@@ -101,11 +96,11 @@ FactoryBot.define do
     end
   end
 
-  factory :anonymous, class: 'AnonymousUser' do
+  factory :anonymous, class: "AnonymousUser" do
     initialize_with { User.anonymous }
   end
 
-  factory :system, class: 'SystemUser' do
+  factory :system, class: "SystemUser" do
     initialize_with { User.system }
   end
 end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'permitted_params/allowed_settings'
+require "permitted_params/allowed_settings"
 
 class PermittedParams
   # This class intends to provide a method for all params hashes coming from the
@@ -162,7 +162,7 @@ class PermittedParams
     p = params.require(:query).permit(*self.class.permitted_attributes[:query])
     p[:sort_criteria] = params
       .require(:query)
-      .permit(sort_criteria: { '0' => [], '1' => [], '2' => [] })
+      .permit(sort_criteria: { "0" => [], "1" => [], "2" => [] })
     p[:sort_criteria].delete :sort_criteria
     p
   end
@@ -179,16 +179,18 @@ class PermittedParams
     params.require(:status).permit(*self.class.permitted_attributes[:status])
   end
 
-  def settings
-    permitted_params = params.require(:settings).permit
-    all_valid_keys = AllowedSettings.all
-
-    permitted_params.merge(params[:settings].to_unsafe_hash.slice(*all_valid_keys))
+  def settings(extra_permitted_filters = nil)
+    params.require(:settings).permit(*AllowedSettings.filters, *extra_permitted_filters)
   end
 
   def user(additional_params = [])
-    permitted_params = params.require(:user).permit(*self.class.permitted_attributes[:user] + additional_params)
-    permitted_params.merge(custom_field_values(:user))
+    if params[:user].present?
+      permitted_params = params.require(:user).permit(*self.class.permitted_attributes[:user] + additional_params)
+      permitted_params.merge(custom_field_values(:user))
+    else
+      # This happens on the Profile page for LDAP user, no "user" hash is sent.
+      {}.merge(custom_field_values(:user, required: false))
+    end
   end
 
   def placeholder_user
@@ -240,6 +242,10 @@ class PermittedParams
     params.require(:type).permit(*self.class.permitted_attributes[:move_to])
   end
 
+  def enumerations_move
+    params.require(:enumeration).permit(*self.class.permitted_attributes[:move_to])
+  end
+
   def search
     params.permit(*self.class.permitted_attributes[:search])
   end
@@ -257,7 +263,7 @@ class PermittedParams
   end
 
   def pref
-    params.fetch(:pref, {}).permit(:hide_mail, :time_zone, :theme,
+    params.fetch(:pref, {}).permit(:time_zone, :theme,
                                    :comments_sorting, :warn_on_leaving_unsaved,
                                    :auto_hide_popups)
   end
@@ -282,6 +288,11 @@ class PermittedParams
     end
 
     whitelist.merge(custom_field_values(:project))
+  end
+
+  def project_custom_field_project_mapping
+    params.require(:project_custom_field_project_mapping)
+      .permit(*self.class.permitted_attributes[:project_custom_field_project_mapping])
   end
 
   def news
@@ -318,7 +329,7 @@ class PermittedParams
   # all the time.
   def message(project = nil)
     # TODO: Move this distinction into the contract where it belongs
-    if project && current_user.allowed_to?(:edit_messages, project)
+    if project && current_user.allowed_in_project?(:edit_messages, project)
       params.fetch(:message, {}).permit(:subject, :content, :forum_id, :locked, :sticky)
     else
       params.fetch(:message, {}).permit(:subject, :content, :forum_id)
@@ -326,7 +337,7 @@ class PermittedParams
   end
 
   def attachments
-    params.permit(attachments: %i[file description id])['attachments']
+    params.permit(attachments: %i[file description id])["attachments"]
   end
 
   def enumerations
@@ -393,19 +404,19 @@ class PermittedParams
     # Reject blank values from include_hidden select fields
     values.each { |_, v| v.compact_blank! if v.is_a?(Array) }
 
-    values.empty? ? {} : { 'custom_field_values' => values.permit! }
+    values.empty? ? {} : { "custom_field_values" => values.permit! }
   end
 
   def permitted_attributes(key, additions = {})
     merged_args = { params:, current_user: }.merge(additions)
 
-    self.class.permitted_attributes[key].map do |permission|
+    self.class.permitted_attributes[key].filter_map do |permission|
       if permission.respond_to?(:call)
         permission.call(merged_args)
       else
         permission
       end
-    end.compact
+    end
   end
 
   def self.permitted_attributes
@@ -461,11 +472,13 @@ class PermittedParams
           :possible_values,
           :regexp,
           :searchable,
-          :visible,
+          :admin_only,
           :default_value,
           :possible_values,
           :multi_value,
           :content_right_to_left,
+          :custom_field_section_id,
+          :allow_non_open_versions,
           { custom_options_attributes: %i(id value default_value position) },
           { type_ids: [] }
         ],
@@ -505,15 +518,16 @@ class PermittedParams
           :budget_id,
           :parent_id,
           :priority_id,
+          :remaining_hours,
           :responsible_id,
           :start_date,
           :status_id,
           :type_id,
           :subject,
           Proc.new do |args|
-            # avoid costly allowed_to? if the param is not there at all
-            if args[:params]['work_package']&.has_key?('watcher_user_ids') &&
-               args[:current_user].allowed_to?(:add_work_package_watchers, args[:project])
+            # avoid costly allowed_in_project? if the param is not there at all
+            if args[:params]["work_package"]&.has_key?("watcher_user_ids") &&
+               args[:current_user].allowed_in_project?(:add_work_package_watchers, args[:project])
 
               { watcher_user_ids: [] }
             end
@@ -535,6 +549,7 @@ class PermittedParams
           :name,
           :redirect_uri,
           :confidential,
+          :enabled,
           :client_credentials_user_id,
           { scopes: [] }
         ],
@@ -545,6 +560,12 @@ class PermittedParams
           :name,
           { type_ids: [] }
         ],
+        project_custom_field_project_mapping: %i(
+          project_id
+          custom_field_id
+          custom_field_section_id
+          include_sub_projects
+        ),
         query: %i(
           name
           display_sums
@@ -574,6 +595,7 @@ class PermittedParams
           name
           color_id
           default_done_ratio
+          excluded_from_totals
           is_closed
           is_default
           is_readonly

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe BackupJob, type: :model do
   shared_examples "it creates a backup" do |opts = {}|
@@ -85,10 +85,35 @@ RSpec.describe BackupJob, type: :model do
       job.perform **arguments.first
     end
 
-    describe '#pg_env' do
-      subject { job.pg_env }
+    describe "environment variables" do
+      let(:hash_config) do
+        ActiveRecord::DatabaseConfigurations::HashConfig.new("test", "primary", config_double)
+      end
 
-      context 'when config has user reference, not username (regression #44251)' do
+      before do
+        allow(ActiveRecord::Base).to receive(:connection_db_config).and_return(hash_config)
+      end
+
+      context "when config has username" do
+        let(:config_double) do
+          {
+            adapter: :postgresql,
+            password: "blabla",
+            database: "test",
+            username: "foobar"
+          }
+        end
+
+        it "sets PGUSER and other variables" do
+          perform
+
+          expect(Open3).to have_received(:capture3) do |*args|
+            expect(args[0]).to include("PGUSER" => "foobar", "PGPASSWORD" => "blabla", "PGDATABASE" => "test")
+          end
+        end
+      end
+
+      context "when config has user reference, not username (regression #44251)" do
         let(:config_double) do
           {
             adapter: :postgresql,
@@ -98,14 +123,12 @@ RSpec.describe BackupJob, type: :model do
           }
         end
 
-        before do
-          allow(job).to receive(:database_config).and_return(config_double)
-        end
+        it "still sets PGUSER and other variables" do
+          perform
 
-        it 'still sets a PGUSER' do
-          expect(subject['PGUSER']).to eq 'foobar'
-          expect(subject['PGPASSWORD']).to eq 'blabla'
-          expect(subject['PGDATABASE']).to eq 'test'
+          expect(Open3).to have_received(:capture3) do |*args|
+            expect(args[0]).to include("PGUSER" => "foobar", "PGPASSWORD" => "blabla", "PGDATABASE" => "test")
+          end
         end
       end
     end
@@ -191,11 +214,11 @@ RSpec.describe BackupJob, type: :model do
       }
     }
   ) do
-    let(:dummy_path) { "/tmp/op_uploaded_files/1639754082-3468-0002-0911/file.ext" }
+    let(:dummy_path) { "#{LocalFileUploader.cache_dir}/1639754082-3468-0002-0911/file.ext" }
 
     before do
       FileUtils.mkdir_p Pathname(dummy_path).parent.to_s
-      File.open(dummy_path, "w") { |f| f.puts 'dummy' }
+      File.open(dummy_path, "w") { |f| f.puts "dummy" }
 
       allow_any_instance_of(LocalFileUploader).to receive(:cached?).and_return(true)
       allow_any_instance_of(LocalFileUploader)

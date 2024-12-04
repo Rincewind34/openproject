@@ -1,7 +1,3 @@
-<div class="title-container">
-  <h2 [textContent]="text.title"></h2>
-</div>
-
 <form
   *ngIf="formInitialized"
   [formGroup]="form"
@@ -15,7 +11,7 @@
 
   <div class="op-form--submit">
     <button
-      class="button -highlight"
+      class="button -primary"
       [textContent]="text.save"
       type="submit"
     ></button>

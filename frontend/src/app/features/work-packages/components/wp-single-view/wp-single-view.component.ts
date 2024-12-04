@@ -1,6 +1,6 @@
-// -- copyright
+//-- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2023 the OpenProject GmbH
+// Copyright (C) the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -36,15 +36,8 @@ import {
   OnInit,
 } from '@angular/core';
 import { StateService } from '@uirouter/core';
-import {
-  BehaviorSubject,
-  combineLatest,
-} from 'rxjs';
-import {
-  distinctUntilChanged,
-  first,
-  map,
-} from 'rxjs/operators';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+import { distinctUntilChanged, first, map } from 'rxjs/operators';
 
 import { I18nService } from 'core-app/core/i18n/i18n.service';
 import { PathHelperService } from 'core-app/core/path-helper/path-helper.service';
@@ -395,7 +388,7 @@ export class WorkPackageSingleViewComponent extends UntilDestroyedMixin implemen
    */
   private getDateField(change:WorkPackageChangeset):FieldDescriptor {
     const object:FieldDescriptor = {
-      name: '',
+      name: 'date',
       label: this.I18n.t('js.work_packages.properties.date'),
       spanAll: false,
       multiple: false,
@@ -403,10 +396,8 @@ export class WorkPackageSingleViewComponent extends UntilDestroyedMixin implemen
 
     if (change.schema.ofProperty('date')) {
       object.field = this.displayField(change, 'date');
-      object.name = 'date';
     } else {
       object.field = this.displayField(change, 'combinedDate');
-      object.name = 'combinedDate';
     }
 
     return object;

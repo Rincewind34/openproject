@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require_relative './20180116065518_add_hierarchy_paths'
+require_relative "20180116065518_add_hierarchy_paths"
 
 class RemoveHierarchyPaths < ActiveRecord::Migration[5.2]
   def up
@@ -60,7 +60,7 @@ class RemoveHierarchyPaths < ActiveRecord::Migration[5.2]
   ##
   # Map parent sort_criteria to id asc.
   def map_parent_to_id(criteria)
-    if criteria.first.to_s == 'parent'
+    if criteria.first.to_s == "parent"
       %w[id asc]
     else
       criteria

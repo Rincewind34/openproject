@@ -1,4 +1,4 @@
-# Schema: Work_PackageModel
+# Schema: WorkPackageModel
 ---
 type: object
 required:
@@ -61,7 +61,7 @@ properties:
   duration:
     type: string
     format: duration
-    description:  |-
+    description: |-
       **(NOT IMPLEMENTED)** The amount of time in hours the work package needs to be completed.
       Not available for milestone type of work packages.
     readOnly: true
@@ -76,7 +76,7 @@ properties:
     readOnly: true
   ignoreNonWorkingDays:
     type: boolean
-    description:  |-
+    description: |-
       **(NOT IMPLEMENTED)** When scheduling, whether or not to ignore the non working days being defined.
       A work package with the flag set to true will be allowed to be scheduled to a non working day.
     readOnly: true
@@ -93,16 +93,23 @@ properties:
   percentageDone:
     type: integer
     description: Amount of total completion for a work package
+    minimum: 0
+    maximum: 100
+  derivedPercentageDone:
+    type: integer
+    description: Amount of total completion for a work package derived from itself and its descendant work packages
+    readOnly: true
+    minimum: 0
     maximum: 100
   createdAt:
     type: string
     format: date-time
-    description: Time of creation
+    description: Time of creation. Can be writable by admins with the `apiv3_write_readonly_attributes` setting enabled.
     readOnly: true
   updatedAt:
     type: string
     format: date-time
-    description: Time of the most recent change to the work package
+    description: Time of the most recent change to the work package.
     readOnly: true
   _links:
     type: object
@@ -118,24 +125,14 @@ properties:
       - status
       - type
     properties:
-      addAttachment:
-        allOf:
-          - $ref: "./link.yml"
-          - description: |-
-              Attach a file to the WP
-              
-              # Conditions
-              
-              **Permission**: edit work package
-            readOnly: true
       addComment:
         allOf:
           - $ref: "./link.yml"
           - description: |-
               Post comment to WP
-              
+
               # Conditions
-              
+
               **Permission**: add work package notes
             readOnly: true
       addRelation:
@@ -143,9 +140,9 @@ properties:
           - $ref: "./link.yml"
           - description: |-
               Adds a relation to this work package.
-              
+
               # Conditions
-              
+
               **Permission**: manage wp relations
             readOnly: true
       addWatcher:
@@ -153,9 +150,9 @@ properties:
           - $ref: "./link.yml"
           - description: |-
               Add any user to WP watchers
-              
+
               # Conditions
-              
+
               **Permission**: add watcher
             readOnly: true
       customActions:
@@ -163,12 +160,12 @@ properties:
         readOnly: true
         items:
           allOf:
-          - $ref: "./link.yml"
-          - description: |-
-              A predefined action that can be applied to the work package.
-              
-              **Resource**: CustomAction
-            readOnly: true
+            - $ref: "./link.yml"
+            - description: |-
+                A predefined action that can be applied to the work package.
+
+                **Resource**: CustomAction
+              readOnly: true
       previewMarkup:
         allOf:
           - $ref: "./link.yml"
@@ -180,29 +177,69 @@ properties:
           - $ref: "./link.yml"
           - description: |-
               Remove any user from WP watchers
-              
+
               # Conditions
-              
+
               **Permission**: delete watcher
+            readOnly: true
+      delete:
+        allOf:
+          - $ref: "./link.yml"
+          - description: |-
+              Delete this work package
+
+              # Conditions
+
+              **Permission**: delete_work_packages
+            readOnly: true
+      logTime:
+        allOf:
+          - $ref: "./link.yml"
+          - description: |-
+              Create time entries on the work package
+
+              # Conditions
+
+              **Permission**: log_time or log_own_time
+            readOnly: true
+      move:
+        allOf:
+          - $ref: "./link.yml"
+          - description: |-
+              Link to page for moving this work package
+
+              # Conditions
+
+              **Permission**: move_work_packages
+            readOnly: true
+      copy:
+        allOf:
+          - $ref: "./link.yml"
+          - description: |-
+              Link to page for copying this work package
+
+              # Conditions
+
+              **Permission**: add_work_packages
             readOnly: true
       unwatch:
         allOf:
           - $ref: "./link.yml"
           - description: |-
               Remove current user from WP watchers
-              
+
               # Conditions
-              
+
               logged in; watching
             readOnly: true
       update:
         allOf:
           - $ref: "./link.yml"
           - description: |-
-              Form endpoint that aids in preparing and performing edits on a WP
-              
+              Form endpoint that aids in preparing and performing edits on a work package
+
               # Conditions
-              
+
               **Permission**: edit work package
             readOnly: true
       updateImmediately:
@@ -210,9 +247,9 @@ properties:
           - $ref: "./link.yml"
           - description: |-
               Directly perform edits on a work package
-              
+
               # Conditions
-              
+
               **Permission**: edit work package
             readOnly: true
       watch:
@@ -220,9 +257,9 @@ properties:
           - $ref: "./link.yml"
           - description: |-
               Add current user to WP watchers
-              
+
               # Conditions
-              
+
               logged in; not watching
             readOnly: true
       self:
@@ -230,7 +267,7 @@ properties:
           - $ref: "./link.yml"
           - description: |-
               This work package
-              
+
               **Resource**: WorkPackage
             readOnly: true
       schema:
@@ -238,7 +275,7 @@ properties:
           - $ref: "./link.yml"
           - description: |-
               The schema of this work package
-              
+
               **Resource**: Schema
             readOnly: true
       ancestors:
@@ -249,11 +286,11 @@ properties:
             - $ref: "./link.yml"
             - description: |-
                 A visible ancestor work package of the current work package.
-                
+
                 **Resource**: WorkPackage
-                
+
                 # Conditions
-                
+
                 **Permission** view work packages
               readOnly: true
       attachments:
@@ -261,14 +298,38 @@ properties:
           - $ref: "./link.yml"
           - description: |-
               The files attached to this work package
-              
+
               **Resource**: Collection
+
+              # Conditions
+
+              - **Setting**: deactivate_work_package_attachments set to false in related project
+      addAttachment:
+        allOf:
+          - $ref: "./link.yml"
+          - description: |-
+              Attach a file to the work package
+
+              # Conditions
+
+              - **Permission**: edit work package
+            readOnly: true
+      prepareAttachment:
+        allOf:
+          - $ref: "./link.yml"
+          - description: |-
+              Attach a file to the work package
+
+              # Conditions
+
+              - **Setting**: direct uploads enabled
+            readOnly: true
       author:
         allOf:
           - $ref: "./link.yml"
           - description: |-
               The person that created the work package
-              
+
               **Resource**: User
             readOnly: true
       assignee:
@@ -276,18 +337,18 @@ properties:
           - $ref: "./link.yml"
           - description: |-
               The person that is intended to work on the work package
-              
+
               **Resource**: User
       availableWatchers:
         allOf:
           - $ref: "./link.yml"
           - description: |-
               All users that can be added to the work package as watchers.
-              
+
               **Resource**: User
-              
+
               # Conditions
-              
+
               **Permission** add work package watchers
             readOnly: true
       budget:
@@ -295,18 +356,18 @@ properties:
           - $ref: "./link.yml"
           - description: |-
               The budget this work package is associated to
-              
+
               **Resource**: Budget
-              
+
               # Conditions
-              
+
               **Permission** view cost objects
       category:
         allOf:
           - $ref: "./link.yml"
           - description: |-
               The category of the work package
-              
+
               **Resource**: Category
       children:
         type: array
@@ -316,11 +377,11 @@ properties:
             - $ref: "./link.yml"
             - description: |-
                 A visible child work package of the current work package.
-                
+
                 **Resource**: WorkPackage
-                
+
                 # Conditions
-                
+
                 **Permission** view work packages
               readOnly: true
       addFileLink:
@@ -331,7 +392,7 @@ properties:
 
               # Conditions
 
-              **Permission**: manage file links
+              **Permission**: manage_file_links
       fileLinks:
         allOf:
           - $ref: './link.yml'
@@ -340,45 +401,45 @@ properties:
 
               # Conditions
 
-              **Permission**: view file links
+              **Permission**: view_file_links
       parent:
         allOf:
           - $ref: "./link.yml"
           - description: |-
               Parent work package
-              
+
               **Resource**: WorkPackage
       priority:
         allOf:
           - $ref: "./link.yml"
           - description: |-
               The priority of the work package
-              
+
               **Resource**: Priority
       project:
         allOf:
           - $ref: "./link.yml"
           - description: |-
               The project to which the work package belongs
-              
+
               **Resource**: Project
       responsible:
         allOf:
           - $ref: "./link.yml"
           - description: |-
               The person that is responsible for the overall outcome
-              
+
               **Resource**: User
       relations:
         allOf:
           - $ref: "./link.yml"
           - description: |-
               Relations this work package is involved in
-              
+
               **Resource**: Relation
-              
+
               # Conditions
-              
+
               **Permission** view work packages
             readOnly: true
       revisions:
@@ -386,11 +447,11 @@ properties:
           - $ref: "./link.yml"
           - description: |-
               Revisions that are referencing the work package
-              
+
               **Resource**: Revision
-              
+
               # Conditions
-              
+
               **Permission** view changesets
             readOnly: true
       status:
@@ -398,18 +459,18 @@ properties:
           - $ref: "./link.yml"
           - description: |-
               The current status of the work package
-              
+
               **Resource**: Status
       timeEntries:
         allOf:
           - $ref: "./link.yml"
           - description: |-
               All time entries logged on the work package. Please note that this is a link to an HTML resource for now and as such, the link is subject to change.
-              
+
               **Resource**: N/A
-              
+
               # Conditions
-              
+
               **Permission** view time entries
             readOnly: true
       type:
@@ -417,25 +478,25 @@ properties:
           - $ref: "./link.yml"
           - description: |-
               The type of the work package
-              
+
               **Resource**: Type
       version:
         allOf:
           - $ref: "./link.yml"
           - description: |-
               The version associated to the work package
-              
+
               **Resource**: Version
       watchers:
         allOf:
           - $ref: "./link.yml"
           - description: |-
               All users that are currently watching this work package
-              
+
               **Resource**: Collection
-              
+
               # Conditions
-              
+
               **Permission** view work package watchers
             readOnly: true
 
@@ -576,5 +637,5 @@ example:
   percentageDone: 0
   customField1: Foo
   customField2: 42
-  createdAt: '2014-08-29T12:40:53Z'
-  updatedAt: '2014-08-29T12:44:41Z'
+  createdAt: '2014-08-29T12:40:53.373Z'
+  updatedAt: '2014-08-29T12:44:41.981Z'

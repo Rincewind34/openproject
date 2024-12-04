@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -31,7 +31,7 @@ class CleanCustomValues < ActiveRecord::Migration[5.2]
     invalid_cv = CustomValue
       .joins(:custom_field)
       .where("#{CustomField.table_name}.field_format = 'list'")
-      .where.not(value: '')
+      .where.not(value: "")
       .where("value !~ '^[0-9]+$'")
 
     if invalid_cv.count > 0
@@ -41,7 +41,7 @@ class CleanCustomValues < ActiveRecord::Migration[5.2]
       end
 
       warn warn_string
-      invalid_cv.update_all(value: '')
+      invalid_cv.update_all(value: "")
     end
   end
 

@@ -1,6 +1,6 @@
-// -- copyright
+//-- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2023 the OpenProject GmbH
+// Copyright (C) the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -70,9 +70,13 @@ export class OpPrincipalComponent implements OnInit {
 
   @Input() hideName = false;
 
+  @Input() nameClasses? = '';
+
   @Input() link = true;
 
   @Input() size:AvatarSize = 'default';
+
+  @Input() title = '';
 
   public constructor(
     readonly elementRef:ElementRef,
@@ -95,11 +99,13 @@ export class OpPrincipalComponent implements OnInit {
         {
           hide: this.hideName,
           link: this.link,
+          classes: this.nameClasses,
         },
         {
           hide: this.hideAvatar,
           size: this.size,
         },
+        this.title === '' ? null : this.title,
       );
     }
   }

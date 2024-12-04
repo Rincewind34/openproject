@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require_relative "./migration_utils/column"
+require_relative "migration_utils/column"
 
 class BigintPrimaryAndForeignKeys < ActiveRecord::Migration[7.0]
   KEY_CHANGES = {
@@ -60,8 +60,8 @@ class BigintPrimaryAndForeignKeys < ActiveRecord::Migration[7.0]
     CustomStyle => [:id],
     CustomValue => %i[id customized_id custom_field_id],
     Journal::CustomizableJournal => %i[id journal_id custom_field_id],
-    Delayed::Job => [:id],
     DesignColor => [:id],
+    :delayed_jobs => [:id], # delayed job removed in favour of good_job see WP #42 or PR #42
     Journal::DocumentJournal => %i[id project_id category_id],
     Document => %i[id project_id category_id],
     :done_statuses_for_project => %i[project_id status_id],

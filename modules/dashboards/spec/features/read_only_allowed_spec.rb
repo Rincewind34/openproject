@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,11 +26,11 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
-require_relative '../support/pages/dashboard'
+require_relative "../support/pages/dashboard"
 
-RSpec.describe 'Read only mode when user lacks edit permission on dashboard', js: true do
+RSpec.describe "Read only mode when user lacks edit permission on dashboard", :js do
   let!(:type) { create(:type) }
   let!(:project) { create(:project, types: [type]) }
   let!(:work_package) do
@@ -53,7 +53,7 @@ RSpec.describe 'Read only mode when user lacks edit permission on dashboard', js
   end
 
   let(:role) do
-    create(:role, permissions:)
+    create(:project_role, permissions:)
   end
 
   let(:user) do
@@ -71,11 +71,11 @@ RSpec.describe 'Read only mode when user lacks edit permission on dashboard', js
     dashboard_page.visit!
   end
 
-  it 'can not modify the dashboard but can still use it' do
+  it "can not modify the dashboard but can still use it" do
     dashboard_page.expect_unable_to_add_widget(dashboard.row_count, dashboard.column_count, :row)
     dashboard_page.expect_no_help_mode
 
-    table_widget = Components::Grids::GridArea.new('.grid--area.-widgeted:nth-of-type(1)')
+    table_widget = Components::Grids::GridArea.new(".grid--area.-widgeted:nth-of-type(1)")
 
     table_widget.expect_not_resizable
 

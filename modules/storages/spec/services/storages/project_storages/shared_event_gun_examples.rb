@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,17 +28,23 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-RSpec.shared_examples 'an event gun' do |event|
+require "spec_helper"
+require_module_spec_helper
+
+RSpec.shared_examples "an event gun" do |event|
   %i[automatic manual inactive].each do |mode|
     context "when project_folder mode is #{mode}" do
-      it 'fires an appropriate event' do
+      it "fires an appropriate event" do
         allow(OpenProject::Notifications).to(receive(:send))
         model_instance.project_folder_mode = mode
 
         subject
 
         expect(OpenProject::Notifications).to(
-          have_received(:send).with(event, project_folder_mode: mode)
+          have_received(:send)
+          .with(event, project_folder_mode: mode,
+                       project_folder_mode_previously_was: model_instance.project_folder_mode_previously_was,
+                       storage: model_instance.storage)
         )
       end
     end

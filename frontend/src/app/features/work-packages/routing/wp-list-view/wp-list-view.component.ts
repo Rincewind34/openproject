@@ -1,6 +1,6 @@
-// -- copyright
+//-- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2023 the OpenProject GmbH
+// Copyright (C) the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -140,7 +140,7 @@ export class WorkPackageListViewComponent extends UntilDestroyedMixin implements
     this.ngZone.runOutsideAngular(() => {
       setTimeout(() => {
         const selectedRow = this.elementRef.nativeElement.querySelector('.wp-table--row.-checked');
-        const selectedCard = this.elementRef.nativeElement.querySelector('[data-qa-selector="op-wp-single-card"].-checked');
+        const selectedCard = this.elementRef.nativeElement.querySelector('[data-test-selector="op-wp-single-card"].-checked');
 
         // The header of the table hides the scrolledIntoView element
         // so we scrollIntoView the previous element, if any

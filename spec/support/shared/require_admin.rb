@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,21 +26,21 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-def require_admin_and_render_template(path)
-  describe 'GET #show' do
-    subject { get 'show' }
+RSpec.shared_examples "GET #show requires admin permission and renders template" do |path:|
+  describe "GET #show" do
+    subject { get "show" }
 
-    describe 'permissions' do
+    describe "permissions" do
       let(:fetch) { subject }
 
-      it_behaves_like 'a controller action with require_admin'
+      it_behaves_like "a controller action with require_admin"
     end
 
-    it 'renders the API settings template' do
+    it "renders the API settings template" do
       subject
 
       expect(response).to be_successful
-      expect(response).to render_template "admin/settings/#{path}/show", 'layouts/admin'
+      expect(response).to render_template "admin/settings/#{path}/show", "layouts/admin"
     end
   end
 end

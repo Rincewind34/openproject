@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,28 +27,33 @@
 #++
 
 class RenameBimModule < ActiveRecord::Migration[6.0]
+  # Note: rails 7.1 breaks the class' ancestor chain, when a class with an enum definition
+  # without a database field is being referenced.
+  # Re-defining the Project class without the enum to avoid the issue.
+  class Project < ApplicationRecord; end
+
   def up
-    projects_with_bcf = EnabledModule.where(name: 'bcf').pluck(:project_id)
+    projects_with_bcf = EnabledModule.where(name: "bcf").pluck(:project_id)
     # Delete all bcf to avoid duplicates
-    EnabledModule.where(name: 'bcf').delete_all
-    EnabledModule.where(name: 'ifc_models').update_all(name: 'bim')
+    EnabledModule.where(name: "bcf").delete_all
+    EnabledModule.where(name: "ifc_models").update_all(name: "bim")
 
     # Re-enable bim if ifc_models was not active but bcf was
     Project.where(id: projects_with_bcf).includes(:enabled_modules).each do |project|
-      project.enabled_modules.create(name: 'bim') unless project.enabled_module_names.include?('bim')
+      project.enabled_modules.create(name: "bim") unless project.enabled_module_names.include?("bim")
     end
 
     # Rename attachments container
-    Attachment.where(container_type: 'Bcf::Viewpoint').update_all(container_type: 'Bim::Bcf::Viewpoint')
-    Attachment.where(container_type: 'IFCModels::IFCModel').update_all(container_type: 'Bim::IfcModels::IfcModel')
+    execute "UPDATE attachments SET container_type = 'Bim::Bcf::Viewpoint' WHERE container_type = 'Bcf::Viewpoint'"
+    execute "UPDATE attachments SET container_type = 'Bim::IfcModels::IfcModel' WHERE container_type = 'IFCModels::IFCModel'"
   end
 
   def down
     # We cannot now which module was active, so enable BCF
-    EnabledModule.where(name: 'bim').update_all(name: 'bcf')
+    EnabledModule.where(name: "bim").update_all(name: "bcf")
 
     # Rename attachments container
-    Attachment.where(container_type: 'Bim::Bcf::Viewpoint').update_all(container_type: 'Bcf::Viewpoint')
-    Attachment.where(container_type: 'Bim::IfcModel::IfcModel').update_all(container_type: 'IFCModels::IFCModel')
+    execute "UPDATE attachments SET container_type = 'Bcf::Viewpoint' WHERE container_type = 'Bim::Bcf::Viewpoint'"
+    execute "UPDATE attachments SET container_type = 'IfcModels::IfcModel' WHERE container_type = 'Bim::IFCModels::IFCModel'"
   end
 end

@@ -1,6 +1,6 @@
 # --copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2010-2022 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -67,7 +67,7 @@ module API::V3::Values::Schemas
     def type_for(_property)
       # This is but a stub. Currently, only 'start_date' and 'due_date'
       # need to be supported so this simple approach works.
-      'Date'
+      "Date"
     end
   end
 end

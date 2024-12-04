@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -42,8 +42,8 @@ module Queries::Filters::Shared
         super(name, options)
       end
 
-      def self.create!(custom_field:, custom_field_context:, **options)
-        new(custom_field:, custom_field_context:, **options)
+      def self.create!(custom_field:, custom_field_context:, **)
+        new(custom_field:, custom_field_context:, **)
       end
 
       def project
@@ -81,13 +81,13 @@ module Queries::Filters::Shared
 
       def type
         case custom_field.field_format
-        when 'float'
+        when "float"
           :float
-        when 'int'
+        when "int"
           :integer
-        when 'text'
+        when "text"
           :text
-        when 'date'
+        when "date"
           :date
         else
           :string
@@ -110,13 +110,16 @@ module Queries::Filters::Shared
         messages = errors.full_messages
                          .join(" #{I18n.t('support.array.sentence_connector')} ")
 
-        human_name + I18n.t(default: ' %<message>s', message: messages)
+        human_name + I18n.t(default: " %<message>s", message: messages)
       end
 
       protected
 
       def condition
-        operator_strategy.sql_for_field(values_replaced, CustomValue.table_name, 'value')
+        [
+          custom_field_context.where_subselect_conditions,
+          operator_strategy.sql_for_field(values_replaced, CustomValue.table_name, "value")
+        ].compact.join(" AND ")
       end
 
       def type_strategy_class

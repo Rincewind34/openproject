@@ -1,6 +1,6 @@
 <%#-- copyright
 OpenProject is an open source project management software.
-Copyright (C) 2012-2023 the OpenProject GmbH
+Copyright (C) the OpenProject GmbH
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License version 3.
@@ -54,7 +54,9 @@ See COPYRIGHT and LICENSE files for more details.
 <% end %>
 
 <% if version.work_packages.count > 0 %>
-  <%= progress_bar([version.closed_percent, version.completed_percent], width: '40%', legend: ('%0.0f' % version.completed_percent)) %>
+  <% closed = version.closed_percent %>
+  <% done = version.completed_percent - closed %>
+  <%= progress_bar([closed, done], width: '40%', legend: ('%0.0f' % version.completed_percent)) %>
   <p class="progress-info">
     <%= link_to_if(version.closed_issues_count > 0,
                    t(:label_x_closed_work_packages_abbr, count: version.closed_issues_count),

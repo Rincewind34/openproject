@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,38 +26,34 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'support/pages/page'
+require "support/pages/page"
 
 module Pages
   class BoardListPage < Page
     def visit!
-      raise 'Define how to visit me'
+      raise "Define how to visit me"
     end
 
     def expect_create_button
-      within '.toolbar-items' do
-        expect(page).to have_link 'Board'
-      end
+      expect(page).to have_test_selector "add-board-button"
     end
 
     def expect_no_create_button
-      within '.toolbar-items' do
-        expect(page).not_to have_link 'Board'
-      end
+      expect(page).not_to have_test_selector "add-board-button"
     end
 
     def expect_delete_buttons(*boards)
-      within '#content-wrapper' do
+      within "#content-wrapper" do
         boards.each do |board|
-          expect(page).to have_selector "[data-qa-selector='board-remove-#{board.id}']"
+          expect(page).to have_css "[data-test-selector='board-remove-#{board.id}']"
         end
       end
     end
 
     def expect_no_delete_buttons(*boards)
-      within '#content-wrapper' do
+      within "#content-wrapper" do
         boards.each do |board|
-          expect(page).not_to have_selector "[data-qa-selector='board-remove-#{board.id}']"
+          expect(page).to have_no_css "[data-test-selector='board-remove-#{board.id}']"
         end
       end
     end
@@ -65,15 +61,15 @@ module Pages
     def expect_boards_listed(*boards)
       expected_board_names = board_names_for(boards)
 
-      within '#content-wrapper' do
+      within "#content-wrapper" do
         expected_board_names.each do |board_name|
-          expect(page).to have_selector("td.name", text: board_name)
+          expect(page).to have_css("td.name", text: board_name)
         end
       end
     end
 
     def expect_boards_listed_in_order(*boards)
-      within '#content-wrapper' do
+      within "#content-wrapper" do
         listed_board_names = all("td.name").map(&:text)
         expect_board_names = board_names_for(boards)
 
@@ -84,9 +80,9 @@ module Pages
     def expect_boards_not_listed(*boards)
       unexpected_board_names = board_names_for(boards)
 
-      within '#content-wrapper' do
+      within "#content-wrapper" do
         unexpected_board_names.each do |board_name|
-          expect(page).not_to have_selector("td.title", text: board_name)
+          expect(page).to have_no_css("td.title", text: board_name)
         end
       end
     end
@@ -96,17 +92,17 @@ module Pages
     end
 
     def expect_no_boards_listed
-      within '#content-wrapper' do
+      within "#content-wrapper" do
         expect(page).to have_content I18n.t(:no_results_title_text)
       end
     end
 
     def expect_to_be_on_page(number)
-      expect(page).to have_selector('.op-pagination--item_current', text: number)
+      expect(page).to have_css(".op-pagination--item_current", text: number)
     end
 
     def to_page(number)
-      within '.op-pagination--pages' do
+      within ".op-pagination--pages" do
         click_link number.to_s
       end
     end

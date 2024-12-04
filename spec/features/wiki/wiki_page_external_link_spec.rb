@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,9 +26,9 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.describe 'Wiki page external link', js: true do
+RSpec.describe "Wiki page external link", :js do
   shared_let(:admin) { create(:admin) }
   current_user { admin }
 
@@ -37,27 +37,27 @@ RSpec.describe 'Wiki page external link', js: true do
     create(:wiki_page,
            wiki: project.wiki,
            author: admin,
-           title: 'Wiki Page No. 55',
+           title: "Wiki Page No. 55",
            text: 'A link to <a href="http://0.0.0.0:3001/">OpenProject</a>.')
   end
 
-  it 'opens that link in a new window or tab' do
+  it "opens that link in a new window or tab" do
     visit project_wiki_path(project, wiki_page)
 
     link = page.find('a[href^="http://0.0.0.0:3001/"]')
     new_window = window_opened_by { link.click }
     within_window new_window do
-      expect(page.current_url).to start_with 'http://0.0.0.0:3001/'
+      expect(page.current_url).to start_with "http://0.0.0.0:3001/"
     end
     new_window.close
   end
 
-  context 'when the link contains an invalid url' do
+  context "when the link contains an invalid url" do
     before do
       wiki_page.update(text: 'A link to <a href="https:///">OpenProject</a>.')
     end
 
-    it 'does not opens that link in a new window or tab' do
+    it "does not opens that link in a new window or tab" do
       visit project_wiki_path(project, wiki_page)
 
       link = page.find('a[href^="https:///"]')

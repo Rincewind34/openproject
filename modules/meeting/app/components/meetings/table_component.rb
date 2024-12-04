@@ -2,7 +2,7 @@
 
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -32,14 +32,17 @@ module Meetings
   class TableComponent < ::TableComponent
     options :current_project # used to determine if displaying the projects column
 
-    sortable_columns :title, :project_name, :start_time, :duration, :location
+    sortable_columns :title, :project_name, :type, :start_time, :duration, :location
 
     def initial_sort
       %i[start_time asc]
     end
 
     def sortable_columns_correlation
-      super.merge(project_name: 'projects.name')
+      super.merge(
+        project_name: "projects.name",
+        type: "meetings.type"
+      )
     end
 
     def initialize_sorted_model
@@ -56,6 +59,7 @@ module Meetings
       @headers ||= [
         [:title, { caption: Meeting.human_attribute_name(:title) }],
         current_project.blank? ? [:project_name, { caption: Meeting.human_attribute_name(:project) }] : nil,
+        [:type, { caption: Meeting.human_attribute_name(:type) }],
         [:start_time, { caption: Meeting.human_attribute_name(:start_time) }],
         [:duration, { caption: Meeting.human_attribute_name(:duration) }],
         [:location, { caption: Meeting.human_attribute_name(:location) }]

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -25,8 +25,8 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 #++
-require 'spec_helper'
-require_relative '../shared_expectations'
+require "spec_helper"
+require_relative "../shared_expectations"
 
 RSpec.describe CustomActions::Actions::Type do
   let(:key) { :type }
@@ -43,10 +43,10 @@ RSpec.describe CustomActions::Actions::Type do
      { value: types.last.id, label: types.last.name }]
   end
 
-  it_behaves_like 'base custom action'
-  it_behaves_like 'associated custom action' do
-    describe '#allowed_values' do
-      it 'is the list of all type' do
+  it_behaves_like "base custom action"
+  it_behaves_like "associated custom action" do
+    describe "#allowed_values" do
+      it "is the list of all type" do
         allowed_values
 
         expect(instance.allowed_values)

@@ -2,7 +2,7 @@
 
 # -- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,10 +28,10 @@
 # See COPYRIGHT and LICENSE files for more details.
 # ++
 
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.describe 'Menu items',
-               'User and permissions' do
+RSpec.describe "Menu items",
+               "User and permissions" do
   shared_current_user { create(:admin) }
 
   context "when I visit the /users path" do
@@ -40,7 +40,7 @@ RSpec.describe 'Menu items',
     end
 
     it 'renders the "Users and permissions" menu with its children entries', :aggregate_failures do
-      within '#menu-sidebar' do
+      within "#menu-sidebar" do
         expect(page)
           .to have_link(I18n.t(:label_user_and_permission))
 

@@ -1,6 +1,6 @@
 <%#-- copyright
 OpenProject is an open source project management software.
-Copyright (C) 2012-2023 the OpenProject GmbH
+Copyright (C) the OpenProject GmbH
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License version 3.
@@ -48,7 +48,7 @@ See COPYRIGHT and LICENSE files for more details.
 
   <p><%= f.text_field :journal_notes, label: :comments %></p>
   <%= styled_button_tag t(:button_save),
-                        class: '-highlight -with-icon icon-checkmark button--save-agenda',
+                        class: '-primary -with-icon icon-checkmark button--save-agenda',
                         data: { disable_with: I18n.t(:label_loading) } %>
   <%= link_to t(:button_cancel),
               "#",

@@ -1,12 +1,12 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
 #
 # OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
-# Copyright (C) 2006-2017 Jean-Philippe Lang
+# Copyright (C) 2006-2013 Jean-Philippe Lang
 # Copyright (C) 2010-2013 the ChiliProject Team
 #
 # This program is free software; you can redistribute it and/or
@@ -34,13 +34,13 @@ module TeamPlanner
       sortable_columns :name, :project_name, :created_at
 
       def initial_sort_correlation
-        ['queries.name', 'asc']
+        ["queries.name", "asc"]
       end
 
       def sortable_columns_correlation
-        super.merge(name: 'queries.name',
-                    project_name: 'projects.name',
-                    created_at: 'queries.created_at')
+        super.merge(name: "queries.name",
+                    project_name: "projects.name",
+                    created_at: "queries.created_at")
       end
 
       def paginated?

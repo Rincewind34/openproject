@@ -2,7 +2,7 @@
 
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -80,7 +80,7 @@ class TableComponent < ApplicationComponent
     rescue NameError
       raise(
         NameError,
-        "#{mod}::RowComponent required by #{mod}::TableComponent not defined. " +
+        "#{mod}::RowComponent required by #{name} not defined. " +
         "Expected to be defined in `app/components/#{mod.underscore}/row_component.rb`."
       )
     end
@@ -145,12 +145,20 @@ class TableComponent < ApplicationComponent
       .per_page(helpers.per_page_param)
   end
 
+  def test_selector
+    self.class.name.dasherize
+  end
+
   def rows
     model
   end
 
   def row_class
     self.class.row_class
+  end
+
+  def container_class
+    nil
   end
 
   def columns
@@ -170,7 +178,7 @@ class TableComponent < ApplicationComponent
   end
 
   def initial_order
-    initial_sort_correlation.join(' ')
+    initial_sort_correlation.join(" ")
   end
 
   def paginated?

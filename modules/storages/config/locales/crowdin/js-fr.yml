@@ -11,10 +11,11 @@ fr:
       login_to: "Connexion à %{storageType}"
       no_connection: "Aucune connexion à %{storageType}"
       open_storage: "Ouvrir %{storageType}"
-      select_location: "Sélectionnez la localisation"
+      select_location: "Sélectionnez l'emplacement"
       choose_location: "Choisir emplacement"
       types:
         nextcloud: "Nextcloud"
+        one_drive: "OneDrive/SharePoint"
         default: "Stockage"
       information:
         connection_error: >
@@ -30,7 +31,7 @@ fr:
         already_existing_body: >
           Un fichier avec le nom « %{fileName} » existe déjà à l'emplacement où vous essayez de téléverser ce fichier. Que voulez-vous faire ?
         directory_not_writeable: "Vous n'avez pas la permission d'ajouter des fichiers à ce dossier."
-        dragging_many_files: "Le téléversement vers %{storageType} ne supporte qu'un seul fichier à la fois."
+        dragging_many_files: "Le dépôt vers %{storageType} ne supporte qu'un seul fichier à la fois."
         dragging_folder: "Le téléversement vers %{storageType} ne prend pas en charge les dossiers."
         empty_folder: "Ce dossier est vide."
         empty_folder_location_hint: "Cliquez sur le bouton ci-dessous pour téléverser le fichier à cet endroit."
@@ -47,12 +48,11 @@ fr:
         empty: >
           Il n'y a actuellement aucun fichier lié à ce lot de travaux. Commencez à lier les fichiers avec l'action ci-dessous ou à partir de %{storageType}.
         download: "Télécharger %{fileName}"
-        no_permission: "Vous n'avez pas la permission de voir ce fichier."
         open: "Ouvrir le fichier sur le stockage"
         open_location: "Ouvrir le fichier à l'emplacement"
         remove: "Supprimer le lien de fichier"
         remove_confirmation: >
-          Êtes-vous sûr de vouloir dissocier le fichier de ce lot de travaux ? Unlinking n'affecte pas le fichier original et supprime seulement la connexion à ce lot de travaux.
+          Êtes-vous sûr de vouloir dissocier le fichier de ce lot de travaux ? La suppression du lien n'affecte pas le fichier original et supprime seulement la connexion à ce lot de travaux.
         remove_short: "Supprimer le lien"
         select: "Sélectionner les fichiers"
         select_all: "Tout sélectionner"
@@ -65,15 +65,21 @@ fr:
           other: "%{count} liens de fichier ont été créés avec succès."
         upload_error:
           default: >
-            Votre fichier (%{fileName}) n'a pas pu être téléversé. Veuillez vérifier que la dernière version de l'application Nextcloud « OpenProject Integration » est installée et contactez votre administrateur pour obtenir plus d'informations.
+            Votre fichier (%{fileName}) n'a pas pu être téléchargé.
           403: >
             Votre fichier (%{fileName}) n'a pas pu être téléversé en raison de restrictions du système. Veuillez contacter votre administrateur pour obtenir plus d'informations.
           413: >
             Votre fichier (%{fileName}) a une taille supérieure à la taille limite que OpenProject peut téléverser sur %{storageType}. Vous pouvez d'abord téléverser le fichier directement sur %{storageType}, puis le lier.
           507: >
             Votre fichier (%{fileName}) a une taille supérieure au quota de stockage autorisé. Contactez votre administrateur pour modifier ce quota.
+          detail:
+            nextcloud: >
+              Veuillez vérifier que la dernière version de l'application Nextcloud "OpenProject Integration" est installée et contactez votre administrateur pour plus d'informations.
         link_uploaded_file_error: >
-          Une erreur s'est produite lors de la liaison du fichier '%{fileName}' récemment téléversé au lot de travaux %{workPackageId}.
-        not_allowed_tooltip: "Veuillez vous connecter à Nextcloud pour accéder à ce fichier"
+          Une erreur s'est produite lors de la liaison du fichier '%{fileName}' récemment déposé sur le lot de travaux %{workPackageId}.
+        tooltip:
+          not_logged_in: "Veuillez vous connecter au stockage pour accéder à ce fichier."
+          view_not_allowed: "Vous n'avez pas la permission de voir ce fichier."
+          not_found: "Impossible de trouver ce fichier."
         already_linked_file: "Ce fichier est déjà lié à ce lot de travaux."
         already_linked_directory: "Ce répertoire est déjà lié à ce lot de travaux."

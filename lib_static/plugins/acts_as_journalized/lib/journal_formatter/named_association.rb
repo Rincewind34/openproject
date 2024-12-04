@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,7 +29,7 @@
 module JournalFormatter
   class NamedAssociation < Attribute
     def render(key_with_id, values, options = { html: true })
-      key = key_with_id.to_s.delete_suffix('_id')
+      key = key_with_id.to_s.delete_suffix("_id")
       label, old_value, value = format_details(key, values, cache: options[:cache])
 
       if options[:html]
@@ -56,7 +56,7 @@ module JournalFormatter
         if klass && value
           record = associated_object(klass, value.to_i, cache:)
           if record
-            if record.respond_to? 'name'
+            if record.respond_to? :name
               record.name
             else
               record.subject

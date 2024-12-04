@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require "#{Rails.root}/db/migrate/migration_utils/permission_adder"
+require "#{Rails.root.join('db/migrate/migration_utils/permission_adder')}"
 
 class AddBoardViewToRoles < ActiveRecord::Migration[5.2]
   def up
@@ -34,8 +34,8 @@ class AddBoardViewToRoles < ActiveRecord::Migration[5.2]
       .add(:view_work_packages,
            :show_board_views)
 
-    unless Setting.default_projects_modules.include?('board_view')
-      Setting.default_projects_modules = Setting.default_projects_modules + ['board_view']
+    if Setting.default_projects_modules_writable? && Setting.default_projects_modules&.exclude?("board_view")
+      Setting.default_projects_modules = Setting.default_projects_modules + ["board_view"]
     end
   end
 

@@ -1,6 +1,6 @@
-// -- copyright
+//-- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2023 the OpenProject GmbH
+// Copyright (C) the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -24,15 +24,15 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 // See COPYRIGHT and LICENSE files for more details.
-// ++    Ng1FieldControlsWrapper,
+//++    Ng1FieldControlsWrapper,
 
-import { Component, ElementRef } from '@angular/core';
-import { WorkPackageTableConfigurationObject } from 'core-app/features/work-packages/components/wp-table/wp-table-configuration';
-
-export const wpEmbeddedTableMacroSelector = 'macro.embedded-table';
+import { Component, ElementRef, Input } from '@angular/core';
+import {
+  WorkPackageTableConfigurationObject,
+} from 'core-app/features/work-packages/components/wp-table/wp-table-configuration';
+import { populateInputsFromDataset } from 'core-app/shared/components/dataset-inputs';
 
 @Component({
-  selector: wpEmbeddedTableMacroSelector,
   template: `
     <wp-embedded-table-entry [queryProps]="queryProps"
                              [configuration]="configuration">
@@ -40,8 +40,7 @@ export const wpEmbeddedTableMacroSelector = 'macro.embedded-table';
   `,
 })
 export class EmbeddedTablesMacroComponent {
-  // noinspection JSUnusedGlobalSymbols
-  public queryProps:any;
+  @Input() public queryProps:object;
 
   public configuration:WorkPackageTableConfigurationObject = {
     actionsColumnEnabled: false,
@@ -49,11 +48,9 @@ export class EmbeddedTablesMacroComponent {
     contextMenuEnabled: false,
   };
 
-  constructor(readonly elementRef:ElementRef) {
-  }
-
-  ngOnInit() {
-    const element = this.elementRef.nativeElement;
-    this.queryProps = JSON.parse(element.dataset.queryProps);
+  constructor(
+    readonly elementRef:ElementRef,
+  ) {
+    populateInputsFromDataset(this);
   }
 }

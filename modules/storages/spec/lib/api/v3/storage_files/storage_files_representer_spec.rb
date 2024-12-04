@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,25 +28,26 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
+require_module_spec_helper
 
 RSpec.describe API::V3::StorageFiles::StorageFilesRepresenter do
   let(:user) { build_stubbed(:user) }
-  let(:storage) { build_stubbed(:storage) }
+  let(:storage) { build_stubbed(:nextcloud_storage) }
   let(:created_at) { DateTime.now }
   let(:last_modified_at) { DateTime.now }
 
   let(:parent) do
     Storages::StorageFile.new(
       id: 23,
-      name: 'Documents',
+      name: "Documents",
       size: 2048,
-      mime_type: 'application/x-op-directory',
+      mime_type: "application/x-op-directory",
       created_at:,
       last_modified_at:,
-      created_by_name: 'admin',
-      last_modified_by_name: 'admin',
-      location: '/Documents',
+      created_by_name: "admin",
+      last_modified_by_name: "admin",
+      location: "/Documents",
       permissions: %i[readable writeable]
     )
   end
@@ -52,14 +55,14 @@ RSpec.describe API::V3::StorageFiles::StorageFilesRepresenter do
   let(:file) do
     Storages::StorageFile.new(
       id: 42,
-      name: 'readme.md',
+      name: "readme.md",
       size: 4096,
-      mime_type: 'text/plain',
+      mime_type: "text/plain",
       created_at:,
       last_modified_at:,
-      created_by_name: 'admin',
-      last_modified_by_name: 'admin',
-      location: '/Documents/readme.md',
+      created_by_name: "admin",
+      last_modified_by_name: "admin",
+      location: "/Documents/readme.md",
       permissions: %i[readable writeable]
     )
   end
@@ -67,14 +70,14 @@ RSpec.describe API::V3::StorageFiles::StorageFilesRepresenter do
   let(:ancestor) do
     Storages::StorageFile.new(
       id: 47,
-      name: '/',
+      name: "/",
       size: 4096,
-      mime_type: 'application/x-op-directory',
+      mime_type: "application/x-op-directory",
       created_at:,
       last_modified_at:,
-      created_by_name: 'admin',
-      last_modified_by_name: 'admin',
-      location: '/',
+      created_by_name: "admin",
+      last_modified_by_name: "admin",
+      location: "/",
       permissions: %i[readable writeable]
     )
   end
@@ -87,26 +90,26 @@ RSpec.describe API::V3::StorageFiles::StorageFilesRepresenter do
 
   subject { representer.to_json }
 
-  describe 'properties' do
-    it_behaves_like 'property', :_type do
+  describe "properties" do
+    it_behaves_like "property", :_type do
       let(:value) { representer._type }
     end
 
-    it_behaves_like 'collection', :files do
+    it_behaves_like "collection", :files do
       let(:value) { files.files }
       let(:element_decorator) do
         ->(value) { API::V3::StorageFiles::StorageFileRepresenter.new(value, storage, current_user: user) }
       end
     end
 
-    it_behaves_like 'collection', :ancestors do
+    it_behaves_like "collection", :ancestors do
       let(:value) { files.ancestors }
       let(:element_decorator) do
         ->(value) { API::V3::StorageFiles::StorageFileRepresenter.new(value, storage, current_user: user) }
       end
     end
 
-    it_behaves_like 'property', :parent do
+    it_behaves_like "property", :parent do
       let(:value) { API::V3::StorageFiles::StorageFileRepresenter.new(files.parent, storage, current_user: user) }
     end
   end

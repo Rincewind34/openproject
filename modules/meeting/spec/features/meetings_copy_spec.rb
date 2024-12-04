@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,35 +26,33 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.describe 'Meetings copy', :js, :with_cuprite do
+RSpec.describe "Meetings copy", :js, :with_cuprite do
   shared_let(:project) { create(:project, enabled_module_names: %w[meetings]) }
   shared_let(:permissions) { %i[view_meetings create_meetings] }
   shared_let(:user) do
     create(:user,
-           member_in_project: project,
-           member_with_permissions: permissions).tap do |u|
-      u.pref[:time_zone] = 'UTC'
+           member_with_permissions: { project => permissions }).tap do |u|
+      u.pref[:time_zone] = "Etc/UTC"
 
       u.save!
     end
   end
   shared_let(:other_user) do
     create(:user,
-           member_in_project: project,
-           member_with_permissions: permissions)
+           member_with_permissions: { project => permissions })
   end
 
-  shared_let(:start_time) { Time.current.tomorrow.at_noon }
+  shared_let(:start_time) { Time.current.next_day.at_noon }
   shared_let(:duration) { 1.5 }
   shared_let(:agenda_text) { "We will talk" }
   shared_let(:meeting) do
     create(:meeting,
            author: user,
            project:,
-           title: 'Awesome meeting!',
-           location: 'Meeting room',
+           title: "Awesome meeting!",
+           location: "Meeting room",
            duration:,
            start_time:).tap do |m|
       create(:meeting_agenda, meeting: m, text: agenda_text)
@@ -64,41 +62,42 @@ RSpec.describe 'Meetings copy', :js, :with_cuprite do
 
   shared_let(:twelve_hour_format) { "%I:%M %p" }
   shared_let(:copied_meeting_time_heading) do
-    date = start_time.strftime("%m/%d/%Y")
+    date = (start_time + 1.week).strftime("%m/%d/%Y")
     start_of_meeting = start_time.strftime(twelve_hour_format)
     end_of_meeting = (start_time + meeting.duration.hours).strftime(twelve_hour_format)
 
-    "Time: #{date} #{start_of_meeting} - #{end_of_meeting} (GMT+00:00) UTC"
+    "Start time: #{date} #{start_of_meeting} - #{end_of_meeting} UTC+00:00"
   end
 
   before do
     login_as user
   end
 
-  it 'copying a meeting' do
+  it "copying a meeting" do
     visit project_meetings_path(project)
 
-    click_link meeting.title
+    click_on meeting.title
 
-    within '.meeting--main-toolbar' do
-      click_link 'Copy'
+    find_test_selector("meetings-more-dropdown-menu").click
+    page.within(".menu-drop-down-container") do
+      click_on "Copy"
     end
 
     expect(page)
-      .to have_field 'Title',      with: meeting.title
+      .to have_field "Title",      with: meeting.title
     expect(page)
-      .to have_field 'Location',   with: meeting.location
+      .to have_field "Location",   with: meeting.location
     expect(page)
-      .to have_field 'Duration',   with: meeting.duration
+      .to have_field "Duration",   with: meeting.duration
     expect(page)
-      .to have_field 'Start date', with: start_time.strftime("%Y-%m-%d")
+      .to have_field "Start date", with: (start_time + 1.week).strftime("%Y-%m-%d")
     expect(page)
-      .to have_field 'Time',       with: start_time.strftime("%H:%M")
+      .to have_field "Time",       with: start_time.strftime("%H:%M")
 
-    click_button "Create"
+    click_on "Create"
 
     # Be on the new meeting's page with copied over attributes
-    expect(page).not_to have_current_path meeting_path(meeting.id)
+    expect(page).to have_no_current_path meeting_path(meeting.id)
 
     expect(page)
       .to have_content("Added by #{user.name}")
@@ -115,17 +114,17 @@ RSpec.describe 'Meetings copy', :js, :with_cuprite do
 
     # Does not copy the attendees
     expect(page)
-      .not_to have_content "Attendees: #{other_user.name}"
+      .to have_no_content "Attendees: #{other_user.name}"
     expect(page)
       .to have_content "Attendees:"
 
     # Copies the agenda
-    click_link "Agenda"
+    click_on "Agenda"
     expect(page)
       .to have_content agenda_text
 
     # Adds an entry to the history
-    click_link "History"
+    click_on "History"
     expect(page)
       .to have_content("Copied from Meeting ##{meeting.id}")
   end

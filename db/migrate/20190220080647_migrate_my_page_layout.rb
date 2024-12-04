@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -61,7 +61,7 @@ class MigrateMyPageLayout < ActiveRecord::Migration[5.2]
     start_row = 1
     # Give every widget a fixed height of 4 rows
     widget_height = 4
-    (old_layout['top'] || []).each do |block|
+    (old_layout["top"] || []).each do |block|
       map_widget my_page,
                  old_name: block,
                  start_row:,
@@ -74,7 +74,7 @@ class MigrateMyPageLayout < ActiveRecord::Migration[5.2]
 
     # Migrate left
     left_row = start_row
-    (old_layout['left'] || []).each do |block|
+    (old_layout["left"] || []).each do |block|
       map_widget my_page,
                  old_name: block,
                  start_row: left_row,
@@ -87,7 +87,7 @@ class MigrateMyPageLayout < ActiveRecord::Migration[5.2]
 
     # Migrate right
     right_row = start_row
-    (old_layout['right'] || []).each do |block|
+    (old_layout["right"] || []).each do |block|
       map_widget my_page,
                  old_name: block,
                  start_row: right_row,
@@ -107,7 +107,7 @@ class MigrateMyPageLayout < ActiveRecord::Migration[5.2]
   def remove_old_my_page(pref)
     # There are some cases where keys where not symbolized
     pref.others.delete(:my_page_layout)
-    pref.others.delete('my_page_layout')
+    pref.others.delete("my_page_layout")
     pref.save
   end
 

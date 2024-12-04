@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,9 +26,9 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-OpenProject::Application.routes.draw do
-  scope '', as: 'backlogs' do
-    scope 'projects/:project_id', as: 'project' do
+Rails.application.routes.draw do
+  scope "", as: "backlogs" do
+    scope "projects/:project_id", as: "project" do
       resources :backlogs,         controller: :rb_master_backlogs,  only: :index
 
       resources :sprints,          controller: :rb_sprints,          only: %i[show update] do
@@ -51,22 +51,22 @@ OpenProject::Application.routes.draw do
     end
   end
 
-  scope 'projects/:project_id', as: 'project', module: 'projects' do
-    namespace 'settings' do
+  scope "projects/:project_id", as: "project", module: "projects" do
+    namespace "settings" do
       resource :backlogs, only: %i[show update] do
         member do
-          post 'rebuild_positions' => 'backlogs#rebuild_positions'
+          post "rebuild_positions" => "backlogs#rebuild_positions"
         end
       end
     end
   end
 
-  get 'projects/:project_id/versions/:id/edit' => 'version_settings#edit'
+  get "projects/:project_id/versions/:id/edit" => "version_settings#edit"
 
-  scope 'admin' do
+  scope "admin" do
     resource :backlogs,
              only: %i[show update],
              controller: :backlogs_settings,
-             as: 'admin_backlogs_settings'
+             as: "admin_backlogs_settings"
   end
 end

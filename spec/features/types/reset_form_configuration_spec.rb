@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,9 +26,9 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.describe 'Reset form configuration', js: true do
+RSpec.describe "Reset form configuration", :js do
   shared_let(:admin) { create(:admin) }
   let(:type) { create(:type) }
 
@@ -38,7 +38,7 @@ RSpec.describe 'Reset form configuration', js: true do
 
   describe "with EE token and CFs", with_ee: %i[edit_attribute_groups] do
     let(:custom_fields) { [custom_field] }
-    let(:custom_field) { create(:issue_custom_field, :integer, is_required: true, name: 'MyNumber') }
+    let(:custom_field) { create(:issue_custom_field, :integer, is_required: true, name: "MyNumber") }
     let(:cf_identifier) { custom_field.attribute_name }
     let(:cf_identifier_api) { cf_identifier.camelcase(:lower) }
 
@@ -50,17 +50,17 @@ RSpec.describe 'Reset form configuration', js: true do
       visit edit_type_tab_path(id: type.id, tab: "form_configuration")
     end
 
-    it 'resets the form properly after changes with CFs (Regression test #27487)' do
+    it "resets the form properly after changes with CFs (Regression test #27487)" do
       # Should be initially disabled
       form.expect_inactive(cf_identifier)
 
       # Add into new group
-      form.add_attribute_group('New Group')
-      form.move_to(cf_identifier, 'New Group')
+      form.add_attribute_group("New Group")
+      form.move_to(cf_identifier, "New Group")
       form.expect_attribute(key: cf_identifier)
 
       form.save_changes
-      expect(page).to have_selector('.op-toast.-success', text: 'Successful update.', wait: 10)
+      expect_flash(message: "Successful update.")
 
       SeleniumHubWaiter.wait
       form.reset_button.click
@@ -70,13 +70,13 @@ RSpec.describe 'Reset form configuration', js: true do
       # Wait for page reload
       SeleniumHubWaiter.wait
 
-      expect(page).not_to have_selector('.group-head', text: 'NEW GROUP')
-      expect(page).not_to have_selector('.group-head', text: 'OTHER')
+      expect(page).to have_no_css(".group-head", text: "NEW GROUP")
+      expect(page).to have_no_css(".group-head", text: "OTHER")
       type.reload
 
       expect(type.custom_field_ids).to be_empty
 
-      new_group = type.attribute_groups.detect { |g| g.key == 'New Group' }
+      new_group = type.attribute_groups.detect { |g| g.key == "New Group" }
       expect(new_group).not_to be_present
 
       other_group = type.attribute_groups.detect { |g| g.key == :other }

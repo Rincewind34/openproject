@@ -7,7 +7,7 @@ keywords: GDPR, data flow, processing personal data, data privacy information
 ---
 # Processing of personal data
 
-Status of this document: 2023-11-01
+Status of this document: 2024-09-22
 
 ## Purpose of this document
 
@@ -39,13 +39,13 @@ Anonymity is not complete because the underlying webserver might still generate 
 
 To sign-in to the OpenProject platform, the [registration of a user account](../../system-admin-guide/users-permissions/users/#create-users) is required. For registered user's the following personal data are processed:
 
-##### User profile (bu-01)
+#### User profile (bu-01)
 
 - Name
 - Username
 - Avatar
 
-##### User settings (bu-02)
+#### User settings (bu-02)
 
 - Email address
 - Notification settings
@@ -54,7 +54,7 @@ To sign-in to the OpenProject platform, the [registration of a user account](../
 - Time zone settings
 - Display settings (contrast modes, custom themes)
 
-##### User authentication (bu-03)
+#### User authentication (bu-03)
 
 * Access tokens
 * User sessions
@@ -62,20 +62,20 @@ To sign-in to the OpenProject platform, the [registration of a user account](../
 * Phone number for sending one-time passwords via SMS
 * OATH secret codes
 
-##### User notification settings (bu-04)
+#### User notification settings (bu-04)
 
 - Default notification settings
-- Project-specific notification settings 
+- Project-specific notification settings
 - Default email reminder settings
 - Project-specific email reminder settings
 
-##### User roles and permissions (bu-05)
+#### User roles and permissions (bu-05)
 
 - Group memberships
-- Project roles 
+- Project roles
 - Global roles
 
-##### User rates (bu-06)
+#### User rates (bu-06)
 
 * Default hourly rate
 * Hourly rate per project
@@ -86,43 +86,53 @@ To sign-in to the OpenProject platform, the [registration of a user account](../
 
 Depending on the individual use and permissions of the user the following personal data is processed:
 
-##### Boards (cb-01) 
+#### Boards (cb-01)
 
 - Assignment of a person to a work package (author, assignee, responsible, user custom fields)
 - Change history
 - Person mentioned in a board
 
-##### Budgets (cb-02)
+#### Budgets (cb-02)
 
 - Assignments of a person to a budget
 - Change history
 - Person mentioned in a budget description
 
-##### Comments (cc-01)
+#### Comments (cc-01)
 
 - Author of a comment
 - Change history
 - Reactions of a user to a comment
 - Person mentioned in a comment
 
-##### Documents (cd-01) 
-
-- Assignment of a document to an uploader or creator
-- Change history
-- Person mentioned in a document (incl. file attributes)
-
-##### Email notifications (ce-01)
+#### Email notifications (ce-01)
 
 - Email header including sender and recipients
 - Person mentioned in an email
 
-##### Meetings (cm-01)
+#### Files (cf-01)
+
+- Assignment of a files to an uploader or creator
+- Change history
+- Person mentioned in a file (incl. file attributes)
+
+#### GitHub pull requests (cg-01)
+
+* Assignment of a person to a pull request in GitHub (author, reviewer, participant)
+* Change history
+
+#### GitLab merge requests and issues (cg-02)
+
+* Assignment of a person to a merge request or issue in GitLab (author, reviewer, participant)
+* Change history
+
+#### Meetings (cm-01)
 
 - Assignment of a person (author, invitee, participant) to a meeting
 - Change history
 - Person mentioned in an agenda item
 
-##### Projects (cp-01)
+#### Projects (cp-01)
 
 - Assignment of a person to a project (author, project member)
 
@@ -134,46 +144,44 @@ Depending on the individual use and permissions of the user the following person
 
 - Persons mentioned in a project status information
 
-
-##### Project calendars (cp-02)
+#### Project calendars (cp-02)
 
 - Assignment of objects shown in the calendar (meetings, work packages, versions, milestones) to a person
 - Change history
 - Person mentioned in a calendar item
 
-##### Project news (cp-03)
+#### Project news (cp-03)
 
 - Author of a project news
 - Change history
 - Person mentioned in a project news
 
-##### Team planner (ct-01)
+#### Team planner (ct-01)
 
 - Assignment of a work package to a person
 - Change history
 - Persons mentioned in team planners
 
-##### Time tracking (ct-02)
+#### Time tracking (ct-02)
 
 - Assignments of a time entry to a person
 - Change history
 - Person mentioned in a time entry
 
-##### Wiki pages (cw-01)
+#### Wiki pages (cw-01)
 
 - Assignment of an wiki page edit to a person (author, contributor)
 - Change history
 - Person mentioned in a wiki page
 
-##### Work packages (cw-02)
+#### Work packages (cw-02)
 
 - Assignment of a work package to a person
 - Change history
 - Person mentioned in a list or project schedule
-- Person mentioned in an attributs or text field
+- Person mentioned in an attribute or text field
 - Person mentioned in a linked file
-- Person mentioned in a linked pull request (i.e. GitHub)
-
+- Person mentioned in a linked pull request (i.e. GitHub or GitLab)
 
 ### D: Logging
 
@@ -184,6 +192,7 @@ Activities in OpenProject are automatically journalized. It allows users to unde
 Independently of the change history every interaction (i.e. web request) of a browser or other client results in an entry written to the server logfiles. These files support the operation of the application as they provide information on faulty behavior of the system (i.e. bugs and lack of performance).
 
 Those log files contain the following person related data:
+
 * id of the user performing the request
 * time of the request
 * url called
@@ -195,9 +204,9 @@ The data listed above is generated upon entering the application. When actually 
 
 #### Retention period
 
-Logfiles are automatically removed based on a first-in-first-out mechanism. This is done to limit the disk space which ensures the server's operation and at the same time serves as a means to erase the log entries once they have served their purpose of supporting operations. By default the retention period is determined by the size of the logfile. Once the logfile reaches its storage limit, the oldest entries are removed. 
+Logfiles are automatically removed based on a first-in-first-out mechanism. This is done to limit the disk space which ensures the server's operation and at the same time serves as a means to erase the log entries once they have served their purpose of supporting operations. By default the retention period is determined by the size of the logfile. Once the logfile reaches its storage limit, the oldest entries are removed.
 
-As such, the log entries are not kept for a fixed period of time. If there are a lot of requests, old entries are removed faster then if there are less requests. Administrators of an OpenProject installation might decide to configure a different behaviour that factors in the age of the log entries.
+As such, the log entries are not kept for a fixed period of time. If there are a lot of requests, old entries are removed faster then if there are less requests. Administrators of an OpenProject installation might decide to configure a different behavior that factors in the age of the log entries.
 
 #### Technical documentation
 
@@ -233,18 +242,20 @@ flowchart TD
   direction TB
     idp["Identity provider (idp)"]
     nex["Nextcloud (nex)"]
+    osh["OneDrive/SharePoint (osh)"]
     gih["GitHub (gih)"]
+    gil["GitLab (gil)"]
     cal["Calendar (cal)"]
-  	O["API integrations (api)"]
+   O["API integrations (api)"]
  
 end
 
   subgraph services[Internal Services]
   direction TB
-  	M[Memcached]
-	  P[PostgreSQL]
-	  S[Object storage or NFS]
-	  email["Email gateways (eml)"]
+   M[Memcached]
+   P[PostgreSQL]
+   S[Object storage or NFS]
+   email["Email gateways (eml)"]
   end
 
 
@@ -254,13 +265,13 @@ end
   
   subgraph localclients[Local Client / User device]
   direction TB
-	browser
-	A1
-	A2
-	
-	
-	
-	
+ browser
+ A1
+ A2
+ 
+ 
+ 
+ 
 end
 
   
@@ -272,7 +283,7 @@ As a web application, the primary data flow is between the user's web browser (o
 
 The external web server acts as a proxy/reverse-proxy for the OpenProject Puma app server, relaying requests for it to handle and respond. In the course of the request, access to external services such as the PostgreSQL database, a caching server, or attached storages might be performed. In case of S3-compatible object storage set ups, OpenProject performs calls to the object storage to put or request files from it. Likewise, for network-attached storages linked into the application, underlying network requests are performed. These are out of scope for this evaluation, as they are provided and maintained by the operator of the system.
 
-In the course of using the application, background tasks are enqueued in the database such as outgoing emails, cleanup tasks, or notification processing. These tasks are performed in a separate process, the background worker queue. This process accesses the same services as the application server process to access or modify data. It might connect to external integrations such as a [Nextcloud](../../user-guide/nextcloud-integration/) instance to set up file sharings depending on actions performed by the users.
+In the course of using the application, background tasks are enqueued in the database such as outgoing emails, cleanup tasks, or notification processing. These tasks are performed in a separate process, the background worker queue. This process accesses the same services as the application server process to access or modify data. It might connect to external integrations such as a [Nextcloud](../../user-guide/file-management/nextcloud-integration/) or [OneDrive/SharePoint](../../user-guide/file-management/one-drive-integration/) instance to set up file sharings depending on actions performed by the users.
 
 **Exemplary request flow**
 
@@ -305,23 +316,23 @@ flowchart LR
   
   subgraph IDP[Identity Provider]
    direction LR
-  	ssoprovider[SSO provider]
-  	LDAP
+   ssoprovider[SSO provider]
+   LDAP
   
   end
   
   subgraph openproject["Relying Party (OpenProject) "]
    direction LR
-  	ssoclient[SSO client]
-  	ldapauthentication[LDAP authentication]
-  	ldapgroupsync[LDAP group sync]
-  	
-	end
+   ssoclient[SSO client]
+   ldapauthentication[LDAP authentication]
+   ldapgroupsync[LDAP group sync]
+   
+ end
 
   subgraph localclients[Local clients]
    direction LR
-  	Browser
-  	end
+   Browser
+   end
   
 ```
 
@@ -329,7 +340,7 @@ flowchart LR
 
 * Centralized identity and access management
 * Single sign on and single sign out ([OIDC](../../system-admin-guide/authentication/openid-providers/), [SAML](../../system-admin-guide/authentication/saml/))
-* [Syncing LDAP groups with OpenProject groups](../../system-admin-guide/authentication/ldap-authentication/ldap-group-synchronization/)  
+* [Syncing LDAP groups with OpenProject groups](../../system-admin-guide/authentication/ldap-connections/ldap-group-synchronization/)  
 
 #### Processed data
 
@@ -344,10 +355,9 @@ flowchart LR
 * `idp-02` TLS
 * `idp-03` TLS
 
-### C: Email (eml) 
+### C: Email (eml)
 
-#### Overview 
-
+#### Overview
 
 ```mermaid
 %%{init: {'theme':'neutral'}}%%
@@ -360,24 +370,24 @@ flowchart LR
  
    subgraph localclients[Local clients]
   direction TB
-  	A
+   A
     end
  
  subgraph internal[Internal services]
   direction TB
-  	C
+   C
   
     end
 
   subgraph external[External services]
   direction TB
-  	A
-  	B
+   A
+   B
     end
     
   subgraph OpenProject
   direction TB
-  	D
+   D
     end
     
     
@@ -387,7 +397,7 @@ flowchart LR
 
 #### Purpose
 
-* Create a new work package by sending an email to a configured email adress.
+* Create a new work package by sending an email to a configured email address.
 * Adding a comment to an existing work package by answering to an email notification.
 * Sending email notifications about updates in OpenProject (e.g [email reminder](../../system-admin-guide/emails-and-notifications/), meeting updates, project invitation, wiki notifications)
 
@@ -395,7 +405,7 @@ flowchart LR
 
 * `bu-01`
 * `bu-04`
-* `bu-05` 
+* `bu-05`
 * `cc-01`
 * `cm-01`
 * `cp-01`
@@ -423,19 +433,19 @@ flowchart LR
   opicalapi -->|cal-02| localcalendarapp
   
   subgraph localclient[Local clients]
-  	direction TB
-  		localcalendarapp
+   direction TB
+    localcalendarapp
     end
 
 
     subgraph external[External services]
-  		direction TB
-  			B
+    direction TB
+     B
     end
     
     subgraph OpenProject
- 		direction TB
-  			projectcalendar[Project calendar] --> opicalapi 
+   direction TB
+     projectcalendar[Project calendar] --> opicalapi 
     end
 ```
 
@@ -455,7 +465,7 @@ flowchart LR
 
 * `cal-01` TLS
 * `cal-02` TLS (not controlled by the OpenProject system)
-* `cal-03` TLS (not controlled by the OpenProject system) 
+* `cal-03` TLS (not controlled by the OpenProject system)
 
 ### E: Nextcloud (nex)
 
@@ -470,35 +480,34 @@ flowchart LR
   appopenprojectintegration <-->|nex-04| openprojectapi
   
   subgraph local[Local clients]
-  	Browser
-  	nextclouddesktopclient
+   Browser
+   nextclouddesktopclient
    end
 
 subgraph openproject[OpenProject]
    
-  	opnextcloudintegrattion[Nextcloud integration]
-  	openprojectapi[API]
-  		end
+   opnextcloudintegrattion[Nextcloud integration]
+   openprojectapi[API]
+    end
 
   subgraph nextcloud[Nextcloud]
-  	groupfolder[Group folder app]
-  	appopenprojectintegration[OpenProject integration app]
-  	nextcloudapi[API]
-	end 
+   groupfolder[Group folder app]
+   appopenprojectintegration[OpenProject integration app]
+   nextcloudapi[API]
+ end 
   
 ```
 
 #### Purpose
 
-* Users can link files stored in Nextcloud with work package in OpenProject.
+* Users can link files stored in Nextcloud with work packages in OpenProject.
 * Project folders in Nextcloud can be managed in OpenProject (create, delete, update, user permissions).
 
 #### Processed data
 
 * `bu-01`
-* `bu-03 (iCalendar access tokens)`
-* `cm-01`
-* `cw-02`
+* `bu-03`
+* `cf-01`
 
 #### Security measures
 
@@ -507,33 +516,80 @@ subgraph openproject[OpenProject]
 * `nex-03` TLS
 * `nex-04` TLS
 
-### F: GitHub (gih)
+### F: OneDrive/SharePoint (osh)
 
 #### Overview
 
 ```mermaid
 %%{init: {'theme':'neutral'}}%%
 flowchart LR
-	gitclient <-->|gih-01| githubapi
-	githubapi <-->|gih-02| opgithubintegration
-	githubwebhooks -->|gih-03| opgithubintegration
+  Browser <--> |osh-01| openproject
+  Browser <-->|osh-02| onedrive
+  onedrivedesktopclient[Nextcloud desktop client] <-->|osh-03| onedriveapi
+  appopenprojectintegration <-->|osh-04| openprojectapi
+  
+  subgraph local[Local clients]
+   Browser
+   onedrivedesktopclient[OneDrive desktop client]
+   end
+
+subgraph openproject[OpenProject]
+   
+   oponedrivetegration[OneDrive/SharePoint integration]
+   openprojectapi[API]
+    end
+
+  subgraph onedrive[OneDrive/SharePoint]
+   appopenprojectintegration[OpenProject integration app]
+   onedriveapi[API]
+ end 
+  
+```
+
+#### Purpose
+
+* Users can link files stored in OneDrive/SharePoint with work packages in OpenProject.
+
+#### Processed data
+
+* `bu-01`
+* `bu-03`
+* `cf-01`
+
+#### Security measures
+
+* `osh-01` TLS
+* `osh-02` TLS
+* `osh-03` TLS
+* `osh-04` TLS
+
+### G: GitHub (gih)
+
+#### Overview
+
+```mermaid
+%%{init: {'theme':'neutral'}}%%
+flowchart LR
+ gitclient <-->|gih-01| githubapi
+ githubapi <-->|gih-02| opgithubintegration
+ githubwebhooks -->|gih-03| opgithubintegration
 
   subgraph GitHub
    direction TB
-  	githubapi[API]
-	githubwebhooks[Webhooks]
+   githubapi[API]
+ githubwebhooks[Webhooks]
 
-	end
-	
-	subgraph localclients[Local clients]
+ end
+ 
+ subgraph localclients[Local clients]
    direction TB
-  	gitclient[Git client]
-	end
+   gitclient[Git client]
+ end
 
   subgraph openproject[OpenProject]
    direction TB
-  	opgithubintegration[Github integration] --- workpackagesmodule[Work packages module]
-	end
+   opgithubintegration[Github integration] --- workpackagesmodule[Work packages module]
+ end
   
   
 ```
@@ -545,6 +601,7 @@ flowchart LR
 
 #### Processed data
 
+* cg-01
 * cw-02
 
 #### Security measure
@@ -553,26 +610,72 @@ flowchart LR
 * `gih-02` TLS
 * `gih-03` TLS
 
-### G: API integrations (api)
+### H: GitLab (gil)
 
 #### Overview
 
 ```mermaid
 %%{init: {'theme':'neutral'}}%%
 flowchart LR
-	api <-->|api-01| apiintegration[API integration]
-	
-	subgraph externalintegreations[External integrations]
+ gitclient <-->|gil-01| gitlabapi
+ gitlabapi <-->|gil-02| opgitlabintegration
+ gitlabwebhooks -->|gil-03| opgitlabintegration
+
+  subgraph GitLab
    direction TB
-  	apiintegration
-	end
+   gitlabapi[API]
+ gitlabwebhooks[Webhooks]
+
+ end
+ 
+ subgraph localclients[Local clients]
+   direction TB
+   gitclient[Git client]
+ end
 
   subgraph openproject[OpenProject]
    direction TB
-  	api[API]
-	end
+   opgitlabintegration[GitLab integration] --- workpackagesmodule[Work packages module]
+ end
   
   
+```
+
+#### Purpose
+
+- Connect merge requests in GitLab with work packages in OpenProject.
+- Connect issues in GitLab with work packages in OpenProject.
+- Show the status of merge requests in related work packages.
+
+#### Processed data
+
+* cg-02
+* cw-02
+
+#### Security measure
+
+* `gil-01` TLS
+* `gil-02` TLS
+* `gil-03` TLS
+
+### I: API integrations (api)
+
+#### Overview
+
+```mermaid
+%%{init: {'theme':'neutral'}}%%
+flowchart LR
+ api <-->|api-01| apiintegration[API integration]
+ 
+ subgraph externalintegreations[External integrations]
+   direction TB
+   apiintegration
+ end
+
+  subgraph openproject[OpenProject]
+   direction TB
+   api[API]
+ end
 ```
 
 #### Purpose
@@ -583,7 +686,7 @@ flowchart LR
 
 * All data the user has permissions to.
 
-> **Note**: Please see the [API documentation](https://www.openproject.org/docs/api) for further information about all API endpoints.
+> **Note**: Please see the [API documentation](../../api/) for further information about all API endpoints.
 
 #### Security measure
 
@@ -595,17 +698,17 @@ OpenProject makes use of technical cookies to identity the browser client and/or
 
 | **Cookie name**                                | **Description**                                              | **Expiry**                                                   | **Security flags**                                    | **Implementation**                                           |
 | ---------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ----------------------------------------------------- | ------------------------------------------------------------ |
-| `_open_project_session` (name is configurable) | contains the information about the logged in user as well as information stored between requests on the user's choices (e.g. the filters for costs are in part stored there) | Session <br />+ configurable server-sideTTL                  | secure<br />httponly<br />Samesite=Lax<br />encrypted | [Code ref](https://github.com/opf/openproject/blob/release/13.0/config/initializers/session_store.rb#L34-L39) |
-| `autologin` (name is configurable)             | (Optional feature, requires opt-in under Administration > Authentication settings) <br />enables the user to automatically log in again after the session expired (e.g. because the browser was closed). It is set when the user checks the '*Stay logged in*' box in the login form.<br /> | Cookie 1 year<br />+ server-side token N days (configurable) | secure<br />httponly<br />Samesite=Lax<br />encrypted | [Code ref](https://github.com/opf/openproject/blob/release/13.0/app/controllers/concerns/accounts/user_login.rb#L19C1-L29) |
-| `op2fa_remember_token`                         | the presence of that cookie suppresses the need for the user to provide a second factor upon login for N days (configurable by administration) if the user selects to do so when entering the 2fa information. | N days (configurable)                                        | secure<br />httponly<br />Samesite=Lax<br />encrypted | [Code ref](https://github.com/opf/openproject/blob/release/13.0/modules/two_factor_authentication/app/controllers/concerns/two_factor_authentication/remember_token.rb#L28-L34) |
+| `_open_project_session` (name is configurable) | contains the information about the logged in user as well as information stored between requests on the user's choices (e.g. the filters for costs are in part stored there) | Session <br>+ configurable server-sideTTL                  | secure<br>httponly<br>Samesite=Lax<br>encrypted | [Code ref](https://github.com/opf/openproject/blob/release/13.0/config/initializers/session_store.rb#L34-L39) |
+| `autologin` (name is configurable)             | (Optional feature, requires opt-in under Administration > Authentication settings) <br>enables the user to automatically log in again after the session expired (e.g. because the browser was closed). It is set when the user checks the '*Stay logged in*' box in the login form.<br> | Cookie 1 year<br>+ server-side token N days (configurable) | secure<br>httponly<br>Samesite=Lax<br>encrypted | [Code ref](https://github.com/opf/openproject/blob/release/13.0/app/controllers/concerns/accounts/user_login.rb#L19C1-L29) |
+| `op2fa_remember_token`                         | the presence of that cookie suppresses the need for the user to provide a second factor upon login for N days (configurable by administration) if the user selects to do so when entering the 2fa information. | N days (configurable)                                        | secure<br>httponly<br>Samesite=Lax<br>encrypted | [Code ref](https://github.com/opf/openproject/blob/release/13.0/modules/two_factor_authentication/app/controllers/concerns/two_factor_authentication/remember_token.rb#L28-L34) |
 
 ## Deletion of personal data
 
-Whenever a user in OpenProject is fully deleted, the system scrubs and removes all user master data, all functional assignments, and all references to a user in the change histories. All actions performed in the name of the user are being replaced with a singular "**Deleted user**" reference in order to maintain integrity of database references, such as being an author of a work package that remains. Finally, the user data itself will be deleted, removing all structural traces of PII in the system. 
+Whenever a user in OpenProject is fully deleted, the system scrubs and removes all user master data, all functional assignments, and all references to a user in the change histories. All actions performed in the name of the user are being replaced with a singular "**Deleted user**" reference in order to maintain integrity of database references, such as being an author of a work package that remains. Finally, the user data itself will be deleted, removing all structural traces of PII in the system.
 
 **Note:** Due to the user references changing, respective cache keys for information such as work packages or projects are invalidated automatically.
 
-**Note:** Deleting a user account is a permanent action and cannot be reversed. 
+**Note:** Deleting a user account is a permanent action and cannot be reversed.
 
 For more information on user account deletion, please see [the user administration guide](../../system-admin-guide/users-permissions/users/#delete-users).
 

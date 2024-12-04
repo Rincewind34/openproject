@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe Journable::WithHistoricAttributes,
                with_ee: %i[baseline_comparison] do
@@ -62,15 +62,14 @@ RSpec.describe Journable::WithHistoricAttributes,
 
   let(:user1) do
     create(:user,
-           firstname: 'user',
-           lastname: '1',
-           member_in_project: project,
-           member_with_permissions: %i[view_work_packages view_file_links])
+           firstname: "user",
+           lastname: "1",
+           member_with_permissions: { project => %i[view_work_packages view_file_links] })
   end
   let(:build_query) do
     build(:query, user: nil, project: nil).tap do |query|
       query.filters.clear
-      query.add_filter 'subject', '~', search_term
+      query.add_filter "subject", "~", search_term
     end
   end
 
@@ -150,7 +149,7 @@ RSpec.describe Journable::WithHistoricAttributes,
     end
 
     context "with active record relation of work packages" do
-      let(:work_packages) { WorkPackage.all }
+      let(:work_packages) { WorkPackage.order(subject: :asc).all }
 
       it "provides access to the work-package attributes" do
         expect(subject.map(&:subject)).to eq ["The current work package 1", "The current work package 2"]
@@ -166,7 +165,7 @@ RSpec.describe Journable::WithHistoricAttributes,
     end
   end
 
-  describe '#attributes_by_timestamp' do
+  describe "#attributes_by_timestamp" do
     let(:work_packages) { work_package1 }
 
     context "with a single work package" do
@@ -247,7 +246,7 @@ RSpec.describe Journable::WithHistoricAttributes,
     end
 
     context "with active record relation of work packages" do
-      let(:work_packages) { WorkPackage.all }
+      let(:work_packages) { WorkPackage.order(subject: :asc).all }
 
       it "provides access to the work-package attributes at timestamps" do
         expect(subject.first.attributes_by_timestamp["2022-01-01T00:00:00Z"].subject).to eq "The original work package 1"
@@ -280,7 +279,7 @@ RSpec.describe Journable::WithHistoricAttributes,
     end
   end
 
-  describe '#exists_at_timestamps' do
+  describe "#exists_at_timestamps" do
     context "with a single work package" do
       let(:work_packages) { work_package1 }
 
@@ -289,7 +288,7 @@ RSpec.describe Journable::WithHistoricAttributes,
         expect(subject.exists_at_timestamps).to include Timestamp.parse("PT0S")
       end
 
-      context 'with the work package not being visible currently' do
+      context "with the work package not being visible currently" do
         let(:other_project) { create(:project) }
 
         before do
@@ -303,7 +302,7 @@ RSpec.describe Journable::WithHistoricAttributes,
         end
       end
 
-      context 'with the work package not having been visible before but being visible now' do
+      context "with the work package not having been visible before but being visible now" do
         let(:other_project) { create(:project) }
 
         before do
@@ -367,20 +366,20 @@ RSpec.describe Journable::WithHistoricAttributes,
     end
   end
 
-  describe '#at_timestamp' do
+  describe "#at_timestamp" do
     context "with a single work package" do
       let(:work_packages) { work_package1 }
 
       it "returns the journable at a former time it existed with the attributes set to the former values" do
-        expect(subject.at_timestamp(Timestamp.parse("2022-01-01T00:00:00Z")).attributes.slice('subject', 'id'))
-                      .to eq('subject' => "The original work package 1",
-                             'id' => work_package1.id)
+        expect(subject.at_timestamp(Timestamp.parse("2022-01-01T00:00:00Z")).attributes.slice("subject", "id"))
+                      .to eq("subject" => "The original work package 1",
+                             "id" => work_package1.id)
       end
 
       it "returns the journable at the current time" do
-        expect(subject.at_timestamp(Timestamp.parse("PT0S")).attributes.slice('subject', 'id'))
-          .to eq('subject' => "The current work package 1",
-                 'id' => work_package1.id)
+        expect(subject.at_timestamp(Timestamp.parse("PT0S")).attributes.slice("subject", "id"))
+          .to eq("subject" => "The current work package 1",
+                 "id" => work_package1.id)
       end
 
       it "returns nil for a time it did not exist yet" do
@@ -388,7 +387,7 @@ RSpec.describe Journable::WithHistoricAttributes,
           .to be_nil
       end
 
-      context 'with the work package not being visible currently' do
+      context "with the work package not being visible currently" do
         let(:other_project) { create(:project) }
 
         before do
@@ -397,9 +396,9 @@ RSpec.describe Journable::WithHistoricAttributes,
         end
 
         it "returns the journable at a former time it existed with the attributes set to the former values" do
-          expect(subject.at_timestamp(Timestamp.parse("2022-01-01T00:00:00Z")).attributes.slice('subject', 'id'))
-            .to eq('subject' => "The original work package 1",
-                   'id' => work_package1.id)
+          expect(subject.at_timestamp(Timestamp.parse("2022-01-01T00:00:00Z")).attributes.slice("subject", "id"))
+            .to eq("subject" => "The original work package 1",
+                   "id" => work_package1.id)
         end
 
         it "returns nil at the current time" do
@@ -408,7 +407,7 @@ RSpec.describe Journable::WithHistoricAttributes,
         end
       end
 
-      context 'with the work package not having been visible before but being visible now' do
+      context "with the work package not having been visible before but being visible now" do
         let(:other_project) { create(:project) }
 
         before do
@@ -416,21 +415,21 @@ RSpec.describe Journable::WithHistoricAttributes,
         end
 
         it "returns the journable at a former time it existed (and was invisible) with the attributes set to the former values" do
-          expect(subject.at_timestamp(Timestamp.parse("2022-01-01T00:00:00Z")).attributes.slice('subject', 'id'))
-            .to eq('subject' => "The original work package 1",
-                   'id' => work_package1.id)
+          expect(subject.at_timestamp(Timestamp.parse("2022-01-01T00:00:00Z")).attributes.slice("subject", "id"))
+            .to eq("subject" => "The original work package 1",
+                   "id" => work_package1.id)
         end
 
         it "returns the journable at the current time" do
-          expect(subject.at_timestamp(Timestamp.parse("PT0S")).attributes.slice('subject', 'id'))
-            .to eq('subject' => "The current work package 1",
-                   'id' => work_package1.id)
+          expect(subject.at_timestamp(Timestamp.parse("PT0S")).attributes.slice("subject", "id"))
+            .to eq("subject" => "The current work package 1",
+                   "id" => work_package1.id)
         end
       end
     end
   end
 
-  describe '#historic?' do
+  describe "#historic?" do
     context "with a single work package" do
       let(:work_packages) { work_package1 }
 
@@ -472,7 +471,7 @@ RSpec.describe Journable::WithHistoricAttributes,
     end
   end
 
-  describe '#matches_query_filters_at_timestamps' do
+  describe "#matches_query_filters_at_timestamps" do
     let(:query) { build_query }
     let(:search_term) { "original" }
 
@@ -593,19 +592,19 @@ RSpec.describe Journable::WithHistoricAttributes,
     end
   end
 
-  describe '#changed_at_timestamp' do
+  describe "#changed_at_timestamp" do
     subject { described_class.wrap(work_package1, timestamps:) }
 
-    context 'for a timestamp where the work package did exist' do
-      it 'returns the changed attributes at the timestamp compared to the current attribute values' do
+    context "for a timestamp where the work package did exist" do
+      it "returns the changed attributes at the timestamp compared to the current attribute values" do
         expect(subject.changed_at_timestamp(Timestamp.parse("2022-01-01T00:00:00Z")))
-          .to match_array ['subject']
+          .to contain_exactly("subject")
       end
 
-      context 'when the work package includes custom field changes' do
+      context "when the work package includes custom field changes" do
         let!(:custom_field) do
           create(:string_wp_custom_field,
-                 name: 'String CF',
+                 name: "String CF",
                  types: project.types,
                  projects: [project])
         end
@@ -614,18 +613,18 @@ RSpec.describe Journable::WithHistoricAttributes,
           create(:custom_value,
                  custom_field:,
                  customized: work_package1,
-                 value: 'This is a string value')
+                 value: "This is a string value")
         end
 
-        it 'returns the changed attributes including custom fields at the timestamp compared to the current attribute values' do
+        it "returns the changed attributes including custom fields at the timestamp compared to the current attribute values" do
           expect(subject.changed_at_timestamp(Timestamp.parse("2022-01-01T00:00:00Z")))
-            .to contain_exactly 'subject', "custom_field_#{custom_field.id}"
+            .to contain_exactly "subject", "custom_field_#{custom_field.id}"
         end
       end
     end
 
-    context 'for a timestamp where the work package did not exist' do
-      it 'returns no changes' do
+    context "for a timestamp where the work package did not exist" do
+      it "returns no changes" do
         expect(subject.changed_at_timestamp(Timestamp.parse("2021-01-01T00:00:00Z")))
           .to be_empty
       end

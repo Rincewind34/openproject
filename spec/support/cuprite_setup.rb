@@ -2,7 +2,7 @@
 
 # -- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,48 +29,68 @@
 # ++
 #
 
-require 'capybara/cuprite'
+require "capybara/cuprite"
 
 def headful_mode?
-  ActiveRecord::Type::Boolean.new.cast(ENV.fetch('OPENPROJECT_TESTING_NO_HEADLESS', nil))
+  ActiveRecord::Type::Boolean.new.cast(ENV.fetch("OPENPROJECT_TESTING_NO_HEADLESS", nil))
 end
 
 def headless_mode?
   !headful_mode?
 end
 
-# Customize browser download path until https://github.com/rubycdp/cuprite/pull/217 is released.
-module SetCupriteDownloadPath
-  def initialize(app, options = {})
-    super
-    @options[:save_path] = DownloadList::SHARED_PATH.to_s
+module WindowResolutionManagement
+  DIMENSION_SEPARATOR = "x"
+
+  class << self
+    # @param [String] resolution, "1920x1080"
+    # @return [Array<Int,Int>] width and height representation of the resolution, [1920, 1080]
+    def extract_dimensions(resolution)
+      resolution.downcase
+                .split(DIMENSION_SEPARATOR)
+                .map(&:to_i)
+    end
   end
 end
-Capybara::Cuprite::Driver.prepend(SetCupriteDownloadPath)
 
 def register_better_cuprite(language, name: :"better_cuprite_#{language}")
   Capybara.register_driver(name) do |app|
     options = {
-      process_timeout: 10,
+      process_timeout: 20,
+      timeout: 10,
+      # In case the timeout is not enough, this option can be activated:
+      # pending_connection_errors: false,
       inspector: true,
-      headless: headless_mode?
+      headless: headless_mode?,
+      save_path: DownloadList::SHARED_PATH.to_s,
+      window_size: [1920, 1080]
     }
-    options = options.merge(window_size: [1920, 1080]) if headless_mode?
 
-    if ENV['CHROME_URL'].present?
-      options = options.merge(url: ENV['CHROME_URL'])
+    if headful_mode? && ENV["CAPYBARA_WINDOW_RESOLUTION"]
+      window_size = WindowResolutionManagement.extract_dimensions(ENV["CAPYBARA_WINDOW_RESOLUTION"])
+      options = options.merge(window_size:)
+    end
+
+    if headful_mode? && ENV["OPENPROJECT_TESTING_SLOWDOWN_FACTOR"]
+      options = options.merge(slowmo: ENV["OPENPROJECT_TESTING_SLOWDOWN_FACTOR"])
+    end
+
+    if ENV["CHROME_URL"].present?
+      options = options.merge(url: ENV["CHROME_URL"])
     end
 
     browser_options = {
-      'disable-dev-shm-usage': nil,
-      'disable-gpu': nil,
-      'disable-popup-blocking': nil,
+      "disable-dev-shm-usage": nil,
+      "disable-gpu": nil,
+      "disable-popup-blocking": nil,
       lang: language,
-      'no-sandbox': nil
+      "accept-lang": language,
+      "no-sandbox": nil,
+      "disable-smooth-scrolling": true
     }
 
-    if ENV['OPENPROJECT_TESTING_AUTO_DEVTOOLS'].present?
-      browser_options = browser_options.merge('auto-open-devtools-for-tabs': nil)
+    if ENV["OPENPROJECT_TESTING_AUTO_DEVTOOLS"].present?
+      browser_options = browser_options.merge("auto-open-devtools-for-tabs": nil)
     end
 
     driver_options = options.merge(browser_options:)
@@ -83,7 +103,7 @@ def register_better_cuprite(language, name: :"better_cuprite_#{language}")
   end
 end
 
-register_better_cuprite 'en'
+register_better_cuprite "en"
 
 MODULES_WITH_CUPRITE_ENABLED = %w[
   avatars
@@ -99,7 +119,7 @@ RSpec.configure do |config|
     end
   end
 
-  config.around(:each, type: :feature, with_cuprite: true) do |example|
+  config.around(:each, :with_cuprite, type: :feature) do |example|
     original_driver = Capybara.javascript_driver
     begin
       Capybara.javascript_driver = :better_cuprite_en

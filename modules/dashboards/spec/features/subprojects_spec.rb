@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,11 +26,11 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
-require_relative '../support/pages/dashboard'
+require_relative "../support/pages/dashboard"
 
-RSpec.describe 'Subprojects widget on dashboard', js: true do
+RSpec.describe "Subprojects widget on dashboard", :js do
   let!(:project) do
     create(:project, parent: parent_project)
   end
@@ -57,7 +57,7 @@ RSpec.describe 'Subprojects widget on dashboard', js: true do
   end
 
   let(:role) do
-    create(:role, permissions:)
+    create(:project_role, permissions:)
   end
 
   let(:user) do
@@ -73,14 +73,14 @@ RSpec.describe 'Subprojects widget on dashboard', js: true do
     Pages::Dashboard.new(project)
   end
 
-  context 'as a user' do
+  context "as a user" do
     current_user { user }
 
-    it 'can add the widget listing active subprojects the user is member of', :aggregate_failures do
+    it "can add the widget listing active subprojects the user is member of", :aggregate_failures do
       dashboard_page.visit!
       dashboard_page.add_widget(1, 1, :within, "Subprojects")
 
-      subprojects_widget = Components::Grids::GridArea.new('.grid--area.-widgeted:nth-of-type(1)')
+      subprojects_widget = Components::Grids::GridArea.new(".grid--area.-widgeted:nth-of-type(1)")
 
       expect(page)
         .to have_link(child_project.name)
@@ -89,41 +89,41 @@ RSpec.describe 'Subprojects widget on dashboard', js: true do
         expect(page)
           .to have_link(child_project.name)
         expect(page)
-          .not_to have_link(archived_child_project.name)
+          .to have_no_link(archived_child_project.name)
         expect(page)
-          .not_to have_link(grandchild_project.name)
+          .to have_no_link(grandchild_project.name)
         expect(page)
-          .not_to have_link(invisible_child_project.name)
+          .to have_no_link(invisible_child_project.name)
         expect(page)
-          .not_to have_link(parent_project.name)
+          .to have_no_link(parent_project.name)
         expect(page)
-          .not_to have_link(project.name)
+          .to have_no_link(project.name)
       end
     end
   end
 
-  context 'as an admin' do
+  context "as an admin" do
     current_user { create(:admin) }
 
-    it 'can add the widget listing all active subprojects', :aggregate_failures do
+    it "can add the widget listing all active subprojects", :aggregate_failures do
       dashboard_page.visit!
       dashboard_page.add_widget(1, 2, :within, "Subprojects")
 
-      subprojects_widget = Components::Grids::GridArea.new('.grid--area.-widgeted:nth-of-type(2)')
+      subprojects_widget = Components::Grids::GridArea.new(".grid--area.-widgeted:nth-of-type(2)")
 
       within(subprojects_widget.area) do
         expect(page)
           .to have_link(child_project.name)
         expect(page)
-          .not_to have_link(archived_child_project.name)
+          .to have_no_link(archived_child_project.name)
         expect(page)
-          .not_to have_link(grandchild_project.name)
+          .to have_no_link(grandchild_project.name)
         expect(page)
           .to have_link(invisible_child_project.name) # admins can see projects they are not a member of
         expect(page)
-          .not_to have_link(parent_project.name)
+          .to have_no_link(parent_project.name)
         expect(page)
-          .not_to have_link(project.name)
+          .to have_no_link(project.name)
       end
     end
   end

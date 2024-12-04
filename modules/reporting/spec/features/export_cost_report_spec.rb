@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,14 +26,14 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require_relative '../spec_helper'
-require_relative 'support/pages/cost_report_page'
+require_relative "../spec_helper"
+require_relative "support/pages/cost_report_page"
 
-RSpec.describe "Cost reports XLS export", js: true do
+RSpec.describe "Cost reports XLS export", :js do
   shared_let(:project) { create(:project) }
   shared_let(:user) { create(:admin) }
-  shared_let(:cost_type) { create(:cost_type, name: 'Post-war', unit: 'cap', unit_plural: 'caps') }
-  shared_let(:work_package) { create(:work_package, project:, subject: 'Some task') }
+  shared_let(:cost_type) { create(:cost_type, name: "Post-war", unit: "cap", unit_plural: "caps") }
+  shared_let(:work_package) { create(:work_package, project:, subject: "Some task") }
   shared_let(:cost_entry) { create(:cost_entry, user:, work_package:, project:, cost_type:) }
   let(:report_page) { Pages::CostReportPage.new project }
   let(:sheet) { @download_list.refresh_from(page).latest_downloaded_content } # rubocop:disable RSpec/InstanceVariable
@@ -52,15 +52,15 @@ RSpec.describe "Cost reports XLS export", js: true do
     DownloadList.clear
   end
 
-  it 'can download and open the XLS' do
+  it "can download and open the XLS" do
     report_page.visit!
-    click_on 'Export XLS'
+    click_on "Export XLS"
 
-    expect(page).to have_content I18n.t('js.job_status.generic_messages.in_queue'),
+    expect(page).to have_content I18n.t("job_status_dialog.generic_messages.in_queue"),
                                  wait: 10
     perform_enqueued_jobs
 
-    expect(page).to have_text("The export has completed successfully")
+    expect(page).to have_text(I18n.t("export.succeeded"))
 
     title, _, entry, = subject.rows
     expect(title.first).to include("Cost reports (#{Time.zone.today.strftime('%m/%d/%Y')})")
@@ -68,9 +68,9 @@ RSpec.describe "Cost reports XLS export", js: true do
 
     expect(date).to eq(Time.zone.today.iso8601)
     expect(user_ref).to eq(user.name)
-    expect(wp_ref).to include 'Some task'
+    expect(wp_ref).to include "Some task"
     expect(project_ref).to eq project.name
     expect(costs).to eq 1.0
-    expect(type).to eq 'Post-war'
+    expect(type).to eq "Post-war"
   end
 end

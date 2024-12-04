@@ -2,7 +2,7 @@
 
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -41,10 +41,10 @@ module Users
 
       def headers
         [
-          [:is_current, { caption: I18n.t('users.sessions.current') }],
-          [:browser, { caption: I18n.t('users.sessions.browser') }],
-          [:device, { caption: I18n.t('users.sessions.device') }],
-          [:updated_at, { caption: I18n.t('attributes.updated_at') }]
+          [:is_current, { caption: I18n.t("users.sessions.current") }],
+          [:browser, { caption: I18n.t("users.sessions.browser") }],
+          [:device, { caption: I18n.t("users.sessions.device") }],
+          [:updated_at, { caption: I18n.t("attributes.updated_at") }]
         ]
       end
     end

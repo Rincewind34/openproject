@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -63,9 +63,11 @@ class WorkPackages::SetAttributesService < BaseServices::SetAttributes
     shift_dates_to_soonest_working_days
     update_duration
     update_derivable
+    update_progress_attributes
     update_project_dependent_attributes
     reassign_invalid_status_if_type_changed
     set_templated_description
+    set_cause_for_readonly_attributes
   end
 
   def derivable_attribute
@@ -149,6 +151,7 @@ class WorkPackages::SetAttributesService < BaseServices::SetAttributes
       work_package.start_date = days.start_date(work_package.due_date, work_package.duration)
     end
   end
+
   # rubocop:enable Metrics/AbcSize
 
   def set_default_attributes(attributes)
@@ -219,7 +222,7 @@ class WorkPackages::SetAttributesService < BaseServices::SetAttributes
   end
 
   def normalize_whitespace(string)
-    string.gsub(/\s/, ' ').squeeze(' ')
+    string.gsub(/\s/, " ").squeeze(" ")
   end
 
   def set_custom_attributes(attributes)
@@ -248,7 +251,7 @@ class WorkPackages::SetAttributesService < BaseServices::SetAttributes
       reassign_category
       set_parent_to_nil
 
-      reassign_type unless work_package.type_id_changed?
+      assign_default_type unless work_package.type
     end
   end
 
@@ -281,10 +284,22 @@ class WorkPackages::SetAttributesService < BaseServices::SetAttributes
     work_package.duration = 1 if work_package.milestone?
   end
 
+  def update_progress_attributes
+    derive_progress_values_class.new(work_package).call
+  end
+
+  def derive_progress_values_class
+    if WorkPackage.status_based_mode?
+      DeriveProgressValuesStatusBased
+    else
+      DeriveProgressValuesWorkBased
+    end
+  end
+
   def set_version_to_nil
     if work_package.version &&
-       work_package.project &&
-       work_package.project.shared_versions.exclude?(work_package.version)
+      work_package.project &&
+      work_package.project.shared_versions.exclude?(work_package.version)
       work_package.version = nil
     end
   end
@@ -307,12 +322,12 @@ class WorkPackages::SetAttributesService < BaseServices::SetAttributes
     end
   end
 
-  def reassign_type
+  def assign_default_type
     available_types = work_package.project.types.order(:position)
 
-    return if available_types.include?(work_package.type) && work_package.type
-
     work_package.type = available_types.first
+    update_duration
+    unify_milestone_dates
 
     reassign_status assignable_statuses
   end
@@ -353,7 +368,7 @@ class WorkPackages::SetAttributesService < BaseServices::SetAttributes
 
   def new_start_date_from_parent
     return unless work_package.parent_id_changed? &&
-                  work_package.parent
+      work_package.parent
 
     work_package.parent.soonest_start
   end
@@ -413,5 +428,13 @@ class WorkPackages::SetAttributesService < BaseServices::SetAttributes
     start = work_package.start_date || work_package.parent&.start_date
 
     (due && !start) || ((due && start) && (due > start))
+  end
+
+  def set_cause_for_readonly_attributes
+    return unless work_package.changes.keys.intersect?(%w(created_at updated_at author))
+
+    work_package.journal_cause = {
+      "type" => "default_attribute_written"
+    }
   end
 end

@@ -1,4 +1,6 @@
-<div class="wp-relations-hierarchy-section wp-relations--children">
+<div
+  *ngIf="canHaveChildren"
+  class="wp-relations-hierarchy-section wp-relations--children">
   <div class="attributes-group--header">
     <div class="attributes-group--header-container">
       <h3 class="attributes-group--header-text"
@@ -6,11 +8,9 @@
       </h3>
     </div>
   </div>
-  <ng-container wp-isolated-query-space>
-    <wp-children-query
-        [workPackage]="workPackage"
-        [addExistingChildEnabled]="true"
-        [query]="childrenQueryProps">
-    </wp-children-query>
-  </ng-container>
+  <wp-children-query
+    [workPackage]="workPackage"
+    [addExistingChildEnabled]="true"
+    [query]="childrenQueryProps">
+  </wp-children-query>
 </div>

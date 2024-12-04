@@ -26,7 +26,7 @@ Community support is covered to the best of our ability by the active internatio
 
 | Service hours | Support channels                                             | Support services                                       |
 | ------------- | ------------------------------------------------------------ | ------------------------------------------------------ |
-| Best effort   | - [Bug reports or Feature requests](https://community.openproject.org/projects/openproject/work_packages)<br />- [Community forums](https://community.openproject.org/projects/openproject/forums) | - Documentation and user guides<br />- Tutorial videos |
+| Best effort   | - [Bug reports or Feature requests](https://community.openproject.org/projects/openproject/work_packages)<br>- [Community forums](https://community.openproject.org/projects/openproject/forums) | - Documentation and user guides<br>- Tutorial videos |
 
 ### Basic support (cloud and on-premises)
 
@@ -34,7 +34,7 @@ With Basic support, you already have integrated mail support and can reach our e
 
 | Service hours                                             | Support channels       | Support services                                       |
 | --------------------------------------------------------- | ---------------------- | ------------------------------------------------------ |
-| Mon-Fri, 9:30 - 16:00 CET<br />Mon-Fri, 9:30 am - 4 pm ET | - Basic E-Mail support | - Documentation and user guides<br />- Tutorial videos |
+| Mon-Fri, 9:30 - 16:00 CET<br>Mon-Fri, 9:30 am - 4 pm ET | - Basic E-Mail support | - Documentation and user guides<br>- Tutorial videos |
 
 ### Professional support (cloud and on-premises)
 
@@ -42,7 +42,7 @@ The Professional support covers everything from the Basic support. Furthermore, 
 
 | Service hours                                             | Support channels                                   | Support services                                             |
 | --------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------ |
-| Mon-Fri, 9:30 - 17:00 CET<br />Mon-Fri, 9:30 am - 4 pm ET | - Professional E-Mail support<br />- Phone support | - Documentation and user guides<br />- Tutorial videos<br />- Training material and best practices <br />- Onboarding training |
+| Mon-Fri, 9:30 - 17:00 CET<br>Mon-Fri, 9:30 am - 4 pm ET | - Professional E-Mail support<br>- Phone support | - Documentation and user guides<br>- Tutorial videos<br>- Training material and best practices <br>- Onboarding training |
 
 ### Premium support (on-premises only)
 
@@ -52,7 +52,7 @@ Onboarding training in the Premium support plan includes onboarding for a perfec
 
 | Service hours                                                | Support channels                              | Support services                                             |
 | ------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------ |
-| Mon-Fri, 9:30 - 17:30 CET<br />Mon-Fri, 9:30 am - 5:30 pm ET | - Premium E-Mail support<br />- Phone support | - Documentation and user guides<br />- Tutorial videos<br />- Training material and best practices <br />- Onboarding training<br />- Remote hands <br />- Installation support <br />- Upgrade assistance <br />- Dedicated onboarding manager (3h) |
+| Mon-Fri, 9:30 - 17:30 CET<br>Mon-Fri, 9:30 am - 5:30 pm ET | - Premium E-Mail support<br>- Phone support | - Documentation and user guides<br>- Tutorial videos<br>- Training material and best practices <br>- Onboarding training<br>- Remote hands <br>- Installation support <br>- Upgrade assistance <br>- Dedicated onboarding manager (3h) |
 
 ### Corporate support (on-premises only)
 
@@ -60,22 +60,22 @@ The Corporate support covers everything from the Basic, Professional and Premium
 
 | Service hours                                             | Support channels                                | Support services                                             |
 | --------------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------ |
-| Mon-Fri, 9:30 - 18:00 CET<br />Mon-Fri, 9:30 am - 6 pm ET | - Corporate E-Mail support<br />- Phone support | - Documentation and user guides<br />- Tutorial videos<br />- Training material and best practices <br />- Onboarding training<br />- Remote hands <br />- Installation support <br />- Upgrade assistance <br />- Dedicated onboarding manager (3h)<br />- Custom plugin support<br/>- Dedicated support engineer |
+| Mon-Fri, 9:30 - 18:00 CET<br>Mon-Fri, 9:30 am - 6 pm ET | - Corporate E-Mail support<br>- Phone support | - Documentation and user guides<br>- Tutorial videos<br>- Training material and best practices <br>- Onboarding training<br>- Remote hands <br>- Installation support <br>- Upgrade assistance <br>- Dedicated onboarding manager (3h)<br>- Custom plugin support<br/>- Dedicated support engineer |
 
 ## How to receive Enterprise support
 
 Please write us an email to [support@openproject.com](mailto:support@openproject.com) to get help with your OpenProject Enterprise edition. Include a detailed description as well as screenshots, where necessary. Depending on your support level, you will receive a separate support email address with your order.
 
-You can reach us via telephone, depending on your support service hours: 
+You can reach us via telephone, depending on your support service hours:
 
 - EU time zone: +49 30 288 777 07  
 - US time zone: +1 470 231 0041
 
-## Installation support for Enterprise on-premises 
+## Installation support for Enterprise on-premises
 
-Our Premium and Corporate Enterprise on-premises support plans include installation support. We will contact you to get the necessary information to set up your environment. 
+Our Premium and Corporate Enterprise on-premises support plans include installation support. We will contact you to get the necessary information to set up your environment.
 
-### Support Data Collector 
+### Support Data Collector
 
 Please run [our script](./script/op-support-data.sh) and send us the complete terminal output prior to the on-premise installation.
 
@@ -86,6 +86,7 @@ The script should run once on the OpenProject on-premises host with or without O
  Also please do not forget to log your complete terminal output.
  Please attach the log file of the terminal output to an email reply in your ticket at [support@openproject.com](mailto:support@openproject.com)
 
-`sudo chmod +x op-support-data.sh`
-
-` sudo ./op-support-data.sh`
+```shell
+sudo chmod +x op-support-data.sh
+sudo ./op-support-data.sh
+```

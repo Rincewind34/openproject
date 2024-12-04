@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -42,9 +42,9 @@ module API
                    next unless fragment.is_a?(Array)
 
                    ids = fragment.map do |link|
-                     ::API::Utilities::ResourceLinkParser.parse_id link['href'],
+                     ::API::Utilities::ResourceLinkParser.parse_id link["href"],
                                                                    property: :file_link,
-                                                                   expected_version: '3',
+                                                                   expected_version: "3",
                                                                    expected_namespace: :file_links
                    end
 

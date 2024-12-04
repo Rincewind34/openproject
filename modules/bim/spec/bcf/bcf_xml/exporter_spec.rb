@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe OpenProject::Bim::BcfXml::Exporter do
   let(:query) { build(:global_query) }
@@ -42,7 +42,7 @@ RSpec.describe OpenProject::Bim::BcfXml::Exporter do
   subject { described_class.new(query) }
 
   context "one WP without BCF issue associated" do
-    it '#work_packages' do
+    it "#work_packages" do
       expect(subject.work_packages.count).to be(0)
     end
   end
@@ -54,7 +54,7 @@ RSpec.describe OpenProject::Bim::BcfXml::Exporter do
       bcf_issue
     end
 
-    it '#work_packages' do
+    it "#work_packages" do
       expect(subject.work_packages.count).to be(1)
     end
   end

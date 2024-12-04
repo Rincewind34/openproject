@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require_relative './base'
+require_relative "base"
 
 module Pages::Meetings
   class Show < Base
@@ -59,14 +59,14 @@ module Pages::Meetings
       users.each do |user|
         within(meeting_details_container) do
           expect(page)
-            .not_to have_link(user.name)
+            .to have_no_link(user.name)
         end
       end
     end
 
     def expect_date_time(expected)
       expect(page)
-        .to have_content("Time: #{expected}")
+        .to have_content("Start time: #{expected}")
     end
 
     def expect_link_to_location(location)
@@ -77,18 +77,18 @@ module Pages::Meetings
 
     def expect_plaintext_location(location)
       within(meeting_details_container) do
-        expect(page).not_to have_link location
+        expect(page).to have_no_link location
         expect(page).to have_text(location)
       end
     end
 
     def meeting_details_container
-      find('.meeting.details')
+      find(".meeting.details")
     end
 
     def click_edit
-      within '.meeting--main-toolbar .toolbar-items' do
-        click_link 'Edit'
+      within ".meeting--main-toolbar .toolbar-items" do
+        click_on "Edit"
       end
     end
 

@@ -1,6 +1,6 @@
-// -- copyright
+//-- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2023 the OpenProject GmbH
+// Copyright (C) the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -31,10 +31,14 @@ import { StateService } from '@uirouter/core';
 import { OPContextMenuService } from 'core-app/shared/components/op-context-menu/op-context-menu.service';
 import { Directive, ElementRef, Input } from '@angular/core';
 import { isClickedWithModifier } from 'core-app/shared/helpers/link-handling/link-handling';
-import { OpContextMenuTrigger } from 'core-app/shared/components/op-context-menu/handlers/op-context-menu-trigger.directive';
+import {
+  OpContextMenuTrigger,
+} from 'core-app/shared/components/op-context-menu/handlers/op-context-menu-trigger.directive';
 import { BrowserDetector } from 'core-app/core/browser/browser-detector.service';
 import { WorkPackageCreateService } from 'core-app/features/work-packages/components/wp-new/wp-create.service';
-import { Highlighting } from 'core-app/features/work-packages/components/wp-fast-table/builders/highlighting/highlighting.functions';
+import {
+  Highlighting,
+} from 'core-app/features/work-packages/components/wp-fast-table/builders/highlighting/highlighting.functions';
 import { TypeResource } from 'core-app/features/hal/resources/type-resource';
 
 @Directive({
@@ -86,6 +90,11 @@ export class OpTypesContextMenuDirective extends OpContextMenuTrigger {
     } else {
       this.opContextMenu.close();
     }
+  }
+
+  onClose(focus:boolean = false) {
+    this.isOpen = false;
+    super.onClose(focus);
   }
 
   public get locals():{ showAnchorRight?:boolean, contextMenuId?:string, items:OpContextMenuItem[] } {

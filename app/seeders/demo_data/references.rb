@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -67,7 +67,7 @@ module DemoData
       return str if str.blank?
 
       str.gsub(/##(query|sprint|wp)(\.id)?:[a-z_0-9]+/) do |match|
-        tag, reference = match.delete('#').split(":", 2)
+        tag, reference = match.delete("#").split(":", 2)
         instance = seed_data.find_reference(reference.to_sym)
         if match.include?(".id")
           instance.id
@@ -102,11 +102,11 @@ module DemoData
 
     def link(tag, instance)
       case tag
-      when 'query'
+      when "query"
         query_link(instance)
-      when 'sprint'
+      when "sprint"
         sprint_link(instance)
-      when 'wp'
+      when "wp"
         work_package_link(instance)
       else
         raise ArgumentError, "cannot create link for #{tag.inspect}"

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -54,8 +54,8 @@ class RenameCostObjectType < ActiveRecord::Migration[6.1]
     add_index :journals, %i[journable_type journable_id version], unique: true
 
     Journal
-      .where(journable_type: 'CostObject')
-      .update_all(journable_type: 'Budget')
+      .where(journable_type: "CostObject")
+      .update_all(journable_type: "Budget")
   end
 
   def down

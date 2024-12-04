@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -54,7 +54,7 @@ module OpenProject::Plugins
     def self.login_provider_for(user)
       return unless user.identity_url
 
-      provider_name = user.identity_url.split(':').first
+      provider_name = user.identity_url.split(":").first
       find_provider_by_name(provider_name)
     end
 
@@ -81,7 +81,7 @@ module OpenProject::Plugins
 
     def self.filtered_strategy?(_strategy_key, provider)
       name = provider[:name]&.to_s
-      !EnterpriseToken.show_banners? || name == 'developer'
+      !EnterpriseToken.show_banners? || name == "developer"
     end
 
     def self.strategy_key(strategy)

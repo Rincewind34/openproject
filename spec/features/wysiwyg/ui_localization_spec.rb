@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,10 +26,9 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.describe 'WYSIWYG UI localization',
-               js: true do
+RSpec.describe "WYSIWYG UI localization", :js do
   let(:user) { create(:admin, language:) }
   let(:project) { create(:project, enabled_module_names: %w[wiki]) }
   let(:editor) { Components::WysiwygEditor.new }
@@ -53,19 +52,19 @@ RSpec.describe 'WYSIWYG UI localization',
     visit edit_project_wiki_path(project, wiki_page.slug)
   end
 
-  context 'with german locale' do
+  context "with german locale" do
     let(:language) { :de }
 
-    it 'renders the UI in German' do
-      expect(page).to have_selector('.ck-button__label', text: 'Absatz')
+    it "renders the UI in German" do
+      expect(page).to have_css(".ck-button__label", text: "Absatz")
     end
   end
 
-  context 'with english locale' do
+  context "with english locale" do
     let(:language) { :en }
 
-    it 'renders the UI in English' do
-      expect(page).to have_selector('.ck-button__label', text: 'Paragraph')
+    it "renders the UI in English" do
+      expect(page).to have_css(".ck-button__label", text: "Paragraph")
     end
   end
 end

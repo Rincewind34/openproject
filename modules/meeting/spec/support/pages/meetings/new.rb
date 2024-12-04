@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,19 +26,19 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require_relative './base'
-require_relative './show'
+require_relative "base"
+require_relative "show"
 
 module Pages::Meetings
   class New < Base
     include Components::Autocompleter::NgSelectAutocompleteHelpers
 
     def expect_no_main_menu
-      expect(page).not_to have_selector '#main-menu'
+      expect(page).to have_no_css "#main-menu"
     end
 
     def click_create
-      click_button 'Create'
+      click_on "Create"
 
       meeting = Meeting.last
 
@@ -49,32 +49,37 @@ module Pages::Meetings
       end
     end
 
+    def set_type(type)
+      choose type, match: :first
+    end
+
     def set_title(text)
-      fill_in 'Title', with: text
+      fill_in "Title", with: text
     end
 
     def expect_project_dropdown
-      find "[data-qa-selector='project_id']"
+      find "[data-test-selector='project_id']"
     end
 
     def set_project(project)
-      select_autocomplete find("[data-qa-selector='project_id']"),
+      select_autocomplete find("[data-test-selector='project_id']"),
                           query: project.name,
-                          results_selector: 'body'
+                          results_selector: "body"
     end
 
     def set_start_date(date)
-      find_by_id('meeting_start_date').click
+      find_by_id("meeting_start_date").click
       datepicker = Components::BasicDatepicker.new
       datepicker.set_date(date)
     end
 
     def set_start_time(time)
-      fill_in 'Time', with: time
+      input = page.find_by_id("meeting-form-start-time")
+      page.execute_script("arguments[0].value = arguments[1]", input.native, time)
     end
 
     def set_duration(duration)
-      fill_in 'Duration', with: duration
+      fill_in "Duration", with: duration
     end
 
     def invite(user)

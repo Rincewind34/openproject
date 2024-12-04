@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -25,8 +25,8 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 
-require 'spec_helper'
-require 'rack/test'
+require "spec_helper"
+require "rack/test"
 
 RSpec.describe API::V3::WorkPackages::CreateProjectFormAPI, content_type: :json do
   include Rack::Test::Methods
@@ -43,11 +43,11 @@ RSpec.describe API::V3::WorkPackages::CreateProjectFormAPI, content_type: :json 
 
   subject(:response) { last_response }
 
-  it 'returns 200(OK)' do
-    expect(response.status).to eq(200)
+  it "returns 200(OK)" do
+    expect(response).to have_http_status(:ok)
   end
 
-  it 'is of type form' do
-    expect(response.body).to be_json_eql('Form'.to_json).at_path('_type')
+  it "is of type form" do
+    expect(response.body).to be_json_eql("Form".to_json).at_path("_type")
   end
 end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -37,14 +37,14 @@ class CostQuery::SqlStatement < Report::SqlStatement
   attr_accessor :entry_union
 
   def initialize(table, desc = "")
-    super(table, desc)
+    super
     @entry_union = false
   end
 
   # this is a hack to ensure that additional joins added by filters do not result
   # in additional columns being selected.
   def to_s
-    select(['entries.*']) if select == ['*'] && group_by.empty? && entry_union
+    select(["entries.*"]) if select == ["*"] && group_by.empty? && entry_union
     super
   end
 
@@ -93,7 +93,7 @@ class CostQuery::SqlStatement < Report::SqlStatement
                    })
       # FIXME: build this subquery from a sql_statement
       query.from "(SELECT *, #{typed :text, model.model_name.to_s} AS type FROM #{table}) AS #{table}"
-      send("unify_#{table}", query)
+      send(:"unify_#{table}", query)
     end
   end
 

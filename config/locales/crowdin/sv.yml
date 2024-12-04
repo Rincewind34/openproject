@@ -1,6 +1,6 @@
 #-- copyright
 #OpenProject is an open source project management software.
-#Copyright (C) 2012-2023 the OpenProject GmbH
+#Copyright (C) the OpenProject GmbH
 #This program is free software; you can redistribute it and/or
 #modify it under the terms of the GNU General Public License version 3.
 #OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
@@ -24,39 +24,48 @@ sv:
   activities:
     index:
       no_results_title_text: Det har inte förekommit någon aktivitet för projektet inom denna tidsram.
+    work_packages:
+      activity_tab:
+        no_results_title_text: No activity to display
+        no_results_description_text: "Choose \"Show everything\" to show all activity and comments"
+        label_activity_show_all: "Show everything"
+        label_activity_show_only_comments: "Show comments only"
+        label_activity_show_only_changes: "Show changes only"
+        label_sort_asc: "Newest at the bottom"
+        label_sort_desc: "Newest on top"
+        label_type_to_comment: "Add a comment. Type @ to notify people."
+        label_submit_comment: "Submit comment"
+        changed_on: "changed on"
+        created_on: "created this on"
+        changed: "changed"
+        created: "created"
+        commented: "commented"
   admin:
     plugins:
-      no_results_title_text: Det finns för närvarande inga tillgängliga plugins.
+      no_results_title_text: There are currently no plugins installed.
+      no_results_content_text: See our integrations and plugins page for more information.
     custom_styles:
       color_theme: "Färgtema"
       color_theme_custom: "(Anpassad)"
+      tab_interface: "Interface"
+      tab_branding: "Branding"
+      tab_pdf_export_styles: "PDF export styles"
       colors:
-        alternative-color: "Alternativ"
-        content-link-color: "Link font"
-        primary-color: "Primär"
-        primary-color-dark: "Primär (mörk)"
+        primary-button-color: "Primary button"
+        accent-color: "Accent"
         header-bg-color: "Rubrikbakgrund"
         header-item-bg-hover-color: "Rubrikbakgrund vid hovring"
-        header-item-font-color: "Rubriktypsnitt"
-        header-item-font-hover-color: "Rubriktypsnitt vid hovring"
-        header-border-bottom-color: "Rubrikram"
         main-menu-bg-color: "Huvudmeny bakgrund"
         main-menu-bg-selected-background: "Huvudmeny när vald"
         main-menu-bg-hover-background: "Huvudmeny vid hovring"
-        main-menu-font-color: "Typsnitt för huvudmenyn"
-        main-menu-selected-font-color: "Typsnitt för huvudmeny när vald"
-        main-menu-hover-font-color: "Huvudmeny typsnitt vid hovring"
-        main-menu-border-color: "Huvudmeny ram"
       custom_colors: "Anpassade färger"
       customize: "Anpassa din OpenProject installation med din egen logotyp och färger."
       enterprise_notice: "As a special 'Thank you!' for their financial contribution to develop OpenProject, this tiny add-on is only available for Enterprise edition support subscribers."
       enterprise_more_info: "Obs: logotypen som används kommer att vara allmänt tillgänglig."
       manage_colors: "Redigera alternativ för valbara färger"
       instructions:
-        alternative-color: "Stark accentfärg som brukar användas för de viktigaste knapparna på skärmen."
-        content-link-color: "Teckenfärg på de flesta länkarna."
-        primary-color: "Huvudfärg."
-        primary-color-dark: "Vanligtvis en mörkare version av huvudfärgen som används för hover-effekter."
+        primary-button-color: "Strong accent color, used for the most important button on a screen."
+        accent-color: "Color for links and other decently highlighted elements."
         header-item-bg-hover-color: "Bakgrundsfärg på klickbara objekt i sidhuvudet när man hovrar med muspekaren."
         header-item-font-color: "Teckenfärg på klickbara objekt i sidhuvudet."
         header-item-font-hover-color: "Teckenfärg på klickbara objekt i sidhuvudet när man hovrar med muspekaren."
@@ -74,14 +83,15 @@ sv:
       paste: "Paste your Enterprise edition support token"
       required_for_feature: "This add-on is only available with an active Enterprise edition support token."
       enterprise_link: "För mer information, klicka här."
-      start_trial: 'Starta fri provperiod'
-      book_now: 'Boka nu'
-      get_quote: 'Få en offert'
+      start_trial: "Starta fri provperiod"
+      book_now: "Boka nu"
+      get_quote: "Få en offert"
       buttons:
         upgrade: "Uppgradera nu"
         contact: "Kontakta oss för en demo"
       enterprise_info_html: "is an Enterprise <span class='spot-icon spot-icon_inline spot-icon_enterprise-addons'></span> add-on."
       upgrade_info: "Vänligen uppgradera till en betalplan för att aktivera och börja använda den i ditt team."
+    jemalloc_allocator: Jemalloc memory allocator
     journal_aggregation:
       explanation:
         text: "Individual actions of a user (e.g. updating a work package twice) are aggregated into a single action if their age difference is less than the specified timespan. They will be displayed as a single action within the application. This will also delay notifications by the same amount of time reducing the number of emails being sent and will also affect %{webhook_link} delay."
@@ -90,23 +100,33 @@ sv:
     show_until: Visa fram till
     is_active: visas för tillfället
     is_inactive: visas ej för tillfället
+  antivirus_scan:
+    not_processed_yet_message: "Downloading is blocked, as file was not scanned for viruses yet. Please try again later."
+    quarantined_message: "A virus was detected in file '%{filename}'. It has been quarantined and is not available for download."
+    deleted_message: "A virus was detected in file '%{filename}'. The file has been deleted."
+    deleted_by_admin: "The quarantined file '%{filename}' has been deleted by an administrator."
+    overridden_by_admin: "The quarantine for file '%{filename}' has been removed by %{user}. The file can now be acccessed."
+    quarantined_attachments:
+      container: "Container"
+      delete: "Delete the quarantined file"
+      title: "Quarantined attachments"
+      error_cannot_act_self: "Cannot perform actions on your own uploaded files."
   attribute_help_texts:
-    note_public: 'Alla texter och bilder som du lägger till i detta fält är offentligt synliga för alla inloggade användare!'
-    text_overview: 'I den här vyn kan du skapa anpassade hjälptexter för attributvyn. När den är definierad kan dessa texter visas genom att klicka på hjälpikonen bredvid dess tillhörande attribut.'
-    label_plural: 'Hjälptexter för attribut'
-    show_preview: 'Förhandsgranska text'
-    add_new: 'Lägg till hjälptext'
+    note_public: "Alla texter och bilder som du lägger till i detta fält är offentligt synliga för alla inloggade användare!"
+    text_overview: "I den här vyn kan du skapa anpassade hjälptexter för attributvyn. När den är definierad kan dessa texter visas genom att klicka på hjälpikonen bredvid dess tillhörande attribut."
+    label_plural: "Hjälptexter för attribut"
+    show_preview: "Förhandsgranska text"
+    add_new: "Lägg till hjälptext"
     edit: "Redigera hjälptext för %{attribute_caption}"
-    enterprise:
-      description: 'Provide additional information for attributes (incl. custom fields) of work packages and projects. Help texts are displayed when users click on the question mark symbol next to input fields in projects and work packages.'
   background_jobs:
     status:
       error_requeue: "Job experienced an error but is retrying. The error was: %{message}"
       cancelled_due_to: "Jobbet avbröts på grund av fel: %{message}"
   ldap_auth_sources:
-    ldap_error: "LDAP-Error: %{error_message}"
+    ldap_error: "LDAP-fel: %{error_message}"
     ldap_auth_failed: "Kunde inte autentisera vid LDAP-servern."
-    back_to_index: 'Click here to go back to the list of connection.'
+    sync_failed: "Failed to synchronize from LDAP: %{message}."
+    back_to_index: "Click here to go back to the list of connection."
     technical_warning_html: |
       Detta LDAP-formulär kräver teknisk kunskap om din LDAP / Active Directory-inställning.
       <br/>
@@ -136,21 +156,21 @@ sv:
         Om du kryssar i den här rutan kommer OpenProject automatiskt att skapa nya användare från sina LDAP-poster
         när de först autentiserar med OpenProject.
         Lämna detta avmarkerat för att endast tillåta befintliga konton i OpenProject att autentisera via LDAP!
-    connection_encryption: 'Kryptering av anslutning'
-    encryption_details: 'LDAPS / STARTTLS options'
-    system_account: 'Systemkonto'
+    connection_encryption: "Kryptering av anslutning"
+    encryption_details: "LDAPS / STARTTLS options"
+    system_account: "Systemkonto"
     system_account_legend: |
       OpenProject kräver skrivskyddad åtkomst via ett systemkonto för att söka upp användare och grupper i ditt LDAP-träd.
       Vänligen ange bindningsuppgifter för den systemanvändaren i följande avsnitt.
-    ldap_details: 'LDAP-detaljer'
-    user_settings: 'Attributmappning'
+    ldap_details: "LDAP-detaljer"
+    user_settings: "Attributmappning"
     user_settings_legend: |
       Följande fält är relaterade till hur användare skapas i OpenProject från LDAP-poster och
       vilka LDAP-attribut som används för att definiera attributen för en OpenProject-användare (attributmappning).
     tls_mode:
-      plain: 'inga'
-      simple_tls: 'LDAPS'
-      start_tls: 'STARTTLS'
+      plain: "inga"
+      simple_tls: "LDAPS"
+      start_tls: "STARTTLS"
       plain_description: "Opens an unencrypted connection to the LDAP server. Not recommended for production."
       simple_tls_description: "Use LDAPS. Requires a separate port on the LDAP server. This mode is often deprecated, we recommend using STARTTLS whenever possible."
       start_tls_description: "Sends a STARTTLS command after connecting to the standard LDAP port. Recommended for encrypted connections."
@@ -177,38 +197,78 @@ sv:
       label_new_color: "Ny färg"
       label_edit_color: "Redigera färg"
     label_no_color: "Ingen färg"
-    label_properties: "Properties"
+    label_properties: "Egenskaper"
     label_really_delete_color: >
-      Are you sure, you want to delete the following color? Types using this color will not be deleted.
+      Är du säker på att du vill ta bort följande färg? Typer med den här färgen kommer inte att raderas.
   custom_actions:
     actions:
       name: "Åtgärder"
-      add: 'Lägg till åtgärd'
+      add: "Lägg till åtgärd"
       assigned_to:
-        executing_user_value: '(Tilldela till utförande användare)'
-    conditions: 'Villkor'
-    plural: 'Anpassade åtgärder'
-    new: 'Lägg till ny anpassad åtgärd'
-    edit: 'Redigera anpassad åtgärd %{name}'
-    execute: 'Verkställ %{name}'
+        executing_user_value: "(Tilldela till utförande användare)"
+    conditions: "Villkor"
+    plural: "Anpassade åtgärder"
+    new: "Lägg till ny anpassad åtgärd"
+    edit: "Redigera anpassad åtgärd %{name}"
+    execute: "Verkställ %{name}"
     upsale:
-      title: 'Anpassade åtgärder'
-      description: 'Custom actions are one-click shortcuts to a set of pre-defined actions that you can make available on certain work packages based on status, role, type or project.'
+      title: "Anpassade åtgärder"
+      description: "Custom actions are one-click shortcuts to a set of pre-defined actions that you can make available on certain work packages based on status, role, type or project."
   custom_fields:
+    admin:
+      custom_field_projects:
+        is_for_all_blank_slate:
+          heading: For all projects
+          description: This custom field is enabled in all projects since the "For all projects" option is checked. It cannot be deactivated for individual projects.
+      items:
+        actions: "Item actions"
+        blankslate:
+          title: "Your list of items is empty"
+          description: "Start by adding items to the custom field of type hierarchy. Each item can be used to create a hierarchy bellow it. To navigate and create sub-items inside a hierarchy click on the created item."
+        placeholder:
+          label: "Item label"
+          short: "Short name"
+      notice:
+        remember_items_and_projects: "Remember to set items and projects in the respective tabs for this custom field."
+      hierarchy:
+        subitems:
+          zero: no sub-items
+          one: 1 sub-item
+          other: "%{count} sub-items"
     text_add_new_custom_field: >
       Innan du kan lägga till nya anpassade fält till ett projekt måste du skapa dessa.
-    is_enabled_globally: 'Är aktiverad globalt'
-    enabled_in_project: 'Aktiverad i projekt'
-    contained_in_type: 'Ingår i typ'
+    is_enabled_globally: "Är aktiverad globalt"
+    enabled_in_project: "Aktiverad i projekt"
+    contained_in_type: "Ingår i typ"
     confirm_destroy_option: "Radering av ett alternativ kommer radera alla förekomster (i arbetspaket). Är du säker på att du vill radera?"
     reorder_alphabetical: "Reorder values alphabetically"
     reorder_confirmation: "Warning: The current order of available values will be lost. Continue?"
+    instructions:
+      is_required: "Mark the custom field as required. This will make it mandatory to fill in the field when creating new or updating existing resources."
+      is_required_for_project: "Check to enable this attribute and make it required in all projects. It cannot be deactived for individual projects."
+      is_for_all: "Mark the custom field as available in all existing and new projects."
+      multi_select: "Allows the user to assign multiple values to this custom field."
+      searchable: "Include the field values when using the global search functionality."
+      searchable_for_project: "Check to make this attribute available as a filter in project lists."
+      editable: "Allow the field to be editable by users themselves."
+      admin_only: "Check to make this attribute only visible to administrators. Users without admin rights will not be able to view or edit it."
+      is_filter: >
+        Allow the custom field to be used in a filter in work package views. Note that only with 'For all projects' selected, the custom field will show up in global views.
     tab:
       no_results_title_text: Det finns för närvarande inga anpassade fält.
       no_results_content_text: Skapa ett nytt anpassat fält
   concatenation:
-    single: 'eller'
+    single: "eller"
+  dry_validation:
+    errors:
+      rules:
+        label:
+          filled?: "must be filled"
+          not_unique: "must be unique within the same hierarchy level"
+    rules:
+      label: "Etikett"
   global_search:
+    placeholder: "Search in %{app_title}"
     overwritten_tabs:
       wiki_pages: "Wiki"
       messages: "Forum"
@@ -226,13 +286,14 @@ sv:
   projects:
     copy:
       #Contains custom strings for options when copying a project that cannot be found elsewhere.
-      members: 'Project members'
-      overviews: 'Project overview'
-      queries: 'Work packages: saved views'
-      wiki_page_attachments: 'Wiki pages: attachments'
-      work_package_attachments: 'Work packages: attachments'
-      work_package_categories: 'Work packages: categories'
-      work_package_file_links: 'Work packages: file links'
+      members: "Project members"
+      overviews: "Project overview"
+      queries: "Work packages: saved views"
+      wiki_page_attachments: "Wiki pages: attachments"
+      work_package_attachments: "Work packages: attachments"
+      work_package_categories: "Work packages: categories"
+      work_package_file_links: "Work packages: file links"
+      work_package_shares: "Work packages: shares"
     delete:
       scheduled: "Deletion has been scheduled and is performed in the background. You will be notified of the result."
       schedule_failed: "Projektet kan inte tas bort: %{errors}"
@@ -242,11 +303,24 @@ sv:
       completed_text: "Begäran om att ta bort projekt '%{name}' har slutförts."
       completed_text_children: "Additionally, the following subprojects have been deleted:"
     index:
-      open_as_gantt: 'Open as Gantt view'
-      open_as_gantt_title: "Use this button to generate a Gantt view that filters work packages for the projects visible on this page."
-      open_as_gantt_title_admin: "You can modify the view settings (such as selected work package types) in the administration under project settings."
+      open_as_gantt: "Open as Gantt view"
       no_results_title_text: Det finns för närvarande inga projekt
       no_results_content_text: Skapa ett nytt projekt
+      search:
+        label: Project name filter
+        placeholder: Search by project name
+    lists:
+      active: "Aktiva projekt"
+      my: "Mina projekt"
+      favored: "Favorite projects"
+      archived: "Arkiverade projekt"
+      shared: "Shared project lists"
+      my_lists: "Mina projektlistor"
+      new:
+        placeholder: "Ny projektlista"
+      delete_modal:
+        title: "Radera projektlista"
+        text: "This action will not delete any project the list contains. Are you sure you want to delete this project list?"
     settings:
       change_identifier: Change identifier
       activities:
@@ -259,49 +333,154 @@ sv:
         no_results_content_text: Skapa en ny kategori för arbetspaket
       custom_fields:
         no_results_title_text: Det finns för närvarande inga anpassade fält tillgängliga.
+      project_custom_fields:
+        header:
+          title: "Project attributes"
+          description: 'These project attributes will be displayed in your <a href=%{overview_url} target="_blank">project overview page</a> under their respective sections. You can enable or disable individual attributes. Project attributes and sections are defined in the <a href=%{admin_settings_url} target="_blank">administration settings</a> by the administrator of the instance. '
+        filter:
+          label: "Search project attribute"
+        actions:
+          label_enable_single: "Active in this project, click to disable"
+          label_disable_single: "Inactive in this project, click to enable"
+          remove_from_project: "Remove from project"
+          label_enable_all: "Enable all"
+          label_disable_all: "Disable all"
+        is_required_blank_slate:
+          heading: Required in all projects
+          description: This project attribute is activated in all projects since the "Required in all projects" option is checked. It cannot be deactivated for individual projects.
       types:
         no_results_title_text: Det finns för närvarande inga typer tillgängliga.
         form:
-          enable_type_in_project: 'Enable type "%{type}"'
+          enable_type_in_project: 'Aktivera typ "%{type}"'
       versions:
         no_results_title_text: Det finns för närvarande inga versioner av projektet.
         no_results_content_text: Skapa en ny version
       storage:
         no_results_title_text: There is no additional recorded disk space consumed by this project.
+  lists:
+    create:
+      success: "The modified list has been saved as a new list"
+      failure: "The modified list cannot be saved: %{errors}"
+    update:
+      success: "The modified list has been saved"
+      failure: "The modified list cannot be saved: %{errors}"
+    publish:
+      success: "The list has been made public"
+      failure: "The list cannot be made public: %{errors}"
+    unpublish:
+      success: "The list has been made private"
+      failure: "The list cannot be made private: %{errors}"
+    can_be_saved: "List modified:"
+    can_be_saved_as: "The modifications can only be saved in a new list:"
   members:
     index:
       no_results_title_text: Det finns för närvarande inga medlemmar i detta projekt.
       no_results_content_text: Lägg till en medlem i projektet
     invite_by_mail: "Send invite to %{mail}"
+    send_invite_to: "Send invite to"
+    columns:
+      shared: "Shared"
+    filters:
+      all_shares: "All shares"
+    menu:
+      all: "Alla"
+      invited: "Invited"
+      locked: "Låst"
+      project_roles: "Projektroller"
+      wp_shares: "Work package shares"
+      groups: "Grupper"
+    delete_member_dialog:
+      title: "Remove member"
+      will_remove_the_users_role: "This will remove the user’s role from this project."
+      will_remove_the_groups_role: "This will remove the group role from this project."
+      however_work_packages_shared_with_user_html:
+        one: "However, %{shared_work_packages_link} has also been shared with this user."
+        other: "However, %{shared_work_packages_link} have also been shared with this user."
+      however_work_packages_shared_with_group_html:
+        one: "However, %{shared_work_packages_link} has also been shared with this group."
+        other: "However, %{shared_work_packages_link} have also been shared with this group."
+      remove_work_packages_shared_with_user_too: "A user that has been removed as member can still access shared work packages. Would you like to remove the shares too?"
+      remove_work_packages_shared_with_group_too: "A group that has been removed as member can still access shared work packages. Would you like to remove the shares too?"
+      will_not_affect_inherited_shares: "(This will not affect work packages shared with their group)."
+      can_remove_direct_but_not_shared_roles: "You can remove this user as a direct project member but a group they are in is also a member of this project, so they will continue being a member via the group."
+      also_work_packages_shared_with_user_html:
+        one: "Also, %{shared_work_packages_link} has been shared with this user."
+        other: "Also, %{shared_work_packages_link} have been shared with this user."
+      remove_project_membership_or_work_package_shares_too: "Do you want to remove just the user as a direct member (and keep the shares) or remove the work package shares too?"
+      will_remove_all_user_access_priveleges: "Deleting this member will remove all access privileges of the user to the project. The user will still exist as part of the instance."
+      will_remove_all_group_access_priveleges: "Deleting this member will remove all access privileges of the group to the project. The group will still exist as part of the instance."
+      cannot_delete_inherited_membership: "You cannot delete this member because they belong to a group that is itself a member of this project."
+      cannot_delete_inherited_membership_note_admin_html: "You can either remove the group as a member of the project or this specific member from the group in the %{administration_settings_link}."
+      cannot_delete_inherited_membership_note_non_admin: "You can either remove the group as a member of the project or contact your administrator to remove this specific member from the group."
+    delete_work_package_shares_dialog:
+      title: "Revoke work package shares"
+      shared_with_this_user_html:
+        one: "%{all_shared_work_packages_link} has been shared with this user."
+        other: "%{all_shared_work_packages_link} have been shared with this user."
+      shared_with_this_group_html:
+        one: "%{all_shared_work_packages_link} has been shared with this group."
+        other: "%{all_shared_work_packages_link} have been shared with this group."
+      shared_with_permission_html:
+        one: "Only %{shared_work_packages_link} has been shared with %{shared_role_name} permissions."
+        other: "Only %{shared_work_packages_link} have been shared with %{shared_role_name} permissions."
+      revoke_all_or_with_role: "Would you like to revoke access to all shared work packages, or only those with %{shared_role_name} permissions?"
+      will_not_affect_inherited_shares: "(This will not affect work packages shared with their group)."
+      cannot_remove_inherited: "The work packages shares shared via groups cannot be removed."
+      cannot_remove_inherited_with_role: "The work packages shares with role %{shared_role_name} are shared via groups and cannot be removed."
+      cannot_remove_inherited_note_admin_html: "You can either revoke the share to the group or remove this specific member from the group in the %{administration_settings_link}."
+      cannot_remove_inherited_note_non_admin: "You can either revoke the share to the group or contact your administrator to remove this specific member from the group."
+      will_revoke_directly_granted_access: "This action will revoke their access to all of them, but the work packages shared with a group."
+      will_revoke_access_to_all: "This action will revoke their access to all of them."
   my:
     access_token:
+      create_dialog:
+        header: The %{type} token has been generated
+        warning: Note that this is the only time you will see this token, make sure to copy it now.
+      errors:
+        token_name_blank: "Please provide an API token name"
+        token_name_in_use: "This API token name is already in use, please select a different one"
+      new_access_token_dialog_title: "Skapa ny API-token"
+      new_access_token_dialog_show_button_text: "API-token"
+      new_access_token_dialog_text_field_placeholder_text: "Min API-token"
+      new_access_token_dialog_text_field_label: "Namn"
+      new_access_token_dialog_submit_button_text: "Skapa"
+      new_access_token_dialog_text: "This token will allow third-party applications to communicate with your instance. To differentiate the new API token, please give it a name."
+      new_access_token_dialog_attention_text: "Treat API tokens like passwords. Anyone with this link will have access to information from this instance, share it only with trusted users."
       failed_to_reset_token: "Misslyckades med att återställa åtkomst-token: %{error}"
+      failed_to_create_token: "Failed to create access token: %{error}"
+      failed_to_revoke_token: "Failed to revoke access token: %{error}"
       notice_reset_token: "En ny %{type}-token har skapats. Din åtkomst-token är:"
       token_value_warning: "Notera: Detta är den enda gång du kommer se denna token, var säker på att kopiera den nu."
       no_results_title_text: Det finns för närvarande inga tillgängliga åtkomstnycklar.
-      notice_api_token_revoked: "The API token has been deleted. To create a new token please use the link in the API section."
+      notice_api_token_revoked: "The API token has been deleted. To create a new token please use the button in the API section."
       notice_rss_token_revoked: "The RSS token has been deleted. To create a new token please use the link in the RSS section."
-      notice_ical_token_revoked: "iCalendar token \"%{token_name}\" for calendar \"%{calendar_name}\" of project \"%{project_name}\" has been revoked. The iCalendar URL with this token is now invalid."
+      notice_ical_token_revoked: 'iCalendar token "%{token_name}" for calendar "%{calendar_name}" of project "%{project_name}" has been revoked. The iCalendar URL with this token is now invalid.'
   news:
     index:
       no_results_title_text: Det finns för närvarande inget att rapportera.
       no_results_content_text: Lägg till nyhet
   users:
+    autologins:
+      prompt: "Stay logged in for %{num_days}"
     sessions:
+      remembered_devices: "Remembered devices"
+      remembered_devices_caption: "A list of all devices that logged into this account using the 'Stay logged in' option."
       session_name: "%{browser_name} %{browser_version} on %{os_name}"
-      browser: 'Webbläsare'
-      device: 'Enhet / OS'
-      unknown_browser: 'okänd webbläsare'
-      unknown_os: 'okänt operativsystem'
-      current: 'Nuvarande session'
-      title: 'Sessionskontrollering'
-      instructions: 'Det här är en list av enheter som är inloggade på ditt konto. Ta bort alla sessioner som du inte känner igen eller som du inte längre har tillgång till.'
-      may_not_delete_current: 'Du kan inte ta bort din nuvarande session.'
+      browser: "Webbläsare"
+      device: "Enhet / OS"
+      unknown_browser: "okänd webbläsare"
+      unknown_os: "okänt operativsystem"
+      current: "Nuvarande session"
+      title: "Sessionskontrollering"
+      instructions: "Det här är en list av enheter som är inloggade på ditt konto. Ta bort alla sessioner som du inte känner igen eller som du inte längre har tillgång till."
+      may_not_delete_current: "Du kan inte ta bort din nuvarande session."
     groups:
-      member_in_these_groups: 'This user is currently a member of the following groups:'
+      member_in_these_groups: "This user is currently a member of the following groups:"
       no_results_title_text: This user is currently not a member in any group.
     memberships:
       no_results_title_text: Denna användare är för närvarande inte medlem i något projekt.
+  page:
+    text: "Text"
   placeholder_users:
     right_to_manage_members_missing: >
       You are not allowed to delete the placeholder user. You do not have the right to manage members for all projects that the placeholder user is a member of.
@@ -321,28 +500,49 @@ sv:
       priority_color_text: |
         Klicka för att tilldela eller ändra färgen för denna prioritet.
         Den kan användas för att markera arbetspaket i tabellen.
+  reactions:
+    action_title: "React"
+    add_reaction: "Lägg till reaktion"
+    react_with: "Reagera med %{reaction}"
+    and_user: "och %{user}"
+    and_others:
+      one: och 1 annan
+      other: och %{count} andra
+    reaction_by: "%{reaction} by"
   reportings:
     index:
       no_results_title_text: Det finns för närvarande inga statusrapporter.
       no_results_content_text: Lägg till en statusrapport
   statuses:
     edit:
+      status_color_text: |
+        Välj för att tilldela eller ändra färgen för denna status.
+        Den visas i statusknappen och och kan användas för markering av arbetspaket i tabellen.
+      status_default_text: |-
+        New work packages are by default set to this type. They cannot be read-only.
+      status_excluded_from_totals_text: |-
+        Check this option to exclude work packages with this status from totals of Work,
+        Remaining work, and % Complete in a hierarchy.
+      status_percent_complete_text: |-
+        In <a href="%{href}">status-based progress calculation mode</a>, the % Complete of a work
+        package is automatically set to this value when this status is selected.
+        Ignored in work-based mode.
       status_readonly_html: |
         Välj detta val för att markera arbetspaket med denna status som skrivskyddade.
         Inga attribut kan ändras förutom status.
         <br/><strong>Notera</strong>Ärvda värden (t. ex. från barn eller relationer) kommer fortfarande gälla.
-      status_color_text: |
-        Välj för att tilldela eller ändra färgen för denna status.
-        Den visas i statusknappen och och kan användas för markering av arbetspaket i tabellen.
     index:
       no_results_title_text: Det finns för närvarande inga statusar för arbetspaket.
       no_results_content_text: Lägg till ny status
+      headers:
+        is_default: "Standard"
+        is_closed: "Stängt"
+        is_readonly: "Skrivskyddad"
+        excluded_from_totals: "Excluded from totals"
   themes:
-    light: "Light"
-    light_high_contrast: "Light high contrast"
     dark: "Dark"
-    dark_dimmed: "Dark dimmed"
-    dark_high_contrast: "Dark high contrast"
+    light: "Ljust"
+    light_high_contrast: "Light high contrast"
   types:
     index:
       no_results_title_text: Det finns för närvarande inga typer.
@@ -375,19 +575,28 @@ sv:
       no_results_title_text: Det finns för närvarande inga arbetsflöden.
   work_packages:
     x_descendants:
-      one: 'Ett underliggande arbetspaket'
-      other: '%{count} underliggande arbetspaket'
+      one: "Ett underliggande arbetspaket"
+      other: "%{count} underliggande arbetspaket"
     bulk:
       copy_failed: "The work packages could not be copied."
       move_failed: "The work packages could not be moved."
       could_not_be_saved: "Följande arbetspaket kunde inte sparas:"
       none_could_be_saved: "None of the %{total} work packages could be updated."
       x_out_of_y_could_be_saved: "%{failing} out of the %{total} work packages could not be updated while %{success} could."
-      selected_because_descendants: "While %{selected} work packages where selected, in total %{total} work packages are affected which includes descendants."
+      selected_because_descendants: "While %{selected} work packages were selected, in total %{total} work packages are affected which includes descendants."
       descendant: "descendant of selected"
     move:
       no_common_statuses_exists: "Det finns ingen status för alla valda arbetspaket. Deras status kan inte ändras."
-      unsupported_for_multiple_projects: 'Att flytta/kopiera i bulk stöds inte för arbetspaket från flera projekt'
+      unsupported_for_multiple_projects: "Att flytta/kopiera i bulk stöds inte för arbetspaket från flera projekt"
+      current_type_not_available_in_target_project: >
+        The current type of the work package is not enabled in the target project. Please enable the type in the target project if you'd like it to remain unchanged. Otherwise, select an available type in the target project from the list.
+      bulk_current_type_not_available_in_target_project: >
+        The current types of the work packages aren't enabled in the target project. Please enable the types in the target project if you'd like them to remain unchanged. Otherwise, select an available type in the target project from the list.
+    sharing:
+      missing_workflow_warning:
+        title: "Workflow missing for work package sharing"
+        message: "No workflow is configured for the 'Work package editor' role. Without a workflow, the shared with user cannot alter the status of the work package. Workflows can be copied. Select a source type (e.g. 'Task') and source role (e.g. 'Member'). Then select the target types. To start with, you could select all the types as targets. Finally, select the 'Work package editor' role as the target and press 'Copy'. After having thus created the defaults, fine tune the workflows as you do for every other role."
+        link_message: "Configure the workflows in the administration."
     summary:
       reports:
         category:
@@ -411,8 +620,8 @@ sv:
     deletion_pending: "Account has been locked and was scheduled for deletion. Note that this process takes place in the background. It might take a few moments until the user is fully deleted."
     deletion_info:
       data_consequences:
-        other: "Det mesta av informationen som användaren skapat (t.ex. e-post och inställningar) kommer att raderas. Information som exempelvis arbetspaket och wiki-poster kan dock inte raderas eftersom detta skulle påverka andra användares arbete, så detta kommer istället att tilldelas ett konto som heter \"Raderad användare\". Eftersom information från alla raderade konton överförs till detta konto kommer det inte längre vara möjligt att se vem som skapat vad."
-        self: "Det mesta av informationen som du skapat (t.ex. e-post och inställningar) kommer att raderas. Information som exempelvis arbetspaket och wiki-poster kan dock inte raderas eftersom detta skulle påverka andra användares arbete, så detta kommer istället att tilldelas ett konto som heter \"Raderad användare\". Eftersom information från alla raderade konton överförs till detta konto kommer det inte längre vara möjligt att se vilken information du skapat."
+        other: 'Det mesta av informationen som användaren skapat (t.ex. e-post och inställningar) kommer att raderas. Information som exempelvis arbetspaket och wiki-poster kan dock inte raderas eftersom detta skulle påverka andra användares arbete, så detta kommer istället att tilldelas ett konto som heter "Raderad användare". Eftersom information från alla raderade konton överförs till detta konto kommer det inte längre vara möjligt att se vem som skapat vad.'
+        self: 'Det mesta av informationen som du skapat (t.ex. e-post och inställningar) kommer att raderas. Information som exempelvis arbetspaket och wiki-poster kan dock inte raderas eftersom detta skulle påverka andra användares arbete, så detta kommer istället att tilldelas ett konto som heter "Raderad användare". Eftersom information från alla raderade konton överförs till detta konto kommer det inte längre vara möjligt att se vilken information du skapat.'
       heading: "Ta bort konto %{name}"
       info:
         other: "Att ta bort användarkontot är en oåterkallelig åtgärd."
@@ -429,6 +638,8 @@ sv:
       Ditt konto har ännu inte aktiverats. Du måste vänta på att en administratör aktiverar ditt konto.
     error_self_registration_disabled: >
       Användarregistrering är inaktiverat på det här systemet. Be en administratör att skapa ett konto för dig.
+    error_self_registration_limited_provider: >
+      User registration is limited for the Single sign-on provider '%{name}'. Please ask an administrator to activate the account for you or change the self registration limit for this provider.
     login_with_auth_provider: "eller logga in med ditt befintliga konto"
     signup_with_auth_provider: "eller registrera dig via"
     auth_source_login: Vänligen logga in som <em>%{login}</em> för att aktivera ditt konto.
@@ -446,32 +657,23 @@ sv:
         filename: "Fil"
         filesize: "Filstorlek"
       attribute_help_text:
-        attribute_name: 'Attributet'
-        help_text: 'Hjälptext'
-      ldap_auth_source:
-        account: "Konto"
-        attr_firstname: "Firstname attribute"
-        attr_lastname: "Lastname attribute"
-        attr_login: "Username attribute"
-        attr_mail: "Email attribute"
-        base_dn: "Base DN"
-        host: "Host"
-        onthefly: "Automatic user creation"
-        port: "Port"
-        tls_certificate_string: "LDAP server SSL certificate"
+        attribute_name: "Attributet"
+        help_text: "Hjälptext"
       changeset:
         repository: "Versionsarkiv"
       color:
-        hexcode: "Hex code"
+        hexcode: "Hex-kod"
       comment:
         commented: "Kommenterade" #an object that this comment belongs to
       custom_action:
         actions: "Åtgärder"
       custom_field:
+        allow_non_open_versions: "Allow non-open versions"
         default_value: "Standardvärde"
         editable: "Redigerbar"
         field_format: "Format"
         is_filter: "Används som ett filter"
+        is_for_all: "For all projects"
         is_required: "Krävs"
         max_length: "Maximal längd"
         min_length: "Minsta längd"
@@ -479,12 +681,21 @@ sv:
         possible_values: "Möjliga värden"
         regexp: "Reguljära uttryck"
         searchable: "Sökbara"
-        visible: "Synlig"
+        admin_only: "Admin-only"
       custom_value:
         value: "Värde"
+      doorkeeper/application:
+        uid: "Client ID"
+        secret: "Client secret"
+        owner: "Ägare"
+        builtin: "Builtin"
+        enabled: "Active"
+        redirect_uri: "Omdirigerings-URI"
+        client_credentials_user_id: "Användar-ID klientreferenser"
+        scopes: "Omfattning"
+        confidential: "Konfidentiellt"
       enterprise_token:
         starts_at: "Giltig sedan"
-        expires_at: "Förfaller den"
         subscriber: "Prenumerant"
         encoded_token: "Enterprise support-nyckel"
         active_user_count_restriction: "Max antal aktiva användare"
@@ -493,17 +704,25 @@ sv:
         row_count: "Antal rader"
         column_count: "Antal kolumner"
         widgets: "Widgets"
-      relation:
-        delay: "Fördröjning"
-        from: "Arbetspaket"
-        to: "Relaterat arbetspaketet"
-      status:
-        is_closed: "Arbetspaket stängt"
-        is_readonly: "Skrivskyddat arbetspaket"
       journal:
         notes: "Anteckningar"
+      ldap_auth_source:
+        account: "Konto"
+        attr_firstname: "Förnamnsattribut"
+        attr_lastname: "Efternamnsattribut"
+        attr_login: "Attribut för användarnamn"
+        attr_mail: "E-postattribut"
+        base_dn: "Base DN"
+        host: "Host"
+        onthefly: "Automatic user creation"
+        port: "Port"
+        tls_certificate_string: "LDAP server SSL certificate"
       member:
         roles: "Roll"
+      oauth_client:
+        client: "Client ID"
+      planning_element_type_color:
+        hexcode: Hex-kod
       project:
         active_value:
           true: "unarchived"
@@ -516,15 +735,16 @@ sv:
           true: "public"
           false: "private"
         queries: "Frågor"
-        status_code: 'Projektstatus'
-        status_explanation: 'Project status description'
+        status_code: "Projektstatus"
+        description: "Beskrivning"
+        status_explanation: "Project status description"
         status_codes:
-          not_started: 'Inte påbörjad'
-          on_track: 'På rätt spår'
-          at_risk: 'I riskzonen'
-          off_track: 'Urspårat'
-          finished: 'Slutförd'
-          discontinued: 'Discontinued'
+          not_started: "Inte påbörjad"
+          on_track: "På rätt spår"
+          at_risk: "I riskzonen"
+          off_track: "Urspårat"
+          finished: "Slutförd"
+          discontinued: "Discontinued"
         templated: "Template project"
         templated_value:
           true: "marked as template"
@@ -532,6 +752,9 @@ sv:
         types: "Typer"
         versions: "Versioner"
         work_packages: "Arbetspaket"
+      project_custom_field:
+        is_required: "Required for all projects"
+        custom_field_section: Section
       query:
         column_names: "Kolumner"
         relations_to_type_column: "Relationer till %{type}"
@@ -539,10 +762,19 @@ sv:
         group_by: "Gruppera resultat efter"
         filters: "Filter"
         timeline_labels: "Etiketter för tidslinje"
+      relation:
+        lag: "Lag"
+        from: "Arbetspaket"
+        to: "Relaterat arbetspaketet"
       repository:
         url: "URL"
       role:
         permissions: "Behörigheter"
+      status:
+        is_closed: "Arbetspaket stängt"
+        is_readonly: "Skrivskyddat arbetspaket"
+        excluded_from_totals: "Exclude from calculation of totals in hierarchy"
+        default_done_ratio: "% Complete"
       time_entry:
         activity: "Aktivitet"
         hours: "Timmar"
@@ -551,14 +783,16 @@ sv:
         ongoing: "Ongoing"
       type:
         description: "Standardtext för beskrivning"
-        attribute_groups: ''
+        attribute_groups: ""
         is_in_roadmap: "Visas som standard i roadmap"
         is_default: "Aktiverad som standard för nya projekt"
         is_milestone: "Är milstolpe"
         color: "Färg"
       user:
         admin: "Administratör"
-        ldap_auth_source: "LDAP connection"
+        auth_source: "Authentication source"
+        ldap_auth_source: "LDAP-anslutning"
+        identity_url: "Identity URL"
         current_password: "Nuvarande lösenord"
         force_password_change: "Tvinga lösenordsändring vid nästa inloggning"
         language: "Språk"
@@ -568,11 +802,12 @@ sv:
         consented_at: "Samtyckte den"
       user_preference:
         comments_sorting: "Visa kommentarer"
-        hide_mail: "Dölj min E-postadress"
         impaired: "Tillgänglighetsläge"
         time_zone: "Tidszon"
         auto_hide_popups: "Dölj automatiskt meddelanden om åtgärder som lyckats"
         warn_on_leaving_unsaved: "Varna mig när jag lämnar ett arbetspaket med osparade ändringar"
+        theme: "Mode"
+        mode_guideline: "Some modes will overwrite custom theme colours for accessibility and legibility. For the full custom theme, please select Light mode."
       version:
         effective_date: "Slutdatum"
         sharing: "Delas"
@@ -581,27 +816,32 @@ sv:
       wiki_page:
         parent_title: "Överordnad sida"
         redirect_existing_links: "Omdirigera befintliga länkar"
-      planning_element_type_color:
-        hexcode: Hex-kod
       work_package:
         begin_insertion: "Början av införandet"
         begin_deletion: "Början av raderingen"
         children: "Underelement"
-        done_ratio: "Progress (%)"
+        derived_done_ratio: "Total % complete"
+        derived_remaining_hours: "Total remaining work"
+        derived_remaining_time: "Total remaining work"
+        done_ratio: "% Complete"
         duration: "Varaktighet"
         end_insertion: "Slutet av införandet"
         end_deletion: "Slutet av raderingen"
         ignore_non_working_days: "Ignore non working days"
         include_non_working_days:
-          title: 'Working days'
-          false: 'working days only'
-          true: 'include non-working days'
+          title: "Working days"
+          false: "working days only"
+          true: "include non-working days"
+        notify: "Notify" #used in custom actions
         parent: "Överordnad"
         parent_issue: "Överordnad"
         parent_work_package: "Överordnad"
         priority: "Prioritet"
-        progress: "Progress (%)"
+        progress: "% Complete"
         readonly: "Read only"
+        remaining_hours: "Remaining work"
+        remaining_time: "Remaining work"
+        shared_with_users: "Shared with"
         schedule_manually: "Manual scheduling"
         spent_hours: "Förbrukad tid"
         spent_time: "Förbrukad tid"
@@ -610,14 +850,6 @@ sv:
         type: "Typ"
         version: "Version"
         watcher: "Bevakare"
-      'doorkeeper/application':
-        uid: "Client ID"
-        secret: "Client secret"
-        owner: "Ägare"
-        redirect_uri: "Omdirigerings-URI"
-        client_credentials_user_id: "Användar-ID klientreferenser"
-        scopes: "Omfattning"
-        confidential: "Konfidentiellt"
     errors:
       messages:
         accepted: "måste accepteras."
@@ -627,6 +859,8 @@ sv:
         before_or_equal_to: "måste vara före eller lika med %{date}."
         blank: "kan inte vara tomt."
         blank_nested: "needs to have the property '%{property}' set."
+        cannot_delete_mapping: "is required. Cannot be deleted."
+        is_for_all_cannot_modify: "is for all projects and can therefore not be modified."
         cant_link_a_work_package_with_a_descendant: "Ett arbetspaket kan inte kopplas till någon av dess underaktiviteter."
         circular_dependency: "Detta förhållande skulle skapa ett cirkelberoende."
         confirmation: "matchar inte %{attribute}."
@@ -635,6 +869,7 @@ sv:
         error_enterprise_only: "%{action} is only available in the OpenProject Enterprise edition"
         error_unauthorized: "åtkomst nekas."
         error_readonly: "försökte skrivas men är inte skrivbart."
+        error_conflict: "Informationen har uppdaterats av minst en annan användare under tiden."
         email: "är inte en giltig e-postadress."
         empty: "kan inte vara tomt."
         even: "måste vara jämn."
@@ -650,20 +885,23 @@ sv:
         inclusion: "inte är inställd på ett av de tillåtna värdena."
         inclusion_nested: "is not set to one of the allowed values at path '%{path}'."
         invalid: "är ogiltig."
-        invalid_url: 'är inte ett giltigt URL.'
-        invalid_url_scheme: 'är inte ett tillåtet protokoll (tillåtna: %{allowed_schemes}).'
+        invalid_url: "är inte ett giltigt URL."
+        invalid_url_scheme: "är inte ett tillåtet protokoll (tillåtna: %{allowed_schemes})."
         less_than_or_equal_to: "måste vara mindre än eller lika med %{count}."
         not_available: "is not available due to a system configuration."
         not_deletable: "cannot be deleted."
         not_current_user: "is not the current user."
+        not_found: "not found."
         not_a_date: "är inte är ett giltigt datum."
         not_a_datetime: "är inte en giltig datumtid."
         not_a_number: "är inte ett nummer."
         not_allowed: "är inte tillåtet på grund av saknade behörigheter."
+        not_json: "is not a valid JSON object."
         not_an_integer: "är inte ett heltal."
         not_an_iso_date: "är inte ett giltigt datum. Använd formatet ÅÅÅÅ-MM-DD."
         not_same_project: "tillhör inte samma projekt."
         odd: "måste vara udda."
+        regex_match_failed: "does not match the regular expression %{expression}."
         regex_invalid: "kunde inte valideras med det associerade reguljära uttrycket."
         smaller_than_or_equal_to_max_length: "måste vara mindre än eller lika med maximal längd."
         taken: "har redan använts."
@@ -692,12 +930,16 @@ sv:
               format: "%{message}"
         capability:
           context:
-            global: 'Global'
+            global: "Global"
           query:
             filters:
               minimum: "need to include at least one filter for principal, context or id with the '=' operator."
         custom_field:
           at_least_one_custom_option: "Minst ett alternativ måste vara tillgängligt."
+        custom_fields_project:
+          attributes:
+            project_ids:
+              blank: "Please select a project."
         custom_actions:
           only_one_allowed: "(%{name}) endast ett värde är tillåtet."
           empty: "(%{name}) värdet kan inte vara tomt."
@@ -710,35 +952,37 @@ sv:
         doorkeeper/application:
           attributes:
             redirect_uri:
-              fragment_present: 'kan inte innehålla ett fragment.'
-              invalid_uri: 'måste vara en giltig URI.'
-              relative_uri: 'måste vara en absolut URI.'
+              fragment_present: "kan inte innehålla ett fragment."
+              invalid_uri: "måste vara en giltig URI."
+              relative_uri: "måste vara en absolut URI."
               secured_uri: 'is not providing a "Secure Context". Either use HTTPS or a loopback address, such as localhost.'
-              forbidden_uri: 'är förbjudet av servern.'
+              forbidden_uri: "är förbjudet av servern."
             scopes:
               not_match_configured: "matchar inte tillgängliga omfattningar."
         enterprise_token:
           unreadable: "kan inte läsas. Är du säker på att det är en support-nyckel?"
         grids/grid:
-          overlaps: 'överlappar.'
-          outside: 'är utanför nätet.'
-          end_before_start: 'slutvärdet måste vara större än startvärdet.'
+          overlaps: "överlappar."
+          outside: "är utanför nätet."
+          end_before_start: "slutvärdet måste vara större än startvärdet."
         ical_token_query_assignment:
           attributes:
             name:
               blank: "is mandatory. Please select a name."
               not_unique: "is already in use. Please select another name."
+        meeting:
+          error_conflict: "Unable to save because the meeting was updated by someone else in the meantime. Please reload the page."
         notifications:
-          at_least_one_channel: 'At least one channel for sending notifications needs to be specified.'
+          at_least_one_channel: "At least one channel for sending notifications needs to be specified."
           attributes:
             read_ian:
-              read_on_creation: 'cannot be set to true on notification creation.'
+              read_on_creation: "cannot be set to true on notification creation."
             mail_reminder_sent:
-              set_on_creation: 'cannot be set to true on notification creation.'
+              set_on_creation: "cannot be set to true on notification creation."
             reason:
-              no_notification_reason: 'cannot be blank as IAN is chosen as a channel.'
+              no_notification_reason: "cannot be blank as IAN is chosen as a channel."
             reason_mail_digest:
-              no_notification_reason: 'cannot be blank as mail digest is chosen as a channel.'
+              no_notification_reason: "cannot be blank as mail digest is chosen as a channel."
         non_working_day:
           attributes:
             date:
@@ -751,8 +995,8 @@ sv:
               invalid_values: "Ett värde är ogiltigt."
               id_filter_required: "Ett ID-filter krävs."
         project:
-          archived_ancestor: 'Projektet har en arkiverad förfader.'
-          foreign_wps_reference_version: 'Arbetspaket i icke efterkommande projekt referensversioner av projektet eller dess efterkommande.'
+          archived_ancestor: "Projektet har en arkiverad förfader."
+          foreign_wps_reference_version: "Arbetspaket i icke efterkommande projekt referensversioner av projektet eller dess efterkommande."
           attributes:
             base:
               archive_permission_missing_on_subprojects: "You do not have the permissions required to archive all sub-projects. Please contact an administrator."
@@ -761,6 +1005,10 @@ sv:
             enabled_modules:
               dependency_missing: "The module '%{dependency}' needs to be enabled as well since the module '%{module}' depends on it."
               format: "%{message}"
+        project_custom_field_project_mapping:
+          attributes:
+            project_ids:
+              blank: "Please select a project."
         query:
           attributes:
             project:
@@ -780,7 +1028,13 @@ sv:
               invalid: "Timestamps contain invalid values: %{values}"
               forbidden: "Timestamps contain forbidden values: %{values}"
               format: "%{message}"
+            selects:
+              name_not_included: "The 'Name' column needs to be included"
+              nonexistent: "The column '%{column}' does not exist."
+              format: "%{message}"
           group_by_hierarchies_exclusive: "är ömsesidigt uteslutande med grupperingen '%{group_by}'. Du kan inte aktivera båda."
+          can_only_be_modified_by_owner: "The query can only be modified by its owner."
+          need_permission_to_modify_public_query: "You cannot modify a public query."
           filters:
             custom_fields:
               inexistent: "Det finns inget anpassat fält för filtret."
@@ -812,8 +1066,16 @@ sv:
         setting:
           attributes:
             base:
-              working_days_are_missing: 'At least one day of the week must be defined as a working day.'
-              previous_working_day_changes_unprocessed: 'The previous changes to the working days configuration have not been applied yet.'
+              working_days_are_missing: "At least one day of the week must be defined as a working day."
+              previous_working_day_changes_unprocessed: "The previous changes to the working days configuration have not been applied yet."
+              hours_per_day_are_missing: "The number of hours per day must be defined."
+              durations_are_not_positive_numbers: "The durations must be positive numbers."
+              hours_per_day_is_out_of_bounds: "Hours per day can't be more than 24"
+        status:
+          attributes:
+            default_done_ratio:
+              inclusion: "must be between 0 and 100."
+          readonly_default_exlusive: "can not be activated for statuses that are marked default."
         time_entry:
           attributes:
             hours:
@@ -825,10 +1087,10 @@ sv:
             daily_reminders:
               full_hour: "can only be configured to be delivered at a full hour."
             notification_settings:
-              only_one_global_setting: 'There must only be one global notification setting.'
-              email_alerts_global: 'The email notification settings can only be set globally.'
+              only_one_global_setting: "There must only be one global notification setting."
+              email_alerts_global: "The email notification settings can only be set globally."
               format: "%{message}"
-              wrong_date: 'Wrong value for Start date, Due date, or Overdue.'
+              wrong_date: "Wrong value for Start date, Due date, or Overdue."
         watcher:
           attributes:
             user_id:
@@ -844,6 +1106,12 @@ sv:
           attributes:
             assigned_to:
               format: "%{message}"
+            done_ratio:
+              does_not_match_work_and_remaining_work: "does not match Work and Remaining work"
+              cannot_be_set_when_work_is_zero: "cannot be set when Work is 0h"
+              must_be_set_when_remaining_work_is_set: "required when Remaining work is set."
+              must_be_set_when_work_and_remaining_work_are_set: "required when Work and Remaining work are set."
+              inclusion: "must be between 0 and 100."
             due_date:
               not_start_date: "är inte på startdatum, även om detta behövs för milstolpar."
               cannot_be_null: "can not be set to null as start date and duration are known."
@@ -871,8 +1139,19 @@ sv:
               only_same_project_categories_allowed: "Kategorin för ett arbetspaket måste tillhöra samma projekt som arbetspaketet."
               does_not_exist: "Den angivna kategorin finns inte."
             estimated_hours:
-              only_values_greater_or_equal_zeroes_allowed: "måste vara >= 0."
-          readonly_status: 'The work package is in a readonly status so its attributes cannot be changed.'
+              not_a_number: "is not a valid duration."
+              cant_be_inferior_to_remaining_work: "cannot be lower than Remaining work."
+              must_be_set_when_remaining_work_and_percent_complete_are_set: "required when Remaining work and % Complete are set."
+            remaining_hours:
+              not_a_number: "is not a valid duration."
+              cant_exceed_work: "cannot be higher than Work."
+              must_be_set_when_work_is_set: "required when Work is set."
+              must_be_set_when_work_and_percent_complete_are_set: "required when Work and % Complete are set."
+              must_be_set_to_zero_hours_when_work_is_set_and_percent_complete_is_100p: >-
+                must be 0h when Work is set and % Complete is 100%.
+              must_be_empty_when_work_is_empty_and_percent_complete_is_100p: >-
+                must be empty when Work is empty and % Complete is 100%.
+          readonly_status: "The work package is in a readonly status so its attributes cannot be changed."
         type:
           attributes:
             attribute_groups:
@@ -885,11 +1164,12 @@ sv:
           attributes:
             base:
               user_limit_reached: "User limit reached. No more accounts can be created on the current plan."
+              one_must_be_active: "Admin User cannot be locked/removed. At least one admin must be active."
             password_confirmation:
               confirmation: "Password confirmation does not match password."
               format: "%{message}"
             password:
-              weak: "Måste innehålla följande teckentyper (minst %{min_count} av %{all_count}): %{rules}."
+              weak: "Must contain characters of the following classes (at least %{min_count} of %{all_count}): %{rules}"
               lowercase: "gemener (t.ex. \"a\")"
               uppercase: "versal (t.ex. \"A\")"
               numeric: "numeriska (t.ex. ' 1')"
@@ -903,20 +1183,25 @@ sv:
             status:
               invalid_on_create: "är inte en giltig status för nya användare."
             ldap_auth_source:
-              error_not_found: "not found"
+              error_not_found: "hittades inte"
+            auth_source:
+              error_not_found: "hittades inte"
         member:
           principal_blank: "Välj minst en användare eller grupp."
           role_blank: "måste tilldelas."
           attributes:
             roles:
               ungrantable: "har en ej tilldelbar roll."
+              more_than_one: "has more than one role."
             principal:
               unassignable: "kan inte tilldelas till ett projekt."
         version:
-          undeletable_archived_projects: "The version cannot be deleted as it has work packages attached to it."
+          undeletable_archived_projects: "Versionen kan inte tas bort eftersom den har arbetspaket bifogade till den."
           undeletable_work_packages_attached: "Versionen kan inte tas bort eftersom den har arbetspaket bifogade till den."
-        status:
-          readonly_default_exlusive: "can not be activated for statuses that are marked default."
+        token/api:
+          attributes:
+            token_name:
+              format: "%{message}"
       template:
         body: "Kontrollera följande fält:"
         header:
@@ -929,7 +1214,7 @@ sv:
       comment: "Kommentar"
       custom_action: "Anpassad åtgärd"
       custom_field: "Anpassat fält"
-      'doorkeeper/application': "OAuth-autentisering"
+      "doorkeeper/application": "OAuth-autentisering"
       forum: "Forum"
       global_role: "Global role"
       group: "Grupp"
@@ -940,11 +1225,17 @@ sv:
         other: "Notifications"
       placeholder_user: "Placeholder user"
       project: "Projekt"
+      project_query:
+        one: "Projektlista"
+        other: "Projektlistor"
       query: "Anpassad fråga"
       role:
         one: "Roll"
         other: "Roller"
       status: "Arbetspaketstatus"
+      token/api:
+        one: Access token
+        other: Access tokens
       type: "Typ"
       user: "Användare"
       version: "Version"
@@ -955,7 +1246,7 @@ sv:
   errors:
     header_invalid_fields:
       one: "There was a problem with the following field:"
-      other: "There were problems with the following fields:"
+      other: "Det fanns problem med följande fält:"
     header_additional_invalid_fields:
       one: "Additionally, there was a problem with the following field:"
       other: "Additionally, there were problems with the following fields:"
@@ -970,6 +1261,12 @@ sv:
       updated_by_on_time_entry: "logged time updated by %{user} on %{datetime}"
       updated_on: "updated on %{datetime}"
       updated_on_time_entry: "logged time updated on %{datetime}"
+      deleted_on: "deleted on %{datetime}"
+      deleted_by_on: "deleted by %{user} on %{datetime}"
+      added_on: "added on %{datetime}"
+      added_by_on: "added by %{user} on %{datetime}"
+      removed_on: "removed on %{datetime}"
+      removed_by_on: "removed by %{user} on %{datetime}"
       parent_without_of: "Delprojekt"
       parent_no_longer: "No longer subproject of"
       time_entry:
@@ -1011,12 +1308,13 @@ sv:
     default_columns: "Standardkolumnerna"
     description: "Beskrivning"
     derived_due_date: "Derived finish date"
-    derived_estimated_hours: "Derived estimated time"
+    derived_estimated_hours: "Total work"
     derived_start_date: "Derived start date"
     display_sums: "Visa summor"
     due_date: "Slutdatum"
-    estimated_hours: "Beräknad tid"
-    estimated_time: "Beräknad tid"
+    estimated_hours: "Work"
+    estimated_time: "Work"
+    expires_at: "Förfaller den"
     firstname: "Förnamn"
     group: "Grupp"
     groups: "Grupper"
@@ -1077,6 +1375,7 @@ sv:
       token_cooldown: The backup token will be valid in %{hours} hours.
       backup_pending: There is already a backup pending.
       limit_reached: You can only do %{limit} backups per day.
+  button_actions: "Åtgärder"
   button_add: "Lägg till"
   button_add_comment: "Lägg till kommentar"
   button_add_member: Lägg till medlem
@@ -1092,13 +1391,13 @@ sv:
   button_check_all: "Markera alla"
   button_clear: "Rensa"
   button_click_to_reveal: "Klicka för att visa"
-  button_close: 'Stäng'
+  button_close: "Stäng"
   button_collapse_all: "Fäll ihop alla"
   button_configure: "Konfigurera"
   button_continue: "Fortsätt"
   button_copy: "Kopiera"
   button_copy_to_clipboard: "Kopiera till Urklipp"
-  button_copy_link_to_clipboard: "Copy link to clipboard"
+  button_copy_link_to_clipboard: "Kopiera länk till urklipp"
   button_copy_and_follow: "Kopiera och följ"
   button_create: "Skapa"
   button_create_and_continue: "Skapa och fortsätt"
@@ -1110,7 +1409,9 @@ sv:
   button_edit: "Redigera"
   button_edit_associated_wikipage: "Redigerade associerad wikisida: %{page_title}"
   button_expand_all: "Expandera alla"
+  button_favorite: "Lägg till i favoriter"
   button_filter: "Filter"
+  button_finish_setup: "Finish setup"
   button_generate: "Generera"
   button_list: "Lista"
   button_lock: "Lås"
@@ -1127,6 +1428,7 @@ sv:
   button_reset: "Återställ"
   button_rollback: "Återgå till denna version"
   button_save: "Spara"
+  button_save_as: "Spara som"
   button_apply_changes: "Apply changes"
   button_save_back: "Spara och återgå"
   button_show: "Visa"
@@ -1136,6 +1438,7 @@ sv:
   button_unarchive: "Hämta från Arkiv"
   button_uncheck_all: "Avmarkera alla"
   button_unlock: "Lås upp"
+  button_unfavorite: "Remove from favorites"
   button_unwatch: "Sluta bevaka"
   button_update: "Uppdatera"
   button_upgrade: "Uppgradera"
@@ -1146,13 +1449,23 @@ sv:
   button_add_menu_entry: "Lägga till menyalternativ"
   button_configure_menu_entry: "Konfigurera menyalternativ"
   button_delete_menu_entry: "Ta bort menyalternativ"
+  button_view_shared_work_packages: "View shared work packages"
+  button_manage_roles: "Hantera roller"
+  button_remove_member: "Remove member"
+  button_remove_member_and_shares: "Remove member and shares"
+  button_revoke_work_package_shares: "Revoke work package shares"
+  button_revoke_access: "Revoke access"
+  button_revoke_all: "Revoke all"
+  button_revoke_only: "Revoke only %{shared_role_name}"
+  button_publish: "Make public"
+  button_unpublish: "Make private"
   consent:
     checkbox_label: Jag har noterat och samtycker till ovanstående.
     failure_message: Samtycke misslyckades, kan inte fortsätta.
     title: Användarsamtycken
     decline_warning_message: Du har avböjt samtycke och loggats ut.
-    user_has_consented: Användaren har samtyckt till din konfigurerade redogörelse vid den angivna tidpunkten.
-    not_yet_consented: Användaren har ännu inte samtyckt till, kommer att begäras vid nästa inloggning.
+    user_has_consented: The user gave their consent to your [configured consent information text](consent_settings).
+    not_yet_consented: The user has not yet given their consent to your [configured consent information text](consent_settings). They will be reminded the next time they log in.
     contact_mail_instructions: Definiera den e-postadress som användarna kan nå en personuppgiftsansvarig för att utföra uppgifter, ändra eller ta bort förfrågningar.
     contact_your_administrator: Kontakta administratören om du vill att kontot ska tas bort.
     contact_this_mail_address: Kontakta %{mail_address} om du vill få ditt konto borttaget.
@@ -1160,19 +1473,19 @@ sv:
     update_consent_last_time: "Senaste uppdatering av samtycke: %{update_time}"
   copy_project:
     title: 'Copy project "%{source_project_name}"'
-    started: "Började kopiera projekt \"%{source_project_name}\" till \"%{target_project_name}\". Du kommer att informeras via E-post när \"%{target_project_name}\" finns tillgängligt."
+    started: 'Började kopiera projekt "%{source_project_name}" till "%{target_project_name}". Du kommer att informeras via E-post när "%{target_project_name}" finns tillgängligt.'
     failed: "Kan inte kopiera projekt %{source_project_name}"
     failed_internal: "Kopiering misslyckades på grund av ett internt fel."
     succeeded: "Skapade projektet %{target_project_name}"
     errors: "Fel"
-    project_custom_fields: 'Anpassade fält på projektet'
+    project_custom_fields: "Anpassade fält på projektet"
     x_objects_of_this_type:
-      zero: 'No objects of this type'
-      one: 'One object of this type'
-      other: '%{count} objects of this type'
+      zero: "No objects of this type"
+      one: "One object of this type"
+      other: "%{count} objects of this type"
     text:
-      failed: "Kunde inte kopiera projekt \"%{source_project_name}\" till projektet \"%{target_project_name}\"."
-      succeeded: "Kopierade projektet \"%{source_project_name}\" till \"%{target_project_name}\"."
+      failed: 'Kunde inte kopiera projekt "%{source_project_name}" till projektet "%{target_project_name}".'
+      succeeded: 'Kopierade projektet "%{source_project_name}" till "%{target_project_name}".'
   create_new_page: "Wiki-sida"
   date:
     abbr_day_names:
@@ -1197,7 +1510,7 @@ sv:
       - "Okt"
       - "Nov"
       - "Dec"
-    abbr_week: 'Wk'
+    abbr_week: "Wk"
     day_names:
       - "Söndag"
       - "Måndag"
@@ -1214,7 +1527,7 @@ sv:
       long: "%B %d, %Y"
       short: "%b %d"
     #Don't forget the nil at the beginning; there's no such thing as a 0th month
-    month_names:
+    month_names:  #Used in date_select and datetime_select.
       - null
       - "Januari"
       - "Februari"
@@ -1228,7 +1541,6 @@ sv:
       - "Oktober"
       - "November"
       - "December"
-    #Used in date_select and datetime_select.
     order:
       - ':år'
       - ':månad'
@@ -1263,12 +1575,30 @@ sv:
       x_minutes:
         one: "1 minut"
         other: "%{count} minuter"
+      x_minutes_abbreviated:
+        one: "1 min"
+        other: "%{count} min"
+      x_hours:
+        one: "1 timme"
+        other: "%{count} timmar"
+      x_hours_abbreviated:
+        one: "1 hr"
+        other: "%{count} hrs"
+      x_weeks:
+        one: "1 vecka"
+        other: "%{count} veckor"
       x_months:
         one: "En månad"
         other: "%{count} månader"
+      x_years:
+        one: "1 år"
+        other: "%{count} år"
       x_seconds:
         one: "En sekund"
         other: "%{count} sekunder"
+      x_seconds_abbreviated:
+        one: "1 s"
+        other: "%{count} s"
     units:
       hour:
         one: "timme"
@@ -1319,8 +1649,8 @@ sv:
   error_can_not_archive_project: "Det här projektet kan inte arkiveras: %{errors}"
   error_can_not_delete_entry: "Kunde inte ta bort inlägg"
   error_can_not_delete_custom_field: "Det går inte att ta bort anpassat fält"
-  error_can_not_delete_in_use_archived_undisclosed: 'There are also work packages in archived projects. You need to ask an administrator to perform the deletion to see which projects are affected.'
-  error_can_not_delete_in_use_archived_work_packages: 'There are also work packages in archived projects. You need to reactivate the following projects first, before you can change the attribute of the respective work packages: %{archived_projects_urls}'
+  error_can_not_delete_in_use_archived_undisclosed: "There are also work packages in archived projects. You need to ask an administrator to perform the deletion to see which projects are affected."
+  error_can_not_delete_in_use_archived_work_packages: "There are also work packages in archived projects. You need to reactivate the following projects first, before you can change the attribute of the respective work packages: %{archived_projects_urls}"
   error_can_not_delete_type:
     explanation: 'This type contains work packages and cannot be deleted. You can see all affected work packages in <a target="_blank" href="%{url}">this view</a>.'
   error_can_not_delete_standard_type: "Standardtyper kan inte tas bort."
@@ -1331,32 +1661,32 @@ sv:
   error_can_not_unarchive_project: "Det här projektet kan inte avarkiveras: %{errors}"
   error_check_user_and_role: "Välj en användare och en roll."
   error_code: "Fel %{code}"
-  error_color_could_not_be_saved: "Color could not be saved"
-  error_cookie_missing: 'OpenProject cookie saknas. Vänligen kontrollera att cookies är aktiverade, eftersom detta program inte fungerar korrekt annars.'
+  error_color_could_not_be_saved: "Färg kunde inte sparas"
+  error_cookie_missing: "OpenProject cookie saknas. Vänligen kontrollera att cookies är aktiverade, eftersom detta program inte fungerar korrekt annars."
   error_custom_option_not_found: "Alternativet finns inte."
   error_enterprise_activation_user_limit: "Ditt konto kunde inte aktiveras (begränsning för antal användare har uppnåtts). Kontakta administratören för att få tillgång."
   error_enterprise_token_invalid_domain: "The Enterprise edition is not active. Your Enterprise token's domain (%{actual}) does not match the system's host name (%{expected})."
-  error_failed_to_delete_entry: 'Det gick inte ta bort denna post.'
+  error_failed_to_delete_entry: "Det gick inte ta bort denna post."
   error_in_dependent: "Fel vid försök att ändra beroende objekt: %{dependent_class} #%{related_id} - %{related_subject}: %{error}"
   error_in_new_dependent: "Error attempting to create dependent object: %{dependent_class} - %{related_subject}: %{error}"
   error_invalid_selected_value: "Ogiltigt valt värde."
   error_journal_attribute_not_present: "Loggbok innehåller inte attribut %{attribute}."
   error_pdf_export_too_many_columns: "För många kolumner har markerats för PDF-export. Vänlogen minska antalet kolumner."
   error_pdf_failed_to_export: "PDF-exporten kunde inte sparas: %{error}"
-  error_token_authenticity: 'Det gick inte att verifiera Forgery token. Försökte du skicka data på flera webbläsare eller flikar? Stäng alla flikar och försök igen.'
-  error_work_package_done_ratios_not_updated: "Arbetspaketets andel avklarat är inte uppdaterat."
+  error_token_authenticity: "Det gick inte att verifiera Forgery token. Försökte du skicka data på flera webbläsare eller flikar? Stäng alla flikar och försök igen."
   error_work_package_not_found_in_project: "Arbetspaketet hittades inte eller hör inte till detta projekt"
+  error_work_package_id_not_found: "The work package was not found."
   error_must_be_project_member: "måste vara projektmedlem"
   error_migrations_are_pending: "Din OpenProject-installation har väntande databasmigreringar. Du har sannolikt missat att köra migreringarna på din senaste uppgradering. Kontrollera uppgraderingsguiden för att uppgradera din installation ordentligt."
   error_migrations_visit_upgrade_guides: "Besök dokumentationen för vår uppgraderingsguide"
-  error_no_default_work_package_status: "Inget standardvärde för status för arbetspaket har definieras. Vänligen kontrollera din konfiguration (gå till \"Administration-> arbetspaket status\")."
+  error_no_default_work_package_status: 'Inget standardvärde för status för arbetspaket har definieras. Vänligen kontrollera din konfiguration (gå till "Administration-> arbetspaket status").'
   error_no_type_in_project: "Ingen typ associerad till detta projekt. Kontrollera projektinställningarna."
   error_omniauth_registration_timed_out: "Registrering via en extern autentiseringstjänst svarade inte. Försök igen."
   error_omniauth_invalid_auth: "The authentication information returned from the identity provider was invalid. Please contact your administrator for further help."
-  error_password_change_failed: 'An error occurred when trying to change the password.'
+  error_password_change_failed: "An error occurred when trying to change the password."
   error_scm_command_failed: "Ett fel uppstod när du försökte komma åt versionsarkivet: %{value}"
   error_scm_not_found: "Den posten eller revision finns inte i versionsarkivet."
-  error_type_could_not_be_saved: "Type could not be saved"
+  error_type_could_not_be_saved: "Typen kunde inte sparas"
   error_unable_delete_status: "Arbetspaketsstatusen kan inte raderas eftersom det används av minst ett arbetspaket."
   error_unable_delete_default_status: "Det går inte att radera standardvalet för arbetspaketsstatus. Var god väl en annan arbetspaketsstatus som standardval innan du raderar den befintliga."
   error_unable_to_connect: "Kan inte ansluta (%{value})"
@@ -1368,27 +1698,90 @@ sv:
   error_menu_item_not_saved: Menyobjektet kunde inte sparas
   error_wiki_root_menu_item_conflict: >
     Kan inte ändra från "%{old_name}" till "%{new_name}" på grund av en konflikt med det befintliga menyalternativet "%{existing_caption}" (%{existing_identifier}).
-  error_external_authentication_failed: "An error occurred during external authentication. Please try again."
+  error_external_authentication_failed_message: "An error occurred during external authentication: %{message}"
   error_attribute_not_highlightable: "Attribut(en) kan inte markeras: %{attributes}"
   events:
-    changeset: 'Uppdatering redigerades'
+    changeset: "Uppdatering redigerades"
     message: Meddelande redigerades
     news: Nyheter
-    project_attributes: 'Project attributes edited'
-    projects: 'Projektet redigerades'
+    project_attributes: "Project attributes edited"
+    project: "Projektet redigerades"
+    projects: "Projektet redigerades"
     reply: Svarade
-    time_entry: 'Tidrapport redigerades'
-    wiki_page: 'Wiki-sida redigerades'
-    work_package_closed: 'Arbetspaket stängdes'
-    work_package_edit: 'Arbetspaket redigerades'
-    work_package_note: 'Anteckning lades till arbetspaketet'
+    time_entry: "Tidrapport redigerades"
+    wiki_page: "Wiki-sida redigerades"
+    work_package_closed: "Arbetspaket stängdes"
+    work_package_edit: "Arbetspaket redigerades"
+    work_package_note: "Anteckning lades till arbetspaketet"
     title:
-      project: "Project: %{name}"
+      project: "Projekt: %{name}"
       subproject: "Subproject: %{name}"
   export:
-    your_work_packages_export: "Your work packages export"
-    succeeded: "The export has completed successfully."
-    failed: "The export has failed: %{message}"
+    dialog:
+      title: "Export"
+      submit: "Export"
+      format:
+        label: "Filformat"
+        options:
+          csv:
+            label: "CSV"
+          pdf:
+            label: "PDF"
+          xls:
+            label: "XLS"
+      columns:
+        input_label_report: "Add columns to attribute table"
+        input_caption_report: "By default all attributes added as columns in the work package list are selected. Long text fields are not available in the attribute table, but can be displayed below it."
+        input_caption_table: "By default all attributes added as columns in the work package list are selected. Long text fields are not available in table based exports."
+      pdf:
+        export_type:
+          label: "PDF export type"
+          options:
+            table:
+              label: "Table"
+              caption: "Export the work packages list in a table with the desired columns."
+            report:
+              label: "Report"
+              caption: "Export the work package on a detailed report of all work packages in the list."
+            gantt:
+              label: "Gantt chart"
+              caption: "Export the work packages list in a Gantt diagram view."
+        include_images:
+          label: "Include images"
+          caption: "Exclude images to reduce the size of the PDF export."
+        gantt_zoom_levels:
+          label: "Zoom levels"
+          caption: "Select what is the zoom level for dates displayed in the chart."
+          options:
+            days: "Dagar"
+            weeks: "Veckor"
+            months: "Månader"
+            quarters: "Kvartal"
+        column_width:
+          label: "Table column width"
+          options:
+            narrow: "Narrow"
+            medium: "Medium"
+            wide: "Wide"
+            very_wide: "Very wide"
+        paper_size:
+          label: "Paper size"
+          caption: "Depending on the chart size more than one page might be exported."
+        long_text_fields:
+          input_caption: "By default all long text fields are selected."
+          input_label: "Add long text fields"
+          input_placeholder: "Search for long text fields"
+          drag_area_label: "Manage long text fields"
+      xls:
+        include_relations:
+          label: "Include relations"
+          caption: "This option will create a duplicate of each work package for every relation this has with another work package."
+        include_descriptions:
+          label: "Include descriptions"
+          caption: "This option will add a description column in raw format."
+    your_work_packages_export: "Work packages are being exported"
+    succeeded: "Export completed"
+    failed: "An error has occurred while trying to export the work packages: %{message}"
     format:
       atom: "Atom"
       csv: "CSV"
@@ -1396,8 +1789,15 @@ sv:
       pdf_overview_table: "PDF Table"
       pdf_report_with_images: "PDF Report with images"
       pdf_report: "PDF Report"
+      pdf_gantt: "PDF Gantt"
     image:
       omitted: "Image not exported."
+    macro:
+      error: "Macro error, %{message}"
+      attribute_not_found: "attribute not found: %{attribute}"
+      model_not_found: "invalid attribute model: %{model}"
+      resource_not_found: "resource not found: %{resource}"
+      rich_text_unsupported: "Rich text embedding currently not supported in export"
     units:
       hours: h
       days: d
@@ -1437,23 +1837,31 @@ sv:
       postgres_migration: "Migrera din installation till PostgreSQL"
       user_guides: "Användarguider"
       faq: "Vanliga frågor (FAQ)"
+      impressum: "Villkor"
       glossary: "Ordlista"
       shortcuts: "Genvägar"
       blog: "OpenProject blogg"
       forums: "Community forum"
       newsletter: "Säkerhetsnotifieringar / Nyhetsbrev"
   image_conversion:
-    imagemagick: 'Imagemagick'
+    imagemagick: "Imagemagick"
   journals:
     changes_retracted: "Förändringarna drogs tillbaka."
     caused_changes:
       dates_changed: "Dates changed"
+      default_attribute_written: "Read-only attributes written"
+      progress_mode_changed_to_status_based: "Progress calculation updated"
+      status_changed: "Status '%{status_name}'"
       system_update: "OpenProject system update:"
+      work_package_duplicate_closed: "Duplicate work package updated:"
+      total_percent_complete_mode_changed_to_work_weighted_average: "Calculation of % Complete totals now weighted by Work."
+      total_percent_complete_mode_changed_to_simple_average: "Calculation of % Complete totals now based on a simple average of only % Complete values."
     cause_descriptions:
       work_package_predecessor_changed_times: by changes to predecessor %{link}
       work_package_parent_changed_times: by changes to parent %{link}
       work_package_children_changed_times: by changes to child %{link}
       work_package_related_changed_times: by changes to related %{link}
+      work_package_duplicate_closed: The status was automatically updated by the duplicated work package %{link}
       unaccessable_work_package_changed: by changes to a related work package
       working_days_changed:
         changed: "by changes to working days (%{changes})"
@@ -1463,11 +1871,25 @@ sv:
         dates:
           working: "%{date} is now working"
           non_working: "%{date} is now non-working"
+      progress_mode_changed_to_status_based: Progress calculation mode set to status-based
+      status_excluded_from_totals_set_to_false_message: now included in hierarchy totals
+      status_excluded_from_totals_set_to_true_message: now excluded from hierarchy totals
+      status_percent_complete_changed: "% Complete changed from %{old_value}% to %{new_value}%"
       system_update:
         file_links_journal: >
           From now on, activity related to file links (files stored in external storages) will appear here in the Activity tab. The following represent activity concerning links that already existed:
+        progress_calculation_adjusted_from_disabled_mode: >-
+          Progress calculation automatically <a href="%{href}" target="_blank">set to work-based mode and adjusted with version update</a>.
+        progress_calculation_adjusted: >-
+          Progress calculation automatically <a href="%{href}" target="_blank">adjusted with version update</a>.
+        totals_removed_from_childless_work_packages: >-
+          Work and progress totals automatically removed for non-parent work packages with <a href="%{href}" target="_blank">version update</a>. This is a maintenance task and can be safely ignored.
+      total_percent_complete_mode_changed_to_work_weighted_average: >-
+        Child work packages without Work are ignored.
+      total_percent_complete_mode_changed_to_simple_average: >-
+        Work values of child work packages are ignored.
   links:
-    configuration_guide: 'Konfigurationsguide'
+    configuration_guide: "Konfigurationsguide"
     get_in_touch: "Har du frågor? Ta kontakt med oss."
   instructions_after_registration: "Du kan logga in så snart ditt konto har aktiverats genom att klicka på %{signin}."
   instructions_after_logout: "Du kan logga in igen genom att klicka på %{signin}."
@@ -1476,10 +1898,12 @@ sv:
     admin:
       mail_notification: "E-postaviseringar"
       mails_and_notifications: "Emails and notifications"
-      aggregation: 'Aggregation'
+      aggregation: "Aggregation"
       api_and_webhooks: "API and webhooks"
     quick_add:
       label: "Open quick add menu"
+    breadcrumb:
+      nested_element: "%{section_header}: <b>%{title}</b>"
   my_account:
     access_tokens:
       no_results:
@@ -1494,11 +1918,11 @@ sv:
       api:
         title: "API"
         text_hint: "API tokens allow third-party applications to communicate with this OpenProject instance via REST APIs."
-        static_token_name: "API token"
+        static_token_name: "API-token"
         disabled_text: "API tokens are not enabled by the administrator. Please contact your administrator to use this feature."
       ical:
         title: "iCalendar"
-        text_hint: "iCalendar tokens allow users to <a href=\"%{path}\" target=\"_blank\">subscribe to OpenProject calendars</a> and view up-to-date work package information from external clients."
+        text_hint: 'iCalendar tokens allow users to <a href="%{path}" target="_blank">subscribe to OpenProject calendars</a> and view up-to-date work package information from external clients.'
         disabled_text: "iCalendar subscriptions are not enabled by the administrator. Please contact your administrator to use this feature."
         empty_text_hint: "To add an iCalendar token, subscribe to a new or existing calendar from within the Calendar module of a project. You must have the necessary permissions."
       oauth:
@@ -1517,7 +1941,24 @@ sv:
         revoke_token: "Do you really want to remove this token? You will need to login again on %{storage}"
         removed: "File Storage token successfully removed"
         failed: "An error occurred and the token couldn't be removed. Please try again later."
+        unknown_storage: "Unknown storage"
   notifications:
+    reasons:
+      assigned: "Tilldelad till"
+      dateAlert: "Date alert"
+      mentioned: "Mentioned"
+      responsible: "Huvudansvarig"
+      shared: "Shared"
+      watched: "Bevakare"
+    facets:
+      unread: "Unread"
+      unread_title: "Show unread"
+      all: "Alla"
+      all_title: "Visa alla"
+    menu:
+      by_project: "Unread by project"
+      by_reason: "Reason"
+      inbox: "Inkorg"
     send_notifications: "Send notifications for this action"
     work_packages:
       subject:
@@ -1527,77 +1968,73 @@ sv:
         mentioned: "You have been mentioned in %{work_package}"
         responsible: "You have become accountable for %{work_package}"
         watched: "You are watching %{work_package}"
-    update_info_mail:
-      body: >
-        We are excited to announce the release of OpenProject 12.0. It's a major release that will hopefully significantly improve the way you use OpenProject.
-        Starting with this release, we are introducing in-app notifications. From now on, you will receive notifications for updates to work packages directly in OpenProject. You can mark these notifications as read, reply to a comment or even directly modify work package attributes without leaving the notification center.
-        This also means that we will no longer be using emails for notifications. We think the new notification center is a better place to view and act upon these updates. Nevertheless, if you would like continue receiving updates via email, you can choose to receive daily email reminders at particular times of your choosing.
-        Please make sure to verify your new default notification settings, and set your preferences for notifications and email reminders via your account settings. You can do this through the “Change email settings” button bellow.
-        We hope you find in-app notifications useful and that they makes you even more productive.
-        Sincerely, The OpenProject team
-      body_header: 'Version 12.0 with Notification Center'
-      body_subheader: 'Nyheter'
-      subject: 'Important changes to notifications with the release of 12.0'
   label_accessibility: "Tillgänglighet"
   label_account: "Konto"
   label_active: "Aktiv"
-  label_activate_user: 'Aktivera användare'
+  label_activate_user: "Aktivera användare"
   label_active_in_new_projects: "Aktiv i nya projekt"
   label_activity: "Aktivitet"
   label_add_edit_translations: "Lägg till och editera översättningar"
   label_add_another_file: "Lägga till en annan fil"
   label_add_columns: "Lägga till markerade kolumner"
   label_add_note: "Lägga till en anteckning"
+  label_add_projects: "Lägg till projekt"
   label_add_related_work_packages: "Lägg till relaterade arbetspaket"
   label_add_subtask: "Lägg till deluppgift"
   label_added: "lagt till"
+  label_added_by: "Added by %{author}"
   label_added_time_by: "Lagts till av %{author} %{age} sen"
   label_additional_workflow_transitions_for_assignee: "Ytterligare övergångar tillåtna när användaren är tilldelad"
   label_additional_workflow_transitions_for_author: "Ytterligare övergångar tillåtna när användaren är författaren"
   label_administration: "Administration"
-  label_advanced_settings: "Avancerade inställningar"
+  label_interface_colors: "Interface colors"
+  label_interface_colors_description: "These colors control how the application looks. If you modify them the theme will automatically be changed to Custom theme, but we can’t assure the compliance of the accessibility contrast minimums (WCAG 2.1). "
   label_age: "Ålder"
   label_ago: "dagar sedan"
   label_all: "alla"
-  label_all_projects: "All projects"
   label_all_time: "all tid"
   label_all_words: "Alla ord"
   label_all_open_wps: "Alla öppna"
   label_always_visible: "Visas alltid"
   label_announcement: "Meddelande"
+  label_angular: "AngularJS"
   label_api_access_key: "API åtkomstnyckel"
   label_api_access_key_created_on: "API åtkomstnyckel skapade %{value} sedan"
   label_api_access_key_type: "API"
   label_ical_access_key_type: "iCalendar"
-  label_ical_access_key_description: "iCalendar token \"%{token_name}\" for \"%{calendar_name}\" in \"%{project_name}\""
+  label_ical_access_key_description: 'iCalendar token "%{token_name}" for "%{calendar_name}" in "%{project_name}"'
   label_ical_access_key_not_present: "iCalendar token(s) not present."
   label_ical_access_key_generation_hint: "Automatically generated when subscribing to a calendar."
   label_ical_access_key_latest: "latest"
   label_ical_access_key_revoke: "Återkalla"
+  label_add_column: "Lägg till kolumn"
   label_applied_status: "Tillämpad status"
   label_archive_project: "Arkivera projekt"
-  label_archived_projects: "Archived projects"
   label_ascending: "Stigande"
   label_assigned_to_me_work_packages: "Arbetspaket som tilldelats till mig"
   label_associated_revisions: "Kopplade revideringar"
-  label_attachment_delete: "Ta bort fil"
-  label_attachment_new: "Ny fil"
-  label_attachment_plural: "Filer"
+  label_attachment_plural: "Bilagor"
   label_attribute: "Attributet"
   label_attribute_plural: "Attribut"
   label_ldap_auth_source_new: "New LDAP connection"
-  label_ldap_auth_source: "LDAP connection"
+  label_ldap_auth_source: "LDAP-anslutning"
   label_ldap_auth_source_plural: "LDAP connections"
+  label_attribute_expand_text: "The complete text for '%{attribute}'"
   label_authentication: "Autentisering"
+  label_authentication_settings: "Authentication settings"
+  label_available_custom_fields_projects: "Available custom fields projects"
   label_available_global_roles: "Available global roles"
+  label_available_project_attributes: "Available project attributes"
   label_available_project_forums: "Tillgängliga forum"
   label_available_project_repositories: "Tillgängliga databaser"
   label_available_project_versions: "Tillgängliga versioner"
   label_available_project_work_package_categories: "Tillgängliga arbetspaketkategorier"
   label_available_project_work_package_types: "Tillgängliga typer för arbetspaket"
   label_available_projects: "Available projects"
-  label_api_documentation: "API-dokumentation"
+  label_api_doc: "API-dokumentation"
   label_backup: "Backup"
+  label_backup_code: "Reservkod"
+  label_basic_details: "Basic details"
   label_between: "mellan"
   label_blocked_by: "blockeras av"
   label_blocks: "blockerar"
@@ -1607,14 +2044,16 @@ sv:
   label_forum_plural: "Forum"
   label_forum_sticky: "Klistrad"
   label_boolean: "Booleskt värde"
+  label_board_plural: "Tavlor"
   label_branch: "Gren"
   label_browse: "Bläddra"
   label_bulk_edit_selected_work_packages: "Redigera markerade arbetspaket i bulk"
-  label_bundled: '(Bundlad)'
+  label_bundled: "(Bundlad)"
   label_calendar: "Kalender"
   label_calendars_and_dates: "Calendars and dates"
   label_calendar_show: "Visa kalendern"
   label_category: "Kategori"
+  label_completed: Completed
   label_consent_settings: "Användarsamtycken"
   label_wiki_menu_item: Wiki menyalternativ
   label_select_main_menu_item: Välj ny huvudmenypost
@@ -1633,7 +2072,7 @@ sv:
   label_check_uncheck_all_in_column: "Markera/avmarkera alla i kolumnen"
   label_check_uncheck_all_in_row: "Markera/avmarkera allt på raden"
   label_child_element: "Underordnade element"
-  label_chronological_order: "Oldest first"
+  label_choices: "Choices"
   label_close_versions: "Stäng slutförda versioner"
   label_closed_work_packages: "stängt"
   label_collapse: "Fäll ihop"
@@ -1656,6 +2095,8 @@ sv:
   label_copy_workflow_from: "Kopiera arbetsflöde från"
   label_copy_project: "Kopiera projekt"
   label_core_version: "Kärnversion"
+  label_core_build: "Core build"
+  label_created_by: "Created by %{user}"
   label_current_status: "Nuvarande status"
   label_current_version: "Aktuell version"
   label_custom_field_add_no_type: "Lägg till det här fältet till en arbetspaketstyp"
@@ -1663,6 +2104,8 @@ sv:
   label_custom_field_plural: "Anpassade fält"
   label_custom_field_default_type: "Tom typ"
   label_custom_style: "Design"
+  label_custom_style_description: "Choose how OpenProject looks to you with themes, select your default colors to use in the app and how exports look like."
+  label_dashboard: "Översikt"
   label_database_version: "PostgreSQL version"
   label_date: "Datum"
   label_date_and_time: "Datum och tid"
@@ -1677,7 +2120,7 @@ sv:
   label_deleted: "raderad"
   label_deleted_custom_field: "(raderat anpassat fält)"
   label_deleted_custom_option: "(deleted option)"
-  label_empty_element: "(empty)"
+  label_empty_element: "(tom)"
   label_missing_or_hidden_custom_option: "(missing value or lacking permissions to access)"
   label_descending: "Fallande"
   label_details: "Detaljer"
@@ -1685,8 +2128,9 @@ sv:
   label_diff: "diff"
   label_diff_inline: "inline"
   label_diff_side_by_side: "sida vid sida"
-  label_digital_accessibility: 'Digital accessibility (DE)'
+  label_digital_accessibility: "Digital accessibility (DE)"
   label_disabled: "inaktiverad"
+  label_disabled_uppercase: "Disabled"
   label_display: "Visa"
   label_display_per_page: "Per sida: %{value}"
   label_display_used_statuses_only: "Visa endast statusalternativ som används av denna typ"
@@ -1699,9 +2143,9 @@ sv:
   label_edit: "Redigera"
   label_edit_x: "Edit: %{x}"
   label_enable_multi_select: "Växla multival"
-  label_enabled_project_custom_fields: 'Aktiverade anpassade fält'
-  label_enabled_project_modules: 'Aktiverad Moduler'
-  label_enabled_project_activities: 'Aktiverade aktiviteter för tidsspårning'
+  label_enabled_project_custom_fields: "Aktiverade anpassade fält"
+  label_enabled_project_modules: "Aktiverad Moduler"
+  label_enabled_project_activities: "Aktiverade aktiviteter för tidsspårning"
   label_end_to_end: "slut till slut"
   label_end_to_start: "slut till start"
   label_enumeration_new: "Nytt textvärde"
@@ -1711,25 +2155,31 @@ sv:
   label_enterprise_active_users: "%{current}/%{limit} tilldelade aktiva användare"
   label_enterprise_edition: "Enterprise edition"
   label_enterprise_support: "Enterprise support"
+  label_enterprise_addon: "Enterprise add-on"
   label_environment: "Miljö"
-  label_estimates_and_time: "Uppskattningar och tid"
+  label_estimates_and_progress: "Estimates and progress"
   label_equals: "är"
   label_everywhere: "överallt"
   label_example: "Exempel"
   label_experimental: "Experimentell"
   label_i_am_member: "Jag är medlem"
+  label_ifc_viewer: "Ifc Viewer"
+  label_ifc_model_plural: "Ifc Models"
   label_import: "Importera"
   label_export_to: "Finns även som:"
+  label_expand: "Expandera"
   label_expanded_click_to_collapse: "Expanderat. Klicka för att dölja"
   label_f_hour: "%{value} timme"
   label_f_hour_plural: "%{value} timmar"
-  label_favoured: "Favoured"
+  label_favorite: "Favorite"
   label_feed_plural: "Flöden"
   label_feeds_access_key: "RSS access key"
   label_feeds_access_key_created_on: "RSS access key skapad %{value} sen"
   label_feeds_access_key_type: "RSS"
   label_file_plural: "Filer"
+  label_filter: "Filter"
   label_filter_add: "Lägg till filter"
+  label_filter_by: "Filter by"
   label_filter_plural: "Filter"
   label_filters_toggle: "Visa/dölj filter"
   label_float: "Flyttal"
@@ -1737,8 +2187,8 @@ sv:
   label_follows: "följer"
   label_force_user_language_to_default: "Välj standardspråk för användare som har ett icke tillåtet språk"
   label_form_configuration: "Ställ in formulär"
-  label_gantt: "Gantt-schema"
   label_gantt_chart: "Gantt-schema"
+  label_gantt_chart_plural: "Gantt charts"
   label_general: "Allmänt"
   label_generate_key: "Generera en nyckel"
   label_git_path: "Sökväg till .git katalog"
@@ -1752,34 +2202,43 @@ sv:
   label_here: här
   label_hide: "Dölj"
   label_history: "Historik"
+  label_hierarchy: "Hierarchy"
   label_hierarchy_leaf: "Hierarki-blad"
   label_home: "Hem"
   label_subject_or_id: "Ämne eller ID"
   label_calendar_subscriptions: "Calendar subscriptions"
-  label_impressum: "Villkor"
+  label_identifier: "Identifierare"
   label_in: "i"
   label_in_less_than: "i mindre än"
   label_in_more_than: "i mer än"
   label_inactive: "Inaktiv"
   label_incoming_emails: "Inkommande E-post"
-  label_includes: 'inkluderar'
+  label_includes: "inkluderar"
+  label_incomplete: Incomplete
+  label_include_sub_projects: Include sub-projects
   label_index_by_date: "Index efter datum"
   label_index_by_title: "Index efter titel"
   label_information: "Information"
   label_information_plural: "Information"
-  label_installation_guides: 'Installation guides'
+  label_installation_guides: "Installation guides"
   label_integer: "Heltal"
   label_internal: "Intern"
   label_introduction_video: "Introduktionsvideo"
   label_invite_user: "Bjud in användare"
-  label_show_hide: "Visa/Dölj"
+  label_item: "Objekt"
+  label_item_plural: "Objekt"
+  label_share: "Dela"
+  label_share_project_list: "Dela projektlista"
+  label_share_work_package: "Share work package"
   label_show_all_registered_users: "Visa alla registrerade användare"
+  label_show_less: "Visa mindre"
+  label_show_more: "Visa mer"
   label_journal: "Journal"
   label_journal_diff: "Jämför beskrivning"
   label_language: "Språk"
   label_languages: "Språk"
   label_jump_to_a_project: "Hoppa till projekt..."
-  label_keyword_plural: 'Nyckelord'
+  label_keyword_plural: "Nyckelord"
   label_language_based: "Baserat på användarens språk"
   label_last_activity: "Senaste aktivitet"
   label_last_change_on: "Senast ändrad"
@@ -1791,19 +2250,27 @@ sv:
   label_latest_revision: "Senaste revisionen"
   label_latest_revision_plural: "Senaste revisionerna"
   label_ldap_authentication: "LDAP autentisering"
+  label_learn_more: "Lär dig mer"
   label_less_or_equal: "<="
   label_less_than_ago: "mindre än dagar sedan"
+  label_link_url: "Länk (URL)"
   label_list: "Lista"
   label_loading: "Laddar..."
-  label_lock_user: 'Lås användare'
+  label_lock_user: "Lås användare"
   label_logged_as: "Inloggad som"
   label_login: "Logga in"
   label_custom_logo: "Anpassad logotyp"
   label_custom_export_logo: "Custom export logo"
+  label_custom_export_cover: "Custom export cover background"
+  label_custom_export_cover_overlay: "Custom export cover background overlay"
+  label_custom_export_cover_text_color: "Textfärg"
+  label_custom_pdf_export_settings: "Custom PDF export settings"
   label_custom_favicon: "Anpassad favicon"
   label_custom_touch_icon: "Anpassad touch-ikon"
   label_logout: "Logga ut"
+  label_mapping_for: "Mapping for: %{attribute}"
   label_main_menu: "Sidomenyn"
+  label_manage: "Hantera"
   label_manage_groups: "Hantera grupper"
   label_managed_repositories_vendor: "Hanterade %{vendor} databaser"
   label_max_size: "Maximal storlek"
@@ -1811,12 +2278,14 @@ sv:
   label_member_new: "Ny medlem"
   label_member_all_admin: "(Alla roller på grund av admin status)"
   label_member_plural: "Medlemmar"
-  lable_membership_added: 'Member added'
-  lable_membership_updated: 'Member updated'
+  label_membership_plural: "Memberships"
+  label_membership_added: "Member added"
+  label_membership_updated: "Member updated"
+  label_menu: "Menu"
   label_menu_badge:
-    pre_alpha: 'pre-alpha'
-    alpha: 'alpha'
-    beta: 'beta'
+    pre_alpha: "pre-alpha"
+    alpha: "alpha"
+    beta: "beta"
   label_menu_item_name: "Namn på menyalternativ"
   label_message: "Meddelande"
   label_message_last: "Senaste meddelandet"
@@ -1834,11 +2303,13 @@ sv:
   label_months_from: "månader från"
   label_more: "Mer"
   label_more_than_ago: "mer än dagar sedan"
+  label_move_column_left: "Move column left"
+  label_move_column_right: "Move column right"
   label_move_work_package: "Flytta arbetspaket"
-  label_my_account: "Mitt konto"
+  label_my_account: "Kontoinställningar"
   label_my_activity: "Min aktivitet"
   label_my_account_data: "Min kontoinformation"
-  label_my_projects: "Mina projekt"
+  label_my_avatar: "My avatar"
   label_my_queries: "Min anpassade frågor"
   label_name: "Namn"
   label_never: "Aldrig"
@@ -1857,10 +2328,13 @@ sv:
   label_next_week: "Nästa vecka"
   label_no_change_option: "(Ingen ändring)"
   label_no_data: "Ingen data att visa"
+  label_no_due_date: "no finish date"
+  label_no_start_date: "no start date"
   label_no_parent_page: "Ingen överordnad sida"
   label_nothing_display: "Inget att visa"
   label_nobody: "ingen"
-  label_not_found: 'hittades inte'
+  label_not_configured: "Not configured"
+  label_not_found: "hittades inte"
   label_none: "inga"
   label_none_parentheses: "(ingen)"
   label_not_contains: "innehåller inte"
@@ -1870,6 +2344,7 @@ sv:
   label_operator_none: "is empty"
   label_operator_equals_or: "is (OR)"
   label_operator_equals_all: "is (AND)"
+  label_operator_shared_with_user_any: "någon"
   label_open_menu: "Öppna meny"
   label_open_work_packages: "öppna"
   label_open_work_packages_plural: "öppna"
@@ -1902,6 +2377,7 @@ sv:
   label_precedes: "föregår"
   label_preferences: "Inställningar"
   label_preview: "Förhandsgranska"
+  label_preview_not_available: "Preview not available"
   label_previous: "Föregående"
   label_previous_week: "Föregående vecka"
   label_principal_invite_via_email: " eller bjud in nya användare via e-post"
@@ -1909,19 +2385,28 @@ sv:
   label_privacy_policy: "Integritets- och säkerhetspolicy"
   label_product_version: "Produktversion"
   label_profile: "Profil"
+  label_percent_complete: "% Complete"
+  label_progress_tracking: "Progress tracking"
+  label_project: "Projekt"
   label_project_activity: "Project activity"
   label_project_attribute_plural: "Project attributes"
+  label_project_attribute_manage_link: "Manage project attributes"
   label_project_count: "Totalt antal projekt"
   label_project_copy_notifications: "Skicka e-postaviseringar under projekt kopian"
   label_project_latest: "Senaste projekt"
   label_project_default_type: "Tillåta tom typ"
   label_project_hierarchy: "Projekthierarki"
+  label_project_mappings: "Projekt"
   label_project_new: "Nytt projekt"
   label_project_plural: "Projekt"
+  label_project_list_plural: "Projektlistor"
+  label_project_attributes_plural: "Project attributes"
+  label_project_custom_field_plural: "Project attributes"
   label_project_settings: "Projektinställningar"
+  label_project_attributes_settings: "Project attributes settings"
   label_project_storage_plural: "File Storages"
   label_project_storage_project_folder: "File Storages: Project folders"
-  label_projects_storage_information: "%{count} projekt använder %{storage} lagringsutrymme"
+  label_projects_disk_usage_information: "%{count} projects using %{used_disk_space} disk space"
   label_project_view_all: "Visa alla projekt"
   label_project_show_details: "Visa projektdetaljer"
   label_project_hide_details: "Dölj projektdetaljer"
@@ -1941,6 +2426,8 @@ sv:
   label_relation_delete: "Ta bort relation"
   label_relation_new: "Ny relation"
   label_release_notes: "Versionsnoteringar"
+  label_remaining_work: "Remaining work"
+  label_remove_column: "Remove column"
   label_remove_columns: "Ta bort markerade kolumner"
   label_renamed: "ändrat namn"
   label_reply_plural: "Svar"
@@ -1953,10 +2440,9 @@ sv:
   label_repository: "Versionsarkiv"
   label_repository_root: "Sökväg till databasen"
   label_repository_plural: "Versionsarkiv"
-  label_required: 'obligatorisk'
-  label_requires: 'kräver'
+  label_required: "obligatorisk"
+  label_requires: "kräver"
   label_result_plural: "Resultat"
-  label_reverse_chronological_order: "Newest first"
   label_revision: "Revision"
   label_revision_id: "Revision %{value}"
   label_revision_plural: "Revisioner"
@@ -1970,15 +2456,22 @@ sv:
   label_role_plural: "Roll"
   label_role_search: "Tilldela rollen till nya medlemmar"
   label_scm: "SCM"
+  label_scroll_left: "Scroll left"
+  label_scroll_right: "Scroll right"
   label_search: "Sök"
+  label_search_by_name: "Search by name"
   label_send_information: "Send new credentials to the user"
   label_send_test_email: "Skicka test E-post"
+  label_session: "Session"
   label_setting_plural: "Inställningar"
   label_system_settings: "Systeminställningar"
   label_show_completed_versions: "Visa slutförda versioner"
+  label_columns: "Kolumner"
   label_sort: "Sortera"
+  label_sort_ascending: "Sort ascending"
   label_sort_by: "Sortera efter %{value}"
   label_sorted_by: "sorterade efter %{value}"
+  label_sort_descending: "Sort descending"
   label_sort_higher: "Flytta upp"
   label_sort_highest: "Flytta till toppen"
   label_sort_lower: "Flytta ned"
@@ -1988,7 +2481,6 @@ sv:
   label_start_to_start: "början till början"
   label_statistics: "Statistik"
   label_status: "Status"
-  label_stay_logged_in: "Fortsätt vara inloggad"
   label_storage_free_space: "Återstående diskutrymme"
   label_storage_used_space: "Använt diskutrymme"
   label_storage_group: "Filsystem %{identifier} för lagring"
@@ -2003,12 +2495,14 @@ sv:
   label_system_storage: "Lagringsinformation"
   label_table_of_contents: "Innehållsförteckning"
   label_tag: "Etikett"
+  label_team_planner: "Team Planner"
   label_text: "Lång text"
   label_this_month: "denna månad"
   label_this_week: "denna vecka"
   label_this_year: "i år"
   label_time_entry_plural: "Förbrukad tid"
-  label_title: "Title"
+  label_time_entry_activity_plural: "Spent time activities"
+  label_title: "Titel"
   label_projects_menu: "Projekt"
   label_today: "idag"
   label_top_menu: "Huvudmeny"
@@ -2017,11 +2511,10 @@ sv:
   label_type_new: "Ny typ"
   label_type_plural: "Typer"
   label_ui: "Användargränssnitt"
-  label_update_work_package_done_ratios: "Uppdatera arbetspaketets andel avklarat"
   label_updated_time: "Uppdaterad %{value} sen"
   label_updated_time_at: "%{author} %{age}"
   label_updated_time_by: "Uppdaterad av %{author} %{age} sen"
-  label_upgrade_guides: 'Uppgraderingsguider'
+  label_upgrade_guides: "Uppgraderingsguider"
   label_used_by: "Används av"
   label_used_by_types: "Används av typer"
   label_used_in_projects: "Används i projekt"
@@ -2072,6 +2565,7 @@ sv:
   label_wiki_show_new_page_link: "Visa undermenyn \"Skapa ny underordnad sida\""
   label_wiki_show_submenu_item: "Visa som undermenyalternativ för "
   label_wiki_start: "Startsida"
+  label_work: "Work"
   label_work_package: "Arbetspaket"
   label_work_package_attachments: "Bilagor till arbetspaket"
   label_work_package_category_new: "Ny kategori"
@@ -2087,9 +2581,10 @@ sv:
   label_work_package_tracking: "Arbetspaketsspårning"
   label_work_package_view_all: "Visa alla arbetspaket"
   label_workflow: "Arbetsflöde"
+  label_workflow_copy: "Copy workflow"
   label_workflow_plural: "Arbetsflöden"
   label_workflow_summary: "Sammanfattning"
-  label_working_days: "Working days"
+  label_working_days_and_hours: "Working days and hours"
   label_x_closed_work_packages_abbr:
     one: "en stängd"
     other: "%{count} stängda"
@@ -2102,13 +2597,22 @@ sv:
     one: "en öppen"
     other: "%{count} öppnade"
     zero: "0 open"
+  label_x_work_packages:
+    one: "1 work package"
+    other: "%{count} work packages"
+    zero: "No work packages"
   label_x_projects:
     one: "Ett projekt"
     other: "%{count} projekt"
     zero: "no projects"
+  label_x_files:
+    one: "1 fil"
+    other: "%{count} filer"
+    zero: "no files"
   label_yesterday: "igår"
+  label_zen_mode: "Zen mode"
   label_role_type: "Typ"
-  label_member_role: "Project role"
+  label_member_role: "Projektroll"
   label_global_role: "Global role"
   label_not_changeable: "(kan inte ändras)"
   label_global: "Global"
@@ -2116,58 +2620,99 @@ sv:
   macro_execution_error: "Fel under körning av makrot %{macro_name}"
   macro_unavailable: "Makrot %{macro_name} kan inte visas."
   macros:
-    placeholder: '[Placeholder] Makro %{macro_name}'
+    placeholder: "[Placeholder] Makro %{macro_name}"
     errors:
-      missing_or_invalid_parameter: 'Saknad eller ogiltig makro-parameter.'
+      missing_or_invalid_parameter: "Saknad eller ogiltig makro-parameter."
     legacy_warning:
-      timeline: 'Detta äldre tidslinje-makro har tagits bort och är inte längre tillgängligt. Du kan ersätta funktionen med ett inbäddat tabell-makro.'
+      timeline: "Detta äldre tidslinje-makro har tagits bort och är inte längre tillgängligt. Du kan ersätta funktionen med ett inbäddat tabell-makro."
     include_wiki_page:
-      removed: 'Makro finns inte längre.'
+      removed: "Makro finns inte längre."
     wiki_child_pages:
       errors:
         page_not_found: "Kan inte hitta wiki-sidan '%{name}'."
     create_work_package_link:
       errors:
-        no_project_context: 'Ropar på create_work_package_link makro utanför projektsammanhang.'
+        no_project_context: "Ropar på create_work_package_link makro utanför projektsammanhang."
         invalid_type: "Hittar ingen typ med namn '%{type}' i projekt '%{project}'."
-      link_name: 'Nytt arbetspaket'
-      link_name_type: 'Ny %{type_name}'
+      link_name: "Nytt arbetspaket"
+      link_name_type: "Ny %{type_name}"
   mail:
-    actions: 'Åtgärder'
+    actions: "Åtgärder"
     digests:
-      including_mention_singular: 'including a mention'
-      including_mention_plural: 'including %{number_mentioned} mentions'
-      unread_notification_singular: '1 unread notification'
-      unread_notification_plural: '%{number_unread} unread notifications'
-      you_have: 'You have'
-    logo_alt_text: 'Logo'
+      including_mention_singular: "including a mention"
+      including_mention_plural: "including %{number_mentioned} mentions"
+      unread_notification_singular: "1 unread notification"
+      unread_notification_plural: "%{number_unread} unread notifications"
+      you_have: "You have"
+    logo_alt_text: "Logo"
     mention:
       subject: "%{user_name} mentioned you in #%{id} - %{subject}"
     notification:
-      center: 'To notification center'
-      see_in_center: 'See comment in notification center'
-      settings: 'Change email settings'
-    salutation: 'Hej %{user}'
+      center: "To notification center"
+      see_in_center: "See comment in notification center"
+      settings: "Change email settings"
+    salutation: "Hej %{user}"
+    salutation_full_name: "Full name"
     work_packages:
-      created_at: 'Created at %{timestamp} by %{user} '
-      login_to_see_all: 'Logga in för att se alla notifikationer. '
-      mentioned: 'Du har blivit <b>nämnd i en kommentar</b>'
-      mentioned_by: '%{user} nämnde dig i en kommentar'
+      created_at: "Created at %{timestamp} by %{user} "
+      login_to_see_all: "Logga in för att se alla notifikationer. "
+      mentioned: "Du har blivit <b>nämnd i en kommentar</b>"
+      mentioned_by: "%{user} nämnde dig i en kommentar"
       more_to_see:
-        one: 'There is 1 more work package with notifications.'
-        other: 'There are %{count} more work packages with notifications.'
-      open_in_browser: 'Open in browser'
+        one: "There is 1 more work package with notifications."
+        other: "There are %{count} more work packages with notifications."
+      open_in_browser: "Open in browser"
       reason:
-        watched: 'Watched'
-        assigned: 'Assigned'
-        responsible: 'Huvudansvarig'
-        mentioned: 'Mentioned'
-        subscribed: 'alla'
-        prefix: 'Received because of the notification setting: %{reason}'
-        date_alert_start_date: 'Date alert'
-        date_alert_due_date: 'Date alert'
-      see_all: 'See all'
-      updated_at: 'Updated at %{timestamp} by %{user}'
+        watched: "Watched"
+        assigned: "Assigned"
+        responsible: "Huvudansvarig"
+        mentioned: "Mentioned"
+        shared: "Shared"
+        subscribed: "alla"
+        prefix: "Received because of the notification setting: %{reason}"
+        date_alert_start_date: "Date alert"
+        date_alert_due_date: "Date alert"
+      see_all: "See all"
+      updated_at: "Updated at %{timestamp} by %{user}"
+    sharing:
+      work_packages:
+        allowed_actions: "You may %{allowed_actions} this work package. This can change depending on your project role and permissions."
+        create_account: "To access this work package, you will need to create and activate an account on %{instance}."
+        open_work_package: "Open work package"
+        subject: "Work package #%{id} was shared with you"
+        enterprise_text: "Share work packages with users who are not members of the project."
+        summary:
+          user: "%{user} shared a work package with you with %{role_rights} rights"
+          group: "%{user} shared a work package with the group %{group} you are a member of"
+    storages:
+      health:
+        plaintext:
+          storage: "Storage"
+          healthy:
+            summary: 'Good news! The status of your storage, %{storage_name}, is currently displaying as "Healthy".'
+            error-solved-on: "Solved On"
+            recommendation: "We will continue monitoring the system to ensure it remains in good health. In case of any discrepancies, we will notify you."
+            details: "For more details or to make any necessary amendments, you can visit your storage configuration"
+          unhealthy:
+            summary: 'The status of your storage, %{storage_name}, is currently displaying as "Error". We''ve detected an issue that might require your attention.'
+            error-details: "Error Details"
+            error-message: "Error Message"
+            error-occurred-on: "Occurred On"
+            recommendation: "We recommend heading over to the storage configuration page to address this issue"
+            unsubscribe: "If you would no longer like to receive these notifications, you can unsubscribe at any time. To unsubscribe, please follow the instructions on this page"
+        email_notification_settings: "Storage email notification settings"
+        see_storage_settings: "See storage settings"
+        healthy:
+          subject: 'Storage "%{name}" is now healthy!'
+          solved_at: "solved at"
+          summary: "The problem with your %{storage_name} storage integration is now solved"
+        unhealthy:
+          subject: 'Storage "%{name}" is unhealthy!'
+          since: "since"
+          summary: "There is a problem with your %{storage_name} storage integration"
+          troubleshooting:
+            text: "For more information, check file storages"
+            link_text: "troubleshooting documentation"
   mail_body_account_activation_request: "En ny användare (%{value}) har registrerats. Kontot väntar på ditt godkännande:"
   mail_body_account_information: "Din kontoinformation"
   mail_body_account_information_external: "Du kan använda ditt %{value} konto för att logga in."
@@ -2196,9 +2741,9 @@ sv:
   mail_body_register_closing: "Your OpenProject team"
   mail_body_register_ending: "Stay connected! Kind regards,"
   mail_body_reminder: "%{count} arbetspaket som är tilldelade till dig förfaller de närmaste %{days} dagarna:"
-  mail_body_group_reminder: "%{count} arbetspaket som är tilldelade till gruppen \"%{group}\" ska vara klara inom de närmaste %{days} dagarna:"
-  mail_body_wiki_page_added: "The '%{id}' wiki page has been added by %{author}."
-  mail_body_wiki_page_updated: "The '%{id}' wiki page has been updated by %{author}."
+  mail_body_group_reminder: '%{count} arbetspaket som är tilldelade till gruppen "%{group}" ska vara klara inom de närmaste %{days} dagarna:'
+  mail_body_wiki_page_added: "Wiki-sidan '%{id}' har lagts till av %{author}."
+  mail_body_wiki_page_updated: "'%{id}' wiki-sidan har uppdaterats av %{author}."
   mail_subject_account_activation_request: "%{value}} kontoaktiveringsbegäran"
   mail_subject_backup_ready: "Your backup is ready"
   mail_subject_backup_token_reset: "Backup token reset"
@@ -2273,10 +2818,12 @@ sv:
   notice_file_not_found: "Sidan du försökte komma åt existerar inte eller har tagits bort."
   notice_forced_logout: "Du har blivit automatiskt utloggad efter %{ttl_time} minuter av inaktivitet."
   notice_internal_server_error: "Det uppstod ett fel på sidan du försökte komma åt. Om du fortsatt har problem kontakta administratören för %{app_title} för att få hjälp."
-  notice_work_package_done_ratios_updated: "Arbetspaketets andel avklarat uppdaterat."
   notice_locking_conflict: "Informationen har uppdaterats av minst en annan användare under tiden."
   notice_locking_conflict_additional_information: "Uppdatering(ar) kom från %{users}."
   notice_locking_conflict_reload_page: "Vänligen ladda om sidan, granska ändringarna och tilldela dina uppdateringar igen."
+  notice_locking_conflict_warning: "This page has been updated by someone else. To not lose your edits, copy them locally and reload to view the updated version."
+  notice_locking_conflict_danger: "Could not save your changes because of conflicting modifications. To not lose your edits, copy them locally and reload to view the updated version."
+  notice_locking_conflict_action_button: "Discard changes and reload"
   notice_member_added: Lade till %{name} i projektet.
   notice_members_added: Lade till %{number} användare till projektet.
   notice_member_removed: "Tog bort %{user} från projektet."
@@ -2289,6 +2836,7 @@ sv:
   notice_principals_found_multiple: "%{number} resultat hittades. Använd TAB för att fokusera på det första."
   notice_principals_found_single: "Ett resultat. Använd TAB för att fokusera på det."
   notice_project_not_deleted: "Projektet raderades ej."
+  notice_project_not_found: "Project not found."
   notice_successful_connection: "Lyckad anslutning."
   notice_successful_create: "Skapades utan problem."
   notice_successful_delete: "Raderades utan problem."
@@ -2296,9 +2844,6 @@ sv:
   notice_successful_update_custom_fields_added_to_project: |
     Successful update. The custom fields of the activated types are automatically activated
     on the work package form. <a href="%{url}" target="_blank">See more</a>.
-  notice_successful_update_custom_fields_added_to_type: |
-    Successful update. The active custom fields are automatically activated for
-    the associated projects of this type.
   notice_to_many_principals_to_display: "Det finns för många resultat. \nBegränsa sökningen genom att skriva namnet på den nya medlemmen (eller gruppen)."
   notice_user_missing_authentication_method: Användaren har ännu inte valt ett lösenord eller annat sätt logga in.
   notice_user_invitation_resent: En inbjudan har skickats till %{email}.
@@ -2338,6 +2883,8 @@ sv:
   permission_add_work_packages: "Lägg till arbetspaket"
   permission_add_messages: "Publicera meddelanden"
   permission_add_project: "Skapa projekt"
+  permission_add_work_package_attachments: "Lägg till bilagor"
+  permission_add_work_package_attachments_explanation: "Allows adding attachments without Edit work packages permission"
   permission_archive_project: "Arkivera projekt"
   permission_create_user: "Skapa användare"
   permission_manage_user: "Redigera användare"
@@ -2347,9 +2894,12 @@ sv:
   permission_assign_versions: "Tilldela versioner"
   permission_browse_repository: "Skrivskyddad åtkomst till databasen (bläddra och och checka ut)"
   permission_change_wiki_parent_page: "Ändra överordnad wiki-sida"
+  permission_change_work_package_status: "Change work package status"
+  permission_change_work_package_status_explanation: "Allows changing status without Edit work packages permission"
   permission_comment_news: "Kommentera nyhet"
   permission_commit_access: "Läs- och skrivbehörighet till databasen (incheckning)"
   permission_copy_projects: "Kopiera projekt"
+  permission_copy_work_packages: "Kopiera arbetspaket"
   permission_create_backup: "Create backups"
   permission_delete_work_package_watchers: "Ta bort bevakare"
   permission_delete_work_packages: "Ta bort arbetspaket"
@@ -2366,6 +2916,7 @@ sv:
   permission_edit_own_messages: "Redigera egna meddelanden"
   permission_edit_own_time_entries: "Redigera egna tidrapporter"
   permission_edit_project: "Redigera projekt"
+  permission_edit_project_attributes: "Edit project attributes"
   permission_edit_reportings: "Redigera rapporter"
   permission_edit_time_entries: "Edit time logs for other users"
   permission_edit_timelines: "Redigera tidslinjer"
@@ -2392,28 +2943,45 @@ sv:
   permission_protect_wiki_pages: "Skydda wiki-sidor"
   permission_rename_wiki_pages: "Byt namn på wiki-sidor"
   permission_save_queries: "Spara vyer"
+  permission_search_project: "Search project"
   permission_select_custom_fields: "Välj anpassade fält"
+  permission_select_project_custom_fields: "Select project attributes"
   permission_select_project_modules: "Välj projektmoduler"
+  permission_share_work_packages: "Share work packages"
   permission_manage_types: "Välj typer"
+  permission_view_project: "View projects"
   permission_view_changesets: "Visa databasrevisioner i OpenProject"
   permission_view_commit_author_statistics: "Visa statistik över incheckningar per författare"
   permission_view_dashboards: "View dashboards"
   permission_view_work_package_watchers: "Visa lista med bevakare"
   permission_view_work_packages: "Visa arbetspaket"
   permission_view_messages: "Visa meddelanden"
+  permission_view_news: "View news"
   permission_view_members: "Visa medlemmar"
   permission_view_reportings: "Visa rapporter"
+  permission_view_shared_work_packages: "View work package shares"
   permission_view_time_entries: "Visa förbrukad tid"
   permission_view_timelines: "Visa tidslinjer"
+  permission_view_user_email: "View users' mail addresses"
   permission_view_wiki_edits: "Visa historik över wiki"
   permission_view_wiki_pages: "Visa wiki"
   permission_work_package_assigned: "Become assignee/responsible"
   permission_work_package_assigned_explanation: "Arbetspaket kan tilldelas användare och grupper som har denna roll i respektive projektet"
+  permission_view_project_activity: "View project activity"
+  permission_view_project_attributes: "View project attributes"
+  permission_save_bcf_queries: "Save BCF queries"
+  permission_manage_public_bcf_queries: "Manage public BCF queries"
+  permission_edit_attribute_help_texts: "Edit attribute help texts"
+  permission_manage_public_project_queries: "Manage public project lists"
+  permission_view_project_query: "View project query"
+  permission_edit_project_query: "Edit project query"
   placeholders:
     default: "-"
   project:
     destroy:
-      confirmation: "Om du fortsätter kommer projekt %{identifier} och all relaterad information att förstöras permanent."
+      confirmation: "If you continue, the project %{identifier} will be permanently destroyed. To confirm this action please introduce the project name in the field below, this will:"
+      project_delete_result_1: "Delete all related data."
+      project_delete_result_2: "Delete all managed project folders in the attached storages."
       info: "Att radera ett projekt går inte att ångra."
       project_verification: "Ange projektnamn %{name} för att verifiera raderingen."
       subprojects_confirmation: "Följande delprojekt kommer också raderas: %{value}."
@@ -2425,18 +2993,23 @@ sv:
     template:
       copying: >
         Your project is being created from the selected template project. You will be notified by mail as soon as the project is available.
-      use_template: 'Use template'
-      make_template: 'Set as template'
-      remove_from_templates: 'Remove from templates'
+      use_template: "Use template"
+      make_template: "Set as template"
+      remove_from_templates: "Remove from templates"
     archive:
       are_you_sure: "Är du säker på att du vill arkivera projektet '%{name}'?"
       archived: "Arkiverad"
+    count:
+      zero: "0 projekt"
+      one: "1 projekt"
+      other: "%{count} projekt"
   project_module_activity: "Aktivitet"
   project_module_forums: "Forum"
   project_module_work_package_tracking: "Arbetspaket"
   project_module_news: "Nyheter"
   project_module_repository: "Versionsarkiv"
   project_module_wiki: "Wiki"
+  permission_header_for_project_module_work_package_tracking: "Work packages and Gantt charts"
   query:
     attribute_and_direction: "%{attribute} (%{direction})"
   #possible query parameters (e.g. issue queries),
@@ -2444,21 +3017,23 @@ sv:
   query_fields:
     active_or_archived: "Aktiv eller arkiverad"
     assigned_to_role: "Tilldelades roll"
-    member_of_group: "Den tilldelades grupp"
     assignee_or_group: "Tilldelad eller tillhörandegrupp"
-    subproject_id: "Including subproject"
-    only_subproject_id: "Only subproject"
+    member_of_group: "Den tilldelades grupp"
     name_or_identifier: "Namn eller identifierare"
+    only_subproject_id: "Only subproject"
+    shared_with_user: "Shared with users"
+    shared_with_me: "Shared with me"
+    subproject_id: "Including subproject"
   repositories:
-    at_identifier: 'på %{identifier}'
-    atom_revision_feed: 'Atom revisionsflöde'
+    at_identifier: "på %{identifier}"
+    atom_revision_feed: "Atom revisionsflöde"
     autofetch_information: "Markera denna om du vill att databaser ska uppdateras per automatik när sidan för databasmoduler öppnas. Detta omfattar hämtning av incheckningar och uppdatering av nödvändigt lagringsutrymme."
     checkout:
       access:
-        readwrite: 'Läsa + Skriva'
-        read: 'Skrivskyddad'
-        none: 'Du saknar behörighet att checka ut så du kan endast visa databasen i denna applikation.'
-      access_permission: 'Dina behörigheter för denna databas'
+        readwrite: "Läsa + Skriva"
+        read: "Skrivskyddad"
+        none: "Du saknar behörighet att checka ut så du kan endast visa databasen i denna applikation."
+      access_permission: "Dina behörigheter för denna databas"
       url: "URL för att checka ut"
       base_url_text: "Bas-URL för att generera URL:er för utcheckning (ex. https://myserver.example.org/repos/). Observera: Bas-URL:en används bara i hanterade databaser. Andra databaser ändras inte."
       default_instructions:
@@ -2556,13 +3131,16 @@ sv:
     warnings:
       cannot_annotate: "Den här filen kan inte kommenteras."
   scheduling:
-    activated: 'activated'
-    deactivated: 'deactivated'
+    activated: "activated"
+    deactivated: "deactivated"
   search_input_placeholder: "Sök ..."
   setting_apiv3_cors_enabled: "Enable CORS"
   setting_apiv3_cors_origins: "API V3 Cross-Origin Resource Sharing (CORS) allowed origins"
   setting_apiv3_cors_origins_text_html: >
     If CORS is enabled, these are the origins that are allowed to access OpenProject API. <br/> Please check the <a href="%{origin_link}" target="_blank">Documentation on the Origin header</a> on how to specify the expected values.
+  setting_apiv3_write_readonly_attributes: "Write access to read-only attributes"
+  setting_apiv3_write_readonly_attributes_instructions_html: >
+    If enabled, the API will allow administrators to write static read-only attributes during creation, such as createdAt and author. <br/> <strong>Warning:</strong> This setting has a use-case for e.g., importing data, but allows administrators to impersonate the creation of items as other users. All creation requests are being logged however with the true author. </br> For more information on attributes and supported resources, please see the %{api_documentation_link}.
   setting_apiv3_max_page_size: "Maximum API page size"
   setting_apiv3_max_page_instructions_html: >
     Set the maximum page size the API will respond with. It will not be possible to perform API requests that return more values on a single page. <br/> <strong>Warning:</strong> Please only change this value if you are sure why you need it. Setting to a high value will result in significant performance impacts, while a value lower than the per page options will cause errors in paginated views.
@@ -2572,6 +3150,7 @@ sv:
     If the docs page is enabled you can get an interactive view of the APIv3 documentation under <a href="%{link}" target="_blank">%{link}</a>.
   setting_attachment_whitelist: "Attachment upload whitelist"
   setting_email_delivery_method: "Leveransmetod för e-post"
+  setting_emails_salutation: "Address user in emails with"
   setting_sendmail_location: "Sökväg till sendmail"
   setting_smtp_enable_starttls_auto: "Använd STARTTLS om det går"
   setting_smtp_ssl: "Använd SSL-anslutning"
@@ -2585,6 +3164,9 @@ sv:
   setting_app_subtitle: "Undertitel för applikation"
   setting_app_title: "Programnamn"
   setting_attachment_max_size: "Bilaga max. storlek"
+  setting_show_work_package_attachments: "Show attachments in the files tab by default"
+  setting_antivirus_scan_mode: "Scan mode"
+  setting_antivirus_scan_action: "Infected file action"
   setting_autofetch_changesets: "Automatiskt hämtning av databasförändringar"
   setting_autologin: "Autoinloggning"
   setting_available_languages: "Tillgängliga språk"
@@ -2593,7 +3175,7 @@ sv:
   setting_brute_force_block_minutes: "Tiden som användaren är blockerad"
   setting_cache_formatted_text: "Cache-formaterad text"
   setting_use_wysiwyg_description: "Välj för att aktivera CKEditor5 WYSIWYG editor för alla användare som standard. CKEditor har begränsad funktionalitet för GFM Markdown."
-  setting_column_options: "Anpassa utseendet på arbetspaketslistan"
+  setting_column_options: "Default work package lists columns"
   setting_commit_fix_keywords: "Nyckelord för fixande"
   setting_commit_logs_encoding: "Kodning av incheckningsmeddelanden"
   setting_commit_logtime_activity_id: "Aktivitet för tidrapport"
@@ -2609,24 +3191,37 @@ sv:
   setting_default_language: "Standardspråk"
   setting_default_projects_modules: "Standardmoduler för nya projekt"
   setting_default_projects_public: "Nya projekt är offentliga som standard"
+  setting_disable_password_login: "Disable password authentication"
   setting_diff_max_lines_displayed: "Max antal diff rader som visas"
+  setting_omniauth_direct_login_provider: "Direct login SSO provider"
   setting_display_subprojects_work_packages: "Visa arbetspaket för delprojekt på huvudprojekt som standard"
+  setting_duration_format: "Duration format"
+  setting_duration_format_hours_only: "Hours only"
+  setting_duration_format_days_and_hours: "Dagar och timmar"
+  setting_duration_format_instructions: "This defines how Work, Remaining work, and Time spent durations are displayed."
   setting_emails_footer: "E-post sidfot"
   setting_emails_header: "E-post sidhuvud"
   setting_email_login: "Använd e-post som inloggning"
   setting_enabled_scm: "Aktiverade SCM"
-  setting_enabled_projects_columns: "Visible in project list"
+  setting_enabled_projects_columns: "Columns in a projects list displayed by default"
   setting_feeds_enabled: "Aktivera Flöden"
   setting_ical_enabled: "Enable iCalendar subscriptions"
   setting_feeds_limit: "Innehållsbegränsning på Flöden"
   setting_file_max_size_displayed: "Maxstorlek på textfiler som visas inline"
   setting_host_name: "Värdnamn"
+  setting_hours_per_day: "Timmar per dag"
+  setting_hours_per_day_explanation: >-
+    This defines what is considered a "day" when displaying duration in days and hours (for example, if a day is 8 hours, 32 hours would be 4 days).
   setting_invitation_expiration_days: "Aktiveringsmail upphör efter"
-  setting_work_package_done_ratio: "Beräkna arbetspaketets andel avklarat med"
-  setting_work_package_done_ratio_field: "Använd fältet arbetspaket"
-  setting_work_package_done_ratio_status: "Använd fältet arbetspaketsstatus"
-  setting_work_package_done_ratio_disabled: "Inaktivera (dölj andel klart)"
-  setting_work_package_list_default_columns: "Visa som standard"
+  setting_work_package_done_ratio: "Progress calculation mode"
+  setting_work_package_done_ratio_field: "Work-based"
+  setting_work_package_done_ratio_field_caption_html: >-
+    <i>% Complete</i> can be freely set to any value. If you optionally enter a value for <i>Work</i>, <i>Remaining work</i> will automatically be derived.
+  setting_work_package_done_ratio_status: "Status-based"
+  setting_work_package_done_ratio_status_caption_html: >-
+    Each status has a <i>% Complete</i> value associated with it. Changing status will change <i>% Complete</i>.
+  setting_work_package_done_ratio_explanation_html: >
+    In <b>work-based</b> mode, % Complete can be freely set to any value. If you optionally enter a value for Work, Remaining work will automatically be derived. In <b>status-based</b> mode, each status has a % Complete value associated with it. Changing status will change % Complete.
   setting_work_package_properties: "Egenskaper för arbetspaket"
   setting_work_package_startdate_is_adddate: "Använda aktuellt datum som startdatum för nya arbetspaket"
   setting_work_packages_projects_export_limit: "Work packages / Projects export limit"
@@ -2645,6 +3240,13 @@ sv:
   setting_password_min_length: "Minsta längd"
   setting_password_min_adhered_rules: "Minsta antal teckenklasser som krävs"
   setting_per_page_options: "Objekt per sida alternativ"
+  setting_percent_complete_on_status_closed: "% Complete when status is closed"
+  setting_percent_complete_on_status_closed_no_change: "No change"
+  setting_percent_complete_on_status_closed_no_change_caption_html: >-
+    The value of <i>% Complete</i> will not change even when a work package is closed.
+  setting_percent_complete_on_status_closed_set_100p: "Automatically set to 100%"
+  setting_percent_complete_on_status_closed_set_100p_caption: >-
+    A closed work package is considered complete.
   setting_plain_text_mail: "Oformaterad text i e-post (ingen HTML)"
   setting_protocol: "Protokoll"
   setting_project_gantt_query: "Project portfolio Gantt view"
@@ -2653,7 +3255,6 @@ sv:
   setting_registration_footer: "Sidfot för registrering"
   setting_repositories_automatic_managed_vendor: "Automatisk leverantörstyp för databas"
   setting_repositories_encodings: "Teckenkodningar i versionsarkiv"
-  setting_repository_authentication_caching_enabled: "Aktivera cachelagring för autentiseringsbegäran av versionsarkivsystemet"
   setting_repository_storage_cache_minutes: "Cachning av databasens hårddiskstorlek"
   setting_repository_checkout_display: "Visa instruktioner för utcheckning"
   setting_repository_checkout_base_url: "Bas-URL för utcheckning"
@@ -2669,6 +3270,13 @@ sv:
   setting_sys_api_enabled: "Aktivera webbtjänsten arkivhantering"
   setting_sys_api_description: "Webtjänsten arkivhantering ger integrering och användarautentisering för att åtkomst av arkiv."
   setting_time_format: "Tid"
+  setting_total_percent_complete_mode: "Calculation of % Complete hierarchy totals"
+  setting_total_percent_complete_mode_work_weighted_average: "Weighted by work"
+  setting_total_percent_complete_mode_work_weighted_average_caption_html: >-
+    The <i>total % Complete</i> will be weighted against the <i>Work</i> of each work package in the hierarchy. Work packages without <i>Work</i> will be ignored.
+  setting_total_percent_complete_mode_simple_average: "Simple average"
+  setting_total_percent_complete_mode_simple_average_caption_html: >-
+    <i>Work</i> is ignored and the <i>total % Complete</i> will be a simple average of <i>% Complete</i> values of work packages in the hierarchy.
   setting_accessibility_mode_for_anonymous: "Aktivera hjälpmedelsläget för anonyma användare"
   setting_user_format: "Users name format"
   setting_user_default_timezone: "Standardtidszon för användarna"
@@ -2681,9 +3289,36 @@ sv:
   setting_work_package_list_default_highlighted_attributes: "Standardattribut för inline-markering"
   setting_working_days: "Working days"
   settings:
+    authentication:
+      single_sign_on: "Single Sign-On"
+      omniauth_direct_login_hint_html: >
+        If this option is active, login requests will redirect to the configured omniauth provider. The login dropdown and sign-in page will be disabled. <br/> <strong>Note:</strong> Unless you also disable password logins, with this option enabled, users can still log in internally by visiting the <code>%{internal_path}</code> login page.
     attachments:
       whitelist_text_html: >
         Define a list of valid file extensions and/or mime types for uploaded files. <br/> Enter file extensions (e.g., <code>%{ext_example}</code>) or mime types (e.g., <code>%{mime_example}</code>). <br/> Leave empty to allow any file type to be uploaded. Multiple values allowed (one line for each value).
+      show_work_package_attachments: >
+        Deactivating this option will hide the attachments list on the work packages files tab for new projects. The files attached in the description of a work package will still be uploaded in the internal attachments storage.
+    antivirus:
+      title: "Virus scanning"
+      clamav_ping_failed: "Failed to connect the the ClamAV daemon. Double-check the configuration and try again."
+      remaining_quarantined_files_html: >
+        Virus scanning has been disbled. %{file_count} remain in quarantine. To review quarantined files, please visit this link: %{link}
+      remaining_scan_complete_html: >
+        Remaining files have been scanned. There are %{file_count} in quarantine. You are being redirected to the quarantine page. Use this page to delete or override quarantined files.
+      remaining_rescanned_files: >
+        Virus scanning has been enabled successfully. There are %{file_count} that were uploaded previously and still need to be scanned. This process has been scheduled in the background. The files will remain accessible during the scan.
+      upsale:
+        description: "Ensure uploaded files in OpenProject are scanned for viruses before being accessible by other users."
+      actions:
+        delete: "Delete the file"
+        quarantine: "Quarantine the file"
+        instructions_html: >
+          Select the action to perform for files on which a virus has been detected: <br/> <ul> <li><strong>%{quarantine_option}</strong>: Quarantine the file, preventing users from accessing it. Administrators can review and delete quarantined files in the administration.</li> <li><strong>%{delete_option}</strong>: Delete the file immediately.</li> </ul>
+      modes:
+        clamav_socket_html: Enter the socket to the clamd daemon, e.g., %{example}
+        clamav_host_html: Enter the hostname and port to the clamd daemon separated by colon. e.g., %{example}
+        description_html: >
+          Select the mode in which the antivirus scanner integration should operate. <br/> <ul> <li><strong>%{disabled_option}</strong>: Uploaded files are not scanned for viruses.</li> <li><strong>%{socket_option}</strong>: You have set up ClamAV on the same server as OpenProject and the scan daemon clamd is running in the background</li> <li><strong>%{host_option}</strong>: You are streaming files to an external virus scanning host.</li> </ul>
     brute_force_prevention: "Automatiserad användarblockering"
     date_format:
       first_date_of_week_and_year_set: >
@@ -2704,15 +3339,30 @@ sv:
         priority: "Hel rad per prioritet"
     icalendar:
       enable_subscriptions_text_html: Allows users with the necessary permissions to subscribe to OpenProject calendars and access work package information via an external calendar client. <strong>Note:</strong> Please read about <a href="%{link}" target="_blank">iCalendar subscriptions</a> to understand potential security risks before enabling this.
-    language_name_being_default: '%{language_name} (default)'
+    language_name_being_default: "%{language_name} (default)"
     notifications:
-      events_explanation: 'Governs for which event an email is sent out. Work packages are excluded from this list as the notifications for them can be configured specifically for every user.'
+      events_explanation: "Governs for which event an email is sent out. Work packages are excluded from this list as the notifications for them can be configured specifically for every user."
       delay_minutes_explanation: "Email sending can be delayed to allow users with configured in app notification to confirm the notification within the application before a mail is sent out. Users who read a notification within the application will not receive an email for the already read notification."
     other: "Andra"
     passwords: "Lösenord"
+    project_attributes:
+      heading: "Project attributes"
+      label_new_attribute: "Project attribute"
+      label_new_section: "Section"
+      label_edit_section: "Edit title"
+      label_section_actions: "Section actions"
+      heading_description: "These project attributes appear in the overview page of each project. You can add new attributes, group them into sections and re-order them as you please. These attributes can be enabled or disabled but not re-ordered at a project level."
+      label_project_custom_field_actions: "Project attribute actions"
+      label_no_project_custom_fields: "No project attributes defined in this section"
+      edit:
+        description: "Changes to this project attribute will be reflected in all projects where it is enabled. Required attributes cannot be disabled on a per-project basis."
+      new:
+        heading: "New attribute"
+        description: "Changes to this project attribute will be reflected in all projects where it is enabled. Required attributes cannot be disabled on a per-project basis."
     projects:
+      missing_dependencies: "Project module %{module} was checked which depends on %{dependencies}. You need to check these dependencies as well."
       section_new_projects: "Settings for new projects"
-      section_project_overview: "Settings for project overview list"
+      section_project_overview: "Settings for project lists"
     session: "Session"
     user:
       default_preferences: "Förvalda inställningar"
@@ -2722,10 +3372,11 @@ sv:
       section_work_week: "Work week"
       section_holidays_and_closures: "Holidays and closures"
   text_formatting:
-    markdown: 'Markdown'
-    plain: 'Oformaterad text'
+    markdown: "Markdown"
+    plain: "Oformaterad text"
   status_active: "aktiv"
   status_archived: "arkiverad"
+  status_blocked: "blocked"
   status_invited: inbjuden
   status_locked: låst
   status_registered: Registrerad
@@ -2740,6 +3391,7 @@ sv:
   text_are_you_sure: "Är du säker?"
   text_are_you_sure_continue: "Are you sure you want to continue?"
   text_are_you_sure_with_children: "Ta bort arbetspaket och alla underarbetspaket?"
+  text_are_you_sure_with_project_custom_fields: "Deleting this attribute will also delete its values in all projects. Are you sure you want to do this?"
   text_assign_to_project: "Tilldela till projektet"
   text_form_configuration: >
     Du kan anpassa vilka fält som ska visas i formulär för arbetspaket. Du kan fritt gruppera fälten för att återspegla behoven för din domän.
@@ -2761,6 +3413,8 @@ sv:
     En vit logotyp på transparent bakgrund rekommenderas. För bästa resultat på både vanliga och Retina-skärmar bör bilden vara minst 460x60 px.
   text_custom_export_logo_instructions: >
     Det här är loggan som syns i dina PDF-exporter. Det behöver vara en PNG eller JPEG bildfil. En svart eller färglagd logga på en transparent eller vit bakgrund rekommenderas.
+  text_custom_export_cover_instructions: >
+    This is the image that appears in the background of a cover page in your PDF exports. It needs to be an about 800px width by 500px height sized PNG or JPEG image file.
   text_custom_favicon_instructions: >
     This is the tiny icon that appears in your browser window/tab next to the page's title. It needs to be a squared 32 by 32 pixels sized PNG image file with a transparent background.
   text_custom_touch_icon_instructions: >
@@ -2847,8 +3501,9 @@ sv:
   text_setup_mail_configuration: "Konfigurera din e-postleverantör"
   help_texts:
     views:
-      project: "%{plural} are always attached to a project. After creating a %{singular} you can add work packages from other projects to it."
-      public: "Publish this view, allowing other users to access your view. Users with the 'Manage public views' permission can modify or remove public query. This does not affect the visibility of work package results in that view and depending on their permissions, users may see different results."
+      project: >
+        %{plural} are always attached to a project. You can only select projects here where the %{plural} module is active. After creating a %{singular} you can add work packages from other projects to it.
+      public: "Publicera den här vyn så att andra användare kan komma åt vyn. Användare med behörigheten \"Hantera offentliga vyer\" kan ändra eller ta bort offentlig fråga. Detta påverkar inte synligheten av arbetspaketet resultat i den vyn och beroende på deras behörigheter kan användare se olika resultat."
       favoured: "Mark this view as favourite and add to the saved views sidebar on the left."
   time:
     am: "fm"
@@ -2873,6 +3528,16 @@ sv:
       Om inställningen aktiveras kan inte användare välja användarnamn och loggar istället in med sin e-postadress. En administratör kan däremot ändra användarnamnet separat.
   queries:
     apply_filter: Använd förkonfigurerade filter
+    configure_view:
+      heading: Configure view
+      columns:
+        input_label: "Lägg till kolumner"
+        input_placeholder: "Select a column"
+        drag_area_label: "Manage and reorder columns"
+      sort_by:
+        automatic:
+          heading: "Automatisk"
+          description: "Order the %{plural} by one or more sorting criteria. You will lose the previous sorting."
   top_menu:
     additional_resources: "Ytterligare resurser"
     getting_started: "Komma igång"
@@ -2884,6 +3549,7 @@ sv:
     activate: "Aktivera"
     activate_and_reset_failed_logins: "Aktivera och nollställ misslyckade inloggningsförsök"
     authentication_provider: "Autentiseringstjänst"
+    identity_url_text: "The internal unique identifier provided by the authentication provider."
     authentication_settings_disabled_due_to_external_authentication: >
       Användaren autentiseras via en extern autentiseringstjänst, så det finns inget lösenord i OpenProject som kan ändras.
     authorization_rejected: "Du är inte tillåten att logga in."
@@ -2906,6 +3572,7 @@ sv:
     status_user_and_brute_force: "%{user} och %{brute_force}"
     status_change: "Statusändring"
     text_change_disabled_for_provider_login: "Namnet är satt av din inloggningsleverantör och kan därför inte ändras."
+    text_change_disabled_for_ldap_login: "The name and email is set by LDAP and can thus not be changed."
     unlock: "Lås upp"
     unlock_and_reset_failed_logins: "Lås upp och nollställ misslyckade inloggningsförsök"
   version_status_closed: "stängt"
@@ -2920,23 +3587,25 @@ sv:
   warning_registration_token_expired: |
     Aktiveringsmailet har löpt ut. Vi skickade ett nytt till %{email}. Klicka på länken inne i mailet för att aktivera ditt konto.
   warning_user_limit_reached: >
-    Användargränsen har uppnåtts. Du kan inte aktivera fler användare. Vänligen <a href="%{upgrade_url}">uppgradera din plan</a> eller blockera medlemmar för att tillåta ytterligare användare.
+    Adding additional users will exceed the current limit. Please contact an administrator to increase the user limit to ensure external users are able to access this instance.
+  warning_user_limit_reached_admin: >
+    Adding additional users will exceed the current limit. Please <a href="%{upgrade_url}">upgrade your plan</a> to be able to ensure external users are able to access this instance.
   warning_user_limit_reached_instructions: >
     You reached your user limit (%{current}/%{max} active users). Please contact sales@openproject.com to upgrade your Enterprise edition plan and add additional users.
   warning_protocol_mismatch_html: >
 
   warning_bar:
     https_mismatch:
-      title: 'HTTPS mode setup mismatch'
+      title: "HTTPS mode setup mismatch"
       text_html: >
         Your application is running with HTTPS mode set to <code>%{set_protocol}</code>, but the request is an <code>%{actual_protocol}</code> request. This will result in errors! You will need to set the following configuration value: <code>%{setting_value}</code>. Please see <a href="%{more_info_path}">the installation documentation</a> on how to set this configuration.
     hostname_mismatch:
-      title: 'Hostname setting mismatch'
+      title: "Hostname setting mismatch"
       text_html: >
         Your application is running with its host name setting set to <code>%{set_hostname}</code>, but the request is a <code>%{actual_hostname}</code> hostname. This will result in errors! Go to <a href="%{setting_path}">System settings</a> and change the "Host name" setting to correct this.
   menu_item: "Menyalternativ"
   menu_item_setting: "Synlighet"
-  wiki_menu_item_for: "Menyobjekt för wiki-sida \"%{title}\""
+  wiki_menu_item_for: 'Menyobjekt för wiki-sida "%{title}"'
   wiki_menu_item_setting: "Synlighet"
   wiki_menu_item_new_main_item_explanation: >
     Du tar bort det enda huvudobjektet i wiki menyn. Du måste nu välja en wikisida för vilket ett nytt huvudobjekt kommer att genereras. För att radera wikin inaktiverar projektadministratören wiki-modulen.
@@ -2948,14 +3617,110 @@ sv:
     destroy:
       info: "Att radera arbetspaketet går inte att ångra."
       title: "Radera arbetspaketet"
+    progress:
+      label_note: "Note:"
+      modal:
+        work_based_help_text: "Each field is automatically calculated from the two others when possible."
+        status_based_help_text: "% Complete is set by work package status."
+        migration_warning_text: "In work-based progress calculation mode, % Complete cannot be manually set and is tied to Work. The existing value has been kept but cannot be edited. Please input Work first."
+      derivation_hints:
+        done_ratio:
+          cleared_because_remaining_work_is_empty: "Cleared because Remaining work is empty."
+          cleared_because_work_is_0h: "Cleared because Work is 0h."
+          derived: "Derived from Work and Remaining work."
+        estimated_hours:
+          cleared_because_remaining_work_is_empty: "Cleared because Remaining work is empty."
+          derived: "Derived from Remaining work and % Complete."
+          same_as_remaining_work: "Set to same value as Remaining work."
+        remaining_hours:
+          cleared_because_work_is_empty: "Cleared because Work is empty."
+          cleared_because_percent_complete_is_empty: "Cleared because % Complete is empty."
+          decreased_by_delta_like_work: "Decreased by %{delta}, matching the reduction in Work."
+          derived: "Derived from Work and % Complete."
+          increased_by_delta_like_work: "Increased by %{delta}, matching the increase in Work."
+          same_as_work: "Set to same value as Work."
+    permissions:
+      comment: "Kommentar"
+      comment_description: "Can view and comment this work package."
+      edit: "Redigera"
+      edit_description: "Can view, comment and edit this work package."
+      view: "Vy"
+      view_description: "Can view this work package."
+  sharing:
+    count:
+      zero: "0 användare"
+      one: "1 användare"
+      other: "%{count} användare"
+    filter:
+      project_member: "Projektmedlem"
+      not_project_member: "Not project member"
+      project_group: "Projektgrupp"
+      not_project_group: "Not project group"
+      user: "Användare"
+      group: "Grupp"
+      role: "Roll"
+      type: "Typ"
+    denied: "You don't have permissions to share %{entities}."
+    label_search: "Search for users to invite"
+    label_search_placeholder: "Sök efter användare eller e-postadress"
+    label_toggle_all: "Toggle all shares"
+    remove: "Ta bort"
+    share: "Dela"
+    text_empty_search_description: "There are no users with the current filter criteria."
+    text_empty_search_header: "We couldn't find any matching results."
+    text_empty_state_description: "The %{entity} has not been shared with anyone yet."
+    text_empty_state_header: "Inte delade"
+    text_user_limit_reached: "Adding additional users will exceed the current limit. Please contact an administrator to increase the user limit to ensure external users are able to access this %{entity}."
+    text_user_limit_reached_admins: 'Adding additional users will exceed the current limit. Please <a href="%{upgrade_url}">upgrade your plan</a> to be able to add more users.'
+    warning_user_limit_reached: >
+      Adding additional users will exceed the current limit. Please contact an administrator to increase the user limit to ensure external users are able to access this %{entity}.
+    warning_user_limit_reached_admin: >
+      Adding additional users will exceed the current limit. Please <a href="%{upgrade_url}">upgrade your plan</a> to be able to ensure external users are able to access this %{entity}.
+    warning_no_selected_user: "Please select users to share this %{entity} with"
+    warning_locked_user: "The user %{user} is locked and cannot be shared with"
+    user_details:
+      locked: "Locked user"
+      invited: "Invite sent. "
+      resend_invite: "Resend."
+      invite_resent: "Invite has been resent"
+      not_project_member: "Not a project member"
+      project_group: "Group members might have additional privileges (as project members)"
+      not_project_group: "Group (shared with all members)"
+      additional_privileges_project: "Might have additional privileges (as project member)"
+      additional_privileges_group: "Might have additional privileges (as group member)"
+      additional_privileges_project_or_group: "Might have additional privileges (as project or group member)"
+    project_queries:
+      publishing_denied: "You do not have permission to make project lists public."
+      access_warning: "Users will only see the projects they have access to. Sharing project lists does not impact individual project permissions."
+      user_details:
+        owner: "List owner"
+        can_view_because_public: "Can already view because list is shared with everyone"
+        can_manage_public_lists: "Can edit due to global permissions"
+      public_flag:
+        label: "Share with everyone at %{instance_name}"
+        caption: "Everyone can view this project list. Those with global edit permissions can modify it."
+      blank_state:
+        public:
+          header: "Shared with everyone"
+          description: "Everyone can view this project list. You can also add individual users with extra permissions."
+        private:
+          header: "Not shared: Private"
+          description: "This project list has not been shared with anyone yet. Only you can access this list."
+      permissions:
+        view: "Vy"
+        view_description: "Can view this project list."
+        edit: "Redigera"
+        edit_description: "Can view, share and edit this project list."
+      upsale:
+        message: "Sharing project lists with individual users is an enterprise add-on."
   working_days:
     info: >
-      Days that are not selected are skipped when scheduling work packages (and not included in the day count). These can be overriden at a work-package level.
+      Days that are not selected are skipped when scheduling work packages (and not included in the day count). These can be overridden at a work-package level.
     instance_wide_info: >
       Dates added to the list below are considered non-working and skipped when scheduling work packages.
     change_button: "Change working days"
     warning: >
-      Changing which days of the week are considered working days or non-working days can affect the start and finish days of all work packages in all projects in this instance. <br/> Please note that changes are only applied after you click on the apply changes button.
+      Changing which days of the week are considered working days or non-working days can affect the start and finish days of all work packages in all projects in this instance.
     journal_note:
       changed: _**Working days** changed (%{changes})._
       days:
@@ -2968,7 +3733,7 @@ sv:
   api_v3:
     attributes:
       lock_version: "Lås version"
-      property: 'Property'
+      property: "Property"
     errors:
       code_400: "Felaktig begäran: %{message}"
       code_401: "Du måste autentiseras för att få tillgång till denna resurs."
@@ -2979,6 +3744,7 @@ sv:
       code_429: "Too many requests. Please try again later."
       code_500: "Ett internt fel har inträffat."
       code_500_outbound_request_failure: "An outbound request to another resource has failed with status code %{status_code}."
+      code_500_missing_enterprise_token: "The request can not be handled due to invalid or missing Enterprise token."
       not_found:
         work_package: "The work package you are looking for cannot be found or has been deleted."
       expected:
@@ -3007,49 +3773,47 @@ sv:
         unsupported_context: "Resursen som angavs stöds inte som kontext."
         context_object_not_found: "Kan inte hitta den angivna resursen som kontext."
       validation:
-        done_ratio: "Andel avslutat kan inte anges för överordnade arbetspaket, när det är angivet av status eller när det är inaktiverat."
         due_date: "Slutdatum kan inte anges på överordnade arbetspaket."
-        estimated_hours: "Beräknade timmar kan inte anges för överordnade arbetspaket."
         invalid_user_assigned_to_work_package: "Den valda användaren tillåts inte att vara \"%{property}\" för detta arbetspaket."
         start_date: "Startdatum kan inte anges för överordnade arbetspaket."
       eprops:
         invalid_gzip: "är ogiltig gzip: %{message}"
         invalid_json: "är ogiltig json: %{message}"
     resources:
-      schema: 'Schema'
+      schema: "Schema"
     undisclosed:
       parent: Undisclosed - The selected parent is invisible because of lacking permissions.
       ancestor: Undisclosed - The ancestor is invisible because of lacking permissions.
   doorkeeper:
     pre_authorization:
-      status: 'Förauktorisering'
-    auth_url: 'Auth URL'
-    access_token_url: 'Access token URL'
+      status: "Förauktorisering"
+    auth_url: "Auth URL"
+    access_token_url: "Access token URL"
     errors:
       messages:
         #Common error messages
         invalid_request:
-          unknown: 'Begäran saknar en obligatorisk parameter, innehåller ett parametervärde som inte stöds, eller är på annat sätt felformulerad.'
-          missing_param: 'Missing required parameter: %{value}.'
-          request_not_authorized: 'Request need to be authorized. Required parameter for authorizing request is missing or invalid.'
+          unknown: "Begäran saknar en obligatorisk parameter, innehåller ett parametervärde som inte stöds, eller är på annat sätt felformulerad."
+          missing_param: "Missing required parameter: %{value}."
+          request_not_authorized: "Request need to be authorized. Required parameter for authorizing request is missing or invalid."
         invalid_redirect_uri: "Den begärda omdirigerings-uri är felaktigt formaterad eller matchar inte klientens omdirigerings-URI."
-        unauthorized_client: 'Klienten har inte behörighet att utföra denna begäran med denna metod.'
-        access_denied: 'Resursägaren eller auktoriseringsservern nekade begäran.'
-        invalid_scope: 'Den begärda omfattningen är ogiltig, okänd eller felformulerad.'
-        invalid_code_challenge_method: 'Kodutmaningsmetoden måste vara klartext eller S256.'
-        server_error: 'Auktoriseringsservern stötte på ett oväntat villkor som hindrade den från att uppfylla begäran.'
-        temporarily_unavailable: 'Behörighetsservern kan för närvarande inte hantera begäran på grund av en tillfällig överbelastning eller underhåll av servern.'
+        unauthorized_client: "Klienten har inte behörighet att utföra denna begäran med denna metod."
+        access_denied: "Resursägaren eller auktoriseringsservern nekade begäran."
+        invalid_scope: "Den begärda omfattningen är ogiltig, okänd eller felformulerad."
+        invalid_code_challenge_method: "Kodutmaningsmetoden måste vara klartext eller S256."
+        server_error: "Auktoriseringsservern stötte på ett oväntat villkor som hindrade den från att uppfylla begäran."
+        temporarily_unavailable: "Behörighetsservern kan för närvarande inte hantera begäran på grund av en tillfällig överbelastning eller underhåll av servern."
         #Configuration error messages
-        credential_flow_not_configured: 'Lösenordsflödet för resursägare misslyckades på grund av att Doorkeeper.configure.resource_owner_from_credentials är okonfigurerad.'
-        resource_owner_authenticator_not_configured: 'Det gick inte att hitta resursägaren på grund av att Doorkeeper.configure.resource_owner_authenticator är okonfigurerad.'
-        admin_authenticator_not_configured: 'Åtkomst till administratörspanelen är förbjuden på grund av att Doorkeeper.configure.admin_authenticator är okonfigurerad.'
+        credential_flow_not_configured: "Lösenordsflödet för resursägare misslyckades på grund av att Doorkeeper.configure.resource_owner_from_credentials är okonfigurerad."
+        resource_owner_authenticator_not_configured: "Det gick inte att hitta resursägaren på grund av att Doorkeeper.configure.resource_owner_authenticator är okonfigurerad."
+        admin_authenticator_not_configured: "Åtkomst till administratörspanelen är förbjuden på grund av att Doorkeeper.configure.admin_authenticator är okonfigurerad."
         #Access grant errors
-        unsupported_response_type: 'Auktoriseringsservern stöder inte denna typ av svar.'
-        unsupported_response_mode: 'The authorization server does not support this response mode.'
+        unsupported_response_type: "Auktoriseringsservern stöder inte denna typ av svar."
+        unsupported_response_mode: "The authorization server does not support this response mode."
         #Access token errors
-        invalid_client: 'Klientautentisering misslyckades på grund av okänd klient, ingen klientautentisering inkluderad eller autentiseringsmetod som ej stöds.'
-        invalid_grant: 'Det angivna godkännandebidraget är ogiltigt, utgånget, återkallat, matchar inte den omdirigerings-URI som används i begäran om godkännande, eller utfärdades till en annan klient.'
-        unsupported_grant_type: 'Behörighetsbekräftelsetypen stöds inte av auktoriseringsservern.'
+        invalid_client: "Klientautentisering misslyckades på grund av okänd klient, ingen klientautentisering inkluderad eller autentiseringsmetod som ej stöds."
+        invalid_grant: "Det angivna godkännandebidraget är ogiltigt, utgånget, återkallat, matchar inte den omdirigerings-URI som används i begäran om godkännande, eller utfärdades till en annan klient."
+        unsupported_grant_type: "Behörighetsbekräftelsetypen stöds inte av auktoriseringsservern."
         invalid_token:
           revoked: "Åtkomsttoken har återkallats"
           expired: "Åtkomsttoken har gått ut"
@@ -3061,16 +3825,20 @@ sv:
   unsupported_browser:
     title: "Din webbläsare är föråldrad och stöds inte."
     message: "Du kan stöta på fel och få försämrad upplevelse på denna sida."
-    update_message: 'Vänligen uppdatera din webbläsare.'
+    update_message: "Vänligen uppdatera din webbläsare."
     close_warning: "Bortse från denna varning."
   oauth:
     application:
+      builtin: Built-in instance application
+      confidential: Confidential
       singular: "OAuth-autentisering"
       plural: "OAuth applikationer"
       named: "OAuth applikationen '%{name}'"
       new: "Ny OAuth applikation"
+      non_confidential: Non confidential
       default_scopes: "(Standardomfattning)"
       instructions:
+        enabled: "Enable this application, allowing users to perform authorization grants with it."
         name: "Namnet på din applikation. Detta kommer att visas för andra användare vid auktorisering."
         redirect_uri_html: >
           De tillåtna URL: erna kan omdirigeras till. En post per rad. <br/> Om du registrerar ett skrivbordsprogram, använd följande URL.
@@ -3079,6 +3847,10 @@ sv:
         client_credential_user_id: "Valfritt användar-ID att efterlikna när klienter använder det här programmet. Lämna tomt för att endast tillåta publik åtkomst"
         register_intro: "Om du utvecklar en OAuth API-klientapplikation för OpenProject, kan du registrera den med hjälp av detta formulär för alla användare att använda."
         default_scopes: ""
+    header:
+      builtin_applications: Built-in OAuth applications
+      other_applications: Other OAuth applications
+    empty_application_lists: No OAuth applications have been registered.
     client_id: "Client ID"
     client_secret_notice: >
       Detta är den enda gången vi kan skriva ut klienten hemligt, notera det och hålla det säkert. Det bör behandlas som ett lösenord och kan inte hämtas av OpenProject vid ett senare tillfälle.
@@ -3098,8 +3870,8 @@ sv:
       successful_application_revocation: "Återkallande av applikation %{application_name} lyckades."
       none_given: "Inga OAuth-program har beviljats åtkomst till ditt användarkonto."
     x_active_tokens:
-      one: 'en aktiv token'
-      other: '%{count} aktiv token'
+      one: "en aktiv token"
+      other: "%{count} aktiv token"
     flows:
       authorization_code: "Flöde för auktoriseringskod"
       client_credentials: "Flöde för klientuppgifter"
@@ -3122,7 +3894,7 @@ sv:
       label_request_token: "Request token"
       label_refresh_token: "Refresh token"
     errors:
-      oauth_authorization_code_grant_had_errors: "OAuth2 returned an error"
+      oauth_authorization_code_grant_had_errors: "OAuth2 Authorization grant unsuccessful"
       oauth_reported: "OAuth2 provider reported"
       oauth_returned_error: "OAuth2 returned an error"
       oauth_returned_json_error: "OAuth2 returned a JSON error"
@@ -3159,9 +3931,10 @@ sv:
     response:
       unexpected: "Unexpected response received."
   you: you
+  link: link
   plugin_openproject_auth_plugins:
     name: "OpenProject Auth Plugins"
-    description: "Integration of OmniAuth strategy providers for authentication in Openproject."
+    description: "Integration of OmniAuth strategy providers for authentication in OpenProject."
   plugin_openproject_auth_saml:
     name: "OmniAuth SAML / Single-Sign On"
     description: "Adds the OmniAuth SAML provider to OpenProject"

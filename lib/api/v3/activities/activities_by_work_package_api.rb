@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'api/v3/activities/activity_representer'
+require "api/v3/activities/activity_representer"
 
 module API
   module V3
@@ -50,7 +50,7 @@ module API
             requires :comment, type: Hash
           end
           post do
-            authorize({ controller: :journals, action: :new }, context: @work_package.project) do
+            authorize_in_work_package({ controller: :journals, action: :new }, work_package: @work_package) do
               raise ::API::Errors::NotFound.new
             end
 
@@ -58,7 +58,7 @@ module API
                        .new(user: current_user,
                             work_package: @work_package)
                        .call(params[:comment][:raw],
-                             send_notifications: !(params.has_key?(:notify) && params[:notify] == 'false'))
+                             send_notifications: !(params.has_key?(:notify) && params[:notify] == "false"))
 
             if call.success?
               Activities::ActivityRepresenter.new(call.result, current_user:)

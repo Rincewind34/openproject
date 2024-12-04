@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,12 +26,11 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
-require 'support/edit_fields/edit_field'
+require "spec_helper"
+require "support/edit_fields/edit_field"
 
-RSpec.describe 'Datepicker modal individual non working days (WP #44453)',
-               js: true,
-               with_settings: { date_format: '%Y-%m-%d' } do
+RSpec.describe "Datepicker modal individual non working days (WP #44453)", :js,
+               with_settings: { date_format: "%Y-%m-%d" } do
   shared_let(:user) { create(:admin) }
   shared_let(:project) { create(:project) }
 
@@ -52,12 +51,12 @@ RSpec.describe 'Datepicker modal individual non working days (WP #44453)',
            date: Time.zone.today.end_of_year.next_occurring(:tuesday))
   end
 
-  shared_examples 'shows individual non working days' do
+  shared_examples "shows individual non working days" do
     let(:work_packages_page) { Pages::FullWorkPackage.new(work_package, project) }
     let(:date_field) { work_packages_page.edit_field(date_attribute) }
     let(:datepicker) { date_field.datepicker }
 
-    it 'loads and shows individual non working days when navigating' do
+    it "loads and shows individual non working days when navigating" do
       login_as user
 
       work_packages_page.visit!
@@ -77,17 +76,17 @@ RSpec.describe 'Datepicker modal individual non working days (WP #44453)',
     end
   end
 
-  context 'for multi date work package' do
+  context "for multi date work package" do
     let(:work_package) { bug_wp }
     let(:date_attribute) { :combinedDate }
 
-    it_behaves_like 'shows individual non working days'
+    it_behaves_like "shows individual non working days"
   end
 
-  context 'for milestone work package' do
+  context "for milestone work package" do
     let(:work_package) { milestone_wp }
     let(:date_attribute) { :date }
 
-    it_behaves_like 'shows individual non working days'
+    it_behaves_like "shows individual non working days"
   end
 end

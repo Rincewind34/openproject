@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -235,13 +235,14 @@ class Journable::WithHistoricAttributes < SimpleDelegator
     historic_journable = at_timestamp(Timestamp.parse(timestamp))
 
     return unless historic_journable
+
     changes = ::Acts::Journalized::JournableDiffer.changes(__getobj__, historic_journable)
 
     # In the other occurrences of JournableDiffer.association_changes calls, we are using the plural
     # of the association name (`custom_fields` in this instance), to map the association fields. That
     # will result in a changes hash containing { "custom_fields_1" => ... }. This makes sense in the case
     # of journal changes, because the formatted fields have the convention for plural lookup for journals
-    # defined in the `register_journal_formatted_fields(:custom_field, /custom_fields_\d+/)`.
+    # defined in the `register_journal_formatted_fields(/custom_fields_\d+/, formatter_key: :custom_field)`.
     # In this case the diff is part of the WorkPackageAtTimestampRepresenter where the `representable_map`
     # contains the singular names (`custom_field_1`), hence we need to map the diffs to match that format.
     # As a food for thought, I think it would be more handy to use the singular naming everywhere.
@@ -250,8 +251,8 @@ class Journable::WithHistoricAttributes < SimpleDelegator
       ::Acts::Journalized::JournableDiffer.association_changes(
         historic_journable,
         __getobj__,
-        'custom_values',
-        'custom_field',
+        "custom_values",
+        "custom_field",
         :custom_field_id,
         :value
       )

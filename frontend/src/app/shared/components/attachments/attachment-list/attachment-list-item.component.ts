@@ -1,6 +1,6 @@
-// -- copyright
+//-- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2023 the OpenProject GmbH
+// Copyright (C) the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -38,7 +38,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { distinctUntilChanged, first } from 'rxjs/operators';
+import { distinctUntilChanged } from 'rxjs/operators';
 import { I18nService } from 'core-app/core/i18n/i18n.service';
 import { IPrincipal } from 'core-app/core/state/principals/principal.model';
 import { IAttachment } from 'core-app/core/state/attachments/attachment.model';
@@ -51,7 +51,6 @@ import { ConfirmDialogService } from 'core-app/shared/components/modals/confirm-
 import { ConfirmDialogOptions } from 'core-app/shared/components/modals/confirm-dialog/confirm-dialog.modal';
 import { getIconForMimeType } from 'core-app/shared/components/storages/functions/storages.functions';
 import { IFileIcon } from 'core-app/shared/components/storages/icons.mapping';
-import idFromLink from 'core-app/features/hal/helpers/id-from-link';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -64,6 +63,8 @@ export class OpAttachmentListItemComponent extends UntilDestroyedMixin implement
 
   @Input() public index:number;
 
+  @Input() public showTimestamp = true;
+
   @Output() public removeAttachment = new EventEmitter<void>();
 
   @ViewChild('avatar') avatar:ElementRef;
@@ -71,6 +72,7 @@ export class OpAttachmentListItemComponent extends UntilDestroyedMixin implement
   static imageFileExtensions:string[] = ['jpeg', 'jpg', 'gif', 'bmp', 'png'];
 
   public text = {
+    quarantinedHint: this.I18n.t('js.attachments.quarantined_hint'),
     dragHint: this.I18n.t('js.attachments.draggable_hint'),
     deleteTitle: this.I18n.t('js.attachments.delete'),
     deleteConfirmation: this.I18n.t('js.attachments.delete_confirmation'),

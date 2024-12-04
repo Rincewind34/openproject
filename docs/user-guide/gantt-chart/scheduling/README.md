@@ -11,18 +11,16 @@ keywords: Gantt chart, automatic scheduling, manual scheduling, start date, fini
 # Automatic and manual scheduling modes
 
 <div class="glossary">
-To schedule work packages in the Gantt chart there is an **automatic scheduling mode (default)** and a **manual scheduling mode** (new in [release 11.0](../../../release-notes/11/11-0-0)). To add dependencies between work packages you can set them as predecessor or follower in the Gantt chart. The automatic and manual scheduling modes influence the work packages' behaviour when changing dates of other related work packages.
+To schedule work packages in the Gantt chart there is an **automatic scheduling mode (default)** and a **manual scheduling mode** (new in [release 11.0](../../../release-notes/11/11-0-0)). To add dependencies between work packages you can set them as predecessor or follower in the Gantt chart. The automatic and manual scheduling modes influence the work packages' behavior when changing dates of other related work packages.
 </div>
 
 As the scheduling mode only affects individual work packages you can combine manual scheduling mode (top-down planning) and automatic scheduling mode (bottom-up planning) within the same project.
-
 
 | Topic                                                   | Content                                                      |
 | ------------------------------------------------------- | ------------------------------------------------------------ |
 | [Automatic scheduling mode](#automatic-scheduling-mode) | What happens to work packages, when you connect them in automatic scheduling mode? |
 | [Manual scheduling mode](#manual-scheduling-mode)       | What happens to work packages, when you connect them in manual scheduling mode? |
 | [Changing mode](#changing-mode)                         | How can I change between manual and automatic scheduling mode? |
-
 
 ## Automatic scheduling mode
 
@@ -48,7 +46,6 @@ Changing to the **manual scheduling mode makes sense if**
 Moving a child work package in the manual scheduling mode will not move the dates of the parent work package. The scheduling differences will be indicated by a black or red bracket underneath (e.g. when a child is shorter or longer than the parent phase). See [this explanation](../#understanding-the-colors-and-lines-in-the-gantt-chart) to find out more about the lines and colors in the Gantt chart.
 
 <video src="https://openproject-docs.s3.eu-central-1.amazonaws.com/videos/OpenProject-Top-down-Scheduling.mp4" type="video/mp4" controls="" style="width:100%"></video>
-
 
 ## Changing mode
 

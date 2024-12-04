@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -37,8 +37,8 @@ module API
         base.extend ClassMethods
       end
 
-      def from_hash(hash, *args)
-        return super unless hash && hash['_links']
+      def from_hash(hash, *)
+        return super unless hash && hash["_links"]
 
         copied_hash = hash.deep_dup
 
@@ -46,13 +46,13 @@ module API
           next unless dfn[:linked_resource]
 
           name = dfn[:as] ? dfn[:as].(nil) : dfn.name
-          fragment = copied_hash['_links'].delete(name)
+          fragment = copied_hash["_links"].delete(name)
           next unless fragment
 
           copied_hash[name] = fragment
         end
 
-        super(copied_hash, *args)
+        super(copied_hash, *)
       end
 
       module ClassMethods
@@ -61,11 +61,12 @@ module API
                      setter:,
                      link:,
                      uncacheable_link: false,
+                     link_cache_if: nil,
                      show_if: ->(*) { true },
                      skip_render: nil,
                      embedded: true)
 
-          link(link_attr(name, uncacheable_link), &link)
+          link(link_attr(name, uncacheable_link, link_cache_if), &link)
 
           property name,
                    exec_context: :decorator,
@@ -83,11 +84,12 @@ module API
                       setter:,
                       link:,
                       uncacheable_link: false,
+                      link_cache_if: nil,
                       show_if: ->(*) { true },
                       skip_render: nil,
                       embedded: true)
 
-          links(link_attr(name, uncacheable_link), &link)
+          links(link_attr(name, uncacheable_link, link_cache_if), &link)
 
           property name,
                    exec_context: :decorator,
@@ -144,9 +146,10 @@ module API
                    skip_render:)
         end
 
-        def link_attr(name, uncacheable)
+        def link_attr(name, uncacheable, link_cache_if)
           links_attr = { rel: name.to_s.camelize(:lower) }
           links_attr[:uncacheable] = true if uncacheable
+          links_attr[:cache_if] = link_cache_if if link_cache_if
 
           links_attr
         end
@@ -240,7 +243,7 @@ module API
             link = ::API::Decorators::LinkObject.new(struct,
                                                      path: v3_path,
                                                      property_name: :id,
-                                                     setter: 'id=')
+                                                     setter: "id=")
 
             ids = fragment.map do |href|
               link.from_hash(href)

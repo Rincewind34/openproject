@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,7 +29,7 @@
 class CreateLastProjectFolders < ActiveRecord::Migration[7.0]
   def change
     create_table :last_project_folders,
-                 comment: 'This table contains the last used project folder IDs for a project storage per mode.' do |t|
+                 comment: "This table contains the last used project folder IDs for a project storage per mode." do |t|
       t.references :projects_storage, null: false, foreign_key: { on_delete: :cascade }
       t.string :origin_folder_id
       t.enum :mode, enum_type: :project_folder_modes, default: :inactive, null: false

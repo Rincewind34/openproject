@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe Calendar::CalendarsController do
   let(:project) do
@@ -38,43 +38,39 @@ RSpec.describe Calendar::CalendarsController do
     end
   end
   let(:permissions) { [:view_calendar] }
-  let(:user) do
-    build_stubbed(:user).tap do |user|
-      allow(user)
-        .to receive(:allowed_to?) do |permission, p|
-        permission[:controller] == 'calendar/calendars' &&
-          permission[:action] == 'index' &&
-          (p.nil? || p == project)
-      end
-      allow(user).to receive(:allowed_to_globally?).and_return(false)
+  let(:user) { build_stubbed(:user) }
+
+  before do
+    mock_permissions_for(user) do |mock|
+      mock.allow_in_project *permissions, project:
     end
+
+    login_as user
   end
 
-  before { login_as user }
-
-  describe '#index' do
-    shared_examples_for 'calendar#index' do
+  describe "#index" do
+    shared_examples_for "calendar#index" do
       subject { response }
 
       it { is_expected.to be_successful }
 
-      it { is_expected.to render_template('calendar/calendars/index') }
+      it { is_expected.to render_template("calendar/calendars/index") }
     end
 
-    context 'within a project context' do
+    context "within a project context" do
       before do
         get :index, params: { project_id: project.id }
       end
 
-      it_behaves_like 'calendar#index'
+      it_behaves_like "calendar#index"
     end
 
-    context 'within a global context' do
+    context "within a global context" do
       before do
         get :index
       end
 
-      it_behaves_like 'calendar#index'
+      it_behaves_like "calendar#index"
     end
   end
 end

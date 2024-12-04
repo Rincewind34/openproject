@@ -20,7 +20,6 @@ You can do this in your OpenProject instance in the administration. The number o
 
 Please have a look at [this instruction](../manage-cloud-subscription/) for the Enterprise cloud edition to change your payment details.
 
-
 ## Does OpenProject comply with GDPR?
 
 Yes. The protection of personal data is for OpenProject more than just a legal requirement. We are highly committed to data security and privacy. We are a company based in Berlin, the European Union, and the awareness and importance for data security and privacy actions have always been a major topic for us. OpenProject complies with GDPR and we handle our customer’s data with care. Get more detailed information [here](https://www.openproject.org/security-and-privacy/).
@@ -31,7 +30,7 @@ The data center (AWS) we use for Enterprise cloud edition is ISO27001 certified.
 
 For more information please visit the [information regarding security measures](https://www.openproject.org/legal/data-processing-agreement/technical-and-organizational-data-security-measures) on our website.
 
-## How to change the Open Project Enterprise cloud creators account?
+## How to change the OpenProject Enterprise cloud creators account?
 
 Users (who are administrators) can change email addresses and accounts of other users, but not their own account. Single administrators can change their own account/email address by creating a second administrator account and using the new administrator to change data of the first administrator. The second administrator could be deactivated again afterwards by the first administrator. Normal users CAN change their own email address, just not their login.
 
@@ -41,7 +40,7 @@ A list of all sub-processors used in the OpenProject Enterprise cloud can be fou
 
 Please note: For the OpenProject Enterprise cloud we currently have two SaaS infrastructures:
 
-**OpenProject.com** 
+**OpenProject.com**
 
 This infrastructure is hosted at AWS in Dublin. For sending transactional emails we use the service Postmark which is based in the US.
 
@@ -83,8 +82,22 @@ Access to the database (including the PostgreSQL tables) is restricted for the E
 
 ## Can I use LDAP authentication in my Enterprise cloud environment?
 
-You can use [LDAP authentication](../../../system-admin-guide/authentication/ldap-authentication/) in your cloud environment. **However**, usually LDAP servers will _not_ be exposed to the internet, which they have to be for this to work.
+You can use [LDAP authentication](../../../system-admin-guide/authentication/ldap-connections/) in your cloud environment. **However**, usually LDAP servers will _not_ be exposed to the internet, which they have to be for this to work.
 Whitelisting IPs is no option since the OpenProject servers' IPs are not permanent and can change without notice.
 Moreover we do not have a mechanism to list all IP addresses currently in use.
 
 If you really did want to do it still you would have to whitelist any IP included in the [IP ranges](https://ip-ranges.amazonaws.com/ip-ranges.json) published by AWS for the eu-west-1 region. This is not recommended, though.
+
+## Can I use inbound emails in my Enterprise cloud environment?
+
+Yes if you’re using the Enterprise cloud, inbound emails are already configured.
+
+## How do I use inbound emails?
+
+Inbound emails are already configured in Enterprise cloud.
+You can see how to use in the [inbound email documentation](../../../installation-and-operations/configuration/incoming-emails/).
+
+## Can I set a default project for inbound emails?
+
+No it's not possible to set a default project for inbound mails.
+The project must set as an argument in the email as described in the [inbound email documentation](../../../installation-and-operations/configuration/incoming-emails/).

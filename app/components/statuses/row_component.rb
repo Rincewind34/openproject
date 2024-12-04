@@ -2,7 +2,7 @@
 
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -50,6 +50,10 @@ module Statuses
       checkmark(status.is_readonly?)
     end
 
+    def excluded_from_totals?
+      checkmark(status.excluded_from_totals?)
+    end
+
     def color
       helpers.icon_for_color status.color
     end
@@ -59,8 +63,8 @@ module Statuses
     end
 
     def sort
-      helpers.reorder_links 'status',
-                            { action: 'update', id: status },
+      helpers.reorder_links "status",
+                            { action: "update", id: status },
                             method: :patch
     end
 
@@ -72,7 +76,7 @@ module Statuses
 
     def delete_link
       link_to(
-        helpers.op_icon('icon icon-delete'),
+        helpers.op_icon("icon icon-delete"),
         status_path(status),
         method: :delete,
         data: { confirm: I18n.t(:text_are_you_sure) },

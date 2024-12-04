@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -54,8 +54,8 @@ class RenameTimestamps < ActiveRecord::Migration[6.0]
 
     add_timestamp_column(:journals, :updated_at, :created_at)
 
-    add_timestamp_column(:roles, :created_at, 'CURRENT_TIMESTAMP')
-    add_timestamp_column(:roles, :updated_at, 'CURRENT_TIMESTAMP')
+    add_timestamp_column(:roles, :created_at, "CURRENT_TIMESTAMP")
+    add_timestamp_column(:roles, :updated_at, "CURRENT_TIMESTAMP")
   end
 
   private
@@ -63,7 +63,7 @@ class RenameTimestamps < ActiveRecord::Migration[6.0]
   def alter_name_and_defaults(table, old_column_name, new_column_name)
     rename_column table, old_column_name, new_column_name
 
-    change_column_default table, new_column_name, from: nil, to: -> { 'CURRENT_TIMESTAMP' }
+    change_column_default table, new_column_name, from: nil, to: -> { "CURRENT_TIMESTAMP" }
 
     # Ensure we reset column information because otherwise,
     # +updated_on+ will still be used.
@@ -76,7 +76,7 @@ class RenameTimestamps < ActiveRecord::Migration[6.0]
   end
 
   def add_timestamp_column(table, column_name, from_column = nil)
-    add_column table, column_name, :timestamp, default: -> { 'CURRENT_TIMESTAMP' }
+    add_column table, column_name, :timestamp, default: -> { "CURRENT_TIMESTAMP" }
 
     reversible do |dir|
       dir.up do

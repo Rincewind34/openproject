@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -60,19 +60,19 @@ module Queries::Filters::Shared::CustomFieldFilter
 
     ##
     # Create a filter instance for the given custom field accessor
-    def create!(name:, **options)
+    def create!(name:, **)
       custom_field = find_by_accessor(name)
       raise ::Queries::Filters::InvalidError if custom_field.nil?
 
-      from_custom_field!(custom_field:, **options)
+      from_custom_field!(custom_field:, **)
     end
 
     ##
     # Create a filter instance for the given custom field
-    def from_custom_field!(custom_field:, **options)
+    def from_custom_field!(custom_field:, **)
       constant_name = subfilter_module(custom_field)
       clazz = "::Queries::Filters::Shared::CustomFields::#{constant_name}".constantize
-      clazz.create!(custom_field:, custom_field_context:, **options)
+      clazz.create!(custom_field:, custom_field_context:, **)
     rescue NameError => e
       Rails.logger.error "Failed to constantize custom field filter for #{name}. #{e}"
       raise ::Queries::Filters::InvalidError
@@ -82,11 +82,11 @@ module Queries::Filters::Shared::CustomFieldFilter
     # Get the subfilter class name for the given custom field
     def subfilter_module(custom_field)
       case custom_field.field_format
-      when 'user'
+      when "user"
         :User
-      when 'list', 'version'
+      when "list", "version"
         :ListOptional
-      when 'bool'
+      when "bool"
         :Bool
       else
         :Base
@@ -94,11 +94,11 @@ module Queries::Filters::Shared::CustomFieldFilter
     end
 
     def all_custom_fields
-      key = ['Queries::Filters::Shared::CustomFieldFilter',
+      key = ["Queries::Filters::Shared::CustomFieldFilter",
              custom_field_context.custom_field_class,
-             'all_custom_fields']
+             "all_custom_fields"]
 
-      RequestStore.fetch(key.join('/')) do
+      RequestStore.fetch(key.join("/")) do
         custom_field_context.custom_field_class.all.to_a
       end
     end

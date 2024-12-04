@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -40,14 +40,14 @@ class Query < ApplicationRecord
   has_many :ical_token_query_assignments
   has_many :ical_tokens,
            through: :ical_token_query_assignments,
-           class_name: 'Token::ICal'
+           class_name: "Token::ICal"
   # no `dependent: :destroy` as the ical_tokens are destroyed in the following before_destroy callback
   # dependent: :destroy is not possible as this would only delete the ical_token_query_assignments
   before_destroy :destroy_ical_tokens
 
-  serialize :filters, Queries::WorkPackages::FilterSerializer
-  serialize :column_names, Array
-  serialize :sort_criteria, Array
+  serialize :filters, coder: Queries::WorkPackages::FilterSerializer
+  serialize :column_names, type: Array
+  serialize :sort_criteria, type: Array
 
   validates :include_subprojects,
             inclusion: [true, false]
@@ -103,7 +103,7 @@ class Query < ApplicationRecord
   def add_default_filter
     return if filters.present?
 
-    add_filter('status_id', 'o', [''])
+    add_filter("status_id", "o", [""])
   end
 
   def validate_work_package_filters
@@ -190,7 +190,7 @@ class Query < ApplicationRecord
   end
 
   def filter_for(field)
-    filter = (filters || []).detect { |f| f.field.to_s == field.to_s } || super(field)
+    filter = (filters || []).detect { |f| f.field.to_s == field.to_s } || super
 
     filter.context = self
 
@@ -221,7 +221,7 @@ class Query < ApplicationRecord
 
   def self.available_columns(project = nil)
     Queries::Register
-      .columns[self]
+      .selects[self]
       .map { |col| col.instances(project) }
       .flatten
   end
@@ -259,7 +259,7 @@ class Query < ApplicationRecord
       h
     end
 
-    { 'id' => "#{WorkPackage.table_name}.id" }
+    { "id" => "#{WorkPackage.table_name}.id" }
       .merge(column_sortability)
   end
 
@@ -278,7 +278,7 @@ class Query < ApplicationRecord
                   end
 
     # preserve the order
-    column_list.map { |name| displayable_columns.find { |col| col.name == name.to_sym } }.compact
+    column_list.filter_map { |name| displayable_columns.find { |col| col.name == name.to_sym } }
   end
 
   def column_names=(names)
@@ -306,14 +306,14 @@ class Query < ApplicationRecord
     if arg.is_a?(Hash)
       arg = arg.keys.sort.map { |k| arg[k] }
     end
-    c = arg.reject { |k, _o| k.to_s.blank? }.slice(0, 3).map { |k, o| [k.to_s, o == 'desc' ? o : 'asc'] }
+    c = arg.reject { |k, _o| k.to_s.blank? }.slice(0, 3).map { |k, o| [k.to_s, o == "desc" ? o : "asc"] }
     write_attribute(:sort_criteria, c)
   end
 
   def sort_criteria
     (read_attribute(:sort_criteria) || []).tap do |criteria|
       criteria.map! do |attr, direction|
-        attr = 'id' if attr == 'parent'
+        attr = "id" if attr == "parent"
         [attr, direction]
       end
     end
@@ -363,12 +363,12 @@ class Query < ApplicationRecord
   end
 
   def statement
-    return '1=0' unless valid?
+    return "1=0" unless valid?
 
     statement_filters
       .map { |filter| "(#{filter.where})" }
       .compact_blank
-      .join(' AND ')
+      .join(" AND ")
   end
 
   # Returns the result set
@@ -381,11 +381,11 @@ class Query < ApplicationRecord
   def work_package_journals(options = {})
     Journal.includes(:user)
            .where(journable_type: WorkPackage.to_s)
-           .joins('INNER JOIN work_packages ON work_packages.id = journals.journable_id')
-           .joins('INNER JOIN projects ON work_packages.project_id = projects.id')
-           .joins('INNER JOIN users AS authors ON work_packages.author_id = authors.id')
-           .joins('INNER JOIN types ON work_packages.type_id = types.id')
-           .joins('INNER JOIN statuses ON work_packages.status_id = statuses.id')
+           .joins("INNER JOIN work_packages ON work_packages.id = journals.journable_id")
+           .joins("INNER JOIN projects ON work_packages.project_id = projects.id")
+           .joins("INNER JOIN users AS authors ON work_packages.author_id = authors.id")
+           .joins("INNER JOIN types ON work_packages.type_id = types.id")
+           .joins("INNER JOIN statuses ON work_packages.status_id = statuses.id")
            .order(options[:order])
            .limit(options[:limit])
            .offset(options[:offset])
@@ -402,9 +402,9 @@ class Query < ApplicationRecord
     subproject_filter.context = self
 
     subproject_filter.operator = if include_subprojects?
-                                   '*'
+                                   "*"
                                  else
-                                   '!*'
+                                   "!*"
                                  end
     subproject_filter
   end

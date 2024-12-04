@@ -2,7 +2,7 @@
 
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,10 +28,10 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.shared_examples 'sets the appropriate sort_criteria on each query' do
-  it '', :aggregate_failures do
+RSpec.shared_examples "sets the appropriate sort_criteria on each query" do
+  it "", :aggregate_failures do
     subject
 
     queries_sort_criteria = queries.map(&:sort_criteria)

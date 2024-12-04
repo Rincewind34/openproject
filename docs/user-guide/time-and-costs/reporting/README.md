@@ -12,7 +12,6 @@ You can easily report spent time and costs in OpenProject and filter, group and 
 
 > **Note**: To use the time tracking functionality, the **Time and costs module** needs to be activated in the [project settings](../../projects/project-settings/modules/).
 
-
 | Topic                                                                     | Content                                                                                           |
 |---------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
 | [Time and costs report](#time-and-costs-reports)                          | How to open time and costs reports in OpenProject.                                                |
@@ -39,7 +38,7 @@ You can change the view of a cost reports and adapt it to your needs.
 
 You can select and apply various filters, such as work package, author, start date or target version.
 
-Multiple projects can be selected by adding a **Projects** filter. 
+Multiple projects can be selected by adding a **Projects** filter.
 Depending on your rights in the project, multiple users can also be selected. This way you can filter the time and cost entries exactly to your need, depending on the time, work or user you want to see.
 
 The results will then be displayed in the time and cost report below.
@@ -54,7 +53,7 @@ To add grouping criteria to the columns or rows of the report, select the drop-d
 
 ![Time-costs-group-by](Time-cots-group-by.png)
 
-The grouping criteria will then be added to the columns or rows of the report. 
+The grouping criteria will then be added to the columns or rows of the report.
 
 Click the blue **Apply button** to display your changes.
 
@@ -72,7 +71,7 @@ You can either select **Labor** which will display the logged time to the work p
 
 ![Time-costs-units](Time-costs-units-1574773348146.png)
 
-The **Cash value** will display the costs logged according to the filter and grouping criteria above. This includes labor costs (calculated based on the logged time and the [hourly rate](../time-tracking#define-hourly-rate-for-labor-costs) as well as the unit costs.
+The **Cash value** will display the costs logged according to the filter and grouping criteria above. This includes labor costs (calculated based on the logged time and the [hourly rate](../time-tracking/#define-hourly-rate-for-labor-costs) as well as the unit costs.
 
 ![Time-costs-cash-value](Time-costs-cash-value.png)
 

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -48,7 +48,7 @@ module WorkPackage::PDFExport::TableOfContents
     level = [level_path.length, styles.toc_max_depth].min
     level_style = styles.toc_item(level)
     level_string = "#{level_path.join('.')}. "
-    page_nr_string = (id_wp_meta_map[work_package.id][:page_number] || '000').to_s
+    page_nr_string = (id_wp_meta_map[work_package.id][:page_number] || "000").to_s
     { id: work_package.id,
       level_string:,
       level_string_width: measure_part_width(level_string, level_style),

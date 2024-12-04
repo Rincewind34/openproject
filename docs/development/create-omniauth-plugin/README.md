@@ -6,7 +6,7 @@ This page describes how to create an OpenProject plugin to authenticate users vi
 
 ## Warning
 
-This howto is in a preliminary state and explains a low-level way to create an OmniAuth authentication plugin for OpenProject. We will provide a more high-level API and update this howto soon.
+This how-to is in a preliminary state and explains a low-level way to create an OmniAuth authentication plugin for OpenProject. We will provide a more high-level API and update this how-to soon.
 
 ## OpenID Connect
 
@@ -119,4 +119,3 @@ The first line in the snippet shown above is only necessary because the `openpro
 ### Profit
 
 That’s it. Now users can authenticate using your own provider.
-

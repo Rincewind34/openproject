@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -42,14 +42,14 @@ class API::V3::FileLinks::FileLinksAPI < API::OpenProjectAPI
 
     # `route_param` extends the route by a route parameter of the endpoint.
     # The input parameter value is parsed into the `:file_link_id` symbol.
-    route_param :file_link_id, type: Integer, desc: 'File link id' do
+    route_param :file_link_id, type: Integer, desc: "File link id" do
       # The after validation hook executes after the validation of the request format, but before any execution
       # inside the endpoint context. Hence, it is a good place to actually fetch the handled resource.
       after_validation do
         @file_link = Storages::FileLink.find(params[:file_link_id])
 
         unless @file_link.container.present? &&
-               current_user.allowed_to?(:view_file_links, @file_link.project) &&
+               current_user.allowed_in_project?(:view_file_links, @file_link.project) &&
                @file_link.project.storage_ids.include?(@file_link.storage_id)
           raise ::API::Errors::NotFound.new
         end

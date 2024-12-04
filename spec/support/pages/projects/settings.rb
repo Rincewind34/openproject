@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'support/pages/page'
+require "support/pages/page"
 
 module Pages
   module Projects
@@ -41,11 +41,6 @@ module Pages
 
       def visit_tab!(name)
         visit "/projects/#{project.identifier}/settings/#{name}"
-      end
-
-      # only notice is used as opposed to op-toast
-      def expect_toast(message:, type: :success)
-        expect(page).to have_selector(".op-toast.-#{type}", text: message, wait: 10)
       end
 
       def expect_type_active(type)
@@ -74,7 +69,7 @@ module Pages
       end
 
       def save!
-        click_button 'Save'
+        click_button "Save"
       end
 
       def expect_wp_custom_field(custom_field, active = true)
@@ -83,14 +78,10 @@ module Pages
       end
 
       def fieldset_label
-        find 'fieldset#project_issue_custom_fields label'
+        find "fieldset#project_issue_custom_fields label"
       end
 
       private
-
-      def toast_type
-        :rails
-      end
 
       def path
         project_settings_general_path(project)

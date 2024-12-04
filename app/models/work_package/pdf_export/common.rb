@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -57,7 +57,7 @@ module WorkPackage::PDFExport::Common
       .new format: :pdf,
            title:,
            content:,
-           mime_type: 'application/pdf'
+           mime_type: "application/pdf"
   end
 
   def error(message)
@@ -97,7 +97,7 @@ module WorkPackage::PDFExport::Common
   end
 
   def get_formatted_value(value, column_name)
-    return '' if value.nil?
+    return "" if value.nil?
 
     formatter = formatter_for(column_name, :pdf)
     formatter.format_value(value, {})
@@ -105,7 +105,7 @@ module WorkPackage::PDFExport::Common
 
   def escape_tags(value)
     # only disable html tags, but do not replace html entities
-    value.to_s.gsub('<', '&lt;').gsub('>', '&gt;')
+    value.to_s.gsub("<", "&lt;").gsub(">", "&gt;")
   end
 
   def get_id_column_cell(work_package, value)
@@ -141,7 +141,7 @@ module WorkPackage::PDFExport::Common
   def draw_text_multiline_left(text:, text_style:, max_left:, top:, max_lines:)
     lines = wrap_to_lines(text, max_left - pdf.bounds.left, text_style, max_lines)
     starting_position = top
-    lines.reverse.each do |line|
+    lines.reverse_each do |line|
       starting_position += draw_text_multiline_part(line, text_style, pdf.bounds.left, starting_position)
     end
   end
@@ -149,7 +149,7 @@ module WorkPackage::PDFExport::Common
   def draw_text_multiline_right(text:, text_style:, max_left:, top:, max_lines:)
     lines = wrap_to_lines(text, pdf.bounds.right - max_left, text_style, max_lines)
     starting_position = top
-    lines.reverse.each do |line|
+    lines.reverse_each do |line|
       line_width = measure_text_width(line, text_style)
       line_x = pdf.bounds.right - line_width
       starting_position += draw_text_multiline_part(line, text_style, line_x, starting_position)
@@ -244,7 +244,7 @@ module WorkPackage::PDFExport::Common
   end
 
   def text_column?(column)
-    column.is_a?(Queries::WorkPackages::Columns::CustomFieldColumn) &&
+    column.is_a?(Queries::WorkPackages::Selects::CustomFieldSelect) &&
       %w(string text).include?(column.custom_field.field_format)
   end
 
@@ -260,7 +260,7 @@ module WorkPackage::PDFExport::Common
     if group.blank?
       I18n.t(:label_none_parentheses)
     elsif group.is_a? Array
-      group.join(', ')
+      group.join(", ")
     else
       group.to_s
     end
@@ -282,7 +282,11 @@ module WorkPackage::PDFExport::Common
   end
 
   def wants_report?
-    options[:show_report]
+    options[:pdf_export_type] == "report"
+  end
+
+  def wants_gantt?
+    options[:pdf_export_type] == "gantt"
   end
 
   def with_cover?
@@ -293,17 +297,13 @@ module WorkPackage::PDFExport::Common
     query.display_sums?
   end
 
-  def with_attachments?
-    options[:show_images]
-  end
-
   def build_pdf_filename(base)
     suffix = "_#{title_datetime}.pdf"
-    "#{truncate(base, length: 255 - suffix.chars.length)}#{suffix}".gsub(' ', '-')
+    "#{truncate(sane_filename(base), length: 255 - suffix.length, escape: false)}#{suffix}".tr(" ", "-")
   end
 
   def title_datetime
-    DateTime.now.strftime('%Y-%m-%d_%H-%M')
+    DateTime.now.strftime("%Y-%m-%d_%H-%M")
   end
 
   def current_page_nr

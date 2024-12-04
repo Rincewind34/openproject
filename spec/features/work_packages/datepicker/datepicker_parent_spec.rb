@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,11 +26,10 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
-require 'support/edit_fields/edit_field'
+require "spec_helper"
+require "support/edit_fields/edit_field"
 
-RSpec.describe 'Datepicker logic on parents',
-               js: true, with_settings: { date_format: '%Y-%m-%d' } do
+RSpec.describe "Datepicker logic on parents", :js, with_settings: { date_format: "%Y-%m-%d" } do
   shared_let(:user) { create(:admin) }
 
   # assume sat+sun are non working days
@@ -63,16 +62,16 @@ RSpec.describe 'Datepicker logic on parents',
     datepicker.expect_visible
   end
 
-  context 'with the child having set dates' do
+  context "with the child having set dates" do
     let(:child_attributes) do
       {
-        start_date: '2021-02-01',
-        due_date: '2021-02-02',
+        start_date: "2021-02-01",
+        due_date: "2021-02-02",
         ignore_non_working_days: true
       }
     end
 
-    it 'disables the non working days options' do
+    it "disables the non working days options" do
       datepicker.expect_ignore_non_working_days_disabled
       datepicker.expect_scheduling_mode false
 

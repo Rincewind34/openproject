@@ -1,6 +1,6 @@
 // -- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2023 the OpenProject GmbH
+// Copyright (C) the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -31,14 +31,16 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  EventEmitter,
   HostBinding,
   Input,
   OnDestroy,
   OnInit,
+  Output,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { Observable } from 'rxjs';
+import { fromEvent, Observable } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
 
 import { States } from 'core-app/core/states/states.service';
@@ -53,21 +55,20 @@ import { OpUploadService } from 'core-app/core/upload/upload.service';
 import { TimezoneService } from 'core-app/core/datetime/timezone.service';
 import { IAttachment } from 'core-app/core/state/attachments/attachment.model';
 import isNewResource from 'core-app/features/hal/helpers/is-new-resource';
+import { HttpErrorResponse } from '@angular/common/http';
 
 function containsFiles(dataTransfer:DataTransfer):boolean {
   return dataTransfer.types.indexOf('Files') >= 0;
 }
 
-export const attachmentsSelector = 'op-attachments';
-
 @Component({
-  selector: attachmentsSelector,
+  selector: 'op-attachments',
   templateUrl: './attachments.component.html',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnInit, OnDestroy {
-  @HostBinding('attr.data-qa-selector') public qaSelector = 'op-attachments';
+  @HostBinding('attr.data-test-selector') public testSelector = 'op-attachments';
 
   @HostBinding('class.op-file-section') public className = true;
 
@@ -76,6 +77,14 @@ export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnIni
   @Input() public allowUploading = true;
 
   @Input() public destroyImmediately = true;
+
+  @Input() public externalUploadButton:string|null = null;
+
+  @Input() public showTimestamp = true;
+
+  @Output() public attachmentRemoved = new EventEmitter<void>();
+
+  @Output() public attachmentAdded = new EventEmitter<void>();
 
   public attachments$:Observable<IAttachment[]>;
 
@@ -143,6 +152,14 @@ export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnIni
     if (!(this.resource instanceof HalResource)) {
       // Parse the resource if any exists
       this.resource = this.halResourceService.createHalResource(this.resource, true);
+    }
+
+    if (this.externalUploadButton) {
+      fromEvent(document.querySelector(this.externalUploadButton) as Element, 'click')
+        .pipe(
+          this.untilDestroyed(),
+        )
+        .subscribe(() => this.triggerFileInput());
     }
 
     this.states.forResource(this.resource)!.changes$()
@@ -246,7 +263,10 @@ export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnIni
     this
       .attachmentsResourceService
       .attachFiles(this.resource, filesWithoutFolders)
-      .subscribe();
+      .subscribe({
+        next: () => { this.attachmentAdded.emit(); },
+        error: (error:HttpErrorResponse) => this.toastService.addError(error),
+      });
   }
 
   /**
@@ -262,8 +282,8 @@ export class OpAttachmentsComponent extends UntilDestroyedMixin implements OnIni
       }
 
       // Files however MAY have no mime type as well
-      // so fall back to checking zero or 4096 bytes
-      if (file.size === 0 || file.size === 4096) {
+      // so fall back to checking zero
+      if (file.size === 0) {
         console.warn(`Skipping file because of file size (${file.size}) %O`, file);
         return false;
       }

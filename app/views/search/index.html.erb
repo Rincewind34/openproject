@@ -1,6 +1,6 @@
 <%#-- copyright
 OpenProject is an open source project management software.
-Copyright (C) 2012-2023 the OpenProject GmbH
+Copyright (C) the OpenProject GmbH
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License version 3.
@@ -32,12 +32,12 @@ See COPYRIGHT and LICENSE files for more details.
 
 <% end %>
 
-<global-search-title></global-search-title>
+<opce-global-search-title></opce-global-search-title>
 
-<global-search-tabs></global-search-tabs>
+<opce-global-search-tabs></opce-global-search-tabs>
 
 <% if params[:work_packages].present? %>
-  <global-search-work-packages-entry></global-search-work-packages-entry>
+  <opce-global-search-work-packages></opce-global-search-work-packages>
 <% else %>
 
   <h3><%= t(:label_result_plural) %> (<%= @results_count&.values&.sum || 0 %>)</h3>
@@ -60,7 +60,7 @@ See COPYRIGHT and LICENSE files for more details.
             <span> - </span>
           <% end %>
 
-          <%= link_to highlight_tokens(truncate(e.event_title, escape: false, length: 255), @tokens), with_notes_anchor(e, @tokens) %>
+          <%= link_to highlight_tokens(truncate(e.event_title, escape: false, length: 255), @tokens, text_on_not_found: true), with_notes_anchor(e, @tokens) %>
         </dt>
         <dd>
           <span class="description"><%= highlight_tokens_in_event(e, @tokens) %></span>

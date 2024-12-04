@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -48,13 +48,9 @@ module Journals
       self.journable = journable
     end
 
-    def call(notes: '', cause: {})
-      # JSON columns read from the database always have string keys. As we do not know what is passed in here,
-      # and we want to compare it to values read from the DB, we need to stringify the keys here as well
-      normalized_cause = cause.deep_stringify_keys
-
+    def call(notes: "", cause: CauseOfChange::NoCause.new)
       Journal.transaction do
-        journal = create_journal(notes, normalized_cause)
+        journal = create_journal(notes, cause)
 
         if journal
           reload_journals
@@ -108,6 +104,7 @@ module Journals
     # * New entries in the attachable_journals table, one for every attachment the journable has at the time.
     # * New entries in the customizable_journals table, one for every custom value the journable has at the time.
     # * New entries in the storages_file_links_journals table, one for file link value the journable has at the time.
+    # * New entries in the meeting_agenda_item_journals table, one for agenda_item the journable has at the time.
     #
     # It consists of a couple of parts that are kept as individual queries (as CTEs) but
     # are all executed within a single database call.
@@ -135,6 +132,8 @@ module Journals
     #   recent journal.
     # * the journable's file_links are compared to the storages_file_links_journals entries being associated with the most
     #   recent journal.
+    # * the journable's meeting_agenda_items are compared to the meeting_agenda_item_journals entries being associated with the
+    #   most recent journal.
     # When comparing text based values, newlines are normalized as otherwise users having a different OS might change a text value
     # without intending to.
     #
@@ -189,20 +188,23 @@ module Journals
     # used as the values returned by the overall SQL statement so that an AR instance can be instantiated with it.
     #
     def create_journal_sql(predecessor, notes, cause)
+      journal_modifications = journal_modification_sql(predecessor, notes, cause)
+      relation_modifications = relation_modifications_sql(predecessor)
+
+      journal_cte_clauses = [journal_modifications]
+      journal_cte_clauses << relation_modifications if relation_modifications.any?
+
       <<~SQL
-        WITH cleanup_predecessor_data AS (
+        WITH #{journal_cte_clauses.join(',')}
+        SELECT * from inserted_journal
+      SQL
+    end
+
+    def journal_modification_sql(predecessor, notes, cause)
+      <<~SQL
+        cleanup_predecessor_data AS (
           #{cleanup_predecessor_data(predecessor)}
-        ),
-        cleanup_predecessor_attachable AS (
-          #{cleanup_predecessor_attachable(predecessor)}
-        ),
-        cleanup_predecessor_customizable AS (
-          #{cleanup_predecessor_customizable(predecessor)}
-        ),
-        cleanup_predecessor_storable AS (
-          #{cleanup_predecessor_storable(predecessor)}
-        ),
-        max_journals AS (
+        ), max_journals AS (
           #{select_max_journal_sql(predecessor)}
         ), changes AS (
           #{select_changed_sql}
@@ -216,15 +218,42 @@ module Journals
           #{update_predecessor_sql(predecessor, notes, cause)}
         ), inserted_journal AS (
           #{update_or_insert_journal_sql(predecessor, notes, cause)}
-        ), insert_attachable AS (
-          #{insert_attachable_sql}
-        ), insert_customizable AS (
-          #{insert_customizable_sql}
-        ), insert_storable AS (
-          #{insert_storable_sql}
         )
+      SQL
+    end
 
-        SELECT * from inserted_journal
+    def relation_modifications_sql(predecessor)
+      relations = []
+
+      for_supported_associations do |association|
+        relations << association_modifications_sql(association, predecessor)
+      end
+
+      relations
+    end
+
+    def for_supported_associations
+      associations = {
+        attachable?: :attachable,
+        customizable?: :customizable,
+        file_links: :storable,
+        agenda_items: :agenda_itemable
+      }
+
+      associations.each do |is_associated, association|
+        if journable.respond_to?(is_associated)
+          yield association
+        end
+      end
+    end
+
+    def association_modifications_sql(association, predecessor)
+      <<~SQL
+        cleanup_predecessor_#{association} AS (
+          #{send(:"cleanup_predecessor_#{association}", predecessor)}
+        ), insert_#{association} AS (
+          #{send(:"insert_#{association}_sql")}
+        )
       SQL
     end
 
@@ -237,21 +266,28 @@ module Journals
 
     def cleanup_predecessor_attachable(predecessor)
       cleanup_predecessor(predecessor,
-                          'attachable_journals',
+                          "attachable_journals",
                           :journal_id,
                           :id)
     end
 
     def cleanup_predecessor_customizable(predecessor)
       cleanup_predecessor(predecessor,
-                          'customizable_journals',
+                          "customizable_journals",
                           :journal_id,
                           :id)
     end
 
     def cleanup_predecessor_storable(predecessor)
       cleanup_predecessor(predecessor,
-                          'storages_file_links_journals',
+                          "storages_file_links_journals",
+                          :journal_id,
+                          :id)
+    end
+
+    def cleanup_predecessor_agenda_itemable(predecessor)
+      cleanup_predecessor(predecessor,
+                          "meeting_agenda_item_journals",
                           :journal_id,
                           :id)
     end
@@ -448,6 +484,44 @@ module Journals
                journable_class_name:)
     end
 
+    def insert_agenda_itemable_sql
+      agenda_itemable_sql = <<~SQL
+        INSERT INTO
+          meeting_agenda_item_journals (
+            journal_id,
+            agenda_item_id,
+            author_id,
+            title,
+            notes,
+            position,
+            duration_in_minutes,
+            start_time,
+            end_time,
+            work_package_id,
+            item_type
+          )
+        SELECT
+          #{id_from_inserted_journal_sql},
+          agenda_items.id,
+          agenda_items.author_id,
+          agenda_items.title,
+          agenda_items.notes,
+          agenda_items.position,
+          agenda_items.duration_in_minutes,
+          agenda_items.start_time,
+          agenda_items.end_time,
+          agenda_items.work_package_id,
+          agenda_items.item_type
+        FROM meeting_agenda_items agenda_items
+        WHERE
+          #{only_if_created_sql}
+          AND agenda_items.meeting_id = :journable_id
+      SQL
+
+      sanitize(agenda_itemable_sql,
+               journable_id: journable.id)
+    end
+
     # Updates the updated_at timestamp of the journable.
     # That is only carried out if the journable doesn't already have a newer timestamp than the most recent journal or
     # hasn't been updated by the `#save` call after which this service runs.
@@ -540,24 +614,23 @@ module Journals
     end
 
     def select_changed_sql
-      <<~SQL
+      sql = <<~SQL
         SELECT
            *
         FROM
           (#{data_changes_sql}) data_changes
-        FULL JOIN
-          (#{customizable_changes_sql}) customizable_changes
-        ON
-          customizable_changes.journable_id = data_changes.journable_id
-        FULL JOIN
-          (#{attachable_changes_sql}) attachable_changes
-        ON
-          attachable_changes.journable_id = data_changes.journable_id
-        FULL JOIN
-          (#{storable_changes_sql}) storable_changes
-        ON
-          storable_changes.journable_id = data_changes.journable_id
       SQL
+
+      for_supported_associations do |association|
+        sql += <<~SQL
+          FULL JOIN
+            (#{send(:"#{association}_changes_sql")}) #{association}_changes
+          ON
+            #{association}_changes.journable_id = data_changes.journable_id
+        SQL
+      end
+
+      sql
     end
 
     def attachable_changes_sql
@@ -640,6 +713,39 @@ module Journals
                container_type: journable_class_name)
     end
 
+    def agenda_itemable_changes_sql
+      agenda_itemable_changes_sql = <<~SQL
+        SELECT
+          max_journals.journable_id
+        FROM
+          max_journals
+        LEFT OUTER JOIN
+          meeting_agenda_item_journals
+        ON
+          meeting_agenda_item_journals.journal_id = max_journals.id
+        FULL JOIN
+          (SELECT *
+           FROM meeting_agenda_items
+           WHERE meeting_agenda_items.meeting_id = :journable_id) agenda_items
+        ON
+          agenda_items.id = meeting_agenda_item_journals.agenda_item_id
+        WHERE
+          (agenda_items.id IS DISTINCT FROM meeting_agenda_item_journals.agenda_item_id)
+          OR (agenda_items.title IS DISTINCT FROM meeting_agenda_item_journals.title)
+          OR (#{normalize_newlines_sql('agenda_items.notes')} IS DISTINCT FROM
+              #{normalize_newlines_sql('meeting_agenda_item_journals.notes')})
+          OR (agenda_items.position IS DISTINCT FROM meeting_agenda_item_journals.position)
+          OR (agenda_items.duration_in_minutes IS DISTINCT FROM meeting_agenda_item_journals.duration_in_minutes)
+          OR (agenda_items.start_time IS DISTINCT FROM meeting_agenda_item_journals.start_time)
+          OR (agenda_items.end_time IS DISTINCT FROM meeting_agenda_item_journals.end_time)
+          OR (agenda_items.work_package_id IS DISTINCT FROM meeting_agenda_item_journals.work_package_id)
+          OR (agenda_items.item_type IS DISTINCT FROM meeting_agenda_item_journals.item_type)
+      SQL
+
+      sanitize(agenda_itemable_changes_sql,
+               journable_id: journable.id)
+    end
+
     def data_changes_sql
       data_changes_sql = <<~SQL
         SELECT
@@ -696,9 +802,7 @@ module Journals
 
       data_changes = (journable.journaled_columns_names - text_column_names).map do |column_name|
         <<~SQL
-          (#{journable_table}.#{column_name} != #{data_table}.#{column_name})
-          OR (#{journable_table}.#{column_name} IS NULL AND #{data_table}.#{column_name} IS NOT NULL)
-          OR (#{journable_table}.#{column_name} IS NOT NULL AND #{data_table}.#{column_name} IS NULL)
+          (#{journable_table}.#{column_name} IS DISTINCT FROM #{data_table}.#{column_name})
         SQL
       end
 
@@ -709,7 +813,7 @@ module Journals
         SQL
       end
 
-      data_changes.join(' OR ')
+      data_changes.join(" OR ")
     end
 
     def only_on_changed_or_forced_condition_sql(predecessor, notes, cause)
@@ -727,17 +831,17 @@ module Journals
 
     def data_sink_columns
       text_columns = text_column_names
-      (journable.journaled_columns_names - text_columns + text_columns).join(', ')
+      (journable.journaled_columns_names - text_columns + text_columns).join(", ")
     end
 
     def data_source_columns
       text_columns = text_column_names
       normalized_text_columns = text_columns.map { |column| normalize_newlines_sql(column) }
-      (journable.journaled_columns_names - text_columns + normalized_text_columns).join(', ')
+      (journable.journaled_columns_names - text_columns + normalized_text_columns).join(", ")
     end
 
     def journable_data_sql_addition
-      journable.class.aaj_options[:data_sql]&.call(journable) || ''
+      journable.class.aaj_options[:data_sql]&.call(journable) || ""
     end
 
     def text_column_names

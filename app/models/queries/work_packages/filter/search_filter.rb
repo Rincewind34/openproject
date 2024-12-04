@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,7 +30,7 @@ class Queries::WorkPackages::Filter::SearchFilter <
   Queries::WorkPackages::Filter::WorkPackageFilter
   include Queries::WorkPackages::Filter::OrFilterForWpMixin
 
-  CONTAINS_OPERATOR = '~'.freeze
+  CONTAINS_OPERATOR = "~".freeze
 
   CE_FILTERS = [
     Queries::WorkPackages::Filter::FilterConfiguration.new(
@@ -68,7 +68,7 @@ class Queries::WorkPackages::Filter::SearchFilter <
   end
 
   def human_name
-    I18n.t('label_search')
+    I18n.t("label_search")
   end
 
   def custom_field_configurations

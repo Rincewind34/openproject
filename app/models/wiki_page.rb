@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -54,7 +54,7 @@ class WikiPage < ApplicationRecord
 
   acts_as_journalized
 
-  register_journal_formatted_fields(:wiki_diff, 'text')
+  register_journal_formatted_fields "text", formatter_key: :wiki_diff
 
   attr_accessor :redirect_existing_links
 
@@ -112,7 +112,7 @@ class WikiPage < ApplicationRecord
   end
 
   def visible?(user = User.current)
-    !user.nil? && user.allowed_to?(:view_wiki_pages, project)
+    !user.nil? && user.allowed_in_project?(:view_wiki_pages, project)
   end
 
   def title=(value)
@@ -174,7 +174,7 @@ class WikiPage < ApplicationRecord
 
   # Returns true if usr is allowed to edit the page, otherwise false
   def editable_by?(usr)
-    !protected? || usr.allowed_to?(:protect_wiki_pages, wiki.project)
+    !protected? || usr.allowed_in_project?(:protect_wiki_pages, wiki.project)
   end
 
   def attachments_deletable?(usr = User.current)

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,21 +26,20 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
-require 'features/page_objects/notification'
+require "spec_helper"
+require "features/page_objects/notification"
 
-RSpec.describe 'Work package transitive status workflows', js: true do
+RSpec.describe "Work package transitive status workflows", :js do
   let(:dev_role) do
-    create(:role,
+    create(:project_role,
            permissions: %i[view_work_packages
                            edit_work_packages])
   end
   let(:dev) do
     create(:user,
-           firstname: 'Dev',
-           lastname: 'Guy',
-           member_in_project: project,
-           member_through_role: dev_role)
+           firstname: "Dev",
+           lastname: "Guy",
+           member_with_roles: { project => dev_role })
   end
 
   let(:type) { create(:type) }
@@ -90,7 +89,7 @@ RSpec.describe 'Work package transitive status workflows', js: true do
 
   ##
   # Regression test for #24129
-  it 'allows to move to the final status as defined in the workflow' do
+  it "allows to move to the final status as defined in the workflow" do
     wp_page.update_attributes status: status_intermediate.name
     wp_page.expect_attributes status: status_intermediate.name
 

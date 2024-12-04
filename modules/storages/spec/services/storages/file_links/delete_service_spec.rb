@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -24,18 +26,19 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 # See COPYRIGHT and LICENSE files for more details.
-#
 #++
 
-require 'spec_helper'
-require 'services/base_services/behaves_like_delete_service'
+require "spec_helper"
+require_module_spec_helper
+
+require "services/base_services/behaves_like_delete_service"
 
 RSpec.describe Storages::FileLinks::DeleteService, type: :model do
-  it_behaves_like 'BaseServices delete service' do
+  it_behaves_like "BaseServices delete service" do
     let(:factory) { :file_link }
   end
 
-  it 'creates a journal entry for its container', with_settings: { journal_aggregation_time_minutes: 0 } do
+  it "creates a journal entry for its container", with_settings: { journal_aggregation_time_minutes: 0 } do
     project_storage = create(:project_storage)
     # Tap as the changes would otherwise mess with the journal creation i.e. the updated_at timestamp
     work_package = create(:work_package, project: project_storage.project).tap(&:clear_changes_information)

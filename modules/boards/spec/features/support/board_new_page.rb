@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'support/pages/page'
+require "support/pages/page"
 
 module Pages
   class NewBoard < Page
@@ -13,9 +13,7 @@ module Pages
     def navigate_by_create_button
       visit work_package_boards_path unless page.current_path == work_package_boards_path
 
-      within '.toolbar-items' do
-        click_link 'Board'
-      end
+      page.find_test_selector("add-board-button").click
     end
 
     def set_title(title)
@@ -23,13 +21,13 @@ module Pages
     end
 
     def expect_project_dropdown
-      find "[data-qa-selector='project_id']"
+      find "[data-test-selector='project_id']"
     end
 
     def set_project(project)
-      select_autocomplete(find('[data-qa-selector="project_id"]'),
+      select_autocomplete(find('[data-test-selector="project_id"]'),
                           query: project,
-                          results_selector: 'body',
+                          results_selector: "body",
                           wait_for_fetched_options: false)
     end
 
@@ -42,7 +40,7 @@ module Pages
     end
 
     def click_on_cancel_button
-      click_on 'Cancel'
+      click_on "Cancel"
     end
   end
 end

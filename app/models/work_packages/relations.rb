@@ -1,5 +1,5 @@
 #  OpenProject is an open source project management software.
-#  Copyright (C) 2010-2022 the OpenProject GmbH
+#  Copyright (C) the OpenProject GmbH
 #
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License version 3.
@@ -45,7 +45,7 @@ module WorkPackages::Relations
     #   * to is the followed work package
     has_many :follows_relations,
              -> { where(relation_type: Relation::TYPE_FOLLOWS) },
-             class_name: 'Relation',
+             class_name: "Relation",
              foreign_key: :from_id,
              autosave: true,
              dependent: :nullify,
@@ -57,7 +57,7 @@ module WorkPackages::Relations
     #   * to is the blocked work package
     has_many :blocks_relations,
              -> { where(relation_type: Relation::TYPE_BLOCKS) },
-             class_name: 'Relation',
+             class_name: "Relation",
              foreign_key: :from_id,
              autosave: true,
              dependent: :nullify,
@@ -69,7 +69,7 @@ module WorkPackages::Relations
     #   * to is the duplicated work package
     has_many :duplicates_relations,
              -> { where(relation_type: Relation::TYPE_DUPLICATES) },
-             class_name: 'Relation',
+             class_name: "Relation",
              foreign_key: :from_id,
              autosave: true,
              dependent: :nullify,
@@ -81,7 +81,7 @@ module WorkPackages::Relations
     #   * to is self
     has_many :duplicated_relations,
              -> { where(relation_type: Relation::TYPE_DUPLICATES) },
-             class_name: 'Relation',
+             class_name: "Relation",
              foreign_key: :to_id,
              autosave: true,
              dependent: :nullify,

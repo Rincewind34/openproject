@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2022 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -34,7 +34,7 @@ module API::V3::WorkPackages
 
       if forbidden_timestamps.any?
         message =
-          I18n.t(:'activerecord.errors.models.query.attributes.timestamps.forbidden',
+          I18n.t(:"activerecord.errors.models.query.attributes.timestamps.forbidden",
                  values: forbidden_timestamps.join(", "))
         raise ::API::Errors::BadRequest.new(message)
       end

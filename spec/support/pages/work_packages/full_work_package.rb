@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,21 +26,49 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'support/pages/work_packages/abstract_work_package'
+require "support/pages/work_packages/abstract_work_package"
 
 module Pages
   class FullWorkPackage < Pages::AbstractWorkPackage
     def ensure_loaded
-      find('.work-packages--details--subject', match: :first)
+      find(".work-packages--details--subject", match: :first)
+    end
+
+    def toolbar
+      find_by_id("toolbar-items")
+    end
+
+    def click_share_button
+      within toolbar do
+        # The request to the capabilities endpoint determines
+        # whether the "Share" button is rendered or not.
+        # Instead of waiting for an idle network (which may
+        # include waiting for other network requests unrelated to
+        # sharing), waiting for the button to be present makes
+        # the spec a tad faster.
+        click_button("Share", wait: 10)
+      end
+    end
+
+    def expect_share_button_count(count)
+      page.within_test_selector("op-wp-share-button") do
+        expect(page).to have_css(".badge", text: count, wait: 10)
+      end
+    end
+
+    def wait_for_activity_tab
+      expect(page).to have_test_selector("op-wp-activity-tab", wait: 10)
+      # wait for stimulus js component to be mounted
+      expect(page).to have_css('[data-test-selector="op-wp-activity-tab"][data-stimulus-controller-connected="true"]')
     end
 
     private
 
     def container
-      find('.work-packages--show-view')
+      find(".work-packages--show-view")
     end
 
-    def path(tab = 'activity')
+    def path(tab = "activity")
       if project
         project_work_package_path(project, work_package.id, tab)
       else

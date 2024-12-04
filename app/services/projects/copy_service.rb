@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -41,10 +43,20 @@ module Projects
         ::Projects::Copy::QueriesDependentService,
         ::Projects::Copy::BoardsDependentService,
         ::Projects::Copy::OverviewDependentService,
-        ::Projects::Copy::StoragesDependentService,
-        ::Projects::Copy::StorageProjectFoldersDependentService,
-        ::Projects::Copy::FileLinksDependentService
+        ::Projects::Copy::StoragesDependentService
       ]
+    end
+
+    # Project Folders and File Links aren't dependent services anymore,
+    #  so we need to amend the services for the form Representer
+    def self.copyable_dependencies
+      super + [{ identifier: "storage_project_folders",
+                 name_source: -> { I18n.t(:label_project_storage_project_folder) },
+                 count_source: ->(source, _) { source.storages.count } },
+
+               { identifier: "file_links",
+                 name_source: -> { I18n.t("projects.copy.work_package_file_links") },
+                 count_source: ->(source, _) { source.work_packages.joins(:file_links).count("file_links.id") } }]
     end
 
     protected
@@ -61,7 +73,7 @@ module Projects
         # Clear enabled modules
         enabled_module_names: source_enabled_modules,
         types: source_types,
-        work_package_custom_fields: source_custom_fields,
+        work_package_custom_fields: source_custom_fields
       )
 
       only_allowed_parent_id(attributes)
@@ -78,6 +90,16 @@ module Projects
         # copy services to use
         state.project = super_call.result
       end
+    end
+
+    def after_perform(call)
+      super.tap do |super_call|
+        copy_activated_custom_fields(super_call)
+      end
+    end
+
+    def copy_activated_custom_fields(call)
+      call.result.project_custom_field_ids = source.project_custom_field_ids
     end
 
     def contract_options
@@ -128,7 +150,7 @@ module Projects
 
     def only_allowed_parent_id(attributes)
       if (parent_id = attributes[:parent_id]) && (parent = Project.find_by(id: parent_id)) &&
-        !user.allowed_to?(:add_subprojects, parent)
+        !user.allowed_in_project?(:add_subprojects, parent)
         attributes.except(:parent_id)
       else
         attributes

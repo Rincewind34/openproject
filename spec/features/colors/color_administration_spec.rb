@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,23 +26,23 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.describe 'color administration' do
+RSpec.describe "color administration" do
   shared_let(:admin) { create(:admin) }
 
   before do
     login_as(admin)
   end
 
-  it 'CRUD' do
+  it "CRUD" do
     # Only a stub for now
 
     visit colors_path
 
     expect(page)
-      .to have_content(I18n.t(:'colors.index.no_results_title_text'))
+      .to have_content(I18n.t(:"colors.index.no_results_title_text"))
 
-    click_link I18n.t(:'colors.index.no_results_content_text')
+    click_link I18n.t(:"colors.index.no_results_content_text")
   end
 end

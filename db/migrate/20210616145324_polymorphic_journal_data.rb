@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,7 +29,7 @@
 class PolymorphicJournalData < ActiveRecord::Migration[6.1]
   # The wiki content table got renamed after writing the migration initially.
   class WikiContentJournal < ApplicationRecord
-    self.table_name = 'wiki_content_journals'
+    self.table_name = "wiki_content_journals"
   end
 
   def up

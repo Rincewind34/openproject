@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +28,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe OpenProject::Events do
   def fire_event(event_constant_name)
@@ -34,6 +36,11 @@ RSpec.describe OpenProject::Events do
       "#{described_class}::#{event_constant_name}".constantize,
       payload
     )
+  end
+
+  before do
+    allow(Storages::ManageStorageIntegrationsJob).to receive(:debounce)
+    allow(Storages::AutomaticallyManagedStorageSyncJob).to receive(:debounce)
   end
 
   %w[
@@ -44,24 +51,27 @@ RSpec.describe OpenProject::Events do
     describe(event) do
       subject { fire_event(event) }
 
-      context 'when payload is empty' do
+      context "when payload is empty" do
         let(:payload) { {} }
 
         it do
-          expect { subject }.not_to change(enqueued_jobs, :count)
+          subject
+          expect(Storages::AutomaticallyManagedStorageSyncJob).not_to have_received(:debounce)
         end
       end
 
-      context 'when payload contains automatic project_folder_mpde' do
-        let(:payload) { { project_folder_mode: :automatic } }
-
-        it do
-          expect { subject }.to change(enqueued_jobs, :count).from(0).to(1)
-        end
+      context "when payload contains automatic project_folder_mode" do
+        let(:payload) { { project_folder_mode: "automatic", storage: create(:nextcloud_storage) } }
 
         it do
           subject
-          expect(enqueued_jobs[0][:job]).to eq(Storages::ManageNextcloudIntegrationEventsJob)
+          expect(Storages::AutomaticallyManagedStorageSyncJob).to have_received(:debounce).with(payload[:storage])
+        end
+
+        it do
+          allow(Storages::ManageStorageIntegrationsJob).to receive(:disable_cron_job_if_needed)
+          subject
+          expect(Storages::ManageStorageIntegrationsJob).to have_received(:disable_cron_job_if_needed)
         end
       end
     end
@@ -71,98 +81,102 @@ RSpec.describe OpenProject::Events do
     MEMBER_CREATED
     MEMBER_UPDATED
     MEMBER_DESTROYED
-    PROJECT_UPDATED
-    PROJECT_RENAMED
-    PROJECT_ARCHIVED
-    PROJECT_UNARCHIVED
   ].each do |event|
     describe(event) do
+      let(:project_role) { create(:existing_project_role) }
+      let(:project_storage) { create(:project_storage) }
+      let(:member) { create(:work_package_member, roles: [project_role], project: project_storage.project) }
+
+      let(:payload) { { member: } }
+
       subject { fire_event(event) }
 
-      let(:payload) { {} }
-
-      it do
-        expect { subject }.to change(enqueued_jobs, :count).from(0).to(1)
-      end
-
       it do
         subject
-        expect(enqueued_jobs[0][:job]).to eq(Storages::ManageNextcloudIntegrationEventsJob)
+        expect(Storages::AutomaticallyManagedStorageSyncJob).to have_received(:debounce).with(project_storage.storage)
       end
     end
   end
 
-  describe 'OAUTH_CLIENT_TOKEN_CREATED' do
-    subject { fire_event('OAUTH_CLIENT_TOKEN_CREATED') }
+  %w[PROJECT_UPDATED
+     PROJECT_RENAMED
+     PROJECT_ARCHIVED
+     PROJECT_UNARCHIVED].each do |event|
+    describe(event) do
+      let(:project_storage) { create(:project_storage, :as_automatically_managed) }
+      let(:payload) { { project: project_storage.project } }
 
-    context 'when payload is empty' do
-      let(:payload) { {} }
-
-      it do
-        expect { subject }.not_to change(enqueued_jobs, :count)
-      end
-    end
-
-    context 'when payload contains storage integration type' do
-      let(:payload) { { integration_type: 'Storages::Storage' } }
-
-      it do
-        expect { subject }.to change(enqueued_jobs, :count).from(0).to(1)
-      end
+      subject { fire_event(event) }
 
       it do
         subject
-        expect(enqueued_jobs[0][:job]).to eq(Storages::ManageNextcloudIntegrationEventsJob)
+        expect(Storages::AutomaticallyManagedStorageSyncJob).to have_received(:debounce).with(project_storage.storage)
       end
     end
   end
 
-  describe 'ROLE_UPDATED' do
-    subject { fire_event('ROLE_UPDATED') }
+  describe "OAUTH_CLIENT_TOKEN_CREATED" do
+    subject { fire_event("OAUTH_CLIENT_TOKEN_CREATED") }
 
-    context 'when payload is empty' do
+    context "when payload is empty" do
       let(:payload) { {} }
 
       it do
-        expect { subject }.not_to change(enqueued_jobs, :count)
+        subject
+        expect(Storages::ManageStorageIntegrationsJob).not_to have_received(:debounce)
       end
     end
 
-    context 'when payload contains some nextcloud related permissions as a diff' do
+    context "when payload contains storage integration type" do
+      let(:payload) { { integration_type: "Storages::Storage" } }
+
+      it do
+        subject
+        expect(Storages::ManageStorageIntegrationsJob).to have_received(:debounce)
+      end
+    end
+  end
+
+  describe "ROLE_UPDATED" do
+    subject { fire_event("ROLE_UPDATED") }
+
+    context "when payload is empty" do
+      let(:payload) { {} }
+
+      it do
+        subject
+        expect(Storages::ManageStorageIntegrationsJob).not_to have_received(:debounce)
+      end
+    end
+
+    context "when payload contains some nextcloud related permissions as a diff" do
       let(:payload) { { permissions_diff: [:read_files] } }
 
       it do
-        expect { subject }.to change(enqueued_jobs, :count).from(0).to(1)
-      end
-
-      it do
         subject
-        expect(enqueued_jobs[0][:job]).to eq(Storages::ManageNextcloudIntegrationEventsJob)
+        expect(Storages::ManageStorageIntegrationsJob).to have_received(:debounce)
       end
     end
   end
 
-  describe 'ROLE_DESTROYED' do
-    subject { fire_event('ROLE_DESTROYED') }
+  describe "ROLE_DESTROYED" do
+    subject { fire_event("ROLE_DESTROYED") }
 
-    context 'when payload is empty' do
+    context "when payload is empty" do
       let(:payload) { {} }
 
       it do
-        expect { subject }.not_to change(enqueued_jobs, :count)
+        subject
+        expect(Storages::ManageStorageIntegrationsJob).not_to have_received(:debounce)
       end
     end
 
-    context 'when payload contains some nextcloud related permissions' do
+    context "when payload contains some nextcloud related permissions" do
       let(:payload) { { permissions: [:read_files] } }
 
       it do
-        expect { subject }.to change(enqueued_jobs, :count).from(0).to(1)
-      end
-
-      it do
         subject
-        expect(enqueued_jobs[0][:job]).to eq(Storages::ManageNextcloudIntegrationEventsJob)
+        expect(Storages::ManageStorageIntegrationsJob).to have_received(:debounce)
       end
     end
   end

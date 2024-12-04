@@ -26,6 +26,8 @@ $search-input-height: 30px
     font-size: var(--header-item-font-size)
     color: var(--header-item-font-color)
 
+    &.-input-focused
+      color: var(--body-font-color) !important
     &:hover
       text-decoration: none
 
@@ -38,9 +40,6 @@ $search-input-height: 30px
         color: var(--header-item-font-hover-color)
         border-bottom: var(--header-border-bottom-width) solid var(--header-border-bottom-color)
 
-    &.-input-focused
-      color: var(--header-search-field-font-color)
-
   &--loading
     top: var(--header-height) - 11px  // display directly under ng-input field
     height: 46px                // ng-option height + 1px border
@@ -51,13 +50,18 @@ $search-input-height: 30px
     font-size: 0.9rem
     -webkit-transition: width 0.2s ease-in-out
     transition: width 0.2s ease-in-out
+    .ng-input input.global-search--input
+      color: var(--header-item-font-color) !important
     &::-ms-clear
       margin-right: 5px
       width: 20px
 
     .ng-select-container
-      background: transparent
-      border-color: var(--header-item-font-color)
+      background: transparent !important
+      border-color: var(--header-item-font-color) !important
+
+      &:focus-within
+        @include spot-focus
 
     .ng-arrow-wrapper
       display: none
@@ -75,30 +79,22 @@ $search-input-height: 30px
         // We should probably remove the default theme altogether at some point
         top: 0 !important
 
-      input
-        color: var(--header-item-font-color)
-        height: $search-input-height
-        cursor: text
-
     .ng-placeholder
       // The ng-select default theme is overly specific
       // We might want to replace it with our own BEM theme definition
       color: var(--header-item-font-color) !important
+      // Reduce width to ensure placeholder text does not exceed
+      width: calc(100% - 30px)
 
     &.-expanded
       width: $search-input-width-expanded
-      background: white
+      background: var(--overlay-bgColor)
       border-radius: 4px
-      color: var(--header-search-field-font-color)
-
-      .ng-placeholder,
-      .ng-clear-wrapper,
-      input
-        color: var(--header-search-field-font-color)
-
+      .ng-input input.global-search--input, .ng-clear-wrapper
+        color: var(--body-font-color) !important
     .ng-dropdown-header
       border-bottom: none
-      color: $spot-color-basic-gray-2
+      color: var(--fgColor-muted)
       line-height: 1rem
       margin-top: 0.5rem
       padding: 0.5rem 0.75rem
@@ -113,7 +109,7 @@ $search-input-height: 30px
       height: auto
 
     .ng-option
-      border-bottom: 1px solid #EAEAEA
+      border-bottom: 1px solid var(--borderColor-default)
       white-space: normal
       padding: 5px 10px
       // We do not want the default highlighting of ng-select to take place as
@@ -124,19 +120,17 @@ $search-input-height: 30px
       background-color: unset
       &:last-child
         border-bottom: none
-      &.ng-option-marked
-        color: var(--header-drop-down-item-font-hover-color)
       &.ng-option-disabled
         display: none
-      &.ng-option-selected
-        color: var(--header-drop-down-item-font-hover-color)
+      &.ng-option-marked
+        background-color: var(--control-transparent-bgColor-hover) !important
 
     &.-markable
       .ng-option
         &.ng-option-marked
           background-color: var(--drop-down-hover-bg-color)
         &.ng-option-selected
-          background-color: var(--drop-down-selected-bg-color)
+          background-color: unset
 
   &--input
     // Fix position of the spinner

@@ -1,6 +1,6 @@
 #-- copyright
 #OpenProject is an open source project management software.
-#Copyright (C) 2012-2023 the OpenProject GmbH
+#Copyright (C) the OpenProject GmbH
 #This program is free software; you can redistribute it and/or
 #modify it under the terms of the GNU General Public License version 3.
 #OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
@@ -27,11 +27,7 @@ ru:
     attributes:
       work_package:
         position: "Позиция"
-        remaining_hours: "Оставшиеся часы"
-        remaining_time: "Оставшиеся часы"
-        derived_remaining_hours: "Запланированное время"
-        derived_remaining_time: "Запланированное время"
-        story_points: "Исторические точки"
+        story_points: "Стори поинты"
         backlogs_work_package_type: "Тип невыполненной работы"
     errors:
       models:
@@ -73,7 +69,7 @@ ru:
     show_burndown_chart: "Диаграмма выгорания задач"
     story: "История"
     story_points: "Исторические точки"
-    story_points_ideal: "Точки истории (идеал)"
+    story_points_ideal: "Исторические точки (идеал)"
     task: "Задача"
     task_color: "Цвет задачи"
     unassigned: "Нераспределенные"
@@ -109,7 +105,7 @@ ru:
   ideal: "идеал"
   inclusion: "не входит в список"
   label_back_to_project: "Назад к странице проекта"
-  label_backlog: "Невыполненная работа"
+  label_backlog: "Бэклог"
   label_backlogs: "Бэклоги"
   label_backlogs_unconfigured: "Вы еще не настроили Невыполненные работы. Перейдите на страницу %{administration} > %{plugins}, а затем нажмите на ссылку %{configure} для получения этого дополнения. После того как вы настроите поля, возвратитесь на эту страницу, чтобы начать пользоваться инструментом."
   label_blocks_ids: "Идентификаторы заблокированных рабочих пакетов"
@@ -117,7 +113,7 @@ ru:
   label_column_in_backlog: "Колонка в бэклоге"
   label_hours: "часы"
   label_work_package_hierarchy: "Иерархия пакета работ"
-  label_master_backlog: "Главная невыполненная работа"
+  label_master_backlog: "Основной бэклог"
   label_not_prioritized: "нет приоритетов"
   label_points: "точки"
   label_points_burn_down: "Вниз"

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 
 class CleanEmailsFooter < ActiveRecord::Migration[6.1]
   def up
-    return unless Setting.where(name: 'emails_footer').exists? # rubocop:disable Rails/WhereExists
+    return unless Setting.where(name: "emails_footer").exists? # rubocop:disable Rails/WhereExists
 
     Setting.reset_column_information
     filtered_footer = Setting
@@ -53,11 +53,11 @@ class CleanEmailsFooter < ActiveRecord::Migration[6.1]
 
   def assumed_notification_text?(text)
     [
-      'You have received this notification because of your notification settings',
-      'You have received this notification because you have either subscribed to it, or are involved in it.',
-      'Sie erhalten diese E-Mail aufgrund Ihrer Benachrichtungseinstellungen',
-      '/my/account',
-      '/my/notifications',
+      "You have received this notification because of your notification settings",
+      "You have received this notification because you have either subscribed to it, or are involved in it.",
+      "Sie erhalten diese E-Mail aufgrund Ihrer Benachrichtungseinstellungen",
+      "/my/account",
+      "/my/notifications",
       '/my/mail\_notifications'
     ].any? { |val| text.include?(val) }
   end

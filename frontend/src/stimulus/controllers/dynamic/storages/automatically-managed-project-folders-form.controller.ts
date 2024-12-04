@@ -1,7 +1,7 @@
 /*
  * -- copyright
  * OpenProject is an open source project management software.
- * Copyright (C) 2023 the OpenProject GmbH
+ * Copyright (C) the OpenProject GmbH
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License version 3.
@@ -33,16 +33,27 @@ import { Controller } from '@hotwired/stimulus';
 export default class AutomaticallyManagedProjectFoldersFormController extends Controller {
   static targets = [
     'applicationPasswordInput',
+    'oneDriveInformationText',
+    'submitButton',
   ];
 
   static values = {
+    providerType: String,
     isAutomaticallyManaged: Boolean,
+    doneCompleteLabel: String,
+    doneCompleteWithoutLabel: String,
   };
 
   declare readonly applicationPasswordInputTarget:HTMLElement;
   declare readonly hasApplicationPasswordInputTarget:boolean;
+  declare readonly oneDriveInformationTextTarget:HTMLElement;
+  declare readonly hasOneDriveInformationTextTarget:boolean;
+  declare readonly submitButtonTarget:HTMLElement;
 
+  declare providerTypeValue:string;
   declare isAutomaticallyManagedValue:boolean;
+  declare doneCompleteLabelValue:string;
+  declare doneCompleteWithoutLabelValue:string;
 
   connect():void {
     // On first load if isAutomaticallyManaged is true, show the applicationPasswordInput
@@ -53,15 +64,36 @@ export default class AutomaticallyManagedProjectFoldersFormController extends Co
     this.toggleApplicationPasswordDisplay((evt.target as HTMLInputElement).checked);
   }
 
-  toggleApplicationPasswordDisplay(displayApplicationPasswordInput:boolean):void {
-    if (!this.hasApplicationPasswordInputTarget) {
-      return;
-    }
+  toggleApplicationPasswordDisplay(automaticManagementEnabled:boolean):void {
+    switch (this.providerTypeValue) {
+      case 'Storages::NextcloudStorage':
+        if (!this.hasApplicationPasswordInputTarget) {
+          return;
+        }
 
-    if (displayApplicationPasswordInput) {
-      this.applicationPasswordInputTarget.style.display = 'flex';
-    } else {
-      this.applicationPasswordInputTarget.style.display = 'none';
+        if (automaticManagementEnabled) {
+          this.applicationPasswordInputTarget.classList.remove('d-none');
+          this.submitButtonTarget.textContent = this.doneCompleteLabelValue;
+        } else {
+          this.applicationPasswordInputTarget.classList.add('d-none');
+          this.submitButtonTarget.textContent = this.doneCompleteWithoutLabelValue;
+        }
+
+        break;
+      case 'Storages::OneDriveStorage':
+        if (!this.hasOneDriveInformationTextTarget) {
+          return;
+        }
+
+        if (automaticManagementEnabled) {
+          this.oneDriveInformationTextTarget.classList.remove('d-none');
+        } else {
+          this.oneDriveInformationTextTarget.classList.add('d-none');
+        }
+
+        break;
+      default:
+        throw new Error('unknown storage provider type');
     }
   }
 }

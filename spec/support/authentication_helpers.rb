@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'rack_session_access/capybara'
+require "rack_session_access/capybara"
 
 module AuthenticationHelpers
   def self.included(base)
@@ -41,7 +41,7 @@ module AuthenticationHelpers
       # as they will login AnonymousUser
       if using_cuprite? && js_enabled?
         page.driver.set_cookie(
-          OpenProject::Configuration['session_cookie_name'],
+          OpenProject::Configuration["session_cookie_name"],
           session_value_for(user).to_s
         )
       else
@@ -49,16 +49,21 @@ module AuthenticationHelpers
       end
     end
 
-    allow(User).to receive(:current).and_return(user)
+    allow(RequestStore).to receive(:[]).and_call_original
+    allow(RequestStore).to receive(:[]).with(:current_user).and_return(user)
   end
 
   def login_with(login, password, autologin: false, visit_signin_path: true)
     visit signin_path if visit_signin_path
 
-    within('.user-login--form') do
-      fill_in 'username', with: login
-      fill_in 'password', with: password
-      check I18n.t(:label_stay_logged_in) if autologin
+    within(".user-login--form") do
+      fill_in "username", with: login
+      fill_in "password", with: password
+      if autologin
+        autologin_label = I18n.t("users.autologins.prompt",
+                                 num_days: I18n.t("datetime.distance_in_words.x_days", count: Setting.autologin))
+        check autologin_label
+      end
       click_button I18n.t(:button_login)
     end
   end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -55,7 +55,7 @@ class GithubIntegrationModels < ActiveRecord::Migration[6.1]
     end
 
     create_join_table :github_pull_requests, :work_packages do |t|
-      t.index :github_pull_request_id, name: 'github_pr_wp_pr_id'
+      t.index :github_pull_request_id, name: "github_pr_wp_pr_id"
       t.index %i[github_pull_request_id work_package_id],
               unique: true,
               name: "unique_index_gh_prs_wps_on_gh_pr_id_and_wp_id"

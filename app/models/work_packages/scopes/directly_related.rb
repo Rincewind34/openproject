@@ -1,6 +1,6 @@
 # --copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2010-2022 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -31,9 +31,11 @@ module WorkPackages::Scopes
     extend ActiveSupport::Concern
 
     class_methods do
-      def directly_related(work_package)
-        where(id: Relation.where(from_id: work_package).select(:to_id))
-          .or(where(id: Relation.where(to_id: work_package).select(:from_id)))
+      def directly_related(work_package, ignored_relation: nil)
+        relations_without_ignored = ignored_relation ? Relation.where.not(id: ignored_relation.id) : Relation.all
+
+        where(id: relations_without_ignored.where(from_id: work_package).select(:to_id))
+        .or(where(id: relations_without_ignored.where(to_id: work_package).select(:from_id)))
       end
     end
   end

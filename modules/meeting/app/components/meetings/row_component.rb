@@ -2,7 +2,7 @@
 
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -35,11 +35,19 @@ module Meetings
     end
 
     def title
-      link_to model.title, meeting_path(model)
+      link_to model.title, project_meeting_path(model.project, model)
+    end
+
+    def type
+      if model.is_a?(StructuredMeeting)
+        I18n.t("meeting.types.structured")
+      else
+        I18n.t("meeting.types.classic")
+      end
     end
 
     def start_time
-      safe_join([helpers.format_date(model.start_time), helpers.format_time(model.start_time, false)], " ")
+      safe_join([helpers.format_date(model.start_time), helpers.format_time(model.start_time, include_date: false)], " ")
     end
 
     def duration
@@ -49,7 +57,7 @@ module Meetings
     def location
       helpers.auto_link(model.location,
                         link: :all,
-                        html: { target: '_blank' })
+                        html: { target: "_blank" })
     end
   end
 end

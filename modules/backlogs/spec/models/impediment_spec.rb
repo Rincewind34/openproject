@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,11 +26,11 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe Impediment do
   let(:user) { @user ||= create(:user) }
-  let(:role) { @role ||= create(:role) }
+  let(:role) { @role ||= create(:project_role) }
   let(:type_feature) { @type_feature ||= create(:type_feature) }
   let(:type_task) { @type_task ||= create(:type_task) }
   let(:issue_priority) { @issue_priority ||= create(:priority, is_default: true) }
@@ -74,38 +74,38 @@ RSpec.describe Impediment do
   before do
     allow(Setting)
       .to receive(:plugin_openproject_backlogs)
-      .and_return({ 'points_burn_direction' => 'down',
-                    'wiki_template' => '',
-                    'story_types' => [type_feature.id.to_s],
-                    'task_type' => type_task.id.to_s })
+      .and_return({ "points_burn_direction" => "down",
+                    "wiki_template" => "",
+                    "story_types" => [type_feature.id.to_s],
+                    "task_type" => type_task.id.to_s })
 
     login_as user
   end
 
-  describe 'instance methods' do
-    describe 'blocks_ids=/blocks_ids' do
-      describe 'WITH an integer' do
+  describe "instance methods" do
+    describe "blocks_ids=/blocks_ids" do
+      describe "WITH an integer" do
         it do
           impediment.blocks_ids = 2
           expect(impediment.blocks_ids).to eql [2]
         end
       end
 
-      describe 'WITH a string' do
+      describe "WITH a string" do
         it do
-          impediment.blocks_ids = '1, 2, 3'
+          impediment.blocks_ids = "1, 2, 3"
           expect(impediment.blocks_ids).to eql [1, 2, 3]
         end
       end
 
-      describe 'WITH an array' do
+      describe "WITH an array" do
         it do
           impediment.blocks_ids = [1, 2, 3]
           expect(impediment.blocks_ids).to eql [1, 2, 3]
         end
       end
 
-      describe 'WITH loading from the backend' do
+      describe "WITH loading from the backend" do
         before do
           feature.version = version
           feature.save

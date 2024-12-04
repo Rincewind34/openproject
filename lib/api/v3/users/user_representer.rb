@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -51,7 +51,7 @@ module API
 
           {
             href: api_v3_paths.show_user(represented.id),
-            type: 'text/html'
+            type: "text/html"
           }
         end
 
@@ -143,7 +143,7 @@ module API
                  getter: ->(*) { represented.mail },
                  setter: ->(fragment:, represented:, **) { represented.mail = fragment },
                  exec_context: :decorator,
-                 cache_if: -> { represented.pref.can_expose_mail? || represented.new_record? || current_user_can_manage? }
+                 cache_if: -> { current_user_can_view_user_email? || represented.new_record? || current_user_can_manage? }
 
         property :avatar,
                  exec_context: :decorator,
@@ -159,7 +159,7 @@ module API
 
         property :identity_url,
                  exec_context: :decorator,
-                 as: 'identityUrl',
+                 as: "identityUrl",
                  getter: ->(*) { represented.identity_url },
                  setter: ->(fragment:, represented:, **) { represented.identity_url = fragment },
                  render_nil: true,
@@ -184,7 +184,7 @@ module API
         ##
         # Used while parsing JSON to initialize `ldap_auth_source_id` through the given link.
         def initialize_embedded_links!(data)
-          ldap_auth_source_id = parse_auth_source_id data, "auth_source"
+          ldap_auth_source_id = parse_auth_source_id(data, "authSource") || parse_auth_source_id(data, "auth_source")
 
           if ldap_auth_source_id
             auth_source = LdapAuthSource.find_by_unique(ldap_auth_source_id) # rubocop:disable Rails/DynamicFindBy
@@ -220,7 +220,7 @@ module API
         end
 
         def _type
-          'User'
+          "User"
         end
 
         def current_user_can_delete_represented?
@@ -229,10 +229,14 @@ module API
 
         def current_user_can_manage?
           current_user && (
-            current_user.allowed_to_globally?(:manage_user) ||
-            current_user.allowed_to_globally?(:create_user) ||
+            current_user.allowed_globally?(:manage_user) ||
+            current_user.allowed_globally?(:create_user) ||
             current_user_is_self?
           )
+        end
+
+        def current_user_can_view_user_email?
+          current_user&.allowed_globally?(:view_user_email)
         end
 
         private

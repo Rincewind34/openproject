@@ -2,7 +2,7 @@
 
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,8 +33,8 @@
 class RowComponent < ApplicationComponent
   attr_reader :table
 
-  def initialize(row:, table:, **options)
-    super(row, **options)
+  def initialize(row:, table:, **)
+    super(row, **)
     @table = table
   end
 
@@ -70,7 +70,7 @@ class RowComponent < ApplicationComponent
 
   def checkmark(condition)
     if condition
-      helpers.op_icon 'icon icon-checkmark'
+      helpers.op_icon "icon icon-checkmark"
     end
   end
 end

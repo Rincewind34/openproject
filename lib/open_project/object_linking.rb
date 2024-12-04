@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -85,7 +85,7 @@ module OpenProject
     def link_to_revision(revision, project, options = {})
       text = options.delete(:text) || format_revision(revision)
       rev = revision.respond_to?(:identifier) ? revision.identifier : revision
-      url_opts = { controller: '/repositories', action: 'revision', project_id: project, rev: }
+      url_opts = { controller: "/repositories", action: "revision", project_id: project, rev: }
       html_options = { title: I18n.t(:label_revision_id, value: format_revision(revision)) }.merge(options)
       link_to(h(text), url_opts, html_options)
     end
@@ -103,7 +103,7 @@ module OpenProject
         h(truncate(message.subject, length: 60)),
         topic_path_or_url(options.delete(:no_root) ? message : message.root,
                           {
-                            r: (message.parent_id && message.id),
+                            r: message.parent_id && message.id,
                             anchor: (message.parent_id ? "message-#{message.id}" : nil)
                           }.merge(options)),
         html_options
@@ -131,7 +131,7 @@ module OpenProject
 
     def project_link_name(project, show_icon)
       if show_icon && User.current.member_of?(project)
-        icon_wrapper('icon-context icon-star', I18n.t(:description_my_project).html_safe + '&nbsp;'.html_safe) + project.name
+        icon_wrapper("icon-context icon-star", I18n.t(:description_my_project).html_safe + "&nbsp;".html_safe) + project.name
       else
         project.name
       end

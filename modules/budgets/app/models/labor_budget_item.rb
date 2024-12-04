@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,7 +29,7 @@
 class LaborBudgetItem < ApplicationRecord
   belongs_to :budget
   belongs_to :user
-  belongs_to :principal, foreign_key: 'user_id'
+  belongs_to :principal, foreign_key: "user_id"
 
   include ::Costs::DeletedUserFallback
 
@@ -41,29 +41,11 @@ class LaborBudgetItem < ApplicationRecord
   include ActiveModel::ForbiddenAttributesProtection
   # user_id correctness is ensured in Budget#*_labor_budget_item_attributes=
 
-  def self.visible(user, project)
-    table = arel_table
-
-    view_allowed = Project.allowed_to(user, :view_hourly_rates).select(:id)
-    view_own_allowed = Project.allowed_to(user, :view_own_hourly_rate).select(:id)
-
-    view_or_view_own = table[:project_id]
-                       .in(view_allowed.arel)
-                       .or(table[:project_id]
-                           .in(view_own_allowed.arel)
-                           .and(table[:user_id].eq(user.id)))
-
-    scope = includes([{ budget: :project }, :user])
-            .references(:projects)
-            .where(view_or_view_own)
-
-    if project
-      scope.where(budget: { projects_id: project.id })
-    end
-  end
+  include Scopes::Scoped
+  scopes :visible
 
   scope :visible_costs, lambda { |*args|
-    visible((args.first || User.current), args[1])
+    visible((args.first || User.current))
   }
 
   def costs
@@ -83,7 +65,7 @@ class LaborBudgetItem < ApplicationRecord
   end
 
   def costs_visible_by?(usr)
-    usr.allowed_to?(:view_hourly_rates, budget.project) ||
-      (usr.id == user_id && usr.allowed_to?(:view_own_hourly_rate, budget.project))
+    usr.allowed_in_project?(:view_hourly_rates, budget.project) ||
+      (usr.id == user_id && usr.allowed_in_project?(:view_own_hourly_rate, budget.project))
   end
 end

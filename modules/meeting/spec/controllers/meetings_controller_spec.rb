@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,57 +29,49 @@
 require "#{File.dirname(__FILE__)}/../spec_helper"
 
 RSpec.describe MeetingsController do
-  let(:user) { create(:admin) }
-  let(:project) { create(:project) }
-  let(:other_project) { create(:project) }
+  shared_let(:user) { create(:admin) }
+  shared_let(:project) { create(:project) }
+  shared_let(:other_project) { create(:project) }
 
-  before do
-    allow(User).to receive(:current).and_return user
+  current_user { user }
 
-    allow(Project).to receive(:find).and_return(project)
-
-    allow(controller).to receive(:authorize)
-    allow(controller).to receive(:authorize_global)
-    allow(controller).to receive(:check_if_login_required)
-  end
-
-  describe 'GET' do
-    describe 'index' do
+  describe "GET" do
+    describe "index" do
       let(:meetings) do
         [
           create(:meeting, project:),
-          create(:meeting, project:),
-          create(:meeting, project: other_project)
+          create(:meeting, author: user, project:),
+          create(:meeting, author: user, project: other_project)
         ]
       end
 
-      describe 'html' do
-        context 'when requesting meetings globally' do
+      describe "html" do
+        context "when requesting meetings globally" do
           before do
-            get 'index'
+            get "index"
           end
 
           it { expect(response).to be_successful }
-          it { expect(assigns(:meetings)).to match_array meetings }
+          it { expect(assigns(:meetings)).to match_array meetings[1..2] }
         end
 
-        context 'when requesting meetings scoped to a project ID' do
+        context "when requesting meetings scoped to a project ID" do
           before do
-            get 'index', params: { project_id: project.id }
+            get "index", params: { project_id: project.id }
           end
 
           it { expect(response).to be_successful }
-          it { expect(assigns(:meetings)).to match_array meetings[0..1] }
+          it { expect(assigns(:meetings)).to match_array meetings[1] }
         end
       end
     end
 
-    describe 'show' do
+    describe "show" do
       let(:meeting) { create(:meeting, project:, agenda: nil) }
 
-      describe 'html' do
+      describe "html" do
         before do
-          get 'show', params: { id: meeting.id }
+          get "show", params: { id: meeting.id }
         end
 
         it { expect(response).to be_successful }
@@ -87,7 +79,7 @@ RSpec.describe MeetingsController do
       end
     end
 
-    describe 'new' do
+    describe "new" do
       let(:meeting) { Meeting.new(project:) }
 
       before do
@@ -95,11 +87,11 @@ RSpec.describe MeetingsController do
         allow(Meeting).to receive(:new).and_return(meeting)
       end
 
-      shared_examples_for 'new action' do |response_type:|
+      shared_examples_for "new action" do |response_type:|
         describe response_type do
-          context 'when requesting the page without a project id' do
+          context "when requesting the page without a project id" do
             before do
-              get 'new'
+              get "new"
             end
 
             it { expect(response).to be_successful }
@@ -107,9 +99,9 @@ RSpec.describe MeetingsController do
             it { expect(assigns(:project)).to be_nil }
           end
 
-          context 'when requesting the page with a project id' do
+          context "when requesting the page with a project id" do
             before do
-              get 'new', params: { project_id: project.id }
+              get "new", params: { project_id: project.id }
             end
 
             it { expect(response).to be_successful }
@@ -119,16 +111,16 @@ RSpec.describe MeetingsController do
         end
       end
 
-      it_behaves_like 'new action', response_type: 'html'
-      it_behaves_like 'new action', response_type: 'turbo_stream'
+      it_behaves_like "new action", response_type: "html"
+      it_behaves_like "new action", response_type: "turbo_stream"
     end
 
-    describe 'edit' do
+    describe "edit" do
       let(:meeting) { create(:meeting, project:) }
 
-      describe 'html' do
+      describe "html" do
         before do
-          get 'edit', params: { id: meeting.id }
+          get "edit", params: { id: meeting.id }
         end
 
         it { expect(response).to be_successful }
@@ -137,8 +129,8 @@ RSpec.describe MeetingsController do
     end
   end
 
-  describe 'POST' do
-    describe 'create' do
+  describe "POST" do
+    describe "create" do
       render_views
 
       let(:base_params) do
@@ -150,10 +142,10 @@ RSpec.describe MeetingsController do
 
       let(:base_meeting_params) do
         {
-          title: 'Foobar',
-          duration: '1.0',
-          start_date: '2015-06-01',
-          start_time_hour: '10:00'
+          title: "Foobar",
+          duration: "1.0",
+          start_date: "2015-06-01",
+          start_time_hour: "10:00"
         }
       end
 
@@ -161,65 +153,87 @@ RSpec.describe MeetingsController do
       let(:meeting_params) { base_meeting_params }
 
       before do
-        allow(Project).to receive(:find).and_return(project)
-
         post :create,
              params:
       end
 
-      context 'with a project_id' do
-        context 'and an invalid start_date with start_time_hour' do
+      context "with a project_id" do
+        context "and an invalid start_date with start_time_hour" do
           let(:meeting_params) do
-            base_meeting_params.merge(start_date: '-')
+            base_meeting_params.merge(start_date: "-")
           end
 
-          it 'renders an error' do
+          it "renders an error" do
             expect(response).to have_http_status :ok
             expect(response).to render_template :new
             expect(response.body)
-              .to have_selector '#errorExplanation li',
-                                text: "Start date #{I18n.t('activerecord.errors.messages.not_an_iso_date')}"
+              .to have_text("Date #{I18n.t('activerecord.errors.messages.not_an_iso_date')}")
           end
         end
 
-        context 'and an invalid start_time_hour with start_date' do
+        context "and an invalid start_time_hour with start_date" do
           let(:meeting_params) do
-            base_meeting_params.merge(start_time_hour: '-')
+            base_meeting_params.merge(start_time_hour: "-")
           end
 
-          it 'renders an error' do
+          it "renders an error" do
             expect(response).to have_http_status :ok
             expect(response).to render_template :new
             expect(response.body)
-              .to have_selector '#errorExplanation li',
-                                text: "Starting time #{I18n.t('activerecord.errors.messages.invalid_time_format')}"
+              .to have_text("Start time #{I18n.t('activerecord.errors.messages.invalid_time_format')}")
           end
         end
       end
 
-      context 'with a nil project_id' do
+      context "with a nil project_id" do
         let(:project) { nil }
 
-        it 'renders an error' do
+        it "renders an error" do
           expect(response).to have_http_status :ok
           expect(response).to render_template :new
           expect(response.body)
-            .to have_selector '#errorExplanation li',
-                              text: "Project #{I18n.t('activerecord.errors.messages.blank')}"
+            .to have_text("Project #{I18n.t('activerecord.errors.messages.blank')}")
         end
       end
 
-      context 'without a project_id' do
+      context "without a project_id" do
         let(:params) { base_params.except(:project_id) }
         let(:project) { nil }
 
-        it 'renders an error' do
+        it "renders an error" do
           expect(response).to have_http_status :ok
           expect(response).to render_template :new
           expect(response.body)
-            .to have_selector '#errorExplanation li',
-                              text: "Project #{I18n.t('activerecord.errors.messages.blank')}"
+            .to have_text("Project #{I18n.t('activerecord.errors.messages.blank')}")
         end
+      end
+    end
+  end
+
+  describe "notify" do
+    let!(:meeting) { create(:meeting) }
+    let!(:participant) { create(:meeting_participant, meeting:, attended: true) }
+
+    it "produces a background job for notification" do
+      post :notify, params: { id: meeting.id }
+
+      perform_enqueued_jobs
+      expect(ActionMailer::Base.deliveries.count).to eq(1)
+    end
+
+    context "with an error during deliver" do
+      before do
+        allow(MeetingMailer).to receive(:invited).and_raise(Net::SMTPError)
+      end
+
+      it "produces a flash message containing the mail addresses raising the error" do
+        expect { post :notify, params: { id: meeting.id } }.not_to raise_error
+        meeting.participants.each do |participant|
+          expect(flash[:error]).to include(participant.name)
+        end
+
+        perform_enqueued_jobs
+        expect(ActionMailer::Base.deliveries.count).to eq(0)
       end
     end
   end

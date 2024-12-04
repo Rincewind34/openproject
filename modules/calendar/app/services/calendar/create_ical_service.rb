@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'icalendar'
+require "icalendar"
 
 module Calendar
   class CreateICalService < ::BaseServices::BaseCallable
@@ -45,6 +45,7 @@ module Calendar
       calendar = Icalendar::Calendar.new
 
       calendar.prodid = "-//OpenProject GmbH//OpenProject Core Project//EN"
+      calendar.refresh_interval = "PT1H"
       calendar.x_wr_calname = calendar_name
 
       work_packages.each do |work_package|
@@ -67,7 +68,7 @@ module Calendar
         location
         description
       ].each do |value|
-        event.send("#{value}=", send("#{value}_value", work_package))
+        event.send(:"#{value}=", send(:"#{value}_value", work_package))
       end
 
       event
@@ -83,7 +84,7 @@ module Calendar
 
     def dtstamp_value(work_package)
       # https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.7.2
-      Icalendar::Values::DateTime.new(work_package.updated_at, 'tzid' => 'UTC')
+      Icalendar::Values::DateTime.new(work_package.updated_at, "tzid" => "UTC")
     end
 
     def dtstart_value(work_package)
@@ -91,7 +92,7 @@ module Calendar
     end
 
     def start_date(work_package)
-      (work_package.start_date.presence || work_package.due_date)
+      work_package.start_date.presence || work_package.due_date
     end
 
     def dtend_value(work_package)

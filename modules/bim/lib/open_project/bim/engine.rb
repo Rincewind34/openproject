@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'open_project/plugins'
+require "open_project/plugins"
 
 module OpenProject::Bim
   class Engine < ::Rails::Engine
@@ -34,8 +34,9 @@ module OpenProject::Bim
 
     include OpenProject::Plugins::ActsAsOpEngine
 
-    register 'openproject-bim',
-             author_url: 'https://www.openproject.org',
+    register "openproject-bim",
+             author_url: "https://www.openproject.org",
+             bundled: true,
              settings: {
                default: {}
              } do
@@ -44,20 +45,25 @@ module OpenProject::Bim
                      if: ->(*) { OpenProject::Configuration.bim? }) do
         permission :view_ifc_models,
                    {
-                     'bim/ifc_models/ifc_models': %i[index show defaults],
-                     'bim/ifc_models/ifc_viewer': %i[show]
+                     "bim/ifc_models/ifc_models": %i[index show defaults],
+                     "bim/ifc_models/ifc_viewer": %i[show],
+                     "bim/menus": %i[show]
                    },
+                   permissible_on: :project,
                    contract_actions: { ifc_models: %i[read] }
         permission :manage_ifc_models,
-                   { 'bim/ifc_models/ifc_models': %i[index show destroy edit update create new] },
+                   { "bim/ifc_models/ifc_models": %i[index show destroy edit update create new] },
+                   permissible_on: :project,
                    dependencies: %i[view_ifc_models],
                    contract_actions: { ifc_models: %i[create update destroy] }
         permission :view_linked_issues,
-                   { 'bim/bcf/issues': %i[index] },
+                   { "bim/bcf/issues": %i[index] },
+                   permissible_on: :project,
                    dependencies: %i[view_work_packages],
                    contract_actions: { bcf: %i[read] }
         permission :manage_bcf,
-                   { 'bim/bcf/issues': %i[index upload prepare_import configure_import perform_import] },
+                   { "bim/bcf/issues": %i[index upload prepare_import configure_import perform_import] },
+                   permissible_on: :project,
                    dependencies: %i[view_linked_issues
                                     view_work_packages
                                     add_work_packages
@@ -65,6 +71,7 @@ module OpenProject::Bim
                    contract_actions: { bcf: %i[create update] }
         permission :delete_bcf,
                    {},
+                   permissible_on: :project,
                    dependencies: %i[view_linked_issues
                                     manage_bcf
                                     view_work_packages
@@ -74,36 +81,38 @@ module OpenProject::Bim
                    contract_actions: { bcf: %i[destroy] }
         permission :save_bcf_queries,
                    {},
+                   permissible_on: :project,
                    dependencies: %i[save_queries]
         permission :manage_public_bcf_queries,
                    {},
+                   permissible_on: :project,
                    dependencies: %i[manage_public_queries save_bcf_queries]
       end
 
       Rails.application.reloader.to_prepare do
         OpenProject::AccessControl
           .permission(:view_work_packages)
-          .controller_actions << 'bim/bcf/issues/redirect_to_bcf_issues_list'
+          .controller_actions << "bim/bcf/issues/redirect_to_bcf_issues_list"
       end
 
       ::Redmine::MenuManager.map(:project_menu) do |menu|
         menu.push(:ifc_models,
-                  { controller: '/bim/ifc_models/ifc_models', action: 'defaults' },
-                  caption: :'bcf.label_bcf',
+                  { controller: "/bim/ifc_models/ifc_models", action: "defaults" },
+                  caption: :"bcf.label_bcf",
                   after: :work_packages,
-                  icon: 'bcf',
+                  icon: "op-bcf",
                   badge: :label_new)
 
         menu.push :ifc_viewer_panels,
-                  { controller: '/bim/ifc_models/ifc_models', action: 'defaults' },
+                  { controller: "/bim/ifc_models/ifc_models", action: "defaults" },
                   parent: :ifc_models,
-                  partial: '/bim/ifc_models/ifc_models/panels'
+                  partial: "/bim/menus/menu"
       end
     end
 
-    class_inflection_override('v2_1' => 'V2_1')
+    class_inflection_override("v2_1" => "V2_1")
 
-    assets %w(bim/logo_openproject_bim_big.png)
+    assets %w(bim/logo_openproject_bim_big.png bim/logo_openproject_bim_big_coloured.png)
 
     patches %i[Attachment WorkPackage Type Journal RootSeeder Project FogFileUploader]
 
@@ -116,11 +125,16 @@ module OpenProject::Bim
     patch_with_namespace :DemoData, :WorkPackageSeeder
     patch_with_namespace :DemoData, :WorkPackageBoardSeeder
 
+    config.to_prepare do
+      # needed for `#bcf_issue?` calls in the work package representer
+      ::API::V3::WorkPackages::WorkPackageRepresenter.to_eager_load << :bcf_issue
+    end
+
     extend_api_response(:v3, :work_packages, :work_package) do
       include API::Bim::Utilities::PathHelper
 
       link :bcfTopic,
-           cache_if: -> { current_user_allowed_to(:view_linked_issues) } do
+           cache_if: -> { current_user.allowed_in_project?(:view_linked_issues, represented.project) } do
         next unless represented.bcf_issue?
 
         {
@@ -129,19 +143,19 @@ module OpenProject::Bim
       end
 
       link :convertBCF,
-           cache_if: -> { current_user_allowed_to(:manage_bcf) } do
+           cache_if: -> { current_user.allowed_in_project?(:manage_bcf, represented.project) } do
         next if represented.bcf_issue? || represented.project.nil?
 
         {
           href: bcf_v2_1_paths.topics(represented.project.identifier),
-          title: 'Convert to BCF',
+          title: "Convert to BCF",
           payload: { reference_links: [api_v3_paths.work_package(represented.id)] },
           method: :post
         }
       end
 
       links :bcfViewpoints,
-            cache_if: -> { current_user_allowed_to(:view_linked_issues) } do
+            cache_if: -> { current_user.allowed_in_project?(:view_linked_issues, represented.project) } do
         next unless represented.bcf_issue?
 
         represented.bcf_issue.viewpoints.map do |viewpoint|
@@ -153,14 +167,14 @@ module OpenProject::Bim
     end
 
     extend_api_response(:v3, :work_packages, :work_package_collection) do
-      require_relative 'patches/api/v3/export_formats'
+      require_relative "patches/api/v3/export_formats"
 
       prepend Patches::API::V3::ExportFormats
     end
 
     extend_api_response(:v3, :work_packages, :schema, :work_package_schema) do
       schema :bcf_thumbnail,
-             type: 'BCF Thumbnail',
+             type: "BCF Thumbnail",
              required: false,
              writable: false,
              show_if: ->(*) { represented&.project&.module_enabled?(:bim) }
@@ -171,7 +185,8 @@ module OpenProject::Bim
 
       links :bcfViewpoints do
         journable = represented.journable
-        next unless current_user_allowed_to(:view_linked_issues) && represented.bcf_comment.present? && journable.bcf_issue?
+        next unless current_user.allowed_in_project?(:view_linked_issues, represented.project) &&
+          represented.bcf_comment.present? && journable.bcf_issue?
 
         # There will only be one viewpoint per comment but we nevertheless return a collection here so that it is more
         # similar to the work package representer.
@@ -193,7 +208,7 @@ module OpenProject::Bim
       OpenProject::Bim::Hooks::Hook
     end
 
-    initializer 'bim.bcf.register_mimetypes' do
+    initializer "bim.bcf.register_mimetypes" do
       Mime::Type.register "application/octet-stream", :bcf unless Mime::Type.lookup_by_extension(:bcf)
       Mime::Type.register "application/octet-stream", :bcfzip unless Mime::Type.lookup_by_extension(:bcfzip)
     end
@@ -219,19 +234,19 @@ module OpenProject::Bim
       ::Queries::Register.register(::Query) do
         filter ::Bim::Queries::WorkPackages::Filter::BcfIssueAssociatedFilter
 
-        column ::Bim::Queries::WorkPackages::Columns::BcfThumbnailColumn
+        select ::Bim::Queries::WorkPackages::Selects::BcfThumbnailSelect
       end
 
       ::API::Root.class_eval do
-        content_type :binary, 'application/octet-stream'
+        content_type :binary, "application/octet-stream"
         default_format :binary
-        version 'v1', using: :path do
+        version "v1", using: :path do
           mount ::API::Bim::BcfXml::V1::BcfXmlAPI
         end
       end
     end
 
     add_view :Bim,
-             contract_strategy: 'Bim::Views::ContractStrategy'
+             contract_strategy: "Bim::Views::ContractStrategy"
   end
 end

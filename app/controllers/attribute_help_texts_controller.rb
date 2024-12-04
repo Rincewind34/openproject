@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,11 +27,10 @@
 #++
 
 class AttributeHelpTextsController < ApplicationController
-  layout 'admin'
+  layout "admin"
   menu_item :attribute_help_texts
 
-  before_action :require_admin
-  before_action :require_ee_token, except: %i[upsale]
+  before_action :authorize_global
   before_action :find_entry, only: %i(edit update destroy)
   before_action :find_type_scope
 
@@ -45,8 +44,6 @@ class AttributeHelpTextsController < ApplicationController
 
   def edit; end
 
-  def upsale; end
-
   def create
     call = ::AttributeHelpTexts::CreateService
       .new(user: current_user)
@@ -57,8 +54,8 @@ class AttributeHelpTextsController < ApplicationController
       redirect_to attribute_help_texts_path(tab: call.result.attribute_scope)
     else
       @attribute_help_text = call.result
-      flash[:error] = call.message || I18n.t('notice_internal_server_error')
-      render action: 'new'
+      flash[:error] = call.message || I18n.t("notice_internal_server_error")
+      render action: "new"
     end
   end
 
@@ -71,8 +68,8 @@ class AttributeHelpTextsController < ApplicationController
       flash[:notice] = t(:notice_successful_update)
       redirect_to attribute_help_texts_path(tab: @attribute_help_text.attribute_scope)
     else
-      flash[:error] = call.message || I18n.t('notice_internal_server_error')
-      render action: 'edit'
+      flash[:error] = call.message || I18n.t("notice_internal_server_error")
+      render action: "edit"
     end
   end
 
@@ -88,22 +85,10 @@ class AttributeHelpTextsController < ApplicationController
 
   protected
 
-  def require_ee_token
-    unless EnterpriseToken.allows_to?(:attribute_help_texts)
-      redirect_to upsale_attribute_help_texts_path
-    end
-  end
-
-  def default_breadcrumb
-    if action_name == 'index'
-      t('attribute_help_texts.label_plural')
-    else
-      ActionController::Base.helpers.link_to(t('attribute_help_texts.label_plural'), attribute_help_texts_path)
-    end
-  end
+  def default_breadcrumb; end
 
   def show_local_breadcrumb
-    true
+    false
   end
 
   private
@@ -129,7 +114,7 @@ class AttributeHelpTextsController < ApplicationController
   end
 
   def find_type_scope
-    name = params.fetch(:name, 'WorkPackage')
+    name = params.fetch(:name, "WorkPackage")
     submodule = AttributeHelpText.available_types.find { |mod| mod == name }
 
     if submodule.nil?

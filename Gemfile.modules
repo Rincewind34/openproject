@@ -14,7 +14,7 @@ gem 'omniauth-openid_connect-providers',
 
 gem 'omniauth-openid-connect',
     git: 'https://github.com/opf/omniauth-openid-connect.git',
-    ref: 'efddc061a72791db019259768a4656c0435709e8'
+    ref: 'd63f5967514d10db9ddece798dadfa2ac532cbe0'
 
 group :opf_plugins do
     # included so that engines can reference OpenProject::Version
@@ -33,6 +33,7 @@ group :opf_plugins do
   gem 'openproject-two_factor_authentication', path: 'modules/two_factor_authentication'
   gem 'openproject-webhooks',                  path: 'modules/webhooks'
   gem 'openproject-github_integration',        path: 'modules/github_integration'
+  gem 'openproject-gitlab_integration',        path: 'modules/gitlab_integration'
   gem 'openproject-ldap_groups',               path: 'modules/ldap_groups'
   gem 'openproject-recaptcha',                 path: 'modules/recaptcha'
   gem 'openproject-job_status',                path: 'modules/job_status'
@@ -44,6 +45,7 @@ group :opf_plugins do
   gem 'overviews',                             path: 'modules/overviews'
   gem 'budgets',                               path: 'modules/budgets'
   gem 'openproject-team_planner',              path: 'modules/team_planner'
+  gem 'openproject-gantt',                     path: 'modules/gantt'
   gem 'openproject-calendar',                  path: 'modules/calendar'
   gem 'openproject-storages',                  path: 'modules/storages'
 

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,20 +28,20 @@
 
 class RenameWorkPackageExportLimit < ActiveRecord::Migration[7.0]
   def up
-    if Setting.where(name: 'work_packages_projects_export_limit').exists? # rubocop:disable Rails/WhereExists
+    if Setting.where(name: "work_packages_projects_export_limit").exists? # rubocop:disable Rails/WhereExists
       Setting
-        .where(name: 'work_packages_export_limit')
+        .where(name: "work_packages_export_limit")
         .delete_all
     else
       Setting
-        .where(name: 'work_packages_export_limit')
-        .update_all(name: 'work_packages_projects_export_limit')
+        .where(name: "work_packages_export_limit")
+        .update_all(name: "work_packages_projects_export_limit")
     end
   end
 
   def down
     Setting
-      .where(name: 'work_packages_projects_export_limit')
-      .update_all(name: 'work_packages_export_limit')
+      .where(name: "work_packages_projects_export_limit")
+      .update_all(name: "work_packages_export_limit")
   end
 end

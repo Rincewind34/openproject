@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,17 +26,20 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
+require "support/flash/expectations"
+
 module Components
   class PasswordConfirmationDialog
     include Capybara::DSL
     include Capybara::RSpecMatchers
     include RSpec::Matchers
+    include Flash::Expectations
 
     def confirm_flow_with(password, with_keyboard: false, should_fail: false)
       expect_open
 
       expect(submit_button).to be_disabled
-      fill_in 'request_for_confirmation_password', with: password
+      fill_in "request_for_confirmation_password", with: password
 
       expect(submit_button).not_to be_disabled
       submit(should_fail:, with_keyboard:)
@@ -47,31 +50,30 @@ module Components
     end
 
     def expect_closed
-      expect(page).not_to have_selector(selector)
+      expect(page).to have_no_selector(selector)
     end
 
     def submit_button
-      page.find('[data-qa-selector="confirmation-modal--confirmed"]')
+      page.find('[data-test-selector="confirmation-modal--confirmed"]')
     end
 
     private
 
     def selector
-      '.password-confirm-dialog--modal'
+      ".password-confirm-dialog--modal"
     end
 
     def submit(should_fail:, with_keyboard:)
       if with_keyboard
-        find_field('request_for_confirmation_password').send_keys :enter
+        find_field("request_for_confirmation_password").send_keys :enter
       else
         submit_button.click
       end
 
       if should_fail
-        expect(page).to have_selector('.op-toast.-error',
-                                      text: I18n.t(:notice_password_confirmation_failed))
+        expect_flash(type: :error, message: I18n.t(:notice_password_confirmation_failed))
       else
-        expect(page).not_to have_selector('.op-toast.-error')
+        expect(page).to have_no_css(".op-toast.-error")
       end
     end
   end

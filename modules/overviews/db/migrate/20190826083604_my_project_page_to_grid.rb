@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,13 +29,11 @@
 class MyProjectPageToGrid < ActiveRecord::Migration[5.2]
   # rubocop:disable Rails/ApplicationRecord
   class MyPageEntry < ActiveRecord::Base
-    self.table_name = 'my_projects_overviews'
+    self.table_name = "my_projects_overviews"
 
     serialize :top
     serialize :left
     serialize :right
-
-    belongs_to :project
   end
   # rubocop:enable Rails/ApplicationRecord
 
@@ -77,14 +75,14 @@ class MyProjectPageToGrid < ActiveRecord::Migration[5.2]
   def add_permission
     Role
       .includes(:role_permissions)
-      .where(role_permissions: { permission: 'edit_project' })
+      .where(role_permissions: { permission: "edit_project" })
       .each do |role|
       role.add_permission!(:manage_overview)
     end
   end
 
   def create_grid(entry)
-    grid = Grids::Overview.new project: entry.project, column_count: 2, created_at: entry.created_on
+    grid = Grids::Overview.new project_id: entry.project_id, column_count: 2, created_at: entry.created_on
 
     %i[top left right].each do |area|
       entry.send(area).each do |widget|
@@ -99,21 +97,24 @@ class MyProjectPageToGrid < ActiveRecord::Migration[5.2]
   end
 
   def move_attachments(entry, grid)
-    Attachment
-      .where(container_type: "MyProjectsOverview", container_id: entry.id)
-      .update_all(container_type: 'Grids::Grid', container_id: grid.id)
+    execute <<~SQL.squish
+      UPDATE attachments
+      SET container_type = 'Grids::Grid', container_id = #{grid.id}
+      WHERE container_type = 'MyProjectsOverview'
+      AND container_id = #{entry.id}
+    SQL
   end
 
   def build_widget(grid, widget_config, position)
     method = case widget_config
              when Array
                :build_custom_text_widget
-             when 'project_details'
+             when "project_details"
                :build_project_details_widget
-             when 'work_packages_assigned_to_me',
-                  'work_packages_reported_by_me',
-                  'work_packages_responsible_for',
-                  'work_packages_watched'
+             when "work_packages_assigned_to_me",
+                  "work_packages_reported_by_me",
+                  "work_packages_responsible_for",
+                  "work_packages_watched"
                :build_wp_table_widget
              else
                :build_default_widget
@@ -123,8 +124,8 @@ class MyProjectPageToGrid < ActiveRecord::Migration[5.2]
   end
 
   def build_custom_text_widget(grid, widget_config, position)
-    build_widget_with_options(grid, 'custom_text', position) do |options|
-      name = widget_config[1].presence || grid.project.name
+    build_widget_with_options(grid, "custom_text", position) do |options|
+      name = widget_config[1].presence || "Text"
 
       options[:name] = name
       options[:text] = widget_config[2]
@@ -132,8 +133,8 @@ class MyProjectPageToGrid < ActiveRecord::Migration[5.2]
   end
 
   def build_project_details_widget(grid, _identifier, position)
-    build_default_widget(grid, 'subprojects', position)
-    build_default_widget(grid, 'project_details', position)
+    build_default_widget(grid, "subprojects", position)
+    build_default_widget(grid, "project_details", position)
   end
 
   def build_wp_table_widget(grid, identifier, position)
@@ -165,13 +166,13 @@ class MyProjectPageToGrid < ActiveRecord::Migration[5.2]
 
   def new_name(name)
     {
-      news_latest: 'news',
-      work_package_tracking: 'work_packages_overview',
-      spent_time: 'time_entries_list',
-      work_packages_assigned_to_me: 'work_packages_table',
-      work_packages_reported_by_me: 'work_packages_table',
-      work_packages_responsible_for: 'work_packages_table',
-      work_packages_watched: 'work_packages_table'
+      news_latest: "news",
+      work_package_tracking: "work_packages_overview",
+      spent_time: "time_entries_list",
+      work_packages_assigned_to_me: "work_packages_table",
+      work_packages_reported_by_me: "work_packages_table",
+      work_packages_responsible_for: "work_packages_table",
+      work_packages_watched: "work_packages_table"
     }.with_indifferent_access[name] || name
   end
 
@@ -213,11 +214,11 @@ class MyProjectPageToGrid < ActiveRecord::Migration[5.2]
   end
 
   def applicable?
-    ActiveRecord::Base.connection.table_exists?('my_projects_overviews')
+    ActiveRecord::Base.connection.table_exists?("my_projects_overviews")
   end
 
   def attachments(id)
-    Attachment.where(container_type: 'MyProjectsOverview', container_id: id)
+    Attachment.where(container_type: "MyProjectsOverview", container_id: id)
   end
 
   def new_default_query(attributes = nil)
@@ -229,13 +230,13 @@ class MyProjectPageToGrid < ActiveRecord::Migration[5.2]
   end
 
   def query(grid, identifier)
-    query = new_default_query name: '_',
+    query = new_default_query name: "_",
                               is_public: true,
                               hidden: true,
-                              project: grid.project,
+                              project_id: grid.project_id,
                               user: query_user(grid)
 
-    query.add_filter(filter_name(identifier), '=', [::Queries::Filters::MeValue::KEY])
+    query.add_filter(filter_name(identifier), "=", [::Queries::Filters::MeValue::KEY])
     query.column_names = %w(id type subject)
 
     User.execute_as(query.user) do
@@ -247,34 +248,32 @@ class MyProjectPageToGrid < ActiveRecord::Migration[5.2]
 
   def migratable_entries
     MyPageEntry
-      .includes(:project)
-      .references(:projects)
-      .where.not(projects: { id: nil })
+      .where("project_id IN (SELECT id from projects)")
   end
 
   def filter_name(identifier)
     case identifier
-    when 'work_packages_assigned_to_me'
-      'assigned_to_id'
-    when 'work_packages_reported_by_me'
-      'author_id'
-    when 'work_packages_responsible_for'
-      'responsible_id'
-    when 'work_packages_watched'
-      'watcher_id'
+    when "work_packages_assigned_to_me"
+      "assigned_to_id"
+    when "work_packages_reported_by_me"
+      "author_id"
+    when "work_packages_responsible_for"
+      "responsible_id"
+    when "work_packages_watched"
+      "watcher_id"
     end
   end
 
   def wp_table_widget_name(identifier)
     new_identifier = case identifier
-                     when 'work_packages_assigned_to_me'
-                       'work_packages_assigned'
-                     when 'work_packages_reported_by_me'
-                       'work_packages_created'
-                     when 'work_packages_responsible_for'
-                       'work_packages_accountable'
-                     when 'work_packages_watched'
-                       'work_packages_watched'
+                     when "work_packages_assigned_to_me"
+                       "work_packages_assigned"
+                     when "work_packages_reported_by_me"
+                       "work_packages_created"
+                     when "work_packages_responsible_for"
+                       "work_packages_accountable"
+                     when "work_packages_watched"
+                       "work_packages_watched"
                      end
 
     I18n.t("js.grid.widgets.#{new_identifier}.title")

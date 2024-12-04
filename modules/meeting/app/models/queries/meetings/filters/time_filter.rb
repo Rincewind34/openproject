@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,15 +27,15 @@
 #++
 
 class Queries::Meetings::Filters::TimeFilter < Queries::Meetings::Filters::MeetingFilter
-  PAST_VALUE = 'past'.freeze
-  FUTURE_VALUE = 'future'.freeze
+  PAST_VALUE = "past".freeze
+  FUTURE_VALUE = "future".freeze
 
   validate :validate_only_single_value
 
   def allowed_values
     [
-      [PAST_VALUE],
-      [FUTURE_VALUE]
+      [I18n.t(:label_past_meetings_short), PAST_VALUE],
+      [I18n.t(:label_upcoming_meetings_short), FUTURE_VALUE]
     ]
   end
 

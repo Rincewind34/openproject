@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,14 +28,14 @@
 
 class LdapGroupsTimestamps < ActiveRecord::Migration[6.0]
   def up
-    change_column_default :ldap_groups_synchronized_groups, :created_at, -> { 'CURRENT_TIMESTAMP' }
-    change_column_default :ldap_groups_synchronized_groups, :updated_at, -> { 'CURRENT_TIMESTAMP' }
+    change_column_default :ldap_groups_synchronized_groups, :created_at, -> { "CURRENT_TIMESTAMP" }
+    change_column_default :ldap_groups_synchronized_groups, :updated_at, -> { "CURRENT_TIMESTAMP" }
 
-    change_column_default :ldap_groups_synchronized_filters, :created_at, -> { 'CURRENT_TIMESTAMP' }
-    change_column_default :ldap_groups_synchronized_filters, :updated_at, -> { 'CURRENT_TIMESTAMP' }
+    change_column_default :ldap_groups_synchronized_filters, :created_at, -> { "CURRENT_TIMESTAMP" }
+    change_column_default :ldap_groups_synchronized_filters, :updated_at, -> { "CURRENT_TIMESTAMP" }
 
-    change_column_default :ldap_groups_memberships, :created_at, -> { 'CURRENT_TIMESTAMP' }
-    change_column_default :ldap_groups_memberships, :updated_at, -> { 'CURRENT_TIMESTAMP' }
+    change_column_default :ldap_groups_memberships, :created_at, -> { "CURRENT_TIMESTAMP" }
+    change_column_default :ldap_groups_memberships, :updated_at, -> { "CURRENT_TIMESTAMP" }
   end
 
   def down

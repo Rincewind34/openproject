@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,11 +26,10 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
-require_relative '../support/pages/taskboard'
+require "spec_helper"
+require_relative "../support/pages/taskboard"
 
-RSpec.describe 'Tasks on taskboard',
-               js: true,
+RSpec.describe "Tasks on taskboard", :js,
                with_cuprite: false do
   let!(:project) do
     create(:project,
@@ -51,7 +50,7 @@ RSpec.describe 'Tasks on taskboard',
            type_id: task.id)
   end
   let(:role) do
-    create(:role,
+    create(:project_role,
            permissions: %i(view_taskboards
                            add_work_packages
                            view_work_packages
@@ -62,8 +61,7 @@ RSpec.describe 'Tasks on taskboard',
   end
   let!(:current_user) do
     create(:user,
-           member_in_project: project,
-           member_through_role: role)
+           member_with_roles: { project => role })
   end
   let!(:story1) do
     create(:work_package,
@@ -143,11 +141,11 @@ RSpec.describe 'Tasks on taskboard',
     login_as current_user
     allow(Setting)
       .to receive(:plugin_openproject_backlogs)
-            .and_return('story_types' => [story.id.to_s, other_story.id.to_s],
-                        'task_type' => task.id.to_s)
+            .and_return("story_types" => [story.id.to_s, other_story.id.to_s],
+                        "task_type" => task.id.to_s)
   end
 
-  it 'displays stories which are editable' do
+  it "displays stories which are editable" do
     taskboard_page.visit!
 
     # All stories of the sprint are visible
@@ -236,19 +234,19 @@ RSpec.describe 'Tasks on taskboard',
 
     # There is a button to the burndown chart
     expect(page)
-      .to have_selector("a[href='#{backlogs_project_sprint_burndown_chart_path(project, sprint)}']",
-                        text: 'Burndown Chart')
+      .to have_css("a[href='#{backlogs_project_sprint_burndown_chart_path(project, sprint)}']",
+                   text: "Burndown Chart")
 
     # Tasks can get a color per assigned user
     visit my_settings_path
 
-    fill_in 'Task color', with: '#FBC4B3'
+    fill_in "Task color", with: "#FBC4B3"
 
-    click_button 'Save'
+    click_button "Save"
 
     taskboard_page.visit!
 
     taskboard_page
-      .expect_color_for_task('#FBC4B3', story1_task)
+      .expect_color_for_task("#FBC4B3", story1_task)
   end
 end

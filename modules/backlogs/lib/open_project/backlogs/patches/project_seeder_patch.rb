@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -35,12 +35,11 @@ module OpenProject::Backlogs::Patches::ProjectSeederPatch
     def seed_versions
       super
 
-      version_data = Array(project_data.lookup('versions'))
+      version_data = Array(project_data.lookup("versions"))
       return if version_data.blank?
 
       versions = version_data
-        .map { |data| Version.find_by(name: data['name']) }
-        .compact
+        .filter_map { |data| Version.find_by(name: data["name"]) }
 
       versions.each do |version|
         display = version_settings_display_map[version.name] || VersionSetting::DISPLAY_NONE
@@ -52,11 +51,11 @@ module OpenProject::Backlogs::Patches::ProjectSeederPatch
     # This relies on the names from the core's `config/locales/en.seeders.yml`.
     def version_settings_display_map
       {
-        'Sprint 1' => VersionSetting::DISPLAY_LEFT,
-        'Sprint 2' => VersionSetting::DISPLAY_LEFT,
-        'Bug Backlog' => VersionSetting::DISPLAY_RIGHT,
-        'Product Backlog' => VersionSetting::DISPLAY_RIGHT,
-        'Wish List' => VersionSetting::DISPLAY_RIGHT
+        "Sprint 1" => VersionSetting::DISPLAY_LEFT,
+        "Sprint 2" => VersionSetting::DISPLAY_LEFT,
+        "Bug Backlog" => VersionSetting::DISPLAY_RIGHT,
+        "Product Backlog" => VersionSetting::DISPLAY_RIGHT,
+        "Wish List" => VersionSetting::DISPLAY_RIGHT
       }
     end
   end

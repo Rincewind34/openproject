@@ -2,7 +2,7 @@
 
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,7 +29,7 @@
 #++
 
 class Journal::StorableJournal < Journal::AssociatedJournal
-  self.table_name = 'storages_file_links_journals'
+  self.table_name = "storages_file_links_journals"
 
-  belongs_to :file_link, class_name: 'Storages::FileLink'
+  belongs_to :file_link, class_name: "Storages::FileLink"
 end

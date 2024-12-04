@@ -1,6 +1,6 @@
 <%#-- copyright
 OpenProject is an open source project management software.
-Copyright (C) 2012-2023 the OpenProject GmbH
+Copyright (C) the OpenProject GmbH
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License version 3.
@@ -38,9 +38,6 @@ See COPYRIGHT and LICENSE files for more details.
   :post :
   :put %>
 
-<remote-field-updater data-url="<%= url_for(controller: :budgets, action: :update_material_budget_item, project_id: @cost_entry.project) %>"
-                      data-mode="json">
-</remote-field-updater>
 <%= labelled_tabular_form_for @cost_entry, url: url, html: { method: method } do |f| %>
   <%= error_messages_for 'cost_entry' %>
   <%= back_url_hidden_field_tag %>
@@ -65,7 +62,7 @@ See COPYRIGHT and LICENSE files for more details.
                       data: { :'remote-field-key' => 'fixed_date' } %>
     <label for="cost_entry_spent_on" class="hidden-for-sighted"><%= t(:label_date) %> <%= t(:text_hint_date_format) %></label>
   </div>
-  <% if User.current.allowed_to? :log_costs, @project %>
+  <% if User.current.allowed_in_project? :log_costs, @project %>
     <div class="form--field">
       <%# Without knowing why `prompt` is in this case responsible for no blank line in the selection options %>
       <%= f.select :user_id,
@@ -112,7 +109,7 @@ See COPYRIGHT and LICENSE files for more details.
 
   <div class="form--field">
     <label for="cost_entry_costs_edit" class="form--label"><%= CostEntry.human_attribute_name(:costs) %></label>
-    <% if User.current.allowed_to?(:view_cost_rates, @cost_entry.project) %>
+    <% if User.current.allowed_in_project?(:view_cost_rates, @cost_entry.project) %>
     <span class="form--field-container">
       <a href="#"
          id="cost_entry_costs"
@@ -151,4 +148,8 @@ See COPYRIGHT and LICENSE files for more details.
   </div>
 
   <%= styled_button_tag t(:button_save), class: '-with-icon icon-checkmark' %>
+
+  <opce-remote-field-updater data-url="<%= url_for(controller: :budgets, action: :update_material_budget_item, project_id: @cost_entry.project) %>"
+                             data-mode="json">
+  </opce-remote-field-updater>
 <% end %>

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,79 +28,77 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-module Storages::Peripherals::StorageInteraction::Nextcloud
-  class UploadLinkQuery
-    using Storages::Peripherals::ServiceResultRefinements
+module Storages
+  module Peripherals
+    module StorageInteraction
+      module Nextcloud
+        class UploadLinkQuery
+          include TaggedLogging
 
-    URI_TOKEN_REQUEST = 'index.php/apps/integration_openproject/direct-upload-token'.freeze
-    URI_UPLOAD_BASE_PATH = 'index.php/apps/integration_openproject/direct-upload'.freeze
+          using ServiceResultRefinements
 
-    def initialize(storage)
-      @base_uri = URI(storage.host).normalize
-      @oauth_client = storage.oauth_client
-    end
+          def self.call(storage:, auth_strategy:, upload_data:)
+            new(storage).call(auth_strategy:, upload_data:)
+          end
 
-    def call(user:, data:)
-      Util.token(user:, oauth_client: @oauth_client) do |token|
-        if data.nil? || data['parent'].nil?
-          Util.error(:error, 'Data is invalid', data)
-        else
-          outbound_response(
-            method: :post,
-            relative_path: URI_TOKEN_REQUEST,
-            payload: { folder_id: data['parent'] },
-            token:
-          ).map do |response|
-            Storages::UploadLink.new(
-              URI.parse(Util.join_uri_path(@base_uri, URI_UPLOAD_BASE_PATH, response.token))
-            )
+          def initialize(storage)
+            @storage = storage
+          end
+
+          def call(auth_strategy:, upload_data:)
+            with_tagged_logger do
+              Authentication[auth_strategy].call(storage: @storage) do |http|
+                response = http.post(base_uri, json: payload_from(upload_data:))
+
+                handle_response(response).map do |rsp|
+                  UploadLink.new(URI("#{upload_base_uri}/#{rsp[:token]}"), :post)
+                end
+              end
+            end
+          end
+
+          private
+
+          def base_uri
+            UrlBuilder.url(@storage.uri, "index.php/apps/integration_openproject/direct-upload-token")
+          end
+
+          def upload_base_uri
+            UrlBuilder.url(@storage.uri, "index.php/apps/integration_openproject/direct-upload")
+          end
+
+          def invalid?(upload_data:)
+            upload_data.folder_id.blank? || upload_data.file_name.blank?
+          end
+
+          def payload_from(upload_data:)
+            { folder_id: upload_data.folder_id }
+          end
+
+          def handle_response(response)
+            case response
+            in { status: 200..299 }
+              info "Request successful"
+              ServiceResult.success(result: response.json(symbolize_keys: true))
+            in { status: 404 }
+              info "The parent folder was not found."
+              Util.failure(code: :not_found,
+                           data: Util.error_data_from_response(caller: self.class, response:),
+                           log_message: "Outbound request destination not found!")
+            in { status: 401 }
+              info "User authorization failed."
+              Util.failure(code: :unauthorized,
+                           data: Util.error_data_from_response(caller: self.class, response:),
+                           log_message: "Outbound request not authorized!")
+            else
+              info "Unknown error happened."
+              Util.failure(code: :error,
+                           data: Util.error_data_from_response(caller: self.class, response:),
+                           log_message: "Outbound request failed with unknown error!")
+            end
           end
         end
       end
     end
-
-    private
-
-    # rubocop:disable Metrics/AbcSize
-    def outbound_response(method:, relative_path:, payload:, token:)
-      response = begin
-        ServiceResult.success(
-          result: RestClient::Request.execute(
-            method:,
-            url: Util.join_uri_path(@base_uri, relative_path),
-            payload: payload.to_json,
-            headers: {
-              'Authorization' => "Bearer #{token.access_token}",
-              'Accept' => 'application/json',
-              'Content-Type' => 'application/json'
-            }
-          )
-        )
-      rescue RestClient::Unauthorized => e
-        Util.error(:not_authorized, 'Outbound request not authorized!', e.response)
-      rescue RestClient::NotFound => e
-        Util.error(:not_found, 'Outbound request destination not found!', e.response)
-      rescue RestClient::ExceptionWithResponse => e
-        Util.error(:error, 'Outbound request failed!', e.response)
-      rescue StandardError
-        Util.error(:error, 'Outbound request failed!')
-      end
-
-      # rubocop:disable Style/OpenStructUse
-      # rubocop:disable Style/MultilineBlockChain
-      response
-        .bind do |r|
-        # The nextcloud API returns a successful response with empty body if the authorization is missing or expired
-        if r.body.blank?
-          Util.error(:not_authorized, 'Outbound request not authorized!')
-        else
-          ServiceResult.success(result: r)
-        end
-      end.map { |r| JSON.parse(r.body, object_class: OpenStruct) }
-      # rubocop:enable Style/MultilineBlockChain
-      # rubocop:enable Style/OpenStructUse Style/MultilineBlockChain
-    end
-
-    # rubocop:enable Metrics/AbcSize
   end
 end

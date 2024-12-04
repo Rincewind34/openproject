@@ -1,6 +1,6 @@
-// -- copyright
+//-- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2023 the OpenProject GmbH
+// Copyright (C) the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -33,11 +33,7 @@ import idFromLink from 'core-app/features/hal/helpers/id-from-link';
 import isPersistedResource from 'core-app/features/hal/helpers/is-persisted-resource';
 import { Injectable } from '@angular/core';
 import { QueryFilterInstanceResource } from 'core-app/features/hal/resources/query-filter-instance-resource';
-import {
-  ApiV3Filter,
-  ApiV3FilterBuilder,
-  FilterOperator,
-} from 'core-app/shared/helpers/api-v3/api-v3-filter-builder';
+import { ApiV3Filter, ApiV3FilterBuilder, FilterOperator } from 'core-app/shared/helpers/api-v3/api-v3-filter-builder';
 import { PaginationService } from 'core-app/shared/components/table-pagination/pagination-service';
 import { HalResource } from 'core-app/features/hal/resources/hal-resource';
 import { QueryFilterResource } from 'core-app/features/hal/resources/query-filter-resource';
@@ -83,6 +79,7 @@ export interface QueryProps {
 }
 
 export interface QueryRequestParams {
+  page?:string|number;
   pageSize:string|number;
   offset:string|number;
   'columns[]':string[];
@@ -98,7 +95,9 @@ export interface QueryRequestParams {
   groupBy:string|null;
   filters:string;
   sortBy:string;
+  query_id:string|null;
   timestamps:string;
+  valid_subset?:boolean;
 }
 
 @Injectable({ providedIn: 'root' })

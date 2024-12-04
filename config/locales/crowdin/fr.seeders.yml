@@ -41,7 +41,19 @@ fr:
           name: Spécification
         item_2:
           name: Autre
-      roles:
+      project_query_roles:
+        item_0:
+          name: Visionneuse de requêtes du projet
+        item_1:
+          name: Éditeur de requêtes de projet
+      work_package_roles:
+        item_0:
+          name: Éditeur de lot de travaux
+        item_1:
+          name: Commentateur du lot de travaux
+        item_2:
+          name: Visualisateur de lots de travaux
+      project_roles:
         item_0:
           name: Non membre
         item_1:
@@ -52,8 +64,11 @@ fr:
           name: Lecteur
         item_4:
           name: Administrateur du projet
-        item_5:
+      global_roles:
+        item_0:
           name: Personnel et gestionnaire de projets
+        item_1:
+          name: Rôle global standard
     standard:
       priorities:
         item_0:
@@ -61,79 +76,9 @@ fr:
         item_1:
           name: Normal
         item_2:
-          name: Haut
+          name: Haute
         item_3:
-          name: Immédiat
-      statuses:
-        item_0:
-          name: nouveau
-        item_1:
-          name: En cous de spécification
-        item_2:
-          name: Spécifié
-        item_3:
-          name: Confirmé
-        item_4:
-          name: À planifier
-        item_5:
-          name: Planifié
-        item_6:
-          name: En cours
-        item_7:
-          name: Développé
-        item_8:
-          name: En test
-        item_9:
-          name: Testé
-        item_10:
-          name: Test échoué
-        item_11:
-          name: Clôturé
-        item_12:
-          name: En attente
-        item_13:
-          name: rejeté
-      time_entry_activities:
-        item_0:
-          name: Gestion
-        item_1:
-          name: Spécification
-        item_2:
-          name: Développement
-        item_3:
-          name: Test
-        item_4:
-          name: Support
-        item_5:
-          name: Autre
-      types:
-        item_0:
-          name: Tâche
-        item_1:
-          name: Étape
-        item_2:
-          name: Phase
-        item_3:
-          name: Fonctionnalité
-        item_4:
-          name: Epic
-        item_5:
-          name: Récit utilisateur
-        item_6:
-          name: Bug
-      welcome:
-        title: Bienvenue sur OpenProject !
-        text: |
-          Sélectionnez l'un des projets de démonstration pour commencer avec des données de démonstration que nous avons préparées pour vous.
-
-          * [Projet de démonstration]({{opSetting:base_url}}/projects/demo-project) : pour avoir un aperçu de la gestion de projet classique.
-          * [Projet Scrum]({{opSetting:base_url}}/projects/votre-scrum-project) : pour en apprendre davantage sur la gestion de projet Agile et Scrum.
-
-          De plus, vous pouvez créer un [nouveau projet] vide ({{opSetting:base_url}}/projects/new).
-
-          Collaborez en permanence. Avec une solution open source et l'esprit ouvert.
-
-          Vous pouvez changer ce texte de bienvenue [ici]({{opSetting:base_url}}/admin/settings/general).
+          name: Immédiate
       projects:
         demo-project:
           name: Projet de démonstration
@@ -199,7 +144,7 @@ fr:
                     Si vous avez des questions ou si avez besoin d'aide, n'hésitez pas à nous contacter : [support[at]openproject.com](mailto:support@openproject.com).
               item_5:
                 options:
-                  name: Lots de Travaux
+                  name: Lots de travaux
               item_6:
                 options:
                   name: Étapes
@@ -238,6 +183,21 @@ fr:
                     * [ ] Encore plus de bière
             item_4:
               subject: Fin du projet
+          wiki: |
+            _Dans ce wiki, vous pouvez créer et modifier des pages et des sous-pages de manière collaborative afin de créer un wiki de projet._
+
+            **Vous pouvez :**
+
+            * Insérer du texte et des images, y compris par copier-coller à partir d'autres documents
+            * Créer une hiérarchie de pages avec des pages parentes
+            * Inclure des pages wiki dans le menu du projet
+            * Utilisez des macros pour inclure des éléments, tels qu'une table des matières, des listes de lots de travaux ou des diagrammes de Gantt
+            * Inclure des pages wiki dans d'autres champs de texte, tels que la page de présentation d'un projet
+            * Inclure des liens vers d'autres documents
+            * Afficher l'historique des modifications
+            * Afficher en tant que Markdown
+
+            Plus d'informations : [https://www.openproject.org/docs/user-guide/wiki/](https://www.openproject.org/docs/user-guide/wiki/)
         scrum-project:
           name: Projet Scrum
           status_explanation: Toutes les tâches sont en cours. Les personnes concernées connaissent leurs tâches. Le système est entièrement configuré.
@@ -338,25 +298,23 @@ fr:
                 options:
                   name: Pour commencer
                   text: |
-                    Nous sommes heureux que vous nous ayez rejoints ! Nous vous suggérons d'effectuer quelques essais pour vous familiariser avec OpenProject.
+                    Nous sommes ravis que vous nous ayez rejoints ! Nous vous suggérons de faire quelques essais pour commencer à utiliser OpenProject.
 
-                    Découvrez les fonctionnalités les plus importantes grâce à notre [Visite guidée]({{opSetting:base_url}}/projects/your-scrum-project/backlogs?start_scrum_onboarding_tour=true).
+                    _Essayez les étapes suivantes:_
 
-                    _Essayez les étapes suivantes :_
+                    1. *Invitez de nouveaux membres à votre projet* : &rightarrow ; Accédez à [Membres]({{opSetting:base_url}}/projets/votre-projet-scrum/membres) dans la navigation du projet.
+                    2. *Consulter votre backlogs de produit et de sprint* : &rightarrow ; Accédez à [Backlogs]({{opSetting:base_url}}/projets/votre-scrum-projet/backlogs) dans la navigation du projet.
+                    3. *Consulter votre tableau des tâches* : &rightarrow ; Accéder à [Backlogs]({{opSetting:base_url}}/projects/votre-projet-scrum/backlogs) &rightarrow ; Cliquer sur la flèche droite sur Sprint &rightarrow ; Sélectionner [Task Board](##sprint:scrum_project__version__sprint_1).
+                    4. *Créer un nouveau lot de travaux* : &rightarrow ; Aller sur [Lots de travaux &rightarrow ; Créer]({{opSetting:base_url}}/projets/votre-scrum-projet/lots_de_travaux/nouveau).
+                    5. *Créer et mettre à jour un plan de projet* : &rightarrow ; Aller sur [Plan de projet](##query:scrum_project__query__project_plan) dans la navigation du projet.
+                    6. *Créer un wiki de sprint* : &rightarrow ; Allez dans [Backlogs]({{opSetting:base_url}}/projects/votre-projet-scrum/backlogs) et ouvrez le wiki de sprint à partir du menu déroulant de droite dans un sprint. Vous pouvez modifier le [modèle de wiki]({{opSetting:base_url}}/projets/votre-scrum-projet/wiki/) en fonction de vos besoins.
+                    7. *Activer d'autres modules* : &rightarrow ; Allez dans les [Paramètres du projet &rightarrow ; Modules]({{opSetting:base_url}}/projet/votre-scrum-projet/paramètres/modules).
 
-                    1. *Invitez de nouveaux membres à rejoindre votre projet* : &rightarrow; Accédez à [Membres]({{opSetting:base_url}}/projects/your-scrum-project/members) dans la navigation du projet.
-                    2. *Consultez votre backlog de produit et de sprint* : &rightarrow; Accédez à [Backlogs]({{opSetting:base_url}}/projects/your-scrum-project/backlogs) dans la navigation du projet.
-                    3. *Consultez votre tableau des tâches* : &rightarrow; Accédez à [Backlogs]({{opSetting:base_url}}/projects/your-scrum-project/backlogs) &rightarrow; Cliquez sur la flèche droite dans Sprint &rightarrow; Sélectionnez [Tableau des tâches](##sprint:scrum_project__version__sprint_1).
-                    4. *Créez un nouveau lot de travaux* : &rightarrow; Accédez à [Lots de travaux &rightarrow; Créer]({{opSetting:base_url}}/projects/your-scrum-project/work_packages/new).
-                    5. *Créez et mettez à jour un plan de projet* : &rightarrow; Accédez à [Plan de projet](##query:scrum_project__query__project_plan) dans la navigation du projet.
-                    6. *Créez un wiki de sprint* : &rightarrow; Accédez à [Backlogs]({{opSetting:base_url}}/projects/your-scrum-project/backlogs) et ouvrez le wiki de sprint à partir du menu déroulant de droite dans un sprint. Vous pouvez modifier le [modèle du wiki]({{opSetting:base_url}}/projects/your-scrum-project/wiki/) en fonction de vos besoins.
-                    7. *Activez d'autres modules* : &rightarrow; Accédez à [Paramètres du projet &rightarrow; Modules]({{opSetting:base_url}}/projects/your-scrum-project/settings/modules).
-
-                    Vous trouverez ici nos [Guides de l'utilisateur](https://www.openproject.org/docs/user-guide/).
-                    Si vous avez des questions ou si vous avez besoin d'aide, n'hésitez pas à nous contacter : [support[at]openproject.com](mailto:support@openproject.com).
+                    Vous y trouverez nos [guides de l'utilisateur](https://www.openproject.org/docs/user-guide/).
+                    N'hésitez pas à nous contacter si vous avez des questions ou si vous avez besoin d'aide. N'hésitez pas à nous contacter : [support[at]openproject.com(mailto:support@openproject.com).
               item_5:
                 options:
-                  name: Lots de Travaux
+                  name: Lots de travaux
               item_6:
                 options:
                   name: Plan de projet
@@ -456,3 +414,78 @@ fr:
             * Temps prévu (3 h).
             * Après l'examen du sprint, elle sera modérée par le Maître Scrum.
             * L'équipe discute du sprint : ce qui s'est bien passé, ce qui doit être amélioré pour améliorer la productivité pour le prochain sprint ou même avoir plus de plaisir.
+      statuses:
+        item_0:
+          name: Nouveau
+        item_1:
+          name: En cous de spécification
+        item_2:
+          name: Spécifié
+        item_3:
+          name: Confirmé
+        item_4:
+          name: À planifier
+        item_5:
+          name: Planifié
+        item_6:
+          name: En cours
+        item_7:
+          name: Développé
+        item_8:
+          name: En test
+        item_9:
+          name: Testé
+        item_10:
+          name: Test échoué
+        item_11:
+          name: Clôturé
+        item_12:
+          name: En attente
+        item_13:
+          name: Rejeté
+      time_entry_activities:
+        item_0:
+          name: Gestion
+        item_1:
+          name: Spécification
+        item_2:
+          name: Développement
+        item_3:
+          name: En test
+        item_4:
+          name: Support
+        item_5:
+          name: Autre
+      types:
+        item_0:
+          name: Tâche
+        item_1:
+          name: Étape
+        item_2:
+          name: Phase
+        item_3:
+          name: Fonctionnalité
+        item_4:
+          name: Epic
+        item_5:
+          name: User story
+        item_6:
+          name: Bug
+      welcome:
+        title: Bienvenue sur OpenProject !
+        text: |
+          OpenProject est le principal logiciel de gestion de projet open source. Il prend en charge la gestion de projets classiques, agiles et hybrides et vous donne un contrôle total sur vos données.
+
+          Fonctionnalités principales et cas d'utilisation :
+
+          * [Gestion de portefeuille de projets] (https://www.openproject.org/collaboration-software-features/project-portfolio-management/)
+          * [Planification et organisation de projets](https://www.openproject.org/collaboration-software-features/project-planning-scheduling/)
+          * [Gestion des tâches et suivi des problèmes](https://www.openproject.org/collaboration-software-features/task-management/)
+          * [Tableaux agiles (Scrum et Kanban)](https://www.openproject.org/collaboration-software-features/agile-project-management/)
+          * [Gestion des exigences et planification des versions](https://www.openproject.org/collaboration-software-features/product-development/)
+          * [Suivi du temps et des coûts, budgets](https://www.openproject.org/collaboration-software-features/time-tracking/)
+          * [Collaboration d'équipe et documentation](https://www.openproject.org/collaboration-software-features/team-collaboration/)
+
+          Bienvenue dans l'avenir de la gestion de projet.
+
+          Pour les administrateurs : Vous pouvez modifier ce texte de bienvenue [ici] ({{opSetting:base_url}}/admin/settings/general).

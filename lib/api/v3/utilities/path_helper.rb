@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -144,12 +144,12 @@ module API
             "#{root}/attachments/#{attachment_id}/uploaded"
           end
 
-          def self.available_assignees(project_id)
+          def self.available_assignees_in_project(project_id)
             "#{project(project_id)}/available_assignees"
           end
 
-          def self.available_responsibles(project_id)
-            "#{project(project_id)}/available_responsibles"
+          def self.available_assignees_in_work_package(work_package_id)
+            "#{work_package(work_package_id)}/available_assignees"
           end
 
           def self.available_watchers(work_package_id)
@@ -243,6 +243,7 @@ module API
           show :message
 
           index :newses, :news
+          show :news
 
           def self.news(id)
             "#{newses}/#{id}"
@@ -403,12 +404,21 @@ module API
           index :role
           show :role
 
-          index :global_role, 'roles'
-          show :global_role, 'role'
+          index :project_role, "roles"
+          show :project_role, "role"
+
+          index :global_role, "roles"
+          show :global_role, "role"
+
+          index :work_package_role, "roles"
+          show :work_package_role, "roles"
 
           def self.show_revision(project_id, identifier)
             show_revision_project_repository_path(project_id, identifier)
           end
+
+          index :shares
+          show :share
 
           def self.show_user(user_id)
             user_path(user_id)
@@ -540,7 +550,7 @@ module API
                 "#{project_id}-#{type_id}"
               end
 
-              filter = [{ id: { operator: '=', values: } }]
+              filter = [{ id: { operator: "=", values: } }]
 
               path + "?filters=#{CGI.escape(filter.to_s)}"
             end
@@ -592,7 +602,7 @@ module API
 
             root_url = OpenProject::StaticRouting::StaticUrlHelpers.new.root_url
 
-            root_url.gsub(duplicate_regexp, '') + send(path, arguments)
+            root_url.gsub(duplicate_regexp, "") + send(path, arguments)
           end
         end
 

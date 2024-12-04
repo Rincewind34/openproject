@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,55 +26,53 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
-RSpec.describe 'Help menu items',
-               js: true,
-               with_cuprite: true do
+RSpec.describe "Help menu items", :js, :with_cuprite do
   let(:user) { create(:admin) }
-  let(:help_item) { find('.op-app-help .op-app-menu--item-action') }
-  let(:help_menu_dropdown_selector) { '.op-app-menu--dropdown.op-menu' }
+  let(:help_item) { find(".op-app-help .op-app-menu--item-action") }
+  let(:help_menu_dropdown_selector) { ".op-app-menu--dropdown.op-menu" }
 
   before do
     login_as user
   end
 
-  context 'when force_help_link is not set' do
-    it 'renders a dropdown' do
+  context "when force_help_link is not set" do
+    it "renders a dropdown" do
       visit home_path
 
       help_item.click
 
-      expect(page).to have_selector('.op-app-help .op-menu--item-action',
-                                    text: I18n.t('homescreen.links.user_guides'))
+      expect(page).to have_css(".op-app-help .op-menu--item-action",
+                               text: I18n.t("homescreen.links.user_guides"))
     end
   end
 
-  context 'when force_help_link is set' do
-    let(:custom_url) { 'https://mycustomurl.example.org/' }
+  context "when force_help_link is set" do
+    let(:custom_url) { "https://mycustomurl.example.org/" }
 
     before do
       allow(OpenProject::Configuration).to receive(:force_help_link)
         .and_return custom_url
     end
 
-    it 'renders a link' do
+    it "renders a link" do
       visit home_path
 
       expect(help_item[:href]).to eq(custom_url)
-      expect(page).not_to have_selector('.op-app-help .op-app-menu--dropdown', visible: false)
+      expect(page).to have_no_css(".op-app-help .op-app-menu--dropdown", visible: false)
     end
   end
 
-  describe 'Enterprise Support Link' do
-    include_context 'support links'
+  describe "Enterprise Support Link" do
+    include_context "support links"
 
     def fake_an_enterprise_token
       allow(EnterpriseToken).to receive(:show_banners?).and_return(false)
       allow(EnterpriseToken).to receive(:active?).and_return(true)
     end
 
-    it 'sets the link based on being in a Community version or Enterprise Edition' do
+    it "sets the link based on being in a Community version or Enterprise Edition" do
       # Starting with no Enterprise Token
       visit home_path
       help_item.click

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,14 +32,14 @@ module Storages
   StorageFile = Data.define(
     :id,
     :name,
-    :size,
+    :size, # Integer >= 0
     :mime_type,
-    :created_at,
-    :last_modified_at,
+    :created_at, # Time? DateTime (deprecated)?
+    :last_modified_at, # Time? DateTime (deprecated)?
     :created_by_name,
     :last_modified_by_name,
-    :location,
-    :permissions
+    :location, # Should always start with a '/'
+    :permissions # Array can be empty or nil
   ) do
     def initialize(
       id:,
@@ -51,18 +53,11 @@ module Storages
       location: nil,
       permissions: nil
     )
-      super(
-        id:,
-        name:,
-        size:,
-        mime_type:,
-        created_at:,
-        last_modified_at:,
-        created_by_name:,
-        last_modified_by_name:,
-        location:,
-        permissions:
-      )
+      super
+    end
+
+    def folder?
+      mime_type.present? && mime_type == "application/x-op-directory"
     end
   end
 end

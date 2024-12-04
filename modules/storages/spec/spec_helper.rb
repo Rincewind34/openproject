@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -31,7 +33,39 @@
 
 # Loads spec_helper from OpenProject core
 # This will include any support file from OpenProject core
-require 'spec_helper'
+require "spec_helper"
+require "dry/container/stub"
+
+STORAGES_CASSETTE_LIBRARY_DIR = "modules/storages/spec/support/fixtures/vcr_cassettes"
+
+# Record Storages Cassettes in module
+VCR.configure do |config|
+  config.filter_sensitive_data("<ACCESS_TOKEN>") do
+    ENV.fetch("ONE_DRIVE_TEST_OAUTH_CLIENT_ACCESS_TOKEN", "MISSING_ONE_DRIVE_TEST_OAUTH_CLIENT_ACCESS_TOKEN")
+  end
+  config.filter_sensitive_data("<ACCESS_TOKEN>") do
+    ENV.fetch("NEXTCLOUD_LOCAL_OAUTH_CLIENT_ACCESS_TOKEN", "MISSING_NEXTCLOUD_LOCAL_OAUTH_CLIENT_ACCESS_TOKEN")
+  end
+end
+
+def use_storages_vcr_cassette(name, options = {}, &)
+  WebMock.enable! && VCR.turn_on!
+  VCR.configure do |vcr_config|
+    vcr_config.cassette_library_dir = STORAGES_CASSETTE_LIBRARY_DIR
+  end
+  VCR.use_cassette(name, options, &)
+ensure
+  VCR.turn_off! && WebMock.disable!
+end
 
 # Loads files from relative support/ directory
-Dir[File.join(File.dirname(__FILE__), 'support/**/*.rb')].each { |f| require f }
+Dir[File.join(File.dirname(__FILE__), "support/**/*.rb")].each { |f| require f }
+
+RSpec.configure do |config|
+  config.prepend_before { Storages::Peripherals::Registry.enable_stubs! }
+  config.append_after { Storages::Peripherals::Registry.unstub }
+
+  config.define_derived_metadata(file_path: %r{/modules/storages/spec}) do |metadata|
+    metadata[:vcr_cassette_library_dir] = STORAGES_CASSETTE_LIBRARY_DIR
+  end
+end

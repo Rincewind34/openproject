@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,15 +27,24 @@
 #++
 
 class UpdateXktToVersion8 < ActiveRecord::Migration[6.1]
-  SEEDED_MODEL_DATA = { 'Hospital - Architecture (cc-by-sa-3.0 Autodesk Inc.)' => 'hospital_architecture',
-                        'Hospital - Structural (cc-by-sa-3.0 Autodesk Inc.)' => 'hospital_structural',
-                        'Hospital - Mechanical (cc-by-sa-3.0 Autodesk Inc.)' => 'hospital_mechanical' }.freeze
+  SEEDED_MODEL_DATA = { "Hospital - Architecture (cc-by-sa-3.0 Autodesk Inc.)" => "hospital_architecture",
+                        "Hospital - Structural (cc-by-sa-3.0 Autodesk Inc.)" => "hospital_structural",
+                        "Hospital - Mechanical (cc-by-sa-3.0 Autodesk Inc.)" => "hospital_mechanical" }.freeze
+
+  # Note: rails 7.1 breaks the class' ancestor chain, and raises an error, when a class
+  # with an enum definition without a database field is being referenced.
+  # Re-defining the IfcModel class without the enum to avoid the issue.
+  class IfcModel < ApplicationRecord
+    has_many :attachments, -> { where(container_type: "Bim::IfcModels::IfcModel") },
+             foreign_key: :container_id,
+             class_name: "Attachment"
+  end
 
   def up
     # Queue every IFC model for a new transformation.
     Rails.logger.info "Migrate all IFC models to the latest XKT version"
 
-    if Bim::IfcModels::IfcModel.count.zero?
+    if IfcModel.count.zero?
       Rails.logger.info("No IFC models to migrate")
       return
     end
@@ -59,22 +68,22 @@ class UpdateXktToVersion8 < ActiveRecord::Migration[6.1]
   private
 
   def migrate_all_ifc_models
-    ::Bim::IfcModels::IfcModel.find_each do |ifc_model|
+    IfcModel.find_each do |ifc_model|
       cleanup_metadata_attachment(ifc_model)
       # We have seeded models that do not have an IFC attachment. They cannot get converted as an IFC file is
       # necessary.
-      next if ifc_model.attachments.find_by(description: 'ifc').nil?
+      next if ifc_model.attachments.find_by(description: "ifc").nil?
 
       ::Bim::IfcModels::IfcConversionJob.perform_later(ifc_model)
     end
   end
 
   def cleanup_metadata_attachment(ifc_model)
-    ifc_model.attachments.find_by(description: 'metadata')&.destroy
+    ifc_model.attachments.find_by(description: "metadata")&.destroy
   end
 
   def update_demo_xkt_models
-    project = Project.find_by(identifier: 'demo-bcf-management-project')
+    project = Project.find_by(identifier: "demo-bcf-management-project")
     return unless project
 
     ifc_models = project.ifc_models.joins(:attachments)

@@ -1,5 +1,5 @@
 #  OpenProject is an open source project management software.
-#  Copyright (C) 2022 the OpenProject GmbH
+#  Copyright (C) the OpenProject GmbH
 #
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License version 3.
@@ -24,7 +24,7 @@
 #
 #  See COPYRIGHT and LICENSE files for more details.
 
-require 'open_project/authentication/manager'
+require "open_project/authentication/manager"
 
 module OpenProject
   ##
@@ -217,8 +217,7 @@ module OpenProject
 
         def find_all(identifiers)
           identifiers
-            .map { |ident| stages.find { |st| st.identifier == ident } }
-            .compact
+            .filter_map { |ident| stages.find { |st| st.identifier == ident } }
         end
 
         def complete_path(identifier, session:, back_url: nil)
@@ -238,7 +237,7 @@ module OpenProject
       module_function
 
       def pick_auth_scheme(supported_schemes, default_scheme, request_headers = {})
-        req_scheme = request_headers['HTTP_X_AUTHENTICATION_SCHEME']
+        req_scheme = request_headers["HTTP_X_AUTHENTICATION_SCHEME"]
 
         if supported_schemes.include? req_scheme
           req_scheme
@@ -248,11 +247,11 @@ module OpenProject
       end
 
       def default_auth_scheme
-        'Basic'
+        "Basic"
       end
 
       def default_realm
-        'OpenProject API'
+        "OpenProject API"
       end
 
       def scope_realm(scope = nil)
@@ -262,18 +261,25 @@ module OpenProject
       def response_header(
         default_auth_scheme: self.default_auth_scheme,
         scope: nil,
-        request_headers: {}
+        request_headers: {},
+        error: nil,
+        error_description: nil
       )
-        scheme = pick_auth_scheme auth_schemes(scope), default_auth_scheme, request_headers
+        scheme = pick_auth_scheme(auth_schemes(scope),
+                                  default_auth_scheme,
+                                  request_headers)
 
-        "#{scheme} realm=\"#{scope_realm(scope)}\""
+        header = %{#{scheme} realm="#{scope_realm(scope)}"}
+        header << %{, error="#{error}"}                         if error
+        header << %{, error_description="#{error_description}"} if error && error_description
+        header
       end
 
       def auth_schemes(scope)
         strategies = Array(Manager.scope_config(scope).strategies)
 
         Manager.auth_schemes
-          .select { |_, info| scope.nil? or not (info.strategies & strategies).empty? }
+          .select { |_, info| scope.nil? or info.strategies.intersect?(strategies) }
           .keys
       end
     end

@@ -2,7 +2,7 @@
 
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -32,8 +32,11 @@
 class Storages::Admin::StoragesController < ApplicationController
   using Storages::Peripherals::ServiceResultRefinements
 
+  include FlashMessagesOutputSafetyHelper
+  include OpTurbo::ComponentStream
+
   # See https://guides.rubyonrails.org/layouts_and_rendering.html for reference on layout
-  layout 'admin'
+  layout "admin"
 
   # specify which model #find_model_object should look up
   model_object Storages::Storage
@@ -41,15 +44,14 @@ class Storages::Admin::StoragesController < ApplicationController
   # Before executing any action below: Make sure the current user is an admin
   # and set the @<controller_name> variable to the object referenced in the URL.
   before_action :require_admin
-  before_action :find_model_object, only: %i[show destroy edit update replace_oauth_application]
+  before_action :find_model_object,
+                only: %i[show_oauth_application destroy edit edit_host confirm_destroy update
+                         change_health_notifications_enabled replace_oauth_application]
+  before_action :ensure_valid_provider_type_selected, only: %i[select_provider]
+  before_action :require_ee_token_for_one_drive, only: %i[select_provider]
 
-  # menu_item is defined in the Redmine::MenuManager::MenuController
-  # module, included from ApplicationController.
-  # The menu item is defined in the engine.rb
-  menu_item :storages_admin_settings
+  menu_item :external_file_storages
 
-  # Index page with a list of Storages objects
-  # Called by: Global app/config/routes.rb to serve Web page
   def index
     @storages = Storages::Storage.all
   end
@@ -64,102 +66,207 @@ class Storages::Admin::StoragesController < ApplicationController
     # Set default parameters using a "service".
     # See also: storages/services/storages/storages/set_attributes_services.rb
     # That service inherits from ::BaseServices::SetAttributes
-    @object = ::Storages::Storages::SetAttributesService
-                .new(user: current_user,
-                     model: Storages::NextcloudStorage.new,
-                     contract_class: EmptyContract)
-                .call
-                .result
+    @storage = ::Storages::Storages::SetAttributesService
+                 .new(user: current_user,
+                      model: Storages::Storage.new,
+                      contract_class: EmptyContract)
+                 .call
+                 .result
+
+    update_via_turbo_stream(component: Storages::Admin::Forms::GeneralInfoFormComponent.new(@storage))
+
+    respond_with_turbo_streams(&:html)
   end
 
-  # Actually create a Storage object.
-  # Overwrite the creator_id with the current_user. Is this this pattern always used?
-  # Use service pattern to create a new Storage
-  # See also: storages/services/storages/storages/create_service.rb
-  # Called by: Global app/config/routes.rb to serve Web page
-  def create
-    service_result = Storages::Storages::CreateService.new(user: current_user).call(permitted_storage_params)
-    @object = service_result.result
-    @oauth_application = oauth_application(service_result)
+  def upsale; end
 
-    if service_result.success? && @oauth_application
-      flash[:notice] = I18n.t(:notice_successful_create)
-      render :show_oauth_application
-    else
-      @errors = service_result.errors
-      render :new
+  def select_provider
+    @object = Storages::Storage.new(provider_type: @provider_type)
+    service_result = ::Storages::Storages::SetAttributesService
+                       .new(user: current_user,
+                            model: @object,
+                            contract_class: EmptyContract)
+                       .call
+    @storage = service_result.result
+
+    respond_to do |format|
+      format.html { render :new }
     end
   end
 
-  # Edit page is very similar to new page, except that we don't need to set
-  # default attribute values because the object already exists
-  # Called by: Global app/config/routes.rb to serve Web page
-  def edit; end
-
-  # Update is similar to create above
-  # See also: create above
-  # Called by: Global app/config/routes.rb to serve Web page
-  def update
-    service_result = ::Storages::Storages::UpdateService
-                       .new(user: current_user,
-                            model: @object)
+  def create # rubocop:disable Metrics/AbcSize
+    service_result = Storages::Storages::CreateService
+                       .new(user: current_user)
                        .call(permitted_storage_params)
 
+    @storage = service_result.result
+    @oauth_application = oauth_application(service_result)
+
+    service_result.on_failure do
+      update_via_turbo_stream(component: Storages::Admin::Forms::GeneralInfoFormComponent.new(@storage))
+    end
+
+    service_result.on_success do
+      if @storage.provider_type_one_drive?
+        prepare_storage_for_access_management_form
+        update_via_turbo_stream(component: Storages::Admin::Forms::AccessManagementFormComponent.new(@storage))
+      end
+
+      update_via_turbo_stream(component: Storages::Admin::GeneralInfoComponent.new(@storage))
+
+      if @storage.provider_type_nextcloud?
+        update_via_turbo_stream(
+          component: Storages::Admin::OAuthApplicationInfoCopyComponent.new(
+            oauth_application: @oauth_application,
+            storage: @storage,
+            submit_button_options: { data: { turbo_stream: true } }
+          )
+        )
+      end
+    end
+
+    respond_with_turbo_streams
+  end
+
+  def show_oauth_application
+    @oauth_application = @storage.oauth_application
+
+    update_via_turbo_stream(
+      component: Storages::Admin::OAuthApplicationInfoComponent.new(oauth_application: @oauth_application,
+                                                                    storage: @storage)
+    )
+
+    if @storage.oauth_client.blank?
+      update_via_turbo_stream(
+        component: Storages::Admin::Forms::OAuthClientFormComponent.new(oauth_client: @storage.build_oauth_client,
+                                                                        storage: @storage)
+      )
+    end
+
+    respond_with_turbo_streams
+  end
+
+  def edit; end
+
+  def edit_host
+    update_via_turbo_stream(
+      component: Storages::Admin::Forms::GeneralInfoFormComponent.new(
+        @storage,
+        form_method: :patch,
+        cancel_button_path: edit_admin_settings_storage_path(@storage)
+      )
+    )
+
+    respond_with_turbo_streams
+  end
+
+  def update
+    service_result = ::Storages::Storages::UpdateService
+                       .new(user: current_user, model: @storage)
+                       .call(permitted_storage_params)
+    @storage = service_result.result
+
     if service_result.success?
-      flash[:notice] = I18n.t(:notice_successful_update)
-      redirect_to edit_admin_settings_storage_path(@object)
+      respond_to { |format| format.turbo_stream }
     else
-      @errors = service_result.errors
+      update_via_turbo_stream(
+        component: Storages::Admin::Forms::GeneralInfoFormComponent.new(
+          @storage,
+          form_method: :patch,
+          cancel_button_path: edit_admin_settings_storage_path(@storage)
+        )
+      )
+
+      respond_with_turbo_streams do |format|
+        # FIXME: This should be a partial stream update
+        format.html { render :edit }
+      end
+    end
+  end
+
+  def change_health_notifications_enabled
+    return head :bad_request unless %w[1 0].include?(permitted_storage_params[:health_notifications_enabled])
+
+    if @storage.update(health_notifications_enabled: permitted_storage_params[:health_notifications_enabled])
+      update_via_turbo_stream(component: Storages::Admin::SidePanel::HealthNotificationsComponent.new(storage: @storage))
+      respond_with_turbo_streams
+    else
+      flash.now[:error] = I18n.t("storages.health_email_notifications.error_could_not_be_saved")
       render :edit
     end
   end
 
+  def confirm_destroy
+    @storage_to_destroy = @storage
+  end
+
   def destroy
-    Storages::Storages::DeleteService
-      .new(user: User.current, model: @object)
-      .call
-      .match(
-        # rubocop:disable Rails/ActionControllerFlashBeforeRender
-        on_success: ->(*) { flash[:notice] = I18n.t(:notice_successful_delete) },
-        on_failure: ->(error) { flash[:error] = error.full_messages }
-        # rubocop:enable Rails/ActionControllerFlashBeforeRender
-      )
+    service_result = Storages::Storages::DeleteService
+                       .new(user: User.current, model: @storage)
+                       .call
+
+    # rubocop:disable Rails/ActionControllerFlashBeforeRender
+    service_result.on_failure do
+      flash[:error] = service_result.errors.full_messages
+    end
+
+    service_result.on_success do
+      flash[:notice] = I18n.t(:notice_successful_delete)
+    end
+    # rubocop:enable Rails/ActionControllerFlashBeforeRender
 
     redirect_to admin_settings_storages_path
   end
 
   def replace_oauth_application
-    @object.oauth_application.destroy
-    service_result = ::Storages::OAuthApplications::CreateService.new(storage: @object, user: current_user).call
+    @storage.oauth_application.destroy
+    service_result = ::Storages::OAuthApplications::CreateService.new(storage: @storage, user: current_user).call
+    @oauth_application = service_result.result
 
     if service_result.success?
-      flash[:notice] = I18n.t('storages.notice_oauth_application_replaced')
-      @oauth_application = service_result.result
-      render :show_oauth_application
+      update_via_turbo_stream(component: Storages::Admin::GeneralInfoComponent.new(@storage))
+
+      update_via_turbo_stream(
+        component: Storages::Admin::OAuthApplicationInfoCopyComponent.new(
+          oauth_application: @oauth_application,
+          storage: @storage,
+          submit_button_options: {
+            data: { turbo_stream: true }
+          }
+        )
+      )
+
+      respond_with_turbo_streams
     else
-      @errors = service_result.errors
+      # FIXME: This should be a partial stream update
       render :edit
     end
   end
 
-  # Used by: admin layout
-  # Breadcrumbs is something like OpenProject > Admin > Storages.
-  # This returns the name of the last part (Storages admin page)
-  def default_breadcrumb
-    if action_name == 'index'
-      t(:project_module_storages)
-    else
-      ActionController::Base.helpers.link_to(t(:project_module_storages), admin_settings_storages_path)
-    end
-  end
+  def default_breadcrumb; end
 
-  # See: default_breadcrum above
-  # Defines whether to show breadcrumbs on the page or not.
   def show_local_breadcrumb
-    true
+    false
   end
 
   private
+
+  def prepare_storage_for_access_management_form
+    return unless @storage.automatic_management_unspecified?
+
+    @storage = ::Storages::Storages::SetProviderFieldsAttributesService
+                 .new(user: current_user, model: @storage, contract_class: EmptyContract)
+                 .call
+                 .result
+  end
+
+  def ensure_valid_provider_type_selected
+    short_provider_type = params[:provider]
+    if short_provider_type.blank? || (@provider_type = ::Storages::Storage::PROVIDER_TYPE_SHORT_NAMES[short_provider_type]).blank?
+      flash[:error] = I18n.t("storages.error_invalid_provider_type")
+      redirect_to admin_settings_storages_path
+    end
+  end
 
   def oauth_application(service_result)
     service_result.dependent_results&.first&.result
@@ -167,9 +274,33 @@ class Storages::Admin::StoragesController < ApplicationController
 
   # Called by create and update above in order to check if the
   # update parameters are correctly set.
-  def permitted_storage_params
+  def permitted_storage_params(model_parameter_name = storage_provider_parameter_name)
     params
-      .require(:storages_storage)
-      .permit('name', 'provider_type', 'host', 'oauth_client_id', 'oauth_client_secret')
+      .require(model_parameter_name)
+      .permit("name",
+              "provider_type",
+              "host",
+              "oauth_client_id",
+              "oauth_client_secret",
+              "tenant_id",
+              "drive_id",
+              "automatic_management_enabled",
+              "health_notifications_enabled")
+  end
+
+  def storage_provider_parameter_name
+    if params.key?(:storages_nextcloud_storage)
+      :storages_nextcloud_storage
+    elsif params.key?(:storages_one_drive_storage)
+      :storages_one_drive_storage
+    else
+      :storages_storage
+    end
+  end
+
+  def require_ee_token_for_one_drive
+    if ::Storages::Storage::one_drive_without_ee_token?(@provider_type)
+      redirect_to action: :upsale
+    end
   end
 end

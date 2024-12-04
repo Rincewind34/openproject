@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,17 +26,17 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe VersionSetting do
   let(:version_setting) { build(:version_setting) }
 
   it { is_expected.to belong_to(:project) }
   it { is_expected.to belong_to(:version) }
-  it { expect(VersionSetting.column_names).to include('display') }
+  it { expect(VersionSetting.column_names).to include("display") }
 
-  describe 'Instance Methods' do
-    describe 'WITH display set to left' do
+  describe "Instance Methods" do
+    describe "WITH display set to left" do
       before do
         version_setting.display_left!
       end
@@ -44,7 +44,7 @@ RSpec.describe VersionSetting do
       it { expect(version_setting.display_left?).to be_truthy }
     end
 
-    describe 'WITH display set to right' do
+    describe "WITH display set to right" do
       before do
         version_setting.display_right!
       end
@@ -52,7 +52,7 @@ RSpec.describe VersionSetting do
       it { expect(version_setting.display_right?).to be_truthy }
     end
 
-    describe 'WITH display set to none' do
+    describe "WITH display set to none" do
       before do
         version_setting.display_none!
       end

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,23 +26,22 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + "/../spec_helper.rb")
 
-RSpec.describe 'Only see your own rates', js: true do
+RSpec.describe "Only see your own rates", :js do
   let(:project) { work_package.project }
   let(:user) do
     create(:user,
-           member_in_project: project,
-           member_through_role: role)
+           member_with_roles: { project => role })
   end
   let(:role) do
-    create(:role, permissions: %i[view_own_hourly_rate
-                                  view_work_packages
-                                  view_work_packages
-                                  view_own_time_entries
-                                  view_own_cost_entries
-                                  view_cost_rates
-                                  log_costs])
+    create(:project_role, permissions: %i[view_own_hourly_rate
+                                          view_work_packages
+                                          view_work_packages
+                                          view_own_time_entries
+                                          view_own_cost_entries
+                                          view_cost_rates
+                                          log_costs])
   end
   let(:work_package) { create(:work_package) }
   let(:wp_page) { Pages::FullWorkPackage.new(work_package) }
@@ -57,7 +56,7 @@ RSpec.describe 'Only see your own rates', js: true do
                         hours: 1.00)
   end
   let(:cost_type) do
-    type = create(:cost_type, name: 'Translations')
+    type = create(:cost_type, name: "Translations")
     create(:cost_rate, cost_type: type,
                        rate: 7.00)
     type
@@ -69,11 +68,10 @@ RSpec.describe 'Only see your own rates', js: true do
                         cost_type:,
                         user:)
   end
-  let(:other_role) { create(:role, permissions: []) }
+  let(:other_role) { create(:project_role, permissions: []) }
   let(:other_user) do
     create(:user,
-           member_in_project: project,
-           member_through_role: other_role)
+           member_with_roles: { project => other_role })
   end
   let(:other_hourly_rate) do
     create(:default_hourly_rate, user: other_user,
@@ -109,12 +107,12 @@ RSpec.describe 'Only see your own rates', js: true do
     wp_page.ensure_page_loaded
   end
 
-  it 'only displays own entries and rates' do
+  it "only displays own entries and rates" do
     # All the values do not include the entries made by the other user
-    wp_page.expect_attributes spent_time: '1 h',
-                              costs_by_type: '2 Translations',
-                              overall_costs: '24.00 EUR',
-                              labor_costs: '10.00 EUR',
-                              material_costs: '14.00 EUR'
+    wp_page.expect_attributes spent_time: "1h",
+                              costs_by_type: "2 Translations",
+                              overall_costs: "24.00 EUR",
+                              labor_costs: "10.00 EUR",
+                              material_costs: "14.00 EUR"
   end
 end

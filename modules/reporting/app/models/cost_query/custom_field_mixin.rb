@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -32,13 +32,13 @@ module CostQuery::CustomFieldMixin
   attr_reader :custom_field
 
   SQL_TYPES = {
-    'string' => 'varchar',
-    'list' => 'varchar',
-    'text' => 'text',
-    'bool' => 'boolean',
-    'date' => 'date',
-    'int' => 'decimal(60,3)',
-    'float' => 'decimal(60,3)'
+    "string" => "varchar",
+    "list" => "varchar",
+    "text" => "text",
+    "bool" => "boolean",
+    "date" => "date",
+    "int" => "decimal(60,3)",
+    "float" => "decimal(60,3)"
   }.freeze
 
   def self.extended(base)
@@ -68,7 +68,7 @@ module CostQuery::CustomFieldMixin
 
   def remove_subclasses
     module_parent.constants.each do |constant|
-      if constant.to_s.match /^CustomField\d+/
+      if constant.to_s.match? /^CustomField\d+/
         module_parent.send(:remove_const, constant)
       end
     end

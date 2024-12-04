@@ -2,7 +2,7 @@
 
 # -- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,9 +33,9 @@ module Boards
   class AddButtonComponent < ::AddButtonComponent
     def render?
       if current_project
-        User.current.allowed_to?(:manage_board_views, current_project)
+        User.current.allowed_in_project?(:manage_board_views, current_project)
       else
-        User.current.allowed_to_globally?(:manage_board_views)
+        User.current.allowed_in_any_project?(:manage_board_views)
       end
     end
 
@@ -44,15 +44,19 @@ module Boards
     end
 
     def id
-      'add-board-button'
+      "add-board-button"
+    end
+
+    def test_selector
+      "add-board-button"
     end
 
     def accessibility_label_text
-      I18n.t('boards.label_create_new_board')
+      I18n.t("boards.label_create_new_board")
     end
 
     def label_text
-      I18n.t('boards.label_board')
+      I18n.t("boards.label_board")
     end
   end
 end

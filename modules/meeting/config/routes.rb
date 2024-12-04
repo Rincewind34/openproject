@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,53 +26,108 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-OpenProject::Application.routes.draw do
+Rails.application.routes.draw do
   resources :projects, only: %i[] do
-    resources :meetings, only: %i[index new create]
+    resources :meetings, only: %i[index new create show] do
+      collection do
+        get "menu" => "meetings/menus#show"
+      end
+    end
+  end
+
+  resources :work_packages, only: %i[] do
+    resources :meetings, only: %i[] do
+      collection do
+        resources :tab, only: %i[index], controller: "work_package_meetings_tab", as: "meetings_tab" do
+          get :count, on: :collection
+        end
+      end
+    end
+    resources :meeting_agenda_items, only: %i[] do
+      collection do
+        get :dialog, controller: "work_package_meetings_tab", action: :add_work_package_to_meeting_dialog
+        post :create, controller: "work_package_meetings_tab", action: :add_work_package_to_meeting
+      end
+    end
+  end
+
+  namespace :meetings do
+    resource :menu, only: %[show]
   end
 
   resources :meetings do
-    resource :agenda, controller: 'meeting_agendas', only: [:update] do
+    member do
+      get :check_for_updates
+      get :cancel_edit
+      get :download_ics
+      put :update_title
+      get :details_dialog
+      put :update_details
+      get :participants_dialog
+      put :update_participants
+      put :change_state
+      post :notify
+      get :history
+    end
+    resources :agenda_items, controller: "meeting_agenda_items" do
+      collection do
+        get :new, action: :new, as: :new
+        get :cancel_new
+      end
+      member do
+        get :cancel_edit
+        put :drop
+        put :move
+      end
+    end
+    resources :sections, controller: "meeting_sections" do
+      collection do
+        get :new, action: :new, as: :new
+        get :cancel_new
+      end
+      member do
+        get :cancel_edit
+        put :drop
+        put :move
+      end
+    end
+
+    resource :agenda, controller: "meeting_agendas", only: [:update] do
       member do
         get :history
         get :diff
         put :close
         put :open
-        put :notify
-        put :icalendar
         post :preview
       end
 
       resources :versions, only: [:show],
-                           controller: 'meeting_agendas'
+                           controller: "meeting_agendas"
     end
 
-    resource :contents, controller: 'meeting_contents', only: %i[show update] do
+    resource :contents, controller: "meeting_contents", only: %i[show update] do
       member do
         get :history
         get :diff
-        put :notify
-        get :icalendar
       end
     end
 
-    resource :minutes, controller: 'meeting_minutes', only: [:update] do
+    resource :minutes, controller: "meeting_minutes", only: [:update] do
       member do
         get :history
         get :diff
-        put :notify
         post :preview
       end
 
       resources :versions, only: [:show],
-                           controller: 'meeting_minutes'
+                           controller: "meeting_minutes"
     end
 
     member do
       get :copy
-      match '/:tab' => 'meetings#show', :constraints => { tab: /(agenda|minutes)/ },
+      match "/:tab" => "meetings#show", :constraints => { tab: /(agenda|minutes)/ },
             :via => :get,
-            :as => 'tab'
+            :as => "tab"
     end
   end
 end

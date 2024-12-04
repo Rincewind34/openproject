@@ -1,6 +1,6 @@
-// -- copyright
+//-- copyright
 // OpenProject is an open source project management software.
-// Copyright (C) 2012-2023 the OpenProject GmbH
+// Copyright (C) the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -26,8 +26,12 @@
 // See COPYRIGHT and LICENSE files for more details.
 //++
 
-import { Highlighting } from 'core-app/features/work-packages/components/wp-fast-table/builders/highlighting/highlighting.functions';
-import { HighlightableDisplayField } from 'core-app/shared/components/fields/display/field-types/highlightable-display-field.module';
+import {
+  Highlighting,
+} from 'core-app/features/work-packages/components/wp-fast-table/builders/highlighting/highlighting.functions';
+import {
+  HighlightableDisplayField,
+} from 'core-app/shared/components/fields/display/field-types/highlightable-display-field.module';
 import { InjectField } from 'core-app/shared/helpers/angular/inject-field.decorator';
 import { ApiV3Service } from 'core-app/core/apiv3/api-v3.service';
 import { TimezoneService } from 'core-app/core/datetime/timezone.service';
@@ -75,7 +79,8 @@ export class DateDisplayField extends HighlightableDisplayField {
 
   public get valueString() {
     if (this.value) {
-      return this.timezoneService.formattedDate(this.value);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      return this.timezoneService.formattedDate(this.value, this.context.options.dateFormat);
     }
     return '';
   }

@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -31,12 +31,12 @@ class RenameTokens < ActiveRecord::Migration[6.0]
   end
 
   def up
-    Token.where(type: 'Token::Rss').update_all(type: 'Token::RSS')
-    Token.where(type: 'Token::Api').update_all(type: 'Token::API')
+    Token.where(type: "Token::Rss").update_all(type: "Token::RSS")
+    Token.where(type: "Token::Api").update_all(type: "Token::API")
   end
 
   def down
-    Token.where(type: 'Token::RSS').update_all(type: 'Token::Rss')
-    Token.where(type: 'Token::API').update_all(type: 'Token::Api')
+    Token.where(type: "Token::RSS").update_all(type: "Token::Rss")
+    Token.where(type: "Token::API").update_all(type: "Token::Api")
   end
 end

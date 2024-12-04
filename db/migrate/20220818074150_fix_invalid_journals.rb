@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -62,10 +62,9 @@ class FixInvalidJournals < ActiveRecord::Migration[7.0]
 
   def get_broken_journals
     Journal
-      .pluck('DISTINCT(journable_type)')
+      .pluck("DISTINCT(journable_type)")
       .compact
       .to_h do |journable_type|
-
       relation = Journal
         .where(journable_type:)
         .where.not(data_type: "Journal::#{journable_type}Journal")

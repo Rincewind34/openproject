@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2023 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,98 +26,130 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-module Storages::Peripherals::StorageInteraction::Nextcloud
-  class CopyTemplateFolderCommand
-    using Storages::Peripherals::ServiceResultRefinements
+module Storages
+  module Peripherals
+    module StorageInteraction
+      module Nextcloud
+        class CopyTemplateFolderCommand
+          include TaggedLogging
 
-    def initialize(storage)
-      @uri = URI(storage.host).normalize
-      @username = storage.username
-      @password = storage.password
-    end
+          using ServiceResultRefinements
 
-    def call(source_path:, destination_path:)
-      validate_inputs(source_path, destination_path) >>
-        build_origin_paths >>
-        validate_destination >>
-        copy_folder
-    end
+          def self.call(auth_strategy:, storage:, source_path:, destination_path:)
+            new(storage).call(auth_strategy:, source_path:, destination_path:)
+          end
 
-    def validate_inputs(source_path, destination_path)
-      if source_path.blank? || destination_path.blank?
-        return Util.error(:error, 'Source and destination paths must be present.')
-      end
+          def initialize(storage)
+            @storage = storage
+            @data = ResultData::CopyTemplateFolder.new(id: nil, polling_url: nil, requires_polling: false)
+          end
 
-      ServiceResult.success(result: { source_path:, destination_path: })
-    end
+          def call(auth_strategy:, source_path:, destination_path:)
+            with_tagged_logger do
+              Authentication[auth_strategy].call(storage: @storage) do |http|
+                valid_input_result = validate_inputs(source_path, destination_path).on_failure { return _1 }
 
-    def build_origin_paths
-      ->(input) do
-        escaped_username = CGI.escapeURIComponent(@username)
+                remote_urls = build_origin_urls(**valid_input_result.result)
 
-        source = Util.join_uri_path(
-          @uri.path,
-          "remote.php/dav/files",
-          escaped_username,
-          Util.escape_path(input[:source_path])
-        )
+                ensure_remote_folder_does_not_exist(http, remote_urls[:destination_url]).on_failure { return _1 }
 
-        destination = Util.join_uri_path(
-          @uri.path,
-          "remote.php/dav/files",
-          escaped_username,
-          Util.escape_path(input[:destination_path])
-        )
+                copy_folder(http, **remote_urls).on_failure { return _1 }
 
-        ServiceResult.success(result: { source_url: source, destination_url: destination })
-      end
-    end
+                get_folder_id(auth_strategy, valid_input_result.result[:destination_path])
+              end
+            end
+          end
 
-    def validate_destination
-      ->(urls) do
-        request = Net::HTTP::Head.new(urls[:destination_url])
-        request.initialize_http_header Util.basic_auth_header(@username, @password)
+          private
 
-        response = Util.http(@uri).request(request)
+          def validate_inputs(source_path, destination_path)
+            info "Validating #{source_path} and #{destination_path}"
+            if source_path.blank? || destination_path.blank?
+              return Util.error(:missing_paths, "Source and destination paths must be present.")
+            end
 
-        case response
-        when Net::HTTPSuccess
-          Util.error(:conflict, 'Destination folder already exists.')
-        when Net::HTTPUnauthorized
-          Util.error(:not_authorized, "Not authorized (validate_destination)")
-        when Net::HTTPNotFound
-          ServiceResult.success(result: urls)
-        else
-          Util.error(:unknown, "Unexpected response (validate_destination): #{response.code}", response)
+            ServiceResult.success(result: { source_path:, destination_path: })
+          end
+
+          def build_origin_urls(source_path:, destination_path:)
+            source_url = UrlBuilder.url(@storage.uri, "remote.php/dav/files", @storage.username, source_path)
+            destination_url = UrlBuilder.url(@storage.uri, "remote.php/dav/files", @storage.username, destination_path)
+
+            { source_url:, destination_url: }
+          end
+
+          def ensure_remote_folder_does_not_exist(http, destination_url)
+            info "Checking if #{destination_url} does not already exists."
+            response = http.head(destination_url)
+
+            case response
+            in { status: 200..299 }
+              ServiceResult.failure(result: :conflict,
+                                    errors: Util.storage_error(
+                                      response:, code: :conflict, source:,
+                                      log_message: "The copy would overwrite an already existing folder"
+                                    ))
+            in { status: 401 }
+              ServiceResult.failure(result: :unauthorized,
+                                    errors: Util.storage_error(response:, code: :unauthorized, source:))
+            in { status: 404 }
+              ServiceResult.success
+            else
+              ServiceResult.failure(result: :error,
+                                    errors: Util.storage_error(response:, code: :error, source:))
+            end
+          end
+
+          def copy_folder(http, source_url:, destination_url:)
+            info "Copying #{source_url} to #{destination_url}"
+            handle_response http.request("COPY",
+                                         source_url,
+                                         headers: { "Destination" => destination_url, "Depth" => "infinity" })
+          end
+
+          # rubocop:disable Metrics/AbcSize
+          def handle_response(response)
+            case response
+            in { status: 200..299 }
+              ServiceResult.success(message: "Folder was successfully copied")
+            in { status: 401 }
+              ServiceResult.failure(result: :unauthorized,
+                                    errors: Util.storage_error(response:, code: :unauthorized, source:))
+            in { status: 403 }
+              ServiceResult.failure(result: :forbidden,
+                                    errors: Util.storage_error(response:, code: :forbidden, source:))
+            in { status: 404 }
+              ServiceResult.failure(result: :not_found,
+                                    errors: Util.storage_error(response:, code: :not_found, source:,
+                                                               log_message: "Template folder not found"))
+            in { status: 409 }
+              ServiceResult.failure(result: :conflict,
+                                    errors: Util.storage_error(
+                                      response:, code: :conflict, source:,
+                                      log_message: Util.error_text_from_response(response)
+                                    ))
+            else
+              ServiceResult.failure(result: :error,
+                                    errors: Util.storage_error(response:, code: :error, source:))
+            end
+          end
+
+          # rubocop:enable Metrics/AbcSize
+
+          def get_folder_id(auth_strategy, destination_path)
+            # file_path_to_id_map query returns keys without trailing slashes
+            # TODO: Harden this with https://community.openproject.org/wp/57850
+            sanitized_path = destination_path.chomp("/")
+
+            Registry
+              .resolve("nextcloud.queries.file_path_to_id_map")
+              .call(storage: @storage, auth_strategy:, folder: ParentFolder.new(sanitized_path), depth: 0)
+              .map { |result| @data.with(id: result[sanitized_path].id) }
+          end
+
+          def source = self.class
         end
       end
     end
-
-    # rubocop:disable Metrics/AbcSize
-    def copy_folder
-      ->(urls) do
-        headers = Util.basic_auth_header(@username, @password)
-        headers['Destination'] = urls[:destination_url]
-        headers['Depth'] = 'infinity'
-
-        request = Net::HTTP::Copy.new(urls[:source_url], headers)
-        response = Util.http(@uri).request(request)
-
-        case response
-        when Net::HTTPCreated
-          ServiceResult.success(message: 'Folder was successfully copied')
-        when Net::HTTPUnauthorized
-          Util.error(:not_authorized, "Not authorized (copy_folder)")
-        when Net::HTTPNotFound
-          Util.error(:not_found, "Project folder not found (copy_folder)")
-        when Net::HTTPConflict
-          Util.error(:conflict, Util.error_text_from_response(response))
-        else
-          Util.error(:unknown, "Unexpected response (copy_folder): #{response.code}", response)
-        end
-      end
-    end
-
-    # rubocop:enable Metrics/AbcSize
   end
 end
